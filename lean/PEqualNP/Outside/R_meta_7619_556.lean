@@ -20,7 +20,7 @@ theorem PEqualNP.Outside.R_meta_7619_556
         (∀ i (A : Set (Fin 26 → Bool)), L[i]? = some A →
           ∃ U, (U ∈ B ∨ U ∈ L.take i) ∧ ∃ V, (V ∈ B ∨ V ∈ L.take i) ∧
             (A = U ∩ V ∨ A = U ∪ V)) →
-        ∀ U ∈ L, ∀ V ∈ L, U ≠ V → F ⊂ U → F ⊂ V → U ∩ V ≠ F) :
+        ∀ U ∈ L, ∀ V ∈ L, U ≠ V → F ⊆ U → U ≠ F → F ⊆ V → V ≠ F → U ∩ V ≠ F) :
     (let x1 : Type := Fin (26 : ℕ) → Bool; have x2 : Set (Set x1) := {∅, Set.univ} ∪ Set.range fun (x2 : Fin (26 : ℕ)) => {x3 : x1 | x3 x2 = Bool.true}; have x3 : Set x1 := {x3 : x1 | ∃ (x4 : Fin (13 : ℕ)) (x5 : Fin (13 : ℕ)), (↑x4 + ↑x5) % (13 : ℕ) ∈ [(0 : ℕ), (1 : ℕ), (3 : ℕ), (9 : ℕ)] ∧ x3 (Fin.castAdd (13 : ℕ) x4) = Bool.true ∧ x3 (Fin.natAdd (13 : ℕ) x5) = Bool.true}; ∀ (x4 : Finset (Set x1)), x4.card ≤ (62 : ℕ) → (∀ x6 ∈ x4, x6 ∉ x2) → ∃ (x7 : Set (Set x1)), x2 ⊆ x7 ∧ (∀ x8 ∈ x7, ∀ x10 ∈ x7, ∀ x12 ∈ x4, x12 = x8 ∩ x10 ∨ x12 = x8 ∪ x10 → x12 ∈ x7) ∧ ∀ x8 ∈ x7, ∀ x10 ∈ x7, x8 ∩ x10 ≠ x3) := by
   classical
   let X := Fin 26 → Bool
@@ -180,4 +180,4 @@ theorem PEqualNP.Outside.R_meta_7619_556
     rw [heq, Set.inter_self] at hUV
     exact hVneqF hUV
   exact splitPair L hLlen hnd hLout hFnotL hbuild' U hUinL V hVinL hUneV
-    (lt_of_le_of_ne hFU hUneqF.symm) (lt_of_le_of_ne hFV hVneqF.symm) hUV
+    hFU hUneqF hFV hVneqF hUV
