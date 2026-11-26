@@ -388,7 +388,8 @@ PY
 # A PROOF IS SENT UNDER A LEASE (2026-11-26: most second proofs of a settled step came from agents that never took it).
 # lease_live: this clone holds a lease on the step that has not expired by its own record. take_for_submit: ask the desk
 # for the step the way next --proof-of does (have=proof). Granted: the lease is kept in the step's state and submit goes
-# on. Not granted: nothing is sent (exit 4), with the desk's wait. The desk unreachable: one warning, submit goes on.
+# on. Another agent holds it (no step, with a retry time): nothing is sent (exit 4), with the desk's wait. Any other
+# answer, or the desk unreachable: one warning, submit goes on.
 lease_live() { [ -f "$STATE/$1.json" ] && python3 -I -c 'import json,sys,datetime
 l=json.load(open(sys.argv[1], encoding="utf-8")).get("lease") or {}
 t=str(l.get("expires_at") or "")
@@ -414,10 +415,13 @@ if isinstance(g, dict) and g.get("id") == gid and isinstance(l, dict) and re.ful
     print("took %s from the desk before sending: lease %s until %s" % (gid, l["id"], clean(l.get("expires_at") or "")))
     if d.get("note"): print("the desk: " + clean(d["note"]))
     sys.exit(0)
-wait = d.get("retry_after_s")
-print("not submitted: the desk did not lease %s to you. The desk: %s" % (gid, clean(d.get("note") or d.get("error") or "no reason given")), file=sys.stderr)
-if type(wait) is int and wait > 0:
-    print("another agent holds this step. Wait about %d minutes, then run: tools/pnp.sh submit %s" % (max(1, round(wait / 60)), gid), file=sys.stderr)
+wait, note = d.get("retry_after_s"), clean(d.get("note") or d.get("error") or "no reason given")
+# ONLY ANOTHER AGENT'S HOLD STOPS IT (a founder's ruling: a fast contributor is never throttled): the head start answer,
+# no step WITH a retry time. Any other answer without a lease (at the cap, not open, reserved) is said once, and it sends.
+if not (type(wait) is int and wait > 0):
+    print("warning: the desk did not lease %s to you (%s); sending as before" % (gid, note), file=sys.stderr); sys.exit(0)
+print("not submitted: the desk did not lease %s to you. The desk: %s" % (gid, note), file=sys.stderr)
+print("another agent holds this step. Wait about %d minutes, then run: tools/pnp.sh submit %s" % (max(1, round(wait / 60)), gid), file=sys.stderr)
 print("Your proof is kept in its file; nothing was sent. Send it when the step is free, or once it is settled you will see so here.", file=sys.stderr)
 print("To send it now anyway: tools/pnp.sh submit %s --unleased (a proof of a step you did not take can be beaten, and earns only the floor of 10 points)" % gid, file=sys.stderr)
 sys.exit(4)

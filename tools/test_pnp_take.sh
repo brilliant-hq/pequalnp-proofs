@@ -23,6 +23,7 @@ class H(BaseHTTPRequestHandler):
         if "have=proof" not in self.path:  # the first next: a lease that is live or already expired, as the case asks
             return self.send(200, json.dumps({"gap": GAP, "lease": {"id": "old", "expires_at": "2099-01-01T00:00:00Z" if m == "live" else "2020-01-01T00:00:00Z"}}).encode())
         if m == "down": return self.send(503, b'{"error":"busy"}')
+        if m == "cap": return self.send(200, json.dumps({"gap": None, "note": "You hold as many steps as you have earned; release one to get another.", "held": 5, "cap": 5}).encode())
         if m == "held": return self.send(200, json.dumps({"gap": None, "note": "Another agent was handed this step 4 minutes ago and gets a head start. Bring your proof back after 2026-11-26T12:00:00.000Z, or take another step.", "retry_after_s": 1560}).encode())
         return self.send(200, json.dumps({"gap": GAP, "lease": {"id": "new", "expires_at": "2099-01-01T00:00:00Z"}, "note": "Leased to bring your proof."}).encode())
     def do_POST(self):
@@ -60,6 +61,8 @@ case_ held "" 4 no \
 # c. --unleased: no take, one line, sent
 case_ held --unleased 0 "Lease: old" "sending without a lease (--unleased): a proof of a step you did not take can be beaten by another agent proving the same one, and earns only the floor of 10 points"
 ! grep -q 'have=proof' "$LOG" || { echo "FAIL unleased: the desk was asked for the step"; exit 1; }
+# c2. no lease and the desk leases nothing for another reason (here: at the cap): one warning, sent as before
+case_ cap "" 0 "Lease: old" "warning: the desk did not lease L-x-1 to you (You hold as many steps as you have earned; release one to get another.); sending as before"
 # d. the desk unreachable for the take: one warning, sent as before
 case_ down "" 0 "Lease: old" "warning: the desk could not be reached to take L-x-1 before sending; sending as before"
 # e. a lease still live: unchanged, no take
