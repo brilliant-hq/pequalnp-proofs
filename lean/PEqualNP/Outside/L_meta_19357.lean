@@ -8,6 +8,7 @@ open PEqualNP.Library.Helpers.PromiseColTree
 def asGate (t : Bool × Nat × Nat) : Gate :=
   ⟨if t.1 then .or else .and, [t.2.1,t.2.2]⟩
 
+set_option maxRecDepth 100000 in
 def codes : List (Bool × Nat × Nat) := [
 (true,3,123),(true,13,110),(true,154,248),(true,145,201),(true,164,211),(true,22,55),(true,45,74),(true,61,127),(true,53,64),(true,19,87),(true,67,74),(true,29,58),
 (true,34,89),(true,70,78),(true,175,232),(true,156,166),(true,169,211),(true,244,252),(true,197,238),(true,143,176),(true,165,177),(true,157,171),(true,181,212),(true,131,150),
