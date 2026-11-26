@@ -106,10 +106,32 @@ theorem PEqualNP.Outside.R_meta_4079_556
         simp only [List.getElem_cons_succ]
         rw [e]
         exact key
+  have gateAt_def : ∀ j : ℕ, gateAt C j = C.gates.getD j ⟨GateOp.or, []⟩ := fun _ => rfl
+  have coneStep_def : ∀ (cs : List (List ℕ)) (g : Gate), coneStep 11 cs g =
+      cs ++ [(g.inputs.filter (fun w => decide (11 ≤ w ∧ w < 11 + cs.length))).flatMap
+        (fun w => (w - 11) :: cs.getD (w - 11) [])] := fun _ _ => rfl
+  have orStep_def : ∀ (cs : List (List ℕ)) (g : Gate), orStep 11 cs g =
+      cs ++ [cs.length :: @ite _ (g.op = GateOp.or) (gateOpDecEq g.op GateOp.or)
+        ((g.inputs.filter (fun w => decide (11 ≤ w ∧ w < 11 + cs.length))).flatMap
+          (fun w => cs.getD (w - 11) [])) []] := fun _ _ => rfl
+  let _ : DecidableEq GateOp := gateOpDecEq
+  have mem_orIn : ∀ (w : ℕ) (i : Fin 11), i ∈ orIn 11 C w ↔ (i : ℕ) = w ∨
+      ∃ k < C.gates.length, OrReaches 11 C w k ∧ (gateAt C k).op = GateOp.or ∧
+        (i : ℕ) ∈ (gateAt C k).inputs :=
+    fun _ _ => Finset.mem_filter.trans (and_iff_right (Finset.mem_univ _))
+  have opnd_def : ∀ (a : ℕ) (b : Fin 2), opnd C a b = (gateAt C a).inputs.getD b 0 := fun _ _ => rfl
+  have pairInput_def : ∀ u v : Fin 11, pairInput u v = fun w => decide (w = u ∨ w = v) :=
+    fun _ _ => rfl
+  have mem_orN : ∀ j : ℕ, j ∈ orN G C ↔ j < C.gates.length ∧ (gateAt C j).op = GateOp.or ∧ ¬ BelowF G C j :=
+    fun _ => Finset.mem_filter.trans (and_congr_left' Finset.mem_range)
+  have mem_tops : ∀ j : ℕ, j ∈ tops G C ↔ j < C.gates.length ∧ (gateAt C j).op = GateOp.and ∧ BelowF G C j :=
+    fun _ => Finset.mem_filter.trans (and_congr_left' Finset.mem_range)
+  have evA : ∀ l : List Bool, GateOp.eval GateOp.and l = l.all id := fun _ => rfl
+  have evO : ∀ l : List Bool, GateOp.eval GateOp.or l = l.any id := fun _ => rfl
   let val : List Bool → ℕ → Bool := fun x u => (C.wires x).getD u false
   have gateAt_eq : ∀ {j : ℕ} (hj : j < C.gates.length), gateAt C j = C.gates[j] := by
     intro j hj
-    simp [gateAt, List.getD_eq_getElem?_getD, hj]
+    simp [gateAt_def, List.getD_eq_getElem?_getD, hj]
   have gateAt_mem : ∀ {j : ℕ}, j < C.gates.length → gateAt C j ∈ C.gates := by
     intro j hj
     rw [gateAt_eq hj]
@@ -140,7 +162,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
       (val x (11 + j) = true ↔ ∀ i ∈ (gateAt C j).inputs, i < 11 + j ∧ val x i = true) := by
     intro x hx j hj hop
     rw [val_gate hx hj, hop]
-    simp only [GateOp.eval, List.all_eq_true, List.mem_map, id_eq, forall_exists_index,
+    simp only [evA, List.all_eq_true, List.mem_map, id_eq, forall_exists_index,
       and_imp, forall_apply_eq_imp_iff₂]
     constructor
     · intro h i hi
@@ -156,7 +178,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
       (val x (11 + j) = true ↔ ∃ i ∈ (gateAt C j).inputs, i < 11 + j ∧ val x i = true) := by
     intro x hx j hj hop
     rw [val_gate hx hj, hop]
-    simp only [GateOp.eval, List.any_eq_true, List.mem_map, id_eq]
+    simp only [evO, List.any_eq_true, List.mem_map, id_eq]
     constructor
     · rintro ⟨_, ⟨i, hi, rfl⟩, hv⟩
       by_cases hlt : i < 11 + j
@@ -191,7 +213,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
     | cons g gs ih =>
       intro cs
       rw [List.foldl_cons, ih]
-      simp [coneStep]
+      simp [coneStep_def]
       omega
   have cones_char : ∀ (gs : List Gate) (i j : ℕ),
       i ∈ (gs.foldl (coneStep 11) []).getD j [] ↔
@@ -210,7 +232,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
           (coneStep 11 (gs.foldl (coneStep 11) []) g).getD k [] =
             (gs.foldl (coneStep 11) []).getD k [] := by
         intro k hk
-        simp only [coneStep, List.getD_eq_getElem?_getD]
+        simp only [coneStep_def, List.getD_eq_getElem?_getD]
         rw [List.getElem?_append_left (by omega)]
       rcases Nat.lt_trichotomy j gs.length with h | h | h
       · have e1 : (gs ++ [g]).getD j ⟨GateOp.or, []⟩ = gs.getD j ⟨GateOp.or, []⟩ := by
@@ -232,7 +254,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
         have e2 : (coneStep 11 (gs.foldl (coneStep 11) []) g).getD gs.length [] =
             (g.inputs.filter (fun w => decide (11 ≤ w ∧ w < 11 + gs.length))).flatMap
               (fun w => (w - 11) :: (gs.foldl (coneStep 11) []).getD (w - 11) []) := by
-          simp only [coneStep, List.getD_eq_getElem?_getD]
+          simp only [coneStep_def, List.getD_eq_getElem?_getD]
           rw [List.getElem?_append_right (by omega)]
           simp [hlen]
         rw [e2, e1]
@@ -246,7 +268,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
           rw [key (w - 11) (by omega)] at h3
           exact ⟨w, ⟨hw, h1, h2⟩, h3⟩
       · have e0 : (coneStep 11 (gs.foldl (coneStep 11) []) g).getD j [] = [] := by
-          simp only [coneStep, List.getD_eq_getElem?_getD]
+          simp only [coneStep_def, List.getD_eq_getElem?_getD]
           rw [List.getElem?_eq_none (by simp; omega)]
           rfl
         rw [e0]
@@ -295,7 +317,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
     | cons g gs ih =>
       intro cs
       rw [List.foldl_cons, ih]
-      simp [orStep]
+      simp [orStep_def]
       omega
   have orSets_char : ∀ (gs : List Gate) (i j : ℕ),
       i ∈ (gs.foldl (orStep 11) []).getD j [] ↔
@@ -314,7 +336,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
           (orStep 11 (gs.foldl (orStep 11) []) g).getD k [] =
             (gs.foldl (orStep 11) []).getD k [] := by
         intro k hk
-        simp only [orStep, List.getD_eq_getElem?_getD]
+        simp only [orStep_def, List.getD_eq_getElem?_getD]
         rw [List.getElem?_append_left (by omega)]
       rcases Nat.lt_trichotomy j gs.length with h | h | h
       · have e1 : (gs ++ [g]).getD j ⟨GateOp.or, []⟩ = gs.getD j ⟨GateOp.or, []⟩ := by
@@ -343,7 +365,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
         · have e2 : (orStep 11 (gs.foldl (orStep 11) []) g).getD gs.length [] =
               gs.length :: (g.inputs.filter (fun w => decide (11 ≤ w ∧ w < 11 + gs.length))).flatMap
                 (fun w => (gs.foldl (orStep 11) []).getD (w - 11) []) := by
-            simp only [orStep, List.getD_eq_getElem?_getD]
+            simp only [orStep_def, List.getD_eq_getElem?_getD]
             rw [List.getElem?_append_right (by omega)]
             simp [hlen, hop]
           rw [e2]
@@ -359,7 +381,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
             · rw [key (w - 11) (by omega)] at h3
               exact Or.inr ⟨w, ⟨hw, h1, h2⟩, h3⟩
         · have e2 : (orStep 11 (gs.foldl (orStep 11) []) g).getD gs.length [] = [gs.length] := by
-            simp only [orStep, List.getD_eq_getElem?_getD]
+            simp only [orStep_def, List.getD_eq_getElem?_getD]
             rw [List.getElem?_append_right (by omega)]
             simp [hlen, hop]
           rw [e2]
@@ -370,7 +392,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
             · exact h3
             · exact (hop hop2).elim
       · have e0 : (orStep 11 (gs.foldl (orStep 11) []) g).getD j [] = [] := by
-          simp only [orStep, List.getD_eq_getElem?_getD]
+          simp only [orStep_def, List.getD_eq_getElem?_getD]
           rw [List.getElem?_eq_none (by simp; omega)]
           rfl
         rw [e0]
@@ -424,14 +446,14 @@ theorem PEqualNP.Outside.R_meta_4079_556
   have mem_orIn_reach : ∀ {p : ℕ} (u : Fin 11), u ∈ orIn 11 C p →
       Relation.ReflTransGen OrStep p u.val := by
     intro p u hu
-    simp only [orIn, Finset.mem_filter, Finset.mem_univ, true_and] at hu
+    rw [mem_orIn] at hu
     rcases hu with h | ⟨k, hk, hr, hop, hin⟩
     · rw [h]
     · exact (orReaches_reach k p hr).1.tail ⟨k, hk, rfl, hop, hin, by omega⟩
   have reach_mem_orIn : ∀ {p : ℕ} (u : Fin 11), Relation.ReflTransGen OrStep p u.val →
       u ∈ orIn 11 C p := by
     intro p u hr
-    simp only [orIn, Finset.mem_filter, Finset.mem_univ, true_and]
+    rw [mem_orIn]
     rcases Relation.ReflTransGen.cases_tail hr with h | ⟨c, hpc, hs⟩
     · exact Or.inl h
     · obtain ⟨k, hk, rfl, hop, hin, _⟩ := hs
@@ -442,18 +464,18 @@ theorem PEqualNP.Outside.R_meta_4079_556
   have opndMem : ∀ {a : ℕ}, a < C.gates.length → ∀ b : Fin 2, opnd C a b ∈ (gateAt C a).inputs := by
     intro a ha b
     obtain ⟨p, q, hpq⟩ := binaryInputs ha
-    fin_cases b <;> simp [opnd, hpq]
+    fin_cases b <;> simp [opnd_def, hpq]
   have inputsAsOpnd : ∀ {m z : ℕ}, m < C.gates.length → z ∈ (gateAt C m).inputs →
       ∃ b : Fin 2, z = opnd C m b := by
     intro m z hm hz
     obtain ⟨p, q, hpq⟩ := binaryInputs hm
     rcases List.mem_cons.mp (hpq ▸ hz) with rfl | hq
-    · exact ⟨0, by simp [opnd, hpq]⟩
-    · exact ⟨1, by simpa [opnd, hpq] using List.mem_singleton.mp hq⟩
+    · exact ⟨0, by simp [opnd_def, hpq]⟩
+    · exact ⟨1, by simpa [opnd_def, hpq] using List.mem_singleton.mp hq⟩
   have graphFun_pair : ∀ u v : Fin 11, graphFun G ∅ (pairInput u v) = true ↔ G.Adj u v := by
     intro u v
-    unfold graphFun pairInput
-    simp only [Finset.notMem_empty, false_and, exists_false, decide_false, Bool.false_or,
+    unfold graphFun
+    simp only [pairInput_def, Finset.notMem_empty, false_and, exists_false, decide_false, Bool.false_or,
       decide_eq_true_eq]
     constructor
     · rintro ⟨a, b, hab, ha, hb⟩
@@ -497,7 +519,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
     intro j hj
     apply Finset.eq_empty_iff_forall_notMem.mpr
     intro v hv
-    simp only [orIn, Finset.mem_filter, Finset.mem_univ, true_and] at hv
+    rw [mem_orIn] at hv
     rcases hv with he | ⟨k, _, hr, ho, _⟩
     · have := v.isLt; omega
     · rcases (orReaches_iff j k).mp hr with ⟨_, he | ⟨hof, _⟩⟩
@@ -524,8 +546,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
       exact hbm x ((val_or (by simp) hm ho).mpr ⟨11 + k, hi, hb, hxk⟩)
     apply Finset.mem_sdiff.mpr
     refine ⟨?_, ?_⟩
-    · simpa only [orN, gatesWhere, Finset.mem_filter, Finset.mem_range] using
-        And.intro hm (And.intro ho hNotBelow)
+    · exact (mem_orN m).mpr (And.intro hm (And.intro ho hNotBelow))
     · intro hl
       have hlam := Finset.mem_filter.mp hl
       obtain ⟨b, hb'⟩ := inputsAsOpnd hm hi
@@ -558,7 +579,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
         have htrue : val (List.ofFn (pairInput t t)) C.output = true := by
           apply orStep_val (by simp) hrt
           rw [val_input (by simp) t.isLt, List.getD_eq_getElem?_getD, List.getElem?_ofFn]
-          simp [pairInput, t.isLt]
+          simp [pairInput_def, t.isLt]
         rw [hout] at htrue
         rw [hfalse] at htrue
         cases htrue
@@ -568,8 +589,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
       rw [← hout x]
       exact orStep_val (by simp) hro hx
     have hatop : a ∈ tops G C := by
-      simpa only [tops, gatesWhere, Finset.mem_filter, Finset.mem_range] using
-        And.intro ha (And.intro hand hba)
+      exact (mem_tops a).mpr (And.intro ha (And.intro hand hba))
     have hboth := (val_and (by simp) ha hand).mp hva
     have hv0 : val (List.ofFn (pairInput u v)) (opnd C a 0) = true :=
       (hboth _ (opndMem ha 0)).2
@@ -585,7 +605,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
       rcases trace_wire (pairInput u v) (opnd C a b) hvb with ⟨t, hxt, hrt⟩ | ⟨j, hj, hjand, hrj, hvj⟩
       · left
         refine ⟨t, reach_mem_orIn t hrt, ?_⟩
-        simpa [pairInput] using hxt
+        simpa [pairInput_def] using hxt
       · right
         have hle := orStep_le hrj
         obtain ⟨k1, hk1⟩ : ∃ k1, opnd C a b = 11 + k1 := ⟨opnd C a b - 11, by omega⟩
@@ -620,10 +640,10 @@ theorem PEqualNP.Outside.R_meta_4079_556
             rcases (show b = 0 ∨ b = 1 by omega) with rfl | rfl
             · apply orStep_val (by simp) (mem_orIn_reach t0 ht0)
               rw [val_input (by simp) t0.isLt, List.getD_eq_getElem?_getD, List.getElem?_ofFn]
-              simp [pairInput, t0.isLt]
+              simp [pairInput_def, t0.isLt]
             · apply orStep_val (by simp) (mem_orIn_reach t1 ht1)
               rw [val_input (by simp) t1.isLt, List.getD_eq_getElem?_getD, List.getElem?_ofFn]
-              simp [pairInput, t1.isLt]
+              simp [pairInput_def, t1.isLt]
           exact (graphFun_pair t0 t1).mp (hba _ hv01)
         rcases htu0 with rfl | rfl <;> rcases htu1 with rfl | rfl
         · exact G.ne_of_adj hadj01 rfl
@@ -675,8 +695,9 @@ theorem PEqualNP.Outside.R_meta_4079_556
       · exact Finset.mem_union_left _ (Finset.mem_inter.mpr ⟨he, hge⟩)
       · exact Finset.mem_union_right _ (Finset.mem_inter.mpr ⟨he, hge⟩)
   have hheavy : ∃ j ∈ junk G C, 3 ≤ (Ustar G C ∩ gammaE G C j).card := by
-    by_contra hno
-    push Not at hno
+    by_contra hno0
+    have hno : ∀ j ∈ junk G C, (Ustar G C ∩ gammaE G C j).card < 3 :=
+      fun j hj => Nat.lt_of_not_le (fun h => hno0 ⟨j, hj, h⟩)
     have hg1mem : g1 ∈ junk G C := by rw [hjEq]; simp
     have hg2mem : g2 ∈ junk G C := by rw [hjEq]; simp
     have hu1 : (Ustar G C ∩ gammaE G C g1).card ≤ 2 := Nat.lt_succ_iff.mp (hno g1 hg1mem)
@@ -758,7 +779,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
     have hmRawEmpty : orIn 11 C (11 + m) = ∅ := by
       apply Finset.eq_empty_iff_forall_notMem.mpr
       intro v hv
-      simp only [orIn, Finset.mem_filter, Finset.mem_univ, true_and] at hv
+      rw [mem_orIn] at hv
       rcases hv with he | ⟨k, _, hr, hko, hvk⟩
       · have := v.isLt; omega
       · rcases (orReaches_iff m k).mp hr with ⟨_, rfl | ⟨_, w, hw, _, hrw⟩⟩
@@ -773,7 +794,7 @@ theorem PEqualNP.Outside.R_meta_4079_556
     have hnbm : ¬ BelowF G C m := by
       have hm_in : m ∈ orN G C \ lam G C := by rw [hmEq]; simp
       have hmorN := (Finset.mem_sdiff.mp hm_in).1
-      simp only [orN, gatesWhere, Finset.mem_filter] at hmorN
+      rw [mem_orN] at hmorN
       exact hmorN.2.2
     rcases lastOrBefore hrm1 with hEq | ⟨m', hm', hm'o, hm'i, hm'b, _⟩
     · have ha1c : a1 ∈ centreless G C := by
