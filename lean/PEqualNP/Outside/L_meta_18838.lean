@@ -1,7 +1,7 @@
 import Mathlib
 import PEqualNP.Defs
 
-namespace PEqualNP.Outside.L_meta_18838_helpers
+namespace PEqualNP.Outside.L_meta_18838
 
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity PEqualNP.Represents
 
@@ -571,7 +571,7 @@ lemma digits_two_pow_add_sum (j b : ℕ) (hb : b < 2 ^ j) :
       rw [ih (b / 2) (by omega)]
       omega
 
-end PEqualNP.Outside.L_meta_18838_helpers
+end PEqualNP.Outside.L_meta_18838
 
 theorem PEqualNP.Outside.L_meta_18838 : ∀ (n j : ℕ), 1 ≤ n → ∀ (G : ℕ → ℕ → Bool) (s : ℕ),
   PEqualNP.Represents.RepSizeAtMost (fun u v : Fin n => G u.val v.val) s →
@@ -614,7 +614,7 @@ theorem PEqualNP.Outside.L_meta_18838 : ∀ (n j : ℕ), 1 ≤ n → ∀ (G : �
       decide (u.val / n = v.val / n ∧
         (((Nat.digits 2 (u.val / n)).sum % 2 = 0 ∧ G (u.val % n) (v.val % n) = true) ∨
          ((Nat.digits 2 (u.val / n)).sum % 2 = 1 ∧ G (v.val % n) (u.val % n) = true)))
-    have hstep := PEqualNP.Outside.L_meta_18838_helpers.repSizeAtMost_double_transpose N hN A (s + 4 * n * (2 ^ j - 1)) ih
+    have hstep := PEqualNP.Outside.L_meta_18838.repSizeAtMost_double_transpose N hN A (s + 4 * n * (2 ^ j - 1)) ih
     have hpow : 2 ^ (j + 1) * n = 2 * N := by
       simp only [N, pow_succ]; ring
     have hbound : s + 4 * n * (2 ^ j - 1) + 4 * N = s + 4 * n * (2 ^ (j + 1) - 1) := by
@@ -663,7 +663,7 @@ theorem PEqualNP.Outside.L_meta_18838 : ∀ (n j : ℕ), 1 ≤ n → ∀ (G : �
       have hdiv_lt : (u.val - N) / n < 2 ^ j := by
         rw [Nat.div_lt_iff_lt_mul hn]
         simpa [N, Nat.mul_comm] using hu_lt
-      have hdig := PEqualNP.Outside.L_meta_18838_helpers.digits_two_pow_add_sum j ((u.val - N) / n) hdiv_lt
+      have hdig := PEqualNP.Outside.L_meta_18838.digits_two_pow_add_sum j ((u.val - N) / n) hdiv_lt
       rw [hu_div, hv_div, hu_mod, hv_mod, hdig]
       have hpar : ∀ k : ℕ, (k + 1) % 2 = 0 ↔ k % 2 = 1 := fun k => by omega
       have hpar2 : ∀ k : ℕ, (k + 1) % 2 = 1 ↔ k % 2 = 0 := fun k => by omega
