@@ -277,18 +277,41 @@ jobs:
           # load is shared with the files on disk: for a proof that imports all of Mathlib it
           # needs more memory than a standard runner has. Without swap it starves the runner
           # (the run hangs and its log is lost). The swap file belongs to root, mode 0600.
-          # The disk has no room for it until toolsets this run never uses are removed.
-          sudo rm -rf /usr/local/lib/android /opt/ghc /usr/local/.ghcup /usr/share/swift /opt/hostedtoolcache/CodeQL
-          # As large as the emptier disk allows while 6 GB of it stay free, at most 12 GB.
+          # As large as the emptier disk allows while 6 GB of it stay free, at most 12 GB, as before. The file was always
+          # allocated without writing (fallocate); what took most of this step's time (88 s at the median, 26 Nov) was
+          # removing toolsets this run never uses, hundreds of thousands of files, to make room. They are removed now ONLY
+          # when the emptier disk lacks room for the full 12 GB plus the 6 GB kept free, or the root disk has under 6 GB
+          # available, so neither the swap nor the workspace has less room than before. The swap is never smaller
+          # than before: either the full 12 GB without removing anything, or exactly today's size after removing them.
+          t0=$(date +%s)
+          pick() { df -m --output=avail,target / /mnt 2>/dev/null | awk 'NR>1' | sort -rn | awk 'NR==1{print $2}'; }
+          avail() { df -m --output=avail "$1" | awk 'NR==2{print $1}'; }
+          d=$(pick); cleared=no
+          # Kept only when the root disk too (the workspace, where the outside file is built) has 6 GB available
+          # (seat-redteam-1, S2): the old step always freed it, whatever disk then took the swap.
+          if [ $(( $(avail "$d") - 6144 )) -lt 12288 ] || [ "$(avail /)" -lt 6144 ]; then
+            sudo rm -rf /usr/local/lib/android /opt/ghc /usr/local/.ghcup /usr/share/swift /opt/hostedtoolcache/CodeQL
+            cleared=yes; d=$(pick)
+          fi
           df -m / /mnt 2>/dev/null || true
-          d=$(df -m --output=avail,target / /mnt 2>/dev/null | awk 'NR>1' | sort -rn | awk 'NR==1{print $2}')
-          mb=$(( $(df -m --output=avail "$d" | awk 'NR==2{print $1}') - 6144 ))
+          mb=$(( $(avail "$d") - 6144 ))
           [ "$mb" -le 12288 ] || mb=12288
+          made=none; f=
           if [ "$mb" -ge 1024 ]; then
             f="${d%/}/pnp-swap"
-            sudo fallocate -l "${mb}M" "$f" && sudo chmod 600 "$f"
-            sudo mkswap -q "$f" && sudo swapon "$f"
+            # Allocated without writing; if the filesystem refuses swap on such a file, written as zeros instead.
+            if sudo fallocate -l "${mb}M" "$f" && sudo chmod 600 "$f" && sudo mkswap -q "$f" && sudo swapon "$f"; then made=fallocate
+            else
+              sudo swapoff "$f" 2>/dev/null || true; sudo rm -f "$f"
+              if sudo dd if=/dev/zero of="$f" bs=1M count="$mb" status=none && sudo chmod 600 "$f" && sudo mkswap -q "$f" && sudo swapon "$f"; then made=dd; fi
+            fi
+            [ "$made" != none ] || { echo "FAULT: the swap file could not be turned on (fallocate and dd both failed)"; exit 1; }
           fi
+          # Never without swap (seat-redteam-2, S1): a disk with no room for a swap file of at least 1 GB ends the run as a
+          # FAULT too, instead of going on with none.
+          [ "$made" != none ] || { echo "FAULT: no room for a swap file of at least 1 GB"; exit 1; }
+          echo "swap: ${mb} MB at ${f:-nowhere}, made by ${made}; toolsets removed: ${cleared}; this step took $(( $(date +%s) - t0 )) s"
+          swapon --show
           free -m
 
       - name: Put the file in place and lock the tree
