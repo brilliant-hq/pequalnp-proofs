@@ -4,12 +4,12 @@ namespace PEqualNP.Outside.L_meta_21602_aux
 open PEqualNP.CircuitLowerBounds
 
 private def witnessCircuit : Circuit :=
-  ⟨[⟨.or, [0, 1]⟩, ⟨.and, [2, 5]⟩, ⟨.or, [0, 1]⟩, ⟨.or, [7, 2]⟩, ⟨.not, [8]⟩, ⟨.and, [4, 9]⟩, ⟨.or, [6, 10]⟩, ⟨.not, [11]⟩], 12⟩
+  ⟨[⟨.or, [0, 1]⟩, ⟨.and, [2, 5]⟩, ⟨.or, [5, 2]⟩, ⟨.not, [7]⟩, ⟨.and, [4, 8]⟩, ⟨.or, [6, 9]⟩, ⟨.not, [10]⟩], 11⟩
 
 private theorem fanIn : PEqualNP.MetaComplexity.FanInTwo witnessCircuit := by
   intro g hg
   simp only [witnessCircuit, List.mem_cons,List.not_mem_nil,or_false] at hg
-  rcases hg with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> simp
+  rcases hg with rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> simp
 
 end PEqualNP.Outside.L_meta_21602_aux
 
