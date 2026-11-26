@@ -299,8 +299,31 @@ jobs:
           # folder (the definitions root, every library and program module, so every base module an outside proof of the
           # sample may import is built here), and the project's root PEqualNP; Lean threads: the runner's cores.
           if [ "$MODE" = full ]; then
+            # A FLEET MODULE THAT IMPORTS AN OUTSIDE PROOF (directly or through other modules) cannot build with the outside
+            # folder aside (the baseline run of 26 Nov failed on exactly those). As authoritative.yml's header says, such a
+            # module is compiled only in a locked step with the outside folder present: it is left out of this build and
+            # built by its own step after the sample. The set is read from import lines of our own modules only.
+            python3 -I - "$RUNNER_TEMP/outside-dependent.txt" <<'PY'
+          import os, re, sys
+          sys.setrecursionlimit(20000)
+          mods = {}
+          for root, _, fs in os.walk("PEqualNP"):
+              for f in fs:
+                  if f.endswith(".lean"):
+                      p = os.path.join(root, f)
+                      mods[p[:-5].replace("/", ".")] = [l.split()[1] for l in open(p, encoding="utf-8", errors="replace") if re.match(r"import \S", l)]
+          memo = {}
+          def reaches(m, path=()):
+              if m == "PEqualNP.Outside" or m.startswith("PEqualNP.Outside."): return True
+              if m in memo: return memo[m]
+              if m not in mods or m in path: return False
+              memo[m] = any(reaches(i, path + (m,)) for i in mods[m]); return memo[m]
+          open(sys.argv[1], "w").write("".join(m + "\n" for m in sorted(m for m in mods if reaches(m))))
+          PY
             set -- PEqualNP
-            for f in $(find PEqualNP -name '*.lean' -type f | LC_ALL=C sort); do set -- "$@" "$(printf '%s' "${f%.lean}" | tr / .)"; done
+            for f in $(find PEqualNP -name '*.lean' -type f | LC_ALL=C sort); do
+              m=$(printf '%s' "${f%.lean}" | tr / .); grep -qxF "$m" "$RUNNER_TEMP/outside-dependent.txt" || set -- "$@" "$m"
+            done
             limit=12600
             # LEAN THREADS CAPPED BY MEMORY (seat-redteam-2): the smaller of the cores and the memory in GB divided by 4,
             # until a baseline run shows the peak.
@@ -336,6 +359,10 @@ jobs:
           touch "$RUNNER_TEMP/sampler/done"; kill "$watch" 2>/dev/null; pkill -P "$watch" 2>/dev/null
           secs=$(( $(date +%s) - t0 ))
           echo "the locked build: ${secs} s, peak memory $((pk / 1048576)) MB of a $((cap / 1024)) MB limit, machine $((mem / 1024)) MB, $(nproc) core(s), $threads thread(s)" | tee "$RUNNER_TEMP/baseline.txt"
+          if [ "$MODE" = full ]; then
+            echo "left out of it, built after the sample with the outside folder present: $(grep -c . "$RUNNER_TEMP/outside-dependent.txt") module(s) importing outside proofs" | tee -a "$RUNNER_TEMP/baseline.txt"
+            sed 's/^/  imports an outside proof: /' "$RUNNER_TEMP/outside-dependent.txt" | tee -a "$RUNNER_TEMP/baseline.txt"
+          fi
           if grep -q '^memory watch: the MACHINE is running short\|^no progress: ' "$MARK" 2>/dev/null; then code=137; fi
           sudo /usr/bin/pkill -KILL -u outsider || true
           if [ -e "$aside/Outside" ]; then mv "$aside/Outside" PEqualNP/Outside; fi
@@ -378,11 +405,37 @@ jobs:
           echo "pass=$pass" >> "$GITHUB_OUTPUT"; echo "n=$n" >> "$GITHUB_OUTPUT"
           echo "the sample: $pass of $n compiled in $(( $(date +%s) - t0 )) s"
 
+      - name: The fleet modules that import outside proofs (full mode), with the outside folder present
+        id: dep
+        if: env.MODE == 'full' && steps.run.outputs.code == '0'
+        timeout-minutes: 60
+        run: |
+          set +e -u
+          export PATH=/usr/bin:/bin
+          cd "$W/base/lean"
+          # As authoritative's locked step treats an outside-dependent compile: the locked account, its own namespace, no
+          # network, an empty environment; the outside folder in place, so the outside modules they import are compiled
+          # here too, as that account. After the sample, so nothing built here is read by another step. One build a
+          # module, so a failure names it.
+          n=0; pass=0; : > "$RUNNER_TEMP/dep-failed.txt"
+          while IFS= read -r m; do
+            [ -n "$m" ] || continue; n=$((n + 1))
+            /usr/bin/env -i HOME="$HOME" LANG=C.UTF-8 PATH="$TC_BIN:/usr/bin:/bin" \
+                PNP_TC_BIN="$TC_BIN" PNP_GITCONFIG="$W/in/gitconfig" PNP_BUILD_LOGS="$RUNNER_TEMP/builds" PNP_RW_DIRS="$PNP_RW_DIRS" PNP_LEAN_THREADS=3 \
+              timeout -k 30 1800 sh "$W/base/.github/scripts/lake-locked.sh" build "$m" >> "$RUNNER_TEMP/dep.out" 2>> "$RUNNER_TEMP/dep.err"
+            c=$?; sudo /usr/bin/pkill -KILL -u outsider || true
+            if [ "$c" = 0 ]; then pass=$((pass + 1)); else echo "OUTSIDE-DEPENDENT MODULE FAILED (exit $c): $m" >> "$RUNNER_TEMP/dep-failed.txt"; fi
+          done < "$RUNNER_TEMP/outside-dependent.txt"
+          echo "pass=$pass" >> "$GITHUB_OUTPUT"; echo "n=$n" >> "$GITHUB_OUTPUT"
+          echo "the fleet modules that import outside proofs: $pass of $n built"
+
       - name: The verdict
         if: always()
         env:
           CODE: ${{ steps.run.outputs.code }}
           PASS: ${{ steps.sample.outputs.pass }}
+          DPASS: ${{ steps.dep.outputs.pass }}
+          DN: ${{ steps.dep.outputs.n }}
           N: ${{ steps.sample.outputs.n }}
         run: |
           export PATH=/usr/bin:/bin
@@ -391,17 +444,19 @@ jobs:
           stop="stop-$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
           echo "::stop-commands::$stop"
           tail -n 60 "$RUNNER_TEMP/build.out" 2>/dev/null | quoted; tail -n 60 "$RUNNER_TEMP/build.err" 2>/dev/null | quoted
+          tail -n 40 "$RUNNER_TEMP/dep.out" 2>/dev/null | quoted; tail -n 40 "$RUNNER_TEMP/dep.err" 2>/dev/null | quoted
           echo "::$stop::"
           # The failing sample files: repository paths of our own outside folder, written by this run, no contents.
-          cat "$RUNNER_TEMP/sample-failed.txt" 2>/dev/null | tr -cd 'A-Za-z0-9_./:() \n-'
+          cat "$RUNNER_TEMP/sample-failed.txt" "$RUNNER_TEMP/dep-failed.txt" 2>/dev/null | tr -cd 'A-Za-z0-9_./:() \n-'
           cat "$RUNNER_TEMP/baseline.txt" 2>/dev/null | tr -cd 'A-Za-z0-9_.,:() \n-'
           case "${CODE:-}" in
             0) v=BUILT ;; 1) v=FAILED ;; '') v="REFUSED OR FAULT (the run stopped before the compile; the failed step above says why)" ;; *) v="FAULT (code $CODE: the build did not run as it must; this says nothing about the files)" ;;
           esac
           ok=no; [ "${CODE:-}" = 0 ] && ok=yes
           if [ "$MODE" = full ] && [ "$ok" = yes ]; then
-            v="$v | sample ${PASS:-0} of ${N:-0} accepted"
+            v="$v | sample ${PASS:-0} of ${N:-0} accepted | outside-dependent ${DPASS:-0} of ${DN:-unknown} built"
             [ -n "${N:-}" ] && [ "${N:-0}" -gt 0 ] && [ "${PASS:-}" = "$N" ] || ok=no
+            [ -n "${DN:-}" ] && [ "${DPASS:-}" = "$DN" ] || ok=no
           fi
           echo "VERDICT: $v | pull request $PR | head $(cat "$W/in/head" 2>/dev/null) | base $(cat "$W/in/base" 2>/dev/null) | these bytes compiled; that is not an approval of them" | tee -a "$GITHUB_STEP_SUMMARY"
           while read -r blob f; do echo "  file $f blob $blob" | tee -a "$GITHUB_STEP_SUMMARY"; done < "$W/in/files.txt" 2>/dev/null

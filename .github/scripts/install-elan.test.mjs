@@ -113,7 +113,7 @@ test('library-build.yml: hand start only, read-only, no action, no secret, the s
   assert.doesNotMatch(library, /^\s+(push|pull_request|pull_request_target|schedule|workflow_run):/m, 'another trigger');
   assert.match(library, /^permissions:\n  contents: read\n  pull-requests: read\n\n/m);
   // Both modes: the one locked compile step takes the empty mode's changed modules and the full mode's whole tree.
-  assert.match(library, /if \[ "\$MODE" = full \]; then\n\s+set -- PEqualNP\n[\s\S]+?else\n\s+set --; while IFS= read -r m; do set -- "\$@" "\$m"; done < "\$W\/in\/modules\.txt"[\s\S]+?sh "\$W\/base\/\.github\/scripts\/lake-locked\.sh" build "\$@"/);
+  assert.match(library, /if \[ "\$MODE" = full \]; then\n[\s\S]+?\n\s+set -- PEqualNP\n[\s\S]+?else\n\s+set --; while IFS= read -r m; do set -- "\$@" "\$m"; done < "\$W\/in\/modules\.txt"[\s\S]+?sh "\$W\/base\/\.github\/scripts\/lake-locked\.sh" build "\$@"/);
   assert.match(library, /sh "\$W\/base\/\.github\/scripts\/lake-locked\.sh" build "\$m"/, 'the sample compiles through lake-locked.sh');
   assert.match(library, /sh "\$W\/base\/\.github\/scripts\/install-elan\.sh" "\$ELAN_VERSION" "\$ELAN_SHA256" "\$ELAN_HOME"/);
   // An empty mode takes ADDED library files only: a Defs path, the root, an outside path or a workflow never match.
@@ -153,6 +153,31 @@ test('library-build.yml: a leading comment no longer hides an import from the ch
     assert.deepEqual(run('def x : Nat := 1\n'), []);
   } finally { rmSync(dir, { recursive: true, force: true }); }
   assert.match(library, /case "\$imports" in \*LATE\*\) echo "REFUSED: \$f has an import line after its first other line/);
+});
+
+// OUTSIDE-DEPENDENT FLEET MODULES (the baseline run of 26 Nov): left out of the tree build, which has the outside folder
+// aside, and built after the sample with the folder present. The import walk is run here, as the workflow runs it.
+test('library-build.yml: fleet modules that reach an outside proof are found by their imports and built in their own locked step', () => {
+  const m = library.match(/python3 -I - "\$RUNNER_TEMP\/outside-dependent\.txt" <<'PY'\n([\s\S]+?)\n\s*PY\n/);
+  assert.ok(m, 'the import walk is not where the test looks');
+  const py = m[1].split('\n').map((l) => l.replace(/^ {10}/, '')).join('\n');
+  const dir = mkdtempSync(join(tmpdir(), 'walk-'));
+  try {
+    const put = (rel, text) => { mkdirSync(join(dir, rel, '..'), { recursive: true }); writeFileSync(join(dir, rel), text); };
+    put('PEqualNP/Defs.lean', 'import Mathlib\n');
+    put('PEqualNP/Library/A.lean', 'import PEqualNP.Defs\n');
+    put('PEqualNP/MetaComplexity/Direct.lean', 'import PEqualNP.Outside.L_meta_1\n');
+    put('PEqualNP/MetaComplexity/Through.lean', 'import PEqualNP.MetaComplexity.Direct\n');
+    put('PEqualNP/MetaComplexity/Clean.lean', 'import PEqualNP.Library.A\n-- import PEqualNP.Outside.L_meta_2\n');
+    const out = join(dir, 'dep.txt');
+    execFileSync('python3', ['-I', '-', out], { cwd: dir, input: py });
+    assert.deepEqual(readFileSync(out, 'utf8').trim().split('\n'), ['PEqualNP.MetaComplexity.Direct', 'PEqualNP.MetaComplexity.Through']);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+  assert.match(library, /grep -qxF "\$m" "\$RUNNER_TEMP\/outside-dependent\.txt" \|\| set -- "\$@" "\$m"/, 'they are left out of the tree build');
+  assert.match(library, /id: dep\n\s+if: env\.MODE == 'full' && steps\.run\.outputs\.code == '0'\n\s+timeout-minutes: 60\n/);
+  assert.match(library, /sh "\$W\/base\/\.github\/scripts\/lake-locked\.sh" build "\$m" >> "\$RUNNER_TEMP\/dep\.out"/, 'built through lake-locked.sh, one module a build');
+  assert.ok(library.indexOf('id: sample') < library.indexOf('id: dep'), 'after the sample');
+  assert.match(library, /\[ -n "\$\{DN:-\}" \] && \[ "\$\{DPASS:-\}" = "\$DN" \] \|\| ok=no/);
 });
 
 // THE BASELINE (seat-redteam-2 B): memory first.
