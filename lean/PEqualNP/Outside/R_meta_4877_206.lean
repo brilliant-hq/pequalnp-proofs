@@ -78,7 +78,9 @@ theorem PEqualNP.Outside.R_meta_4877_206
     have wl : W.length = m := (len C.gates x).trans (by rw [hx,lg])
     have first : A.op.eval (A.inputs.map fun i => W.getD i false) = a := by
       change (W.getD C.output false || (W.getD z false || false)) = _
-      simp [a,W,Circuit.eval]
+      change (W.getD C.output false || (W.getD z false || false)) =
+        (W.getD C.output false || W.getD z false)
+      simp
     have old : (W++[a]).getD C.output false = C.eval x := List.getD_append _ _ _ _ (by omega)
     have newg : (W++[a]).getD m false = a := by
       rw [List.getD_append_right _ _ _ _ (by omega),wl,Nat.sub_self]; rfl
@@ -106,7 +108,11 @@ theorem PEqualNP.Outside.R_meta_4877_206
     | cons g gs ih =>
       rw [List.foldl_cons,ih _ (by simp [step]; omega)]
       exact List.getD_append _ _ _ _ hi
-  refine ⟨D,by simpa [D,Circuit.size] using (show C.size+2≤64 by omega),dao,dnd,?_,?_,?_⟩
+  have ds : D.size ≤ 64 := by
+    change (C.gates++[A,B]).length ≤ 64
+    simp only [List.length_append,List.length_cons,List.length_nil,lg]
+    omega
+  refine ⟨D,ds,dao,dnd,?_,?_,?_⟩
   · intro p l inc
     rw [ev _ (List.length_ofFn ..)]
     exact pos _ _ inc
