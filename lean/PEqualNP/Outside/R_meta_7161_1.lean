@@ -24,20 +24,24 @@ theorem PEqualNP.Outside.R_meta_7161_1
                 (B.eval (ix.map x) || decide (∃ p ∈ D, ∃ l : Fin 13, near p l ∧
                   x (Fin.castAdd 13 p) = true ∧ x (Fin.natAdd 13 l) = true)))
     :
-    let relation : Fin 13 → Fin 13 → Prop := fun p l => (p.val + l.val) % 13 ∈ [0, 1, 3, 9]
-    let off := fun s : Finset (Fin 13) => Finset.univ.filter fun l => ∀ p ∈ s, ¬ relation p l
-    let vec := fun (s t : Finset (Fin 13)) => List.ofFn fun i : Fin 26 =>
-      if i.val < 13 then decide (Fin.ofNat 13 i.val ∈ s) else decide (Fin.ofNat 13 i.val ∈ t)
-    ∃ (C : Circuit) (a b : ℕ) (q : Bool),
-      Monotone2 C ∧ C.size ≤ 62 ∧ a < b ∧
-        (∀ p l : Fin 13, relation p l →
-          (if q then GateOp.and else GateOp.or).eval
-            [(C.wires (vec {p} {l})).getD a false, (C.wires (vec {p} {l})).getD b false] = true) ∧
-        (∀ s : Finset (Fin 13), s.card ≤ 3 →
-          (if q then GateOp.and else GateOp.or).eval
-            [(C.wires (vec s (off s))).getD a false, (C.wires (vec s (off s))).getD b false] = false ∧
-          (if q then GateOp.and else GateOp.or).eval
-            [(C.wires (vec (off s) s)).getD a false, (C.wires (vec (off s) s)).getD b false] = false) := by
+    (let x1 : Fin (13 : ℕ) → Fin (13 : ℕ) → Prop := fun (x1 x2 : Fin (13 : ℕ)) =>
+      (↑x1 + ↑x2) % (13 : ℕ) ∈ [(0 : ℕ), (1 : ℕ), (3 : ℕ), (9 : ℕ)]
+    have x2 : Finset (Fin (13 : ℕ)) → Finset (Fin (13 : ℕ)) :=
+      fun (x2 : Finset (Fin (13 : ℕ))) => {x3 : Fin (13 : ℕ) | ∀ x4 ∈ x2, ¬x1 x4 x3}
+    have x3 : Finset (Fin (13 : ℕ)) → Finset (Fin (13 : ℕ)) → List Bool :=
+      fun (x3 x4 : Finset (Fin (13 : ℕ))) => List.ofFn fun (x5 : Fin (26 : ℕ)) =>
+        if ↑x5 < (13 : ℕ) then Decidable.decide (Fin.ofNat (13 : ℕ) ↑x5 ∈ x3)
+        else Decidable.decide (Fin.ofNat (13 : ℕ) ↑x5 ∈ x4)
+    ∃ (x4 : Circuit) (x5 : ℕ) (x6 : ℕ) (x7 : Bool),
+      Monotone2 x4 ∧ x4.size ≤ (62 : ℕ) ∧ x5 < x6 ∧
+        have x8 : ℕ → Finset (Fin (13 : ℕ)) → Finset (Fin (13 : ℕ)) → Bool :=
+          fun (x8 : ℕ) (x9 x10 : Finset (Fin (13 : ℕ))) => (x4.wires (x3 x9 x10)).getD x8 Bool.false
+        have x9 : Finset (Fin (13 : ℕ)) → Finset (Fin (13 : ℕ)) → Bool :=
+          fun (x9 x10 : Finset (Fin (13 : ℕ))) =>
+            (if x7 = Bool.true then GateOp.and else GateOp.or).eval [x8 x5 x9 x10, x8 x6 x9 x10]
+        (∀ (x10 x11 : Fin (13 : ℕ)), x1 x10 x11 → x9 {x10} {x11} = Bool.true) ∧
+          ∀ (x10 : Finset (Fin (13 : ℕ))), x10.card ≤ (3 : ℕ) →
+            x9 x10 (x2 x10) = Bool.false ∧ x9 (x2 x10) x10 = Bool.false) := by
   classical
   obtain ⟨B, hBmono, hBsize, hBoutput, hCore⟩ := core
   obtain ⟨E, hEmono, hEsize, a, b, hab, hExtend⟩ := extend B hBmono hBsize hBoutput
