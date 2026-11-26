@@ -166,7 +166,7 @@ theorem PEqualNP.Outside.R_meta_3791_556
     have hnil : (gateAt C (w - 26)).inputs = [] := List.eq_nil_of_length_eq_zero (by omega)
     have hj : w - 26 < C.gates.length := by unfold Circuit.size at hlt; omega
     have hge_eq : gateAt C (w - 26) = C.gates[w - 26] := by
-      simp [gateAt, List.getD_eq_getElem?_getD, hj]
+      delta gateAt; simp [List.getD_eq_getElem?_getD, hj]
     have hmem : C.gates[w - 26] ∈ C.gates := List.getElem_mem hj
     have hmon := (hmono _ hmem).1
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hmon
@@ -180,7 +180,8 @@ theorem PEqualNP.Outside.R_meta_3791_556
       rw [hnil', hand] at hval
       change (C.gates.foldl stepWire (arc {0, 1, 2, 5})).getD w false = false at hf
       rw [hval] at hf
-      simp [GateOp.eval] at hf
+      rw [List.map_nil] at hf
+      exact absurd hf (by decide)
     · obtain ⟨p, l, ht⟩ := htrue
       have hval := foldl_getD_gate C.gates (pair p l) (w - 26) hj
       rw [pair_len, hweq] at hval
@@ -188,7 +189,8 @@ theorem PEqualNP.Outside.R_meta_3791_556
       rw [hnil', hor] at hval
       change (C.gates.foldl stepWire (pair p l)).getD w false = true at ht
       rw [hval] at ht
-      simp [GateOp.eval] at ht
+      rw [List.map_nil] at ht
+      exact absurd ht (by decide)
   have hin1 : 1 ≤ (gateAt C (w1 - 26)).inputs.length :=
     nonconst w1 hw1ge hw1lt (by obtain ⟨p, l, _, h1, _⟩ := hex1; exact ⟨p, l, h1⟩)
       (fun S hc ha => (harc S ⟨hc, ha⟩).1)
@@ -223,7 +225,7 @@ theorem PEqualNP.Outside.R_meta_3791_556
     intro a b hage halt hbge hblt hab hna hnb hia hib hcab haab hmaj hexb
     have hj : a - 26 < C.gates.length := by unfold Circuit.size at halt; omega
     have hge_eq : gateAt C (a - 26) = C.gates[a - 26] := by
-      simp [gateAt, List.getD_eq_getElem?_getD, hj]
+      delta gateAt; simp [List.getD_eq_getElem?_getD, hj]
     have hmon := (hmono _ (List.getElem_mem hj)).1
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hmon
     rw [← hge_eq] at hmon
