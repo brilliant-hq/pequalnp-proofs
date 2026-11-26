@@ -124,3 +124,33 @@ test('library-build.yml: hand start only, read-only, no action, no secret, the s
   assert.match(library, /select\(\(\.status != "added"\) or \(\.previous_filename != null\) or \(\(\.filename \| test\(env\.LIB_PATH\)\) \| not\)\)/, 'the empty mode refuses all but an added library file');
   assert.match(library, /case "\$\(jq -r '\.author_association \/\/ ""' "\$W\/api\/pr\.json"\)" in OWNER\|MEMBER\)/, 'owner or member only');
 });
+
+// THE IMPORT CHECK (seat-redteam-1 R1, seat-redteam-2 A): the reader takes the leading blank and import lines; a later
+// import line, or one after a block comment's end, makes the file refused. The awk program is run here as the workflow
+// runs it, on files of each shape.
+test('library-build.yml: a leading comment no longer hides an import from the check', () => {
+  const m = library.match(/imports=\$\(awk '([\s\S]+?)' "\$W\/in\/files\/\$i\.lean"\)/);
+  assert.ok(m, 'the import reader is not where the test looks');
+  const dir = mkdtempSync(join(tmpdir(), 'imports-'));
+  try {
+    const run = (text) => { const f = join(dir, 'f.lean'); writeFileSync(f, text); return execFileSync('awk', [m[1].replace(/\n\s+/g, '\n'), f], { encoding: 'utf8' }).trim().split('\n').filter(Boolean); };
+    assert.deepEqual(run('import Mathlib\nimport PEqualNP.Defs.Base\n\ndef x : Nat := 1\n'), ['Mathlib', 'PEqualNP.Defs.Base']);
+    assert.deepEqual(run('\n\nimport Mathlib\ntheorem t : 1 = 1 := rfl\n'), ['Mathlib']);
+    assert.ok(run('-- a comment first\nimport PEqualNP.Library.Helpers\n').includes('LATE'), 'a line comment before the imports');
+    assert.ok(run('/- a block\n   comment -/\nimport PEqualNP.Library.Helpers\n').includes('LATE'), 'a block comment before the imports');
+    assert.ok(run('/- x -/ import PEqualNP.Library.Helpers\n').includes('LATE'), 'an import after a block comment on one line');
+    assert.ok(run('import Mathlib\ndef x : Nat := 1\n  import PEqualNP.Library.Helpers\n').includes('LATE'), 'an indented import after the header');
+    assert.deepEqual(run('def x : Nat := 1\n'), []);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+  assert.match(library, /case "\$imports" in \*LATE\*\) echo "REFUSED: \$f has an import line after its first other line/);
+});
+
+// THE BASELINE (seat-redteam-2 B): memory first.
+test('library-build.yml: full mode caps threads by memory, has swap, the memory watch and step limits', () => {
+  assert.match(library, /bymem=\$\(\( \$\(awk '\/\^MemTotal:\/\{print \$2\}' \/proc\/meminfo\) \/ 4194304 \)\)/, 'threads by memory (GB / 4)');
+  assert.match(library, /- name: Swap space for the build \(as authoritative\)/);
+  assert.match(library, /sh "\$W\/base\/\.github\/scripts\/memory-watch\.sh" "\$RUNNER_TEMP\/sampler" "\$cg" "\$unit" "\$t0" "\$cap" "\$MARK"/);
+  assert.match(library, /systemd-run --quiet --scope --collect --unit="\$unit" -p MemoryMax="\$\{cap\}K"/);
+  assert.match(library, /id: sample\n\s+if: env\.MODE == 'full' && steps\.run\.outputs\.code == '0'\n\s+timeout-minutes: 100\n/, 'the sample step has its own limit');
+  assert.doesNotMatch(library, /MeaningProbe/, 'no meaning test in this patch (it comes rebuilt, separately)');
+});

@@ -9,7 +9,9 @@
 #   mode full    THE DEFINITIONS ROOT: ADDED Lean files directly under lean/PEqualNP/Defs/, and a change to
 #                lean/PEqualNP/Defs.lean that only ADDS lines `import PEqualNP.Defs.<Name>`. Then the WHOLE TREE is
 #                compiled on the base plus those bytes, and the last 50 outside proofs landed on the base are compiled
-#                again against it. The run FAILS unless the tree builds and all of the sample compile.
+#                again against it. The run FAILS unless the tree builds and all of the sample compile. A first run on
+#                the probe pull request (one trivial definitions file, never merged) is the BASELINE: it prints whether
+#                today's tree builds, how long, and its peak memory.
 #
 # It keeps authoritative.yml's rules (read it first; every guard here is one of its guards, cut to this case):
 # - Everything is read through the API before any checkout. The run REFUSES unless the pull request's author is an
@@ -173,7 +175,13 @@ jobs:
           i=0
           while read -r blob f; do
             i=$((i + 1)); [ "$f" != lean/PEqualNP/Defs.lean ] || continue
-            awk '/^[ \t]*$/ { next } /^import / { print $2; next } { exit }' "$W/in/files/$i.lean" | while IFS= read -r m; do
+            # A LATE IMPORT REFUSES THE FILE (seat-redteam-1 R1, seat-redteam-2 A): the header is the leading blank and
+            # `import` lines; any later line that begins with `import` (indented or not), or that holds `-/ import`, is
+            # refused, so a leading comment can no longer hide an import from this check. Our own files put imports first.
+            imports=$(awk 'h == 0 && /^[ \t]*$/ { next } h == 0 && /^import / { print $2; next } { h = 1 }
+                           h == 1 && (/^[ \t]*import[ \t]/ || /-\/[ \t]*import[ \t]/) { print "LATE"; exit }' "$W/in/files/$i.lean")
+            case "$imports" in *LATE*) echo "REFUSED: $f has an import line after its first other line (a comment before the imports would hide them from this check); put every import line first"; exit 1 ;; esac
+            printf '%s\n' "$imports" | grep . | while IFS= read -r m; do
               printf '%s' "$m" | grep -Eqx '(Mathlib|PEqualNP)(\.[A-Za-z0-9_]+)*' || { echo "REFUSED: $f imports something that is not a Mathlib or PEqualNP module"; exit 1; }
               case "$m" in PEqualNP.Outside|PEqualNP.Outside.*) echo "REFUSED: $f imports an outside module; a file of ours never does"; exit 1 ;; esac
               if [ "$MODE" = full ]; then case "$m" in Mathlib|Mathlib.*|PEqualNP.Defs.*) ;; *) echo "REFUSED: $f is a definitions file and imports $m; it may import Mathlib and other definitions only"; exit 1 ;; esac; fi
@@ -231,7 +239,7 @@ jobs:
             d=$(dirname "${f#lean/}"); case ":$dirs:" in *":$d:"*) ;; *) dirs="${dirs:+$dirs:}$d" ;; esac
           done < "$W/in/files.txt"
           printf '[safe]\n\tdirectory = *\n' > "$W/in/gitconfig"
-          sudo useradd --system --create-home --shell /usr/sbin/nologin outsider
+          id outsider >/dev/null 2>&1 || sudo useradd --system --create-home --shell /usr/sbin/nologin outsider
           chmod -R a+rX,go-w "$W"
           # What the locked account may write. Empty mode: the output folders of the changed files. Full mode: every
           # output of the project's own modules (lib/lean and ir; never bin, which holds the trusted judge), since every
@@ -254,6 +262,28 @@ jobs:
           PNP_TC_BIN="$TC_BIN" PNP_GITCONFIG="$W/in/gitconfig" PNP_BUILD_LOGS="$RUNNER_TEMP/builds" PNP_RW_DIRS="$rw" \
             sh "$W/base/.github/scripts/lake-locked.sh" probe || { echo "FAULT: the namespace of the locked build could not be made ready on this runner"; exit 1; }
 
+      - name: Swap space for the build (as authoritative)
+        run: |
+          set -eu
+          # The verifier loads the library more than once in one process, and only the first
+          # load is shared with the files on disk: for a proof that imports all of Mathlib it
+          # needs more memory than a standard runner has. Without swap it starves the runner
+          # (the run hangs and its log is lost). The swap file belongs to root, mode 0600.
+          # The disk has no room for it until toolsets this run never uses are removed.
+          sudo rm -rf /usr/local/lib/android /opt/ghc /usr/local/.ghcup /usr/share/swift /opt/hostedtoolcache/CodeQL
+          # As large as the emptier disk allows while 6 GB of it stay free, at most 12 GB.
+          df -m / /mnt 2>/dev/null || true
+          d=$(df -m --output=avail,target / /mnt 2>/dev/null | awk 'NR>1' | sort -rn | awk 'NR==1{print $2}')
+          mb=$(( $(df -m --output=avail "$d" | awk 'NR==2{print $1}') - 6144 ))
+          [ "$mb" -le 12288 ] || mb=12288
+          if [ "$mb" -ge 1024 ]; then
+            f="${d%/}/pnp-swap"
+            sudo fallocate -l "${mb}M" "$f" && sudo chmod 600 "$f"
+            sudo mkswap -q "$f" && sudo swapon "$f"
+          fi
+          free -m
+
+
       - name: Compile as the locked account (the outside folder aside)
         id: run
         timeout-minutes: 215
@@ -268,18 +298,42 @@ jobs:
           if [ "$MODE" = full ]; then
             set -- PEqualNP
             for f in $(find PEqualNP -name '*.lean' -type f | LC_ALL=C sort); do set -- "$@" "$(printf '%s' "${f%.lean}" | tr / .)"; done
-            limit=12600; threads=$(nproc 2>/dev/null || echo 3); case "$threads" in ''|*[!0-9]*) threads=3 ;; esac
+            limit=12600
+            # LEAN THREADS CAPPED BY MEMORY (seat-redteam-2): the smaller of the cores and the memory in GB divided by 4,
+            # until a baseline run shows the peak.
+            threads=$(nproc 2>/dev/null || echo 3); case "$threads" in ''|*[!0-9]*) threads=3 ;; esac
+            bymem=$(( $(awk '/^MemTotal:/{print $2}' /proc/meminfo) / 4194304 )); [ "$bymem" -ge 1 ] || bymem=1
+            [ "$threads" -le "$bymem" ] || threads=$bymem
           else
             set --; while IFS= read -r m; do set -- "$@" "$m"; done < "$W/in/modules.txt"
             limit=3000; threads=3
           fi
-          echo "the locked build compiles $# module(s)"
+          echo "the locked build compiles $# module(s), $threads Lean thread(s)"
           touch "$RUNNER_TEMP/build.marker"
+          # MEMORY, as authoritative's checker step: one memory limit below the machine's memory for the whole build (the
+          # machine's memory less 3 GB, never less than its old cap), swap beyond it, and the memory watch
+          # (memory-watch.sh), which ends the build as a FAULT, never a verdict, if the MACHINE runs short or the build
+          # makes no progress for 8 minutes.
+          mem=$(awk '/^MemTotal:/{print $2}' /proc/meminfo)
+          old=$(( mem - 1572864 )); [ "$old" -le 6815744 ] || old=6815744
+          cap=$(( mem - 3145728 )); [ "$cap" -ge "$old" ] || cap=$old
+          unit="pnp-libbuild-$GITHUB_RUN_ID"; cg="/sys/fs/cgroup/system.slice/$unit.scope"
+          mkdir -m 700 -p "$RUNNER_TEMP/sampler"; MARK="$RUNNER_TEMP/sampler/markers"; : > "$MARK"; : > "$RUNNER_TEMP/checker.err"
+          t0=$(date +%s)
+          sh "$W/base/.github/scripts/memory-watch.sh" "$RUNNER_TEMP/sampler" "$cg" "$unit" "$t0" "$cap" "$MARK" "$RUNNER_TEMP/checker.err" &
+          watch=$!
           # The environment is emptied: no credential of this run is in it. lake-locked.sh runs the build as `outsider`.
+          sudo /usr/bin/systemd-run --quiet --scope --collect --unit="$unit" -p MemoryMax="${cap}K" --uid="$(id -u)" --gid="$(id -g)" \
           /usr/bin/env -i HOME="$HOME" LANG=C.UTF-8 PATH="$TC_BIN:/usr/bin:/bin" \
               PNP_TC_BIN="$TC_BIN" PNP_GITCONFIG="$W/in/gitconfig" PNP_BUILD_LOGS="$RUNNER_TEMP/builds" PNP_RW_DIRS="$PNP_RW_DIRS" PNP_LEAN_THREADS="$threads" \
             timeout -k 30 "$limit" sh "$W/base/.github/scripts/lake-locked.sh" build "$@" > "$RUNNER_TEMP/build.out" 2> "$RUNNER_TEMP/build.err"
           code=$?
+          pk=$(cat "$cg/memory.peak" 2>/dev/null); printf '%s' "$pk" | grep -Eqx '[0-9]+' || pk=$(cat "$RUNNER_TEMP/sampler/peak" 2>/dev/null)
+          printf '%s' "$pk" | grep -Eqx '[0-9]+' || pk=0
+          touch "$RUNNER_TEMP/sampler/done"; kill "$watch" 2>/dev/null; pkill -P "$watch" 2>/dev/null
+          secs=$(( $(date +%s) - t0 ))
+          echo "the locked build: ${secs} s, peak memory $((pk / 1048576)) MB of a $((cap / 1024)) MB limit, machine $((mem / 1024)) MB, $(nproc) core(s), $threads thread(s)" | tee "$RUNNER_TEMP/baseline.txt"
+          if grep -q '^memory watch: the MACHINE is running short\|^no progress: ' "$MARK" 2>/dev/null; then code=137; fi
           sudo /usr/bin/pkill -KILL -u outsider || true
           if [ -e "$aside/Outside" ]; then mv "$aside/Outside" PEqualNP/Outside; fi
           ls "$RUNNER_TEMP"/builds/*/nsfail >/dev/null 2>&1 && code=97
@@ -293,6 +347,7 @@ jobs:
       - name: The sample (full mode) - the last outside proofs landed on the base, compiled again on the new tree
         id: sample
         if: env.MODE == 'full' && steps.run.outputs.code == '0'
+        timeout-minutes: 100
         run: |
           set +e -u
           export PATH=/usr/bin:/bin
@@ -336,6 +391,7 @@ jobs:
           echo "::$stop::"
           # The failing sample files: repository paths of our own outside folder, written by this run, no contents.
           cat "$RUNNER_TEMP/sample-failed.txt" 2>/dev/null | tr -cd 'A-Za-z0-9_./:() \n-'
+          cat "$RUNNER_TEMP/baseline.txt" 2>/dev/null | tr -cd 'A-Za-z0-9_.,:() \n-'
           case "${CODE:-}" in
             0) v=BUILT ;; 1) v=FAILED ;; '') v="REFUSED OR FAULT (the run stopped before the compile; the failed step above says why)" ;; *) v="FAULT (code $CODE: the build did not run as it must; this says nothing about the files)" ;;
           esac
