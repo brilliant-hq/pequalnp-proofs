@@ -1,0 +1,79 @@
+import Mathlib
+import PEqualNP.Defs
+
+namespace PEqualNP.Outside.L_meta_18920_aux
+
+open PEqualNP.CircuitLowerBounds
+
+def R (a b : List Bool) : Prop :=
+  a.length = b.length ∧ ∀ i, a.getD i false = true → b.getD i false = true
+
+theorem step (g : Gate) (hg : g.op = GateOp.and ∨ g.op = GateOp.or) (a b : List Bool)
+    (h : R a b) :
+    R (a ++ [g.op.eval (g.inputs.map fun i => a.getD i false)])
+      (b ++ [g.op.eval (g.inputs.map fun i => b.getD i false)]) := by
+  obtain ⟨hl, hv⟩ := h
+  have hev : g.op.eval (g.inputs.map fun i => a.getD i false) = true →
+      g.op.eval (g.inputs.map fun i => b.getD i false) = true := by
+    rcases hg with hg | hg <;> rw [hg] <;> simp [GateOp.eval]
+    · intro H j hj; exact hv _ (H j hj)
+    · intro j hj H; exact ⟨j, hj, hv _ H⟩
+  refine ⟨by simp [hl], fun i hi => ?_⟩
+  rcases lt_trichotomy i a.length with h1 | h1 | h1
+  · rw [List.getD_append _ _ _ _ h1] at hi
+    rw [List.getD_append _ _ _ _ (hl ▸ h1)]
+    exact hv _ hi
+  · subst h1
+    rw [List.getD_append_right _ _ _ _ (le_refl _)] at hi
+    rw [hl, List.getD_append_right _ _ _ _ (le_refl _)]
+    simp at hi ⊢
+    exact hev hi
+  · rw [List.getD_eq_default _ _ (by simp; omega)] at hi
+    simp at hi
+
+theorem fold (gs : List Gate) (hg : ∀ g ∈ gs, g.op = GateOp.and ∨ g.op = GateOp.or) :
+    ∀ a b : List Bool, R a b →
+      R (gs.foldl (fun w g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]) a)
+        (gs.foldl (fun w g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]) b) := by
+  induction gs with
+  | nil => intro a b h; exact h
+  | cons g gs ih =>
+    intro a b h
+    simp only [List.foldl_cons]
+    exact ih (fun g' hg' => hg g' (by simp [hg'])) _ _ (step g (hg g (by simp)) a b h)
+
+theorem fa (a b : List Bool) (h : List.Forall₂ (fun (x5 x6 : Bool) => x5 ≤ x6) a b) :
+    ∀ i, a.getD i false = true → b.getD i false = true := by
+  induction h with
+  | nil => intro i hi; simp at hi
+  | cons hab _ ih =>
+    intro i hi
+    cases i with
+    | zero =>
+      simp at hi ⊢
+      subst hi
+      revert hab
+      decide +revert
+    | succ n => simpa using ih n (by simpa using hi)
+
+end PEqualNP.Outside.L_meta_18920_aux
+
+open PEqualNP.Outside.L_meta_18920_aux in
+theorem PEqualNP.Outside.L_meta_18920 : ∀ (x1 : PEqualNP.CircuitLowerBounds.Circuit), PEqualNP.MetaComplexity.Monotone2 x1 → Monotone (PEqualNP.MetaComplexity.circuitFun (27 : ℕ) x1) := by
+  intro C hC x y hxy
+  have hxy2 : List.Forall₂ (fun (x5 x6 : Bool) => x5 ≤ x6) (List.ofFn x) (List.ofFn y) := by
+    rw [List.forall₂_iff_get]
+    refine ⟨by rw [List.length_ofFn, List.length_ofFn], fun i h1 h2 => ?_⟩
+    rw [List.get_ofFn, List.get_ofFn]
+    exact hxy _
+  have hg : ∀ g ∈ C.gates, g.op = PEqualNP.CircuitLowerBounds.GateOp.and ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.or := by
+    intro g hgm
+    have h := (hC g hgm).1
+    simpa using h
+  have hR : R (List.ofFn x) (List.ofFn y) := ⟨hxy2.length_eq, fa _ _ hxy2⟩
+  have h2 := (fold C.gates hg _ _ hR).2 C.output
+  unfold PEqualNP.MetaComplexity.circuitFun PEqualNP.CircuitLowerBounds.Circuit.eval PEqualNP.CircuitLowerBounds.Circuit.wires
+  revert h2
+  generalize (List.foldl _ (List.ofFn x) C.gates).getD C.output false = p
+  generalize (List.foldl _ (List.ofFn y) C.gates).getD C.output false = q
+  decide +revert
