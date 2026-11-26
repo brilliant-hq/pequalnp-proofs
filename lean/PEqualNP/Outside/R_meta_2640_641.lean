@@ -32,15 +32,13 @@ theorem PEqualNP.Outside.R_meta_2640_641
         ∀ x : Fin n → Bool, circuitFun n B x =
           graphFun G A (Function.update (Function.update x (f i) Bool.false) (f j) Bool.false)) :
 ∀ (x1 : ℕ) (x2 : SimpleGraph (Fin x1)) (x3 : Finset (Fin x1)) (x4 : PEqualNP.CircuitLowerBounds.Circuit),   ¬x2.Colorable (2 : ℕ) →     (∀ x6 ∉ x3, (x2.neighborSet x6).ncard = (3 : ℕ)) →       (∀ (x7 : Fin x1) (x8 : x2.Walk x7 x7), x8.IsCycle → (7 : ℕ) ≤ x8.length) →         (∀ (x8 x9 : Fin x1), x2.Adj x8 x9 → x8 ∉ x3) →           (∃ (x9 : Fin x1) (x10 : Fin x1), x2.Adj x9 x10) →             PEqualNP.MetaComplexity.IsMinimalCircuit x1 x4 →               (∀ (x11 : Fin x1 → Bool), x4.eval (List.ofFn x11) = Bool.true ↔ (∃ x12 ∈ x3, x11 x12 = Bool.true) ∨ ∃ (x12 : Fin x1) (x13 : Fin x1), x2.Adj x12 x13 ∧ x11 x12 = Bool.true ∧ x11 x13 = Bool.true) →                 ∃ (x12 : Fin x1) (x13 : Fin x1),                   x2.Adj x12 x13 ∧                     ∃ (x14 : ℕ → PEqualNP.CircuitLowerBounds.Circuit),                       PEqualNP.MetaComplexity.FanInTwo (x14 (0 : ℕ)) ∧                         (x14 (0 : ℕ)).size ≤ x4.size ∧                           PEqualNP.MetaComplexity.circuitFun x1 (x14 (0 : ℕ)) = PEqualNP.MetaComplexity.circuitFun x1 x4 ∧                             ∀ x15 < (7 : ℕ),                               ∃ (x17 : ℕ) (x18 : ℕ),                                 x17 < (x14 x15).size ∧                                   (x18 < x1 + x17 ∨ x1 + (x14 x15).size ≤ x18) ∧                                     x14 (x15 + (1 : ℕ)) = PEqualNP.CircuitMoves.eraseGate x1 (x14 x15) x17 x18 ∧                                       ((∀ (x19 : Fin x1 → Bool),                                           have x20 : List Bool := (x14 x15).wires (List.ofFn (Function.update (Function.update x19 x12 Bool.false) x13 Bool.false));                                           x20.getD (x1 + x17) Bool.false = x20.getD x18 Bool.false) ∨                                         (x14 x15).output ≠ x1 + x17 ∧ ∀ x19 ∈ List.drop (x17 + (1 : ℕ)) (x14 x15).gates, x1 + x17 ∉ x19.inputs) := by
-  let IsClosedWalkTrace {V : Type} (G : SimpleGraph V) (q : ℕ → V) (m : ℕ) : Prop :=
-    q m = q 0 ∧ ∀ t < m, G.Adj (q t) (q (t + 1))
 
   have small_mod (x k : ℕ) (h : x < 2 * k) : x % k = if x < k then x else x - k := by
     split_ifs with h1
     · exact Nat.mod_eq_of_lt h1
     · rw [Nat.mod_eq_sub_mod (by omega), Nat.mod_eq_of_lt (by omega)]
 
-  have loopGirthBound {V : Type} {G : SimpleGraph V} (q : ℕ → V) (m : ℕ) (hl : IsClosedWalkTrace G q m)
+  have loopGirthBound {V : Type} {G : SimpleGraph V} (q : ℕ → V) (m : ℕ) (hl : q m = q 0 ∧ ∀ t < m, G.Adj (q t) (q (t + 1)))
       (hm : 3 ≤ m) (hinj : ∀ a b, a < m → b < m → q a = q b → a = b) : G.egirth ≤ m := by
     obtain ⟨r, rfl⟩ : ∃ r, m = r + 3 := ⟨m - 3, by omega⟩
     have key : ∀ a b : ℕ, a < r + 3 → b < r + 3 → (r + 3 - a + b) % (r + 3) = 1 →
@@ -71,7 +69,7 @@ theorem PEqualNP.Outside.R_meta_2640_641
     simpa using this
 
   have exists_odd_loop {V : Type} {G : SimpleGraph V} (h : ¬ G.Colorable 2) :
-      ∃ k, Odd k ∧ ∃ q, IsClosedWalkTrace G q k := by
+      ∃ k, Odd k ∧ ∃ q : ℕ → V, q k = q 0 ∧ ∀ t < k, G.Adj (q t) (q (t + 1)) := by
     have h' : ¬ G.IsBipartite := h
     rw [isBipartite_iff_forall_walk_even_length] at h'
     push Not at h'
@@ -83,14 +81,14 @@ theorem PEqualNP.Outside.R_meta_2640_641
 
   have oddCycleCore {V : Type} (G : SimpleGraph V)
       (hdeg : ∀ v, (∃ u, G.Adj v u) → (G.neighborSet v).ncard = 3)
-      (hg : (7 : ℕ∞) ≤ G.egirth) (hodd : ∃ k, Odd k ∧ ∃ q, IsClosedWalkTrace G q k) :
+      (hg : (7 : ℕ∞) ≤ G.egirth) (hodd : ∃ k, Odd k ∧ ∃ q : ℕ → V, q k = q 0 ∧ ∀ t < k, G.Adj (q t) (q (t + 1))) :
       ∃ k, 7 ≤ k ∧ Odd k ∧ ∃ c d : ℕ → V,
         (∀ a b, a < k → b < k → c a = c b → a = b) ∧
         (∀ a b, a < k → b < k → d a = d b → a = b) ∧
         (∀ a < k, G.Adj (c a) (d a) ∧ ∀ b < k, d a ≠ c b) ∧
         (∀ a b, a < k → b < k → (G.Adj (c a) (c b) ↔ (a + 1) % k = b ∨ (b + 1) % k = a)) := by
     classical
-    have hmin : ∀ m < Nat.find hodd, m % 2 = 1 → ∀ q, IsClosedWalkTrace G q m → False :=
+    have hmin : ∀ m < Nat.find hodd, m % 2 = 1 → ∀ q : ℕ → V, (q m = q 0 ∧ ∀ t < m, G.Adj (q t) (q (t + 1))) → False :=
       fun m hm ho q hq => Nat.find_min hodd hm ⟨Nat.odd_iff.mpr ho, q, hq⟩
     obtain ⟨hko, p, hp⟩ := Nat.find_spec hodd
     generalize Nat.find hodd = k at hmin hko p hp
@@ -126,19 +124,19 @@ theorem PEqualNP.Outside.R_meta_2640_641
         exact this
     have hkey : ∀ a b, a < b → b < k → p a = p b → False := by
       intro a b hlt hy hxy
-      have l1 : IsClosedWalkTrace G (fun t => p (a + t)) (b - a) := by
+      have l1 : (fun t => p (a + t)) (b - a) = (fun t => p (a + t)) 0 ∧ ∀ t < b - a, G.Adj ((fun t => p (a + t)) t) ((fun t => p (a + t)) (t + 1)) := by
         refine ⟨by simp [show a + (b - a) = b by omega, hxy], fun t ht => ?_⟩
         exact hp.2 _ (by omega)
-      have l2 : IsClosedWalkTrace G (fun t => c (b + t)) (k - (b - a)) := by
+      have l2 : (fun t => c (b + t)) (k - (b - a)) = (fun t => c (b + t)) 0 ∧ ∀ t < k - (b - a), G.Adj ((fun t => c (b + t)) t) ((fun t => c (b + t)) (t + 1)) := by
         refine ⟨?_, fun t _ => hcadj (b + t)⟩
         simp only [Nat.add_zero]
         rw [show b + (k - (b - a)) = a + k by omega, hcper]
         simp [c, Nat.mod_eq_of_lt (show a < k by omega), Nat.mod_eq_of_lt hy, hxy]
       rcases Nat.even_or_odd (b - a) with he | ho
       · rw [Nat.even_iff] at he
-        exact hmin _ (by omega) (by omega) _ l2
+        exact hmin (k - (b - a)) (by omega) (by omega) (fun t => c (b + t)) l2
       · rw [Nat.odd_iff] at ho
-        exact hmin _ (by omega) ho _ l1
+        exact hmin (b - a) (by omega) ho (fun t => p (a + t)) l1
     have hcinj2 : ∀ x y, c x = c y → x % k = y % k := by
       intro x y hxy
       have hx := Nat.mod_lt x (show 0 < k by omega)
@@ -152,7 +150,7 @@ theorem PEqualNP.Outside.R_meta_2640_641
       have := hcinj2 x y hxy
       rwa [Nat.mod_eq_of_lt hx, Nat.mod_eq_of_lt hy] at this
     have hloop_chord : ∀ s m, G.Adj (c (s + m)) (c s) →
-        IsClosedWalkTrace G (fun t => if t ≤ m then c (s + t) else c s) (m + 1) := by
+        (fun t => if t ≤ m then c (s + t) else c s) (m + 1) = (fun t => if t ≤ m then c (s + t) else c s) 0 ∧ ∀ t < m + 1, G.Adj ((fun t => if t ≤ m then c (s + t) else c s) t) ((fun t => if t ≤ m then c (s + t) else c s) (t + 1)) := by
       intro s m hadj
       refine ⟨by simp, fun t ht => ?_⟩
       dsimp only
@@ -164,7 +162,7 @@ theorem PEqualNP.Outside.R_meta_2640_641
         rw [if_pos le_rfl, if_neg (by omega)]
         exact hadj
     have hloop_w : ∀ w s m, G.Adj w (c s) → G.Adj (c (s + m)) w →
-        IsClosedWalkTrace G (fun t => if t = 0 ∨ m + 1 < t then w else c (s + t - 1)) (m + 2) := by
+        (fun t => if t = 0 ∨ m + 1 < t then w else c (s + t - 1)) (m + 2) = (fun t => if t = 0 ∨ m + 1 < t then w else c (s + t - 1)) 0 ∧ ∀ t < m + 2, G.Adj ((fun t => if t = 0 ∨ m + 1 < t then w else c (s + t - 1)) t) ((fun t => if t = 0 ∨ m + 1 < t then w else c (s + t - 1)) (t + 1)) := by
       intro w s m h1 h2
       refine ⟨by simp, fun t ht => ?_⟩
       dsimp only
@@ -179,7 +177,7 @@ theorem PEqualNP.Outside.R_meta_2640_641
       rw [if_neg (by omega), if_neg (by omega)]
       have := hcadj (s + t - 1)
       rwa [show s + t - 1 + 1 = s + (t + 1) - 1 by omega] at this
-    have hseven : ∀ q m, IsClosedWalkTrace G q m → 3 ≤ m → (∀ a b, a < m → b < m → q a = q b → a = b) →
+    have hseven : ∀ (q : ℕ → V) m, (q m = q 0 ∧ ∀ t < m, G.Adj (q t) (q (t + 1))) → 3 ≤ m → (∀ a b, a < m → b < m → q a = q b → a = b) →
         7 ≤ m := by
       intro q m hl hm hi
       have := le_trans hg (loopGirthBound q m hl hm hi)
@@ -203,9 +201,9 @@ theorem PEqualNP.Outside.R_meta_2640_641
         (by rw [show y + (k - (y - x)) = x + k by omega, hcper]; exact hadj)
       rcases Nat.even_or_odd (y - x) with he | ho
       · rw [Nat.even_iff] at he
-        exact hmin _ (by omega) (by omega) _ l1
+        exact hmin (y - x + 1) (by omega) (by omega) (fun t => if t ≤ y - x then c (x + t) else c x) l1
       · rw [Nat.odd_iff] at ho
-        exact hmin _ (by omega) (by omega) _ l2
+        exact hmin (k - (y - x) + 1) (by omega) (by omega) (fun t => if t ≤ k - (y - x) then c (y + t) else c y) l2
     have hadjiff : ∀ a b, a < k → b < k →
         (G.Adj (c a) (c b) ↔ (a + 1) % k = b ∨ (b + 1) % k = a) := by
       intro a b ha hb
@@ -297,9 +295,9 @@ theorem PEqualNP.Outside.R_meta_2640_641
       have g2 := hseven _ _ l2 (by omega) (hwinj (d x) y (k - (y - x)) hwn hy (by omega))
       rcases Nat.even_or_odd (y - x) with he | ho
       · rw [Nat.even_iff] at he
-        exact hmin _ (by omega) (by omega) _ l2
+        exact hmin (k - (y - x) + 2) (by omega) (by omega) (fun t => if t = 0 ∨ k - (y - x) + 1 < t then d x else c (y + t - 1)) l2
       · rw [Nat.odd_iff] at ho
-        exact hmin _ (by omega) (by omega) _ l1
+        exact hmin (y - x + 2) (by omega) (by omega) (fun t => if t = 0 ∨ y - x + 1 < t then d x else c (x + t - 1)) l1
     exact ⟨k, hk7, hko, c, d, hcinj, hdinj, fun a ha => hd a ha, hadjiff⟩
 
   have findOddCycleWithSpokes : ∀ (x1 : ℕ) (x2 : SimpleGraph (Fin x1)) (x3 : Finset (Fin x1)), ¬x2.Colorable (2 : ℕ) → (∀ x5 ∉ x3, (x2.neighborSet x5).ncard = (3 : ℕ)) → (7 : ℕ∞) ≤ x2.egirth → (∀ (x7 x8 : Fin x1), x2.Adj x7 x8 → x7 ∉ x3) → ∃ (x8 : ℕ), (7 : ℕ) ≤ x8 ∧ Odd x8 ∧ ∃ (x9 : Fin x8 ↪ Fin x1) (x10 : Fin x8 ↪ Fin x1), (∀ (x11 : Fin x8), x2.Adj (x9 x11) (x10 x11) ∧ x10 x11 ∉ Set.range ⇑x9) ∧ ∀ (x11 x12 : Fin x8), x2.Adj (x9 x11) (x9 x12) ↔ (↑x11 + (1 : ℕ)) % x8 = ↑x12 ∨ (↑x12 + (1 : ℕ)) % x8 = ↑x11 := by
@@ -332,7 +330,7 @@ theorem PEqualNP.Outside.R_meta_2640_641
       (gs.foldl step w).length = w.length + gs.length := by
     induction gs generalizing w with
     | nil => simp
-    | cons g gs ih => simp [List.foldl_cons, ih, step]; omega
+    | cons g gs ih => rw [List.foldl_cons, ih, List.length_append]; simp only [List.length_cons, List.length_nil]; omega
 
   have fold_stab (gs : List Gate) (w : List Bool) (i : ℕ) (h : i < w.length) :
       (gs.foldl step w).getD i false = w.getD i false := by
@@ -345,11 +343,13 @@ theorem PEqualNP.Outside.R_meta_2640_641
   have gates_erase (n : ℕ) (C : Circuit) (m p : ℕ) (hm : m < C.gates.length) :
       (eraseGate n C m p).gates = C.gates.take m ++
         (C.gates.drop (m + 1)).map (fun g => ⟨g.op, g.inputs.map (eraseRedirect n m p)⟩) := by
-    simp only [eraseGate, if_pos hm]
+    unfold eraseGate
+    rw [if_pos hm]
 
   have out_erase (n : ℕ) (C : Circuit) (m p : ℕ) (hm : m < C.gates.length) :
       (eraseGate n C m p).output = eraseRedirect n m p C.output := by
-    simp only [eraseGate, if_pos hm]
+    unfold eraseGate
+    rw [if_pos hm]
 
   have len_erase (n : ℕ) (C : Circuit) (m p : ℕ) (hm : m < C.gates.length) :
       (eraseGate n C m p).gates.length + 1 = C.gates.length := by
