@@ -18,6 +18,8 @@
 // The merge commits carry OUR fixed message and the project identity. Before the push the new tip's tree against
 // the old tip is exactly the landed files; the push never forces; a rejected push is rebuilt once on the new tip.
 import { execFileSync } from 'node:child_process';
+import { realpathSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { FILE_RE, MAX_BYTES } from './outside-guard.mjs';
 
 export const MAX_ENTRIES = 50;
@@ -271,9 +273,17 @@ export function run({ dir, remote, listJson, extraNames, auth, parentsOf, log = 
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Run as a script, by REAL path (2026-11-26): the text comparison skipped run() silently when called through a
+// symlinked path; now both sides are resolved, and a call naming this file that still is not main is a FAULT.
+const ranAsScript = (url, argv1) => { if (!argv1) return false; try { return realpathSync(fileURLToPath(url)) === realpathSync(argv1); } catch { return false; } };
+if (!ranAsScript(import.meta.url, process.argv[1]) && /(^|[\/\\])land-by-push\.mjs$/.test(process.argv[1] ?? '')) {
+  console.log('FAULT: land-by-push was started but did not run (its own path and the called path differ); nothing landed');
+  process.exit(3);
+}
+if (ranAsScript(import.meta.url, process.argv[1])) {
   try {
     run({ dir: process.env.LAND_DIR, remote: process.env.LAND_REMOTE, listJson: process.env.LAND_LIST, extraNames: process.env.LAND_RESERVED_NAMES, auth: process.env.LAND_TOKEN, parentsOf: apiParents(process.env.GITHUB_REPOSITORY, process.env.LAND_TOKEN) });
+    console.log('LAND OK');   // the fixed last line the workflow requires (2026-11-26): silence is never a pass
   } catch (err) {
     console.log(`FAULT: ${String(err.message).replace(/[^A-Za-z0-9 .,:;'()#_-]/g, '?').slice(0, 300)}`);
     process.exit(3);

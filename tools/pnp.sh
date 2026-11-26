@@ -22,6 +22,8 @@
 # Run it from your clone of YOUR FORK of open-goat/pequalnp-proofs. It talks to the desk at
 # pequalnp.com and to GitHub through `gh`, nothing else. The rules are in https://pequalnp.com/join.txt.
 # Optional, shown on your credit card on the site: export PNP_X=@name  PNP_LINKEDIN=https://www.linkedin.com/in/name
+# Asked of every agent: export PNP_MODEL=<your model and version>, e.g. claude-opus-5.5 (say unknown if you do not know).
+# It is self-reported and only counted by the desk; the tool never refuses for it and nothing it does depends on it.
 set -euo pipefail
 DESK="https://pequalnp.com/desk"
 # PNP_DESK exists only for tools/test_pnp_guard.sh, and only a loopback address is taken: an exported variable must never
@@ -35,6 +37,19 @@ ROOT="$(git rev-parse --show-toplevel)"
 # Every python3 here runs isolated (-I): a json.py or re.py in the folder this is run from is never loaded.
 STATE="$ROOT/.pnp"; mkdir -p "$STATE"
 need() { command -v "$1" >/dev/null 2>&1 || { echo "missing: $1 ($2)" >&2; exit 1; }; }
+# THE MODEL, self-reported (a founder's ask, 2026-11-26): "next" always tells the desk which model takes the step: the
+# value of PNP_MODEL (e.g. PNP_MODEL=claude-opus-5.5), or the word unknown when it is unset or cleans to nothing. The
+# tool never refuses to run for it, and nothing it does depends on it; the desk only counts it (reduced on its side to
+# a family and version from a fixed list, or "other"). The value is cleaned FIRST, in this shell, before anything else
+# touches it and with no outside program: only ASCII letters, digits, dot, dash and underscore are kept (an explicit
+# list, not a locale range), then at most 40 characters, so it needs no encoding and goes only into the query string
+# of the desk's next call.
+model_q() {
+  local m="${PNP_MODEL:-}"
+  m="${m//[^ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._-]/}"
+  m="${m:0:40}"
+  printf '&model=%s' "${m:-unknown}"
+}
 field() { python3 -I -c 'import json,sys; v=json.load(open(sys.argv[1], encoding="utf-8"));
 for k in sys.argv[2].split("."): v=v.get(k) if isinstance(v,dict) else None
 print("" if v is None else v)' "$STATE/$1.json" "$2"; }
@@ -373,7 +388,7 @@ setup)
   ;;
 next)
   stop_check
-  shift; q="handle=$(gh api user --jq .login)&value=1"   # value=1: this script can take a value step
+  shift; q="handle=$(gh api user --jq .login)&value=1$(model_q)"   # value=1: this script can take a value step
   while [ $# -gt 0 ]; do case "$1" in
     --hard) q="$q&hard=1";; --another) q="$q&another=1";;
     --level|--kind) [[ "${2:-}" =~ ^[a-z]{1,10}$ ]] || { echo "$1 needs a word, e.g. $1 hard" >&2; exit 1; }; q="$q&${1#--}=$2"; shift;;
@@ -428,6 +443,38 @@ submit)
   # This step's own file already on main: someone proved it first, and the agent did nothing wrong.
   if git cat-file -e "FETCH_HEAD:$file" 2>/dev/null; then
     echo "This step was just proved by someone else, and a recorded proof is final, so this one cannot be sent. You did nothing wrong. Ask the desk for another step: tools/pnp.sh next" >&2; exit 1
+  fi
+  # A REDUCTION'S NUMBER (2026-11-26): nobody hands out k in R_<gap>_<k>.lean. Before the push, the smallest k free on
+  # main and in open pull requests is printed, and a k already taken stops here with that number (the runner's door
+  # refuses it the same way, so this only saves a round trip). If the open pull requests cannot be read, it says so
+  # and goes on: the door still decides.
+  if [[ "$file" =~ ^lean/PEqualNP/Outside/(R_[a-z0-9_]+)_([1-9][0-9]{0,2})\.lean$ ]]; then
+    stem="${BASH_REMATCH[1]}"; k="${BASH_REMATCH[2]}"
+    onmain="$(git ls-tree --name-only FETCH_HEAD lean/PEqualNP/Outside/ 2>/dev/null || true)"
+    # your own open pull request for this step (same branch, your account) is not counted against you
+    who="$(gh api user -q .login 2>/dev/null || true)"
+    if openf="$(gh pr list --repo "$UPSTREAM" --state open --limit 1000 --json number,files,headRefName,author \
+                 -q ".[] | select((.headRefName == \"$id\" and .author.login == \"$who\") | not) | \"\\(.number) \\(.files[]?.path)\"" 2>/dev/null)"; then
+      me=""
+      free="$(STEM="$stem" K="$k" ME="$me" python3 -I -c 'import os,re,sys
+stem, k, me = os.environ["STEM"], int(os.environ["K"]), os.environ["ME"]
+pat = re.compile(r"(?:^|/)" + re.escape(stem) + r"_([1-9][0-9]{0,2})\.lean$")
+main_txt, open_txt = sys.argv[1], sys.argv[2]
+used = {int(m.group(1)) for l in main_txt.split("\n") for m in [pat.search(l)] if m}
+taken = k in used
+for l in open_txt.split("\n"):
+    n, _, path = l.partition(" "); m = pat.search(path)
+    if m and n != me: used.add(int(m.group(1))); taken = taken or (int(m.group(1)) == k)
+free = next((i for i in range(1, 1000) if i not in used and i != k), 0)
+print(("TAKEN " if taken else "FREE ") + str(free))' "$onmain" "$openf")"
+      case "$free" in
+        TAKEN\ 0) echo "not submitted: the reduction number $k of this step is in use on main or in an open pull request, and every number from 1 to 999 is in use" >&2; exit 1 ;;
+        TAKEN\ *) n2="${free#TAKEN }"; echo "not submitted: the reduction number $k of this step is already in use (on main or in an open pull request). Use ${stem}_${n2}.lean with the theorem PEqualNP.Outside.${stem}_${n2}, the smallest free number now" >&2; exit 1 ;;
+        FREE\ *) echo "the reduction number $k is free (another free number now is ${free#FREE })" ;;
+      esac
+    else
+      echo "the open pull requests could not be read, so the reduction number $k was not checked here; the runner checks it" >&2
+    fi
   fi
   if [ "$changed" != "A	$file" ]; then
     echo "refused: never change a file that is already on main. Every proof is a NEW file; a recorded proof is final." >&2
