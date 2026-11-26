@@ -9,6 +9,7 @@
 //   node outside-guard.mjs gap-of-file <gaps.json> <file path> <out dir>
 //   node outside-guard.mjs imports <lean file> <imports.json> <file path in the pull request> [kind]
 //   node outside-guard.mjs closure <base dir> <imports.json> <judged file path> <out dir> [kind]
+//   node outside-guard.mjs number <file path> <base dir> <open.json> <pr number>   (a reduction's k is free)
 //
 // KINDS. A proof (check) or a refutation (refute) of a posted step S is the file of its gap row,
 // lean/PEqualNP/Outside/L_<gap>.lean. A REDUCTION of S (kind reduce, ships dark) is
@@ -32,7 +33,7 @@
 // an author fixes all of them in one push; at most MAX_PROBLEMS lines, then `... and N more`, and
 // at most MAX_REFUSAL characters in all. The first line is the sentence a one-reason refusal gave.
 // Exit 3: bad usage.
-import { lstatSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import { lstatSync, readdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -123,6 +124,58 @@ export function checkPr(pr, files, tree, repo, defaultBranch) {
   if (e.sha !== f.sha) refuse('the file list and the tree disagree about the content');
   if (!Number.isInteger(e.size) || e.size < 1 || e.size > MAX_BYTES) refuse(`the file must be between 1 and ${MAX_BYTES} bytes`);
   return { file: f.filename, module: moduleOf(f.filename), head, blob: f.sha, author, size: e.size };
+}
+
+// THE NUMBER OF A REDUCTION (2026-11-26, the operator's yes on the checker seat's B2 answer). Nobody hands out k in
+// R_<gap>_<k>.lean: the sender picks it, so two senders who read main at the same time take the same k, the second
+// is checked, cannot merge (main has the path) and waited in silence. So, at the door, before the checker spends a
+// minute, a reduction file is refused when its k is (1) already a file on the base, or (2) the file of an EARLIER
+// open pull request (a smaller number, opened within STALE_HOURS), and the refusal names the smallest k free on
+// both. The earlier pull request keeps its number, so two at once never block each other. An open pull request
+// older than STALE_HOURS stops counting: a number is cheap and an abandoned one must not hold it for ever; the
+// time is the API's createdAt (set by GitHub, not by the sender). Stricter only: nothing that passed before is
+// let through by this, and a file that is not a reduction is not looked at.
+// NO HOARDING (redteam-2's term D2): an account counts for at most MAX_HELD numbers of one step among the counted
+// open pull requests (its earliest ones by number); the rest of its claims hold nothing, so one account opening ten
+// pull requests on a step blocks three numbers, not ten. An entry with no author counts as one account of its own.
+//   onBase: the file names in the base's lean/PEqualNP/Outside; open: the API's open pull requests as
+//   [{ number, createdAt, author, files: [path] }] (read whole, or refused before this); pr: this pull request's number.
+export const STALE_HOURS = 48;
+export const MAX_HELD = 3;
+const R_PARTS_RE = /^(?:lean\/PEqualNP\/Outside\/)?(R_[a-z0-9_]+)_([1-9][0-9]{0,2})\.lean$/;
+export function checkCutNumber(file, onBase, open, pr, now = Date.now()) {
+  const m = R_PARTS_RE.exec(file ?? '');
+  if (!m || !R_FILE_RE.test(file)) return null;
+  const [, stem, ks] = m; const k = Number(ks);
+  if (!Number.isInteger(pr) || pr < 1) refuse('the pull request number is malformed');
+  if (!Array.isArray(onBase) || !Array.isArray(open)) refuse('the list of reduction numbers in use could not be read');
+  const onMain = new Set(); const inOpen = new Set(); let earlier = false;
+  for (const name of onBase) { const q = R_PARTS_RE.exec(String(name)); if (q && q[1] === stem) onMain.add(Number(q[2])); }
+  const claims = [];
+  for (const o of open) {
+    if (!o || !Number.isInteger(o.number) || o.number === pr || !Array.isArray(o.files)) continue;
+    const t = Date.parse(String(o.createdAt ?? ''));
+    if (!Number.isFinite(t) || now - t > STALE_HOURS * 3600e3) continue;
+    for (const f of o.files) {
+      const q = R_PARTS_RE.exec(String(f));
+      if (q && q[1] === stem) claims.push({ number: o.number, author: typeof o.author === 'string' ? o.author : `#${o.number}`, n: Number(q[2]) });
+    }
+  }
+  claims.sort((a, b) => a.number - b.number);
+  const held = new Map();
+  for (const c of claims) {
+    const h = held.get(c.author) ?? 0;
+    if (h >= MAX_HELD) continue;
+    held.set(c.author, h + 1);
+    inOpen.add(c.n);
+    if (c.n === k && c.number < pr) earlier = true;
+  }
+  if (!onMain.has(k) && !earlier) return { k };
+  let free = 0;
+  for (let i = 1; i <= 999; i++) if (!onMain.has(i) && !inOpen.has(i) && i !== k) { free = i; break; }
+  const where = onMain.has(k) ? 'is already a file on main' : 'is the file of an earlier open pull request';
+  const next = free ? `send the same proof as ${stem}_${free}.lean with the theorem PEqualNP.Outside.${stem}_${free} (the smallest number free on main and in open pull requests), and it is judged` : 'every number from 1 to 999 is in use for this step';
+  refuse(`the reduction number ${k} of this step ${where}, so this file could never be merged; ${next}. You did nothing wrong`);
 }
 
 // The gap as the desk posts it. Its file must be the file of the pull request; for a reduction,
@@ -569,6 +622,15 @@ const main = () => {
     put(out, 'imports.json', JSON.stringify(g.imports));
     put(out, 'imports.txt', g.imports.map((m) => `${m}\n`).join(''));
     put(out, 'gap.kind', `${g.kind}\n`);
+  } else if (cmd === 'number' && a.length === 4) {
+    // node outside-guard.mjs number <file path> <base dir> <open.json> <pr number>
+    const [file, baseDir, openPath, prs] = a;
+    if (!/^[1-9][0-9]{0,8}$/.test(prs)) refuse('the pull request number is malformed');
+    const dir = join(baseDir, 'lean', 'PEqualNP', 'Outside');
+    let names = []; try { names = readdirSync(dir); } catch { names = []; }
+    if (!R_FILE_RE.test(file)) refuse('the number check is for a reduction file R_<gap>_<n>.lean only');
+    const r = checkCutNumber(file, names, json(openPath), Number(prs));
+    process.stdout.write(`the reduction number ${r.k} is free on main and in earlier open pull requests\n`);
   } else if (cmd === 'imports' && (a.length === 3 || a.length === 4)) {
     checkFileKind(a[2], a[3]);
     const bytes = readFileSync(a[0]);
@@ -592,7 +654,7 @@ const main = () => {
     put(out, 'outside-sources.txt', r.outside.map((m) => `base/lean/${m.split('.').join('/')}.lean\n`).join(''));
     process.stdout.write(`built before the locked step: ${r.base.join(' ') || '(none)'}\noutside-written, built only in the locked step: ${r.outside.join(' ') || '(none)'}\n`);
   } else {
-    process.stderr.write('usage: outside-guard.mjs pr|gap|gap-of-file|imports|closure ... (see the header)\n');
+    process.stderr.write('usage: outside-guard.mjs pr|gap|gap-of-file|imports|closure|number ... (see the header)\n');
     process.exit(3);
   }
   // ONE FIXED LAST LINE ON SUCCESS (2026-11-26): the workflows require it after every call, so a silent exit 0 is

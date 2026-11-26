@@ -610,3 +610,55 @@ import { ranAsScript } from './outside-guard.mjs';
     assert.equal(ranAsScript(url, undefined), false);
   });
 }
+
+// THE NUMBER OF A REDUCTION (2026-11-26): k free on the base and in EARLIER open pull requests, else refused
+// at the door with the smallest free k named. Later and stale open pull requests do not count.
+import { checkCutNumber, STALE_HOURS, MAX_HELD } from './outside-guard.mjs';
+{
+  const F = (k) => `lean/PEqualNP/Outside/R_meta_4013_${k}.lean`;
+  const now = Date.parse('2026-11-26T03:00:00Z');
+  const ago = (h) => new Date(now - h * 3600e3).toISOString();
+  const base = ['R_meta_4013_1.lean', 'R_meta_4013_2.lean', 'L_meta_4013.lean', 'R_meta_40130_3.lean'];
+  const say = (re) => (e) => re.test(e.message) && !e.message.includes(':');
+  test('cut number: a free k passes', () => assert.deepEqual(checkCutNumber(F(3), base, [], 500, now), { k: 3 }));
+  test('cut number: a k on the base is refused and names the smallest free one', () =>
+    assert.throws(() => checkCutNumber(F(2), base, [], 500, now), say(/number 2 of this step is already a file on main.*R_meta_4013_3\.lean.*PEqualNP\.Outside\.R_meta_4013_3/)));
+  test('cut number: another step with a longer id does not count (R_meta_40130_3 is not R_meta_4013_3)', () =>
+    assert.deepEqual(checkCutNumber(F(3), base, [], 500, now), { k: 3 }));
+  test('cut number: an earlier open pull request holding k refuses, and its other numbers are skipped', () =>
+    assert.throws(() => checkCutNumber(F(3), base, [{ number: 400, createdAt: ago(1), files: [F(3)] }, { number: 450, createdAt: ago(1), files: [F(4)] }], 500, now),
+      say(/earlier open pull request.*R_meta_4013_5\.lean/)));
+  test('cut number: a LATER open pull request holding k does not refuse this one (the earlier keeps it)', () =>
+    assert.deepEqual(checkCutNumber(F(3), base, [{ number: 600, createdAt: ago(1), files: [F(3)] }], 500, now), { k: 3 }));
+  test('cut number: the pull request itself does not count', () =>
+    assert.deepEqual(checkCutNumber(F(3), base, [{ number: 500, createdAt: ago(1), files: [F(3)] }], 500, now), { k: 3 }));
+  test(`cut number: an open pull request older than ${STALE_HOURS} hours stops counting`, () =>
+    assert.deepEqual(checkCutNumber(F(3), base, [{ number: 400, createdAt: ago(STALE_HOURS + 1), files: [F(3)] }], 500, now), { k: 3 }));
+  test('cut number: an entry with no time or a malformed number is ignored, not trusted', () =>
+    assert.deepEqual(checkCutNumber(F(3), base, [{ number: 400, files: [F(3)] }, { number: '400', createdAt: ago(1), files: [F(3)] }, null], 500, now), { k: 3 }));
+  test('cut number: a proof file (L_) is not looked at', () => assert.equal(checkCutNumber('lean/PEqualNP/Outside/L_meta_4013.lean', base, [], 500, now), null));
+  test('cut number: every number in use says so', () => {
+    const all = Array.from({ length: 999 }, (_, i) => `R_meta_4013_${i + 1}.lean`);
+    assert.throws(() => checkCutNumber(F(7), all, [], 500, now), say(/every number from 1 to 999 is in use/));
+  });
+  test(`cut number: one account holds at most ${MAX_HELD} numbers of a step (10 open pull requests block 3)`, () => {
+    const ten = Array.from({ length: 10 }, (_, i) => ({ number: 100 + i, createdAt: ago(1), author: 'hoarder', files: [F(i + 3)] }));   // claims 3..12
+    assert.throws(() => checkCutNumber(F(5), base, ten, 500, now), say(/earlier open pull request.*R_meta_4013_6\.lean/));   // 3, 4, 5 count
+    assert.deepEqual(checkCutNumber(F(6), base, ten, 500, now), { k: 6 });   // the fourth claim holds nothing
+    assert.deepEqual(checkCutNumber(F(12), base, ten, 500, now), { k: 12 });
+    const two = [...ten, { number: 120, createdAt: ago(1), author: 'other', files: [F(6)] }];
+    assert.throws(() => checkCutNumber(F(6), base, two, 500, now), say(/earlier open pull request.*R_meta_4013_7\.lean/));   // another account's claim counts
+  });
+  test('cut number: unreadable lists refuse', () => assert.throws(() => checkCutNumber(F(3), null, [], 500, now), /could not be read/));
+  test('cut number: the command line, on a real base folder', () => {
+    const d = mkdtempSync(pj(tmpdir(), 'cutnum-')); const o = pj(d, 'lean', 'PEqualNP', 'Outside');
+    spawnSync('mkdir', ['-p', o]); wf(pj(o, 'R_meta_4013_1.lean'), ''); wf(pj(d, 'open.json'), JSON.stringify([{ number: 10, createdAt: new Date().toISOString(), files: [F(2)] }]));
+    const r1 = cli('number', F(1), d, pj(d, 'open.json'), '20');
+    assert.equal(r1.status, 1); assert.match(r1.stdout, /^REFUSED: the reduction number 1 of this step is already a file on main.*R_meta_4013_3\.lean/);
+    const r2 = cli('number', F(3), d, pj(d, 'open.json'), '20');
+    assert.equal(r2.status, 0); assert.match(r2.stdout, /number 3 is free/); assert.equal(r2.stdout.trimEnd().split('\n').at(-1), 'GUARD OK: number');
+    const r3 = cli('number', 'lean/PEqualNP/Outside/L_meta_4013.lean', d, pj(d, 'open.json'), '20');
+    assert.equal(r3.status, 1); assert.match(r3.stdout, /^REFUSED: the number check is for a reduction file/); assert.doesNotMatch(r3.stdout, /GUARD OK/);
+    assert.equal(cli('number', F(3), d, pj(d, 'open.json'), 'x').status, 1);
+  });
+}

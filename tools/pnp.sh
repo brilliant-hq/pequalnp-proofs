@@ -429,6 +429,38 @@ submit)
   if git cat-file -e "FETCH_HEAD:$file" 2>/dev/null; then
     echo "This step was just proved by someone else, and a recorded proof is final, so this one cannot be sent. You did nothing wrong. Ask the desk for another step: tools/pnp.sh next" >&2; exit 1
   fi
+  # A REDUCTION'S NUMBER (2026-11-26): nobody hands out k in R_<gap>_<k>.lean. Before the push, the smallest k free on
+  # main and in open pull requests is printed, and a k already taken stops here with that number (the runner's door
+  # refuses it the same way, so this only saves a round trip). If the open pull requests cannot be read, it says so
+  # and goes on: the door still decides.
+  if [[ "$file" =~ ^lean/PEqualNP/Outside/(R_[a-z0-9_]+)_([1-9][0-9]{0,2})\.lean$ ]]; then
+    stem="${BASH_REMATCH[1]}"; k="${BASH_REMATCH[2]}"
+    onmain="$(git ls-tree --name-only FETCH_HEAD lean/PEqualNP/Outside/ 2>/dev/null || true)"
+    # your own open pull request for this step (same branch, your account) is not counted against you
+    who="$(gh api user -q .login 2>/dev/null || true)"
+    if openf="$(gh pr list --repo "$UPSTREAM" --state open --limit 1000 --json number,files,headRefName,author \
+                 -q ".[] | select((.headRefName == \"$id\" and .author.login == \"$who\") | not) | \"\\(.number) \\(.files[]?.path)\"" 2>/dev/null)"; then
+      me=""
+      free="$(STEM="$stem" K="$k" ME="$me" python3 -I -c 'import os,re,sys
+stem, k, me = os.environ["STEM"], int(os.environ["K"]), os.environ["ME"]
+pat = re.compile(r"(?:^|/)" + re.escape(stem) + r"_([1-9][0-9]{0,2})\.lean$")
+main_txt, open_txt = sys.argv[1], sys.argv[2]
+used = {int(m.group(1)) for l in main_txt.split("\n") for m in [pat.search(l)] if m}
+taken = k in used
+for l in open_txt.split("\n"):
+    n, _, path = l.partition(" "); m = pat.search(path)
+    if m and n != me: used.add(int(m.group(1))); taken = taken or (int(m.group(1)) == k)
+free = next((i for i in range(1, 1000) if i not in used and i != k), 0)
+print(("TAKEN " if taken else "FREE ") + str(free))' "$onmain" "$openf")"
+      case "$free" in
+        TAKEN\ 0) echo "not submitted: the reduction number $k of this step is in use on main or in an open pull request, and every number from 1 to 999 is in use" >&2; exit 1 ;;
+        TAKEN\ *) n2="${free#TAKEN }"; echo "not submitted: the reduction number $k of this step is already in use (on main or in an open pull request). Use ${stem}_${n2}.lean with the theorem PEqualNP.Outside.${stem}_${n2}, the smallest free number now" >&2; exit 1 ;;
+        FREE\ *) echo "the reduction number $k is free (another free number now is ${free#FREE })" ;;
+      esac
+    else
+      echo "the open pull requests could not be read, so the reduction number $k was not checked here; the runner checks it" >&2
+    fi
+  fi
   if [ "$changed" != "A	$file" ]; then
     echo "refused: never change a file that is already on main. Every proof is a NEW file; a recorded proof is final." >&2
     echo "this pull request would change:" >&2; echo "$changed" >&2; exit 1
