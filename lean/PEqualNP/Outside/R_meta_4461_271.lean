@@ -37,4 +37,9 @@ theorem PEqualNP.Outside.R_meta_4461_271
   obtain ⟨v,hv,vu,apart,c,drop,hc⟩ :=
     second n G I color cubic girth isolated edge u hu t ht least (lt_of_le_of_lt saving small)
   refine ⟨u,v,hu,hv,Ne.symm vu,apart,c,by omega,?_⟩
-  simpa only [F, Function.update_comm vu] using hc
+  have eqF : (fun x => F u (Function.update x v false)) =
+      (fun x => graphFun G ∅ (Function.update (Function.update x u false) v false)) := by
+    funext x
+    exact congrArg (graphFun G ∅) (Function.update_comm vu false false x)
+  rw [eqF] at hc
+  exact hc
