@@ -60,6 +60,43 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
         ⦃_ : ∀ z ∈ ({e, f} : Finset (Sym2 (Fin 26))), z ∈ U ∧ z ∈ gammaE G C g ∧ ∃ t ∈ T, ∃ d : Fin 2, z ∈ gammaE G C t ∧ OrReaches 26 C (opnd C t d) g⦄
         ⦃_ : ¬ ∃ v : Fin 26, v ∈ e ∧ v ∈ f⦄, False) →
     ∀ (x1 : SimpleGraph (Fin (26 : ℕ))) [x2 : DecidableRel x1.Adj] (x3 : PEqualNP.CircuitLowerBounds.Circuit),   (x1 = SimpleGraph.fromRel fun (x4 x5 : Fin (26 : ℕ)) => ↑x4 < (13 : ℕ) ∧ (13 : ℕ) ≤ ↑x5 ∧ (↑x4 + (26 : ℕ) - ↑x5) % (13 : ℕ) ∈ [(0 : ℕ), (1 : ℕ), (3 : ℕ), (9 : ℕ)]) →     PEqualNP.TopForm.IsLeastAO x1 x3 →       PEqualNP.TopForm.TopForm x1 x3 →         x3.size ≤ (64 : ℕ) →           have x8 : Finset ℕ := PEqualNP.TopForm.tops x1 x3;           have x9 : Finset ℕ := PEqualNP.TopForm.junk x1 x3;           have x10 : Finset (Sym2 (Fin (26 : ℕ))) := PEqualNP.TopForm.Ustar x1 x3;           have x11 : Finset ℕ := PEqualNP.TopForm.orN x1 x3 \ PEqualNP.TopForm.lam x1 x3;           PEqualNP.TopForm.centreless x1 x3 = ∅ → (2 : ℕ) ≤ x9.card → (1 : ℕ) ≤ (PEqualNP.TopForm.mixing x1 x3).card → (3 : ℕ) ≤ x10.card → x8.card + x9.card + x11.card ≤ (13 : ℕ) + x10.card → (52 : ℕ) ≤ (4 : ℕ) * x8.card + x10.card → (∀ (x18 : Finset (Fin (26 : ℕ))), PEqualNP.MetaComplexity.NestedCover.IsMinCover (x1.deleteEdges ↑x10) x18 → x18.card ≤ x8.card) → False := by
+  have gateAt_d : ∀ (C : Circuit) (j : ℕ), gateAt C j = C.gates.getD j ⟨GateOp.or, []⟩ := by
+    intros; exact rfl
+  have pairInput_d : ∀ {n : ℕ} (u v : Fin n), pairInput u v = fun w => decide (w = u ∨ w = v) := by
+    intros; exact rfl
+  have graphFun_d : ∀ {n : ℕ} (K : SimpleGraph (Fin n)) [DecidableRel K.Adj] (A : Finset (Fin n))
+      (x : Fin n → Bool), graphFun K A x =
+        (decide (∃ a ∈ A, x a = true) || decide (∃ u v, K.Adj u v ∧ x u = true ∧ x v = true)) := by
+    intros; exact rfl
+  have coneStep_d : ∀ (n : ℕ) (cs : List (List ℕ)) (g : Gate), coneStep n cs g =
+      cs ++ [(g.inputs.filter (fun w => decide (n ≤ w ∧ w < n + cs.length))).flatMap
+        (fun w => (w - n) :: cs.getD (w - n) [])] := by
+    intros; exact rfl
+  have orStep_d : letI := PEqualNP.MetaComplexity.NestedCover.gateOpDecEq; ∀ (n : ℕ) (cs : List (List ℕ)) (g : Gate), orStep n cs g =
+      cs ++ [cs.length :: (if g.op = GateOp.or then
+        (g.inputs.filter (fun w => decide (n ≤ w ∧ w < n + cs.length))).flatMap
+          (fun w => cs.getD (w - n) [])
+        else [])] := by
+    intros; exact rfl
+  have opnd_d : ∀ (C : Circuit) (a : ℕ) (b : Fin 2), opnd C a b = (gateAt C a).inputs.getD b 0 := by
+    intros; exact rfl
+  have orIn_d : letI := PEqualNP.MetaComplexity.NestedCover.gateOpDecEq; ∀ (n : ℕ) (C : Circuit) (w : ℕ), orIn n C w = Finset.univ.filter fun i : Fin n =>
+      (i : ℕ) = w ∨ ∃ k < C.gates.length,
+        OrReaches n C w k ∧ (gateAt C k).op = GateOp.or ∧ (i : ℕ) ∈ (gateAt C k).inputs := by
+    intros; exact rfl
+  have gatesWhere_d : ∀ (C : Circuit) (P : ℕ → Prop) [DecidablePred P],
+      gatesWhere C P = (Finset.range C.gates.length).filter P := by
+    intros; exact rfl
+  have tops_d : letI := PEqualNP.MetaComplexity.NestedCover.gateOpDecEq; ∀ {n : ℕ} (G : SimpleGraph (Fin n)) [DecidableRel G.Adj] (C : Circuit),
+      tops G C = gatesWhere C fun j => (gateAt C j).op = GateOp.and ∧ BelowF G C j := by
+    intros; exact rfl
+  have orN_d : letI := PEqualNP.MetaComplexity.NestedCover.gateOpDecEq; ∀ {n : ℕ} (G : SimpleGraph (Fin n)) [DecidableRel G.Adj] (C : Circuit),
+      orN G C = gatesWhere C fun j => (gateAt C j).op = GateOp.or ∧ ¬ BelowF G C j := by
+    intros; exact rfl
+  have evalOr_d : ∀ l : List Bool, GateOp.eval GateOp.or l = l.any id := by
+    intros; exact rfl
+  have evalAnd_d : ∀ l : List Bool, GateOp.eval GateOp.and l = l.all id := by
+    intros; exact rfl
   have bitSeparation : ∀ (k : Fin 5), 2 ≤ k.val →
       ∀ f : Fin k.val → Fin (k.val-1) → Bool,
         ¬ (∀ i j, i ≠ j → ∃ t, f i t = true ∧ f j t = false) := by
@@ -72,58 +109,58 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
   have foldl_length (gs : List Gate) (w : List Bool) :
       (gs.foldl stepWire w).length = w.length + gs.length := by
     induction gs generalizing w with
-    | nil => simp
+    | nil => simp -congrConsts
     | cons g gs ih =>
       rw [List.foldl_cons, ih]
-      simp [stepWire]
+      simp -congrConsts [stepWire]
       omega
   have foldl_getD_lt (gs : List Gate) (w : List Bool) (i : ℕ) (hi : i < w.length) :
       (gs.foldl stepWire w).getD i false = w.getD i false := by
     induction gs generalizing w with
     | nil => rfl
     | cons g gs ih =>
-      simp only [List.foldl_cons]
-      have hlt : i < (stepWire w g).length := by simp [stepWire]; omega
+      simp -congrConsts only [List.foldl_cons]
+      have hlt : i < (stepWire w g).length := by simp -congrConsts [stepWire]; omega
       rw [ih (stepWire w g) hlt]
-      simp [stepWire, List.getD_eq_getElem?_getD, List.getElem?_append_left hi]
+      simp -congrConsts [stepWire, List.getD_eq_getElem?_getD, List.getElem?_append_left hi]
   have getD_ge (w : List Bool) (i : ℕ) (hi : w.length ≤ i) : w.getD i false = false := by
-    simp [List.getD_eq_getElem?_getD, List.getElem?_eq_none hi]
+    simp -congrConsts [List.getD_eq_getElem?_getD, List.getElem?_eq_none hi]
   have foldl_getD_gate (gs : List Gate) (w : List Bool) (j : ℕ) (hj : j < gs.length) :
       (gs.foldl stepWire w).getD (w.length + j) false =
         (gs[j]).op.eval ((gs[j]).inputs.map fun i =>
           if i < w.length + j then (gs.foldl stepWire w).getD i false else false) := by
     induction gs generalizing w j with
-    | nil => simp at hj
+    | nil => simp -congrConsts at hj
     | cons g gs ih =>
       rw [List.foldl_cons]
       cases j with
       | zero =>
-        have h1 : w.length < (stepWire w g).length := by simp [stepWire]
+        have h1 : w.length < (stepWire w g).length := by simp -congrConsts [stepWire]
         rw [Nat.add_zero, foldl_getD_lt gs (stepWire w g) w.length h1]
-        simp only [List.getElem_cons_zero]
+        simp -congrConsts only [List.getElem_cons_zero]
         have h2 : (stepWire w g).getD w.length false =
             g.op.eval (g.inputs.map fun i => w.getD i false) := by
-          simp [stepWire, List.getD_eq_getElem?_getD]
+          simp -congrConsts [stepWire, List.getD_eq_getElem?_getD]
         rw [h2]
         congr 1
         apply List.map_congr_left
         intro i _
         by_cases hi : i < w.length
-        · rw [ite_eq_left hi, foldl_getD_lt gs (stepWire w g) i (by simp [stepWire]; omega)]
-          simp [stepWire, List.getD_eq_getElem?_getD, List.getElem?_append_left hi]
+        · rw [ite_eq_left hi, foldl_getD_lt gs (stepWire w g) i (by simp -congrConsts [stepWire]; omega)]
+          simp -congrConsts [stepWire, List.getD_eq_getElem?_getD, List.getElem?_append_left hi]
         · rw [ite_eq_right hi]; exact getD_ge w i (by omega)
       | succ j =>
-        have hj' : j < gs.length := by simpa using hj
+        have hj' : j < gs.length := by simpa -congrConsts using hj
         have key := ih (stepWire w g) j hj'
-        have hl : (stepWire w g).length = w.length + 1 := by simp [stepWire]
+        have hl : (stepWire w g).length = w.length + 1 := by simp -congrConsts [stepWire]
         rw [hl] at key
         have e : w.length + (j + 1) = w.length + 1 + j := by omega
-        simp only [List.getElem_cons_succ]
+        simp -congrConsts only [List.getElem_cons_succ]
         rw [e]
         exact key
   let val (C : Circuit) (x : List Bool) (u : ℕ) : Bool := (C.wires x).getD u false
   have gateAt_eq {C : Circuit} {j : ℕ} (hj : j < C.gates.length) : gateAt C j = C.gates[j] := by
-    simp [gateAt, List.getD_eq_getElem?_getD, hj]
+    simp -congrConsts [gateAt_d, List.getD_eq_getElem?_getD, hj]
   have gateAt_mem {C : Circuit} {j : ℕ} (hj : j < C.gates.length) : gateAt C j ∈ C.gates := by
     rw [gateAt_eq hj]; exact List.getElem_mem hj
   have val_input {n : ℕ} {C : Circuit} {x : List Bool} (hx : x.length = n) {u : ℕ} (hu : u < n) :
@@ -143,7 +180,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       (hr : r < C.gates.length) (hop : (gateAt C r).op = GateOp.or) :
       val C x (n + r) = true ↔ ∃ i ∈ (gateAt C r).inputs, i < n + r ∧ val C x i = true := by
     rw [val_gate hx hr, hop]
-    simp only [GateOp.eval, List.any_map, List.any_eq_true, Function.comp_apply, id_eq]
+    simp -congrConsts only [evalOr_d, evalAnd_d, List.any_map, List.any_eq_true, Function.comp_apply, id_eq]
     constructor
     · rintro ⟨i, hi, h⟩
       by_cases hlt : i < n + r
@@ -155,7 +192,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       (hr : r < C.gates.length) (hop : (gateAt C r).op = GateOp.and) :
       val C x (n + r) = true ↔ ∀ i ∈ (gateAt C r).inputs, i < n + r ∧ val C x i = true := by
     rw [val_gate hx hr, hop]
-    simp only [GateOp.eval, List.all_map, List.all_eq_true, Function.comp_apply, id_eq]
+    simp -congrConsts only [evalOr_d, evalAnd_d, List.all_map, List.all_eq_true, Function.comp_apply, id_eq]
     constructor
     · intro h i hi
       have h' := h i hi
@@ -166,8 +203,8 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       rw [ite_eq_left (h i hi).1]; exact (h i hi).2
   have val_ofFn {n : ℕ} (C : Circuit) (x : Fin n → Bool) (u : Fin n) :
       val C (List.ofFn x) u.val = x u := by
-    rw [val_input (n := n) (by simp) u.isLt]
-    simp [List.getD_eq_getElem?_getD]
+    rw [val_input (n := n) (by simp -congrConsts) u.isLt]
+    simp -congrConsts [List.getD_eq_getElem?_getD]
   have gateVal_eq_val (n : ℕ) (C : Circuit) (j : ℕ) (x : Fin n → Bool) :
       PEqualNP.EdgeOwnership.gateVal n C j x = val C (List.ofFn x) (n + j) := rfl
   let OrStep (n : ℕ) (C : Circuit) (w w' : ℕ) : Prop :=
@@ -201,14 +238,14 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
             exact ⟨w', Relation.ReflTransGen.head ⟨k, hk, rfl, hop, hin, hlt⟩ hr, hv', hw'⟩
           · exact ⟨n + k, Relation.ReflTransGen.refl, hv, Or.inr ⟨k, hk, rfl, hop⟩⟩
   have pairInput_left {n : ℕ} (u v : Fin n) : pairInput u v u = true := by
-    simp [pairInput]
+    simp -congrConsts [pairInput_d]
   have pairInput_right {n : ℕ} (u v : Fin n) : pairInput u v v = true := by
-    simp [pairInput]
+    simp -congrConsts [pairInput_d]
   have pairInput_true {n : ℕ} (u v w : Fin n) : pairInput u v w = true ↔ w = u ∨ w = v := by
-    simp [pairInput]
+    simp -congrConsts [pairInput_d]
   have graphFun_pair {n : ℕ} (G : SimpleGraph (Fin n)) [DecidableRel G.Adj] (u v : Fin n) :
       graphFun G ∅ (pairInput u v) = true ↔ G.Adj u v := by
-    simp only [graphFun, Finset.notMem_empty, false_and, exists_false, decide_false,
+    simp -congrConsts only [graphFun_d, Finset.notMem_empty, false_and, exists_false, decide_false,
       Bool.false_or, decide_eq_true_eq, pairInput_true]
     constructor
     · rintro ⟨a, b, hab, ha, hb⟩
@@ -226,7 +263,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
         Relation.ReflTransGen (OrStep n C) p (n + h) ∧
         val C (List.ofFn (pairInput u v)) (n + h) = true) := by
     obtain ⟨w', hr, hv', hw'⟩ := or_trace (n := n) (C := C) (x := List.ofFn (pairInput u v))
-      (by simp) p hv
+      (by simp -congrConsts) p hv
     rcases hw' with hlt | ⟨h, hh, rfl, hop⟩
     · left
       refine ⟨⟨w', hlt⟩, ?_, hr⟩
@@ -238,7 +275,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
   have reach_var_val {n : ℕ} {C : Circuit} (x : Fin n → Bool) (p : ℕ) (t : Fin n)
       (hr : Relation.ReflTransGen (OrStep n C) p t.val) (ht : x t = true) :
       val C (List.ofFn x) p = true :=
-    orStep_up (n := n) (by simp) hr (by rw [val_ofFn]; exact ht)
+    orStep_up (n := n) (by simp -congrConsts) hr (by rw [val_ofFn]; exact ht)
   have edge_trace {n : ℕ} (G : SimpleGraph (Fin n)) {C : Circuit} (F : (Fin n → Bool) → Bool)
       (hF : ∀ u v : Fin n, F (pairInput u v) = true → G.Adj u v)
       (hout : ∀ x : Fin n → Bool, val C (List.ofFn x) C.output = F x)
@@ -258,40 +295,40 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       (hr : Relation.ReflTransGen (OrStep n C) C.output (n + a)) (x : Fin n → Bool)
       (hv : val C (List.ofFn x) (n + a) = true) : F x = true := by
     rw [← hout]
-    exact orStep_up (n := n) (by simp) hr hv
+    exact orStep_up (n := n) (by simp -congrConsts) hr hv
   have cones_len (n : ℕ) (gs : List Gate) (cs : List (List ℕ)) :
       (gs.foldl (coneStep n) cs).length = cs.length + gs.length := by
     induction gs generalizing cs with
-    | nil => simp
+    | nil => simp -congrConsts
     | cons g gs ih =>
       rw [List.foldl_cons, ih]
-      simp [coneStep]
+      simp -congrConsts [coneStep_d]
       omega
   have cones_char (n : ℕ) (gs : List Gate) :
       ∀ i j, i ∈ (gs.foldl (coneStep n) []).getD j [] ↔
         j < gs.length ∧ ∃ w ∈ (gs.getD j ⟨GateOp.or, []⟩).inputs, n ≤ w ∧ w < n + j ∧
           (i = w - n ∨ i ∈ (gs.foldl (coneStep n) []).getD (w - n) []) := by
     induction gs using List.reverseRecOn with
-    | nil => intro i j; simp
+    | nil => intro i j; simp -congrConsts
     | append_singleton gs g ih =>
       intro i j
       rw [List.foldl_append, List.foldl_cons, List.foldl_nil]
       have hlen : (gs.foldl (coneStep n) []).length = gs.length := by
-        rw [cones_len]; simp
+        rw [cones_len]; simp -congrConsts
       have key : ∀ k, k < gs.length →
           (coneStep n (gs.foldl (coneStep n) []) g).getD k [] =
             (gs.foldl (coneStep n) []).getD k [] := by
         intro k hk
-        simp only [coneStep, List.getD_eq_getElem?_getD]
+        simp -congrConsts only [coneStep_d, List.getD_eq_getElem?_getD]
         rw [List.getElem?_append_left (by omega)]
       rcases Nat.lt_trichotomy j gs.length with h | h | h
       · have e1 : (gs ++ [g]).getD j ⟨GateOp.or, []⟩ = gs.getD j ⟨GateOp.or, []⟩ := by
-          simp only [List.getD_eq_getElem?_getD]
+          simp -congrConsts only [List.getD_eq_getElem?_getD]
           rw [List.getElem?_append_left h]
         rw [key j h, ih i j, e1]
         constructor
         · rintro ⟨_, w, hw, h1, h2, h3⟩
-          refine ⟨by simp; omega, w, hw, h1, h2, ?_⟩
+          refine ⟨by simp -congrConsts; omega, w, hw, h1, h2, ?_⟩
           rw [key (w - n) (by omega)]
           exact h3
         · rintro ⟨_, w, hw, h1, h2, h3⟩
@@ -300,38 +337,38 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
           exact h3
       · subst h
         have e1 : (gs ++ [g]).getD gs.length ⟨GateOp.or, []⟩ = g := by
-          simp [List.getD_eq_getElem?_getD]
+          simp -congrConsts [List.getD_eq_getElem?_getD]
         have e2 : (coneStep n (gs.foldl (coneStep n) []) g).getD gs.length [] =
             (g.inputs.filter (fun w => decide (n ≤ w ∧ w < n + gs.length))).flatMap
               (fun w => (w - n) :: (gs.foldl (coneStep n) []).getD (w - n) []) := by
-          simp only [coneStep, List.getD_eq_getElem?_getD]
+          simp -congrConsts only [coneStep_d, List.getD_eq_getElem?_getD]
           rw [List.getElem?_append_right (by omega)]
-          simp [hlen]
+          simp -congrConsts [hlen]
         rw [e2, e1]
-        simp only [List.mem_flatMap, List.mem_filter, List.mem_cons, decide_eq_true_eq]
+        simp -congrConsts only [List.mem_flatMap, List.mem_filter, List.mem_cons, decide_eq_true_eq]
         constructor
         · rintro ⟨w, ⟨hw, h1, h2⟩, h3⟩
-          refine ⟨by simp, w, hw, h1, h2, ?_⟩
+          refine ⟨by simp -congrConsts, w, hw, h1, h2, ?_⟩
           rw [key (w - n) (by omega)]
           exact h3
         · rintro ⟨_, w, hw, h1, h2, h3⟩
           rw [key (w - n) (by omega)] at h3
           exact ⟨w, ⟨hw, h1, h2⟩, h3⟩
       · have e0 : (coneStep n (gs.foldl (coneStep n) []) g).getD j [] = [] := by
-          simp only [coneStep, List.getD_eq_getElem?_getD]
-          rw [List.getElem?_eq_none (by simp; omega)]
+          simp -congrConsts only [coneStep_d, List.getD_eq_getElem?_getD]
+          rw [List.getElem?_eq_none (by simp -congrConsts; omega)]
           rfl
         rw [e0]
         constructor
-        · intro h0; simp at h0
+        · intro h0; simp -congrConsts at h0
         · rintro ⟨h0, _⟩
-          simp at h0
+          simp -congrConsts at h0
           omega
   have inCone_iff (n : ℕ) (C : Circuit) (i j : ℕ) :
       InCone n C i j ↔ j < C.gates.length ∧ ∃ k, k < j ∧ n + k ∈ (gateAt C j).inputs ∧
         (i = k ∨ InCone n C i k) := by
     have h := cones_char n C.gates i j
-    unfold InCone cones gateAt
+    unfold InCone cones; delta gateAt
     rw [h]
     constructor
     · rintro ⟨h0, w, hw, h1, h2, h3⟩
@@ -377,10 +414,10 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
   have orSets_len (n : ℕ) (gs : List Gate) (cs : List (List ℕ)) :
       (gs.foldl (orStep n) cs).length = cs.length + gs.length := by
     induction gs generalizing cs with
-    | nil => simp
+    | nil => simp -congrConsts
     | cons g gs ih =>
       rw [List.foldl_cons, ih]
-      simp [orStep]
+      simp -congrConsts [orStep_d]
       omega
   have orSets_char (n : ℕ) (gs : List Gate) :
       ∀ i j, i ∈ (gs.foldl (orStep n) []).getD j [] ↔
@@ -388,26 +425,26 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
           ∃ w ∈ (gs.getD j ⟨GateOp.or, []⟩).inputs, n ≤ w ∧ w < n + j ∧
             i ∈ (gs.foldl (orStep n) []).getD (w - n) [])) := by
     induction gs using List.reverseRecOn with
-    | nil => intro i j; simp
+    | nil => intro i j; simp -congrConsts
     | append_singleton gs g ih =>
       intro i j
       rw [List.foldl_append, List.foldl_cons, List.foldl_nil]
       have hlen : (gs.foldl (orStep n) []).length = gs.length := by
-        rw [orSets_len]; simp
+        rw [orSets_len]; simp -congrConsts
       have key : ∀ k, k < gs.length →
           (orStep n (gs.foldl (orStep n) []) g).getD k [] =
             (gs.foldl (orStep n) []).getD k [] := by
         intro k hk
-        simp only [orStep, List.getD_eq_getElem?_getD]
+        simp -congrConsts only [orStep_d, List.getD_eq_getElem?_getD]
         rw [List.getElem?_append_left (by omega)]
       rcases Nat.lt_trichotomy j gs.length with h | h | h
       · have e1 : (gs ++ [g]).getD j ⟨GateOp.or, []⟩ = gs.getD j ⟨GateOp.or, []⟩ := by
-          simp only [List.getD_eq_getElem?_getD]
+          simp -congrConsts only [List.getD_eq_getElem?_getD]
           rw [List.getElem?_append_left h]
         rw [key j h, ih i j, e1]
         constructor
         · rintro ⟨_, h3⟩
-          refine ⟨by simp; omega, ?_⟩
+          refine ⟨by simp -congrConsts; omega, ?_⟩
           rcases h3 with h3 | ⟨hop, w, hw, h1, h2, h3⟩
           · exact Or.inl h3
           · refine Or.inr ⟨hop, w, hw, h1, h2, ?_⟩
@@ -421,21 +458,21 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
             exact Or.inr ⟨hop, w, hw, h1, h2, h3⟩
       · subst h
         have e1 : (gs ++ [g]).getD gs.length ⟨GateOp.or, []⟩ = g := by
-          simp [List.getD_eq_getElem?_getD]
+          simp -congrConsts [List.getD_eq_getElem?_getD]
         rw [e1]
         by_cases hop : g.op = GateOp.or
         · have e2 : (orStep n (gs.foldl (orStep n) []) g).getD gs.length [] =
               gs.length :: (g.inputs.filter (fun w => decide (n ≤ w ∧ w < n + gs.length))).flatMap
                 (fun w => (gs.foldl (orStep n) []).getD (w - n) []) := by
-            simp only [orStep, List.getD_eq_getElem?_getD]
+            simp -congrConsts only [orStep_d, List.getD_eq_getElem?_getD]
             rw [List.getElem?_append_right (by omega)]
-            simp [hlen, hop]
+            simp -congrConsts [hlen, hop]
           rw [e2]
-          simp only [List.mem_cons, List.mem_flatMap, List.mem_filter, decide_eq_true_eq]
+          simp -congrConsts only [List.mem_cons, List.mem_flatMap, List.mem_filter, decide_eq_true_eq]
           constructor
           · rintro (h3 | ⟨w, ⟨hw, h1, h2⟩, h3⟩)
-            · exact ⟨by simp, Or.inl h3⟩
-            · refine ⟨by simp, Or.inr ⟨hop, w, hw, h1, h2, ?_⟩⟩
+            · exact ⟨by simp -congrConsts, Or.inl h3⟩
+            · refine ⟨by simp -congrConsts, Or.inr ⟨hop, w, hw, h1, h2, ?_⟩⟩
               rw [key (w - n) (by omega)]
               exact h3
           · rintro ⟨_, h3 | ⟨_, w, hw, h1, h2, h3⟩⟩
@@ -443,32 +480,32 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
             · rw [key (w - n) (by omega)] at h3
               exact Or.inr ⟨w, ⟨hw, h1, h2⟩, h3⟩
         · have e2 : (orStep n (gs.foldl (orStep n) []) g).getD gs.length [] = [gs.length] := by
-            simp only [orStep, List.getD_eq_getElem?_getD]
+            simp -congrConsts only [orStep_d, List.getD_eq_getElem?_getD]
             rw [List.getElem?_append_right (by omega)]
-            simp [hlen, hop]
+            simp -congrConsts [hlen, hop]
           rw [e2]
-          simp only [List.mem_singleton]
+          simp -congrConsts only [List.mem_singleton]
           constructor
           · intro h3
-            exact ⟨by simp, Or.inl h3⟩
+            exact ⟨by simp -congrConsts, Or.inl h3⟩
           · rintro ⟨_, h3 | ⟨hop2, _⟩⟩
             · exact h3
             · exact (hop hop2).elim
       · have e0 : (orStep n (gs.foldl (orStep n) []) g).getD j [] = [] := by
-          simp only [orStep, List.getD_eq_getElem?_getD]
-          rw [List.getElem?_eq_none (by simp; omega)]
+          simp -congrConsts only [orStep_d, List.getD_eq_getElem?_getD]
+          rw [List.getElem?_eq_none (by simp -congrConsts; omega)]
           rfl
         rw [e0]
         constructor
-        · intro h0; simp at h0
+        · intro h0; simp -congrConsts at h0
         · rintro ⟨h0, _⟩
-          simp at h0
+          simp -congrConsts at h0
           omega
   have orReaches_iff (n : ℕ) (C : Circuit) (k g : ℕ) :
       OrReaches n C (n + k) g ↔ k < C.gates.length ∧ (g = k ∨ ((gateAt C k).op = GateOp.or ∧
         ∃ i ∈ (gateAt C k).inputs, i < n + k ∧ OrReaches n C i g)) := by
     have h := orSets_char n C.gates g k
-    unfold OrReaches orSets gateAt
+    unfold OrReaches orSets; delta gateAt
     have e : n + k - n = k := by omega
     rw [e, h]
     constructor
@@ -511,21 +548,21 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
   have mem_orIn_reach {n : ℕ} {C : Circuit} {p : ℕ} (u : Fin n)
       (hu : u ∈ PEqualNP.TopForm.orIn n C p) :
       Relation.ReflTransGen (OrStep n C) p u.val := by
-    simp only [PEqualNP.TopForm.orIn, Finset.mem_filter, Finset.mem_univ, true_and] at hu
+    simp -congrConsts only [orIn_d, Finset.mem_filter, Finset.mem_univ, true_and] at hu
     rcases hu with h | ⟨k, hk, hr, hop, hin⟩
     · rw [h]
     · exact (orReaches_reach k p hr).1.tail ⟨k, hk, rfl, hop, hin, by omega⟩
   have reach_mem_orIn {n : ℕ} {C : Circuit} {p : ℕ} (u : Fin n)
       (hr : Relation.ReflTransGen (OrStep n C) p u.val) :
       u ∈ PEqualNP.TopForm.orIn n C p := by
-    simp only [PEqualNP.TopForm.orIn, Finset.mem_filter, Finset.mem_univ, true_and]
+    simp -congrConsts only [orIn_d, Finset.mem_filter, Finset.mem_univ, true_and]
     rcases Relation.ReflTransGen.cases_tail hr with h | ⟨c, hpc, hstep⟩
     · exact Or.inl h
     · obtain ⟨k, hk, rfl, hop, hin, _⟩ := hstep
       exact Or.inr ⟨k, hk, reach_orReaches hpc k rfl hk, hop, hin⟩
   have topData {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} {a : ℕ} (ha : a ∈ tops G C) :
       a < C.gates.length ∧ (gateAt C a).op = GateOp.and ∧ BelowF G C a := by
-    simpa only [tops, gatesWhere, Finset.mem_filter, Finset.mem_range] using ha
+    simpa -congrConsts only [tops_d, gatesWhere_d, Finset.mem_filter, Finset.mem_range] using ha
   have junkData {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} {a : ℕ} (ha : a ∈ junk G C) :
       a < C.gates.length ∧ (gateAt C a).op = GateOp.and ∧
         ∃ x : Fin n → Bool, gateVal n C a x = true ∧ graphFun G ∅ x = false := by
@@ -537,7 +574,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
   have opndMem {n : ℕ} {C : Circuit} (hAO : IsAO2 n C) {a : ℕ} (ha : a < C.gates.length) (b : Fin 2) :
       opnd C a b ∈ (gateAt C a).inputs := by
     obtain ⟨p, q, hpq⟩ := binaryInputs hAO ha
-    fin_cases b <;> simp [opnd, hpq]
+    fin_cases b <;> simp -congrConsts [opnd_d, hpq]
   have opndBound {n : ℕ} {C : Circuit} (hAO : IsAO2 n C) {a : ℕ} (ha : a < C.gates.length) (b : Fin 2) :
       opnd C a b < n + a :=
     hAO.2.1 a ha _ (opndMem hAO ha b)
@@ -546,7 +583,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       gateVal n C a x = true ↔
         val C (List.ofFn x) (opnd C a 0) = true ∧
         val C (List.ofFn x) (opnd C a 1) = true := by
-    rw [gateVal_eq_val, val_and (n := n) (by simp) ha hop]
+    rw [gateVal_eq_val, val_and (n := n) (by simp -congrConsts) ha hop]
     constructor
     · intro h
       exact ⟨(h _ (opndMem hAO ha 0)).2, (h _ (opndMem hAO ha 1)).2⟩
@@ -554,10 +591,10 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       refine ⟨hAO.2.1 a ha i hi, ?_⟩
       obtain ⟨p, q, hpq⟩ := binaryInputs hAO ha
       rcases List.mem_cons.mp (hpq ▸ hi) with rfl | hq
-      · simpa [opnd, hpq] using h.1
+      · simpa -congrConsts [opnd_d, hpq] using h.1
       · have e : i = q := List.mem_singleton.mp hq
         subst i
-        simpa [opnd, hpq] using h.2
+        simpa -congrConsts [opnd_d, hpq] using h.2
   have andValOperands {n : ℕ} {C : Circuit} (hAO : IsAO2 n C) {a : ℕ} (ha : a < C.gates.length)
       (hop : (gateAt C a).op = GateOp.and) (x : Fin n → Bool) :
       gateVal n C a x = true ↔ ∀ b : Fin 2, val C (List.ofFn x) (opnd C a b) = true := by
@@ -592,9 +629,9 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       (hz : z ∈ (gateAt C m).inputs) : ∃ b : Fin 2, z = opnd C m b := by
     obtain ⟨p, q, hpq⟩ := binaryInputs hAO hm
     rcases List.mem_cons.mp (hpq ▸ hz) with rfl | hq
-    · exact ⟨0, by simp [opnd, hpq]⟩
+    · exact ⟨0, by simp -congrConsts [opnd_d, hpq]⟩
     · have e : z = q := List.mem_singleton.mp hq
-      exact ⟨1, by simpa [opnd, hpq] using e⟩
+      exact ⟨1, by simpa -congrConsts [opnd_d, hpq] using e⟩
   have sideVal {n : ℕ} {C : Circuit} {a : ℕ} {b : Fin 2} {x : Fin n → Bool} {t : Fin n}
       (ht : t ∈ side (n := n) C a b) (hx : x t = true) :
       val C (List.ofFn x) (opnd C a b) = true :=
@@ -621,7 +658,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     have hb : BelowF G C a := fun x hx =>
       below_of_reach (graphFun G ∅) hout a hr x (gateVal_eq_val n C a x ▸ hx)
     refine ⟨a, ?_, hv⟩
-    simpa only [tops, gatesWhere, Finset.mem_filter, Finset.mem_range] using
+    simpa -congrConsts only [tops_d, gatesWhere_d, Finset.mem_filter, Finset.mem_range] using
       And.intro hl (And.intro hand hb)
   have operandSupport {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} (hAO : IsAO2 n C) (hT : TopForm G C) {a : ℕ}
       (ha : a < C.gates.length) (ho : (gateAt C a).op = GateOp.and) {b : Fin 2}
@@ -638,7 +675,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       orIn n C (n + j) = ∅ := by
     apply Finset.eq_empty_iff_forall_notMem.mpr
     intro v hv
-    simp only [orIn, Finset.mem_filter, Finset.mem_univ, true_and] at hv
+    simp -congrConsts only [orIn_d, Finset.mem_filter, Finset.mem_univ, true_and] at hv
     rcases hv with he | ⟨k, _, hr, ho, _⟩
     · have := v.isLt
       omega
@@ -663,12 +700,12 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     obtain ⟨_, hjop, x, hjx, hx⟩ := junkData hj
     have hNotBelow : ¬ BelowF G C m := by
       intro h
-      have hvm : gateVal n C m x = true := (val_or (n := n) (by simp) hm ho).mpr
+      have hvm : gateVal n C m x = true := (val_or (n := n) (by simp -congrConsts) hm ho).mpr
         ⟨n + j, hi, hb, hjx⟩
       exact Bool.noConfusion (hx.symm.trans (h x hvm))
     apply Finset.mem_sdiff.mpr
     refine ⟨?_, ?_⟩
-    · simpa only [orN, gatesWhere, Finset.mem_filter, Finset.mem_range] using
+    · simpa -congrConsts only [orN_d, gatesWhere_d, Finset.mem_filter, Finset.mem_range] using
         And.intro hm (And.intro ho hNotBelow)
     · intro hl
       obtain ⟨_, h0, h1, _⟩ := Finset.mem_filter.mp hl
@@ -719,7 +756,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     exact Finset.notMem_empty _ hc
   have orData {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} {m : ℕ} (hm : m ∈ orN G C \ lam G C) :
       m < C.gates.length ∧ (gateAt C m).op = GateOp.or ∧ ¬ BelowF G C m := by
-    simpa only [orN, gatesWhere, Finset.mem_filter, Finset.mem_range] using
+    simpa -congrConsts only [orN_d, gatesWhere_d, Finset.mem_filter, Finset.mem_range] using
       (Finset.mem_sdiff.mp hm).1
   have emptyInputOutside {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} (ao : IsAO2 n C) {j m : ℕ}
       (dirty : ¬ BelowF G C j) (empty : orIn n C (n + j) = ∅)
@@ -730,10 +767,10 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       intro hb
       apply dirty
       intro x hx
-      exact hb x ((val_or (n := n) (by simp) hm hop).mpr
+      exact hb x ((val_or (n := n) (by simp -congrConsts) hm hop).mpr
         ⟨_, hin, ao.2.1 _ hm _ hin, hx⟩)
     refine Finset.mem_sdiff.mpr ⟨?_, ?_⟩
-    · simpa only [orN, gatesWhere, Finset.mem_filter, Finset.mem_range] using
+    · simpa -congrConsts only [orN_d, gatesWhere_d, Finset.mem_filter, Finset.mem_range] using
         And.intro hm (And.intro hop hbad)
     · intro hl
       obtain ⟨_, h0, h1, _⟩ := Finset.mem_filter.mp hl
@@ -778,7 +815,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     obtain ⟨p, q, hpq⟩ := binaryInputs ao (orData hm).1
     have hinputs : ∀ w ∈ (gateAt C m).inputs, w = n + j ∨ w = n + k := by
       intro w hw
-      simp only [hpq, List.mem_cons, List.not_mem_nil, or_false] at hjin hkin hw
+      simp -congrConsts only [hpq, List.mem_cons, List.not_mem_nil, or_false] at hjin hkin hw
       omega
     obtain ⟨t, ht⟩ := hne
     rcases Relation.ReflTransGen.cases_head (mem_orIn_reach t ht) with he | ⟨w, hs, hrest⟩
@@ -817,7 +854,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     apply haBelow x ((andValOperands ao haLen haOp x).mpr ?_)
     intro c
     rcases opposite b c with rfl | rfl
-    · exact orStep_up (n := n) (by simp) path hmx
+    · exact orStep_up (n := n) (by simp -congrConsts) path hmx
     · exact sideVal hw hwx
   have oppositeEndpoint {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} (least : IsLeastAO G C) (top : TopForm G C)
       (empty : centreless G C = ∅) {m a : ℕ} {b : Fin 2} {u v : Fin n}
@@ -838,8 +875,8 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       apply ab x ((andValOperands least.1 al aop x).mpr ?_)
       intro c
       rcases opposite b c with rfl | rfl
-      · exact orStep_up (n := n) (by simp) path hx
-      · exact orStep_up (n := n) (by simp) hp hx
+      · exact orStep_up (n := n) (by simp -congrConsts) path hx
+      · exact orStep_up (n := n) (by simp -congrConsts) hp hx
   have rawCoverShape {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} (ao : IsAO2 n C) {m w : ℕ}
       (only : orN G C \ lam G C = {m}) (hm : m ∈ orN G C \ lam G C)
       (hw : w < n + m) :
@@ -873,7 +910,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       have hv := reach_var_val (pairInput u u) _ u (mem_orIn_reach u hu) (pairInput_left u u)
       exact G.irrefl ((graphFun_pair G u u).mp (hb _ hv))
     have hkN : k ∈ orN G C := by
-      simpa only [orN, gatesWhere, Finset.mem_filter, Finset.mem_range] using
+      simpa -congrConsts only [orN_d, gatesWhere_d, Finset.mem_filter, Finset.mem_range] using
         And.intro hkl (And.intro hko hbelow)
     have hkL : k ∈ lam G C := by
       by_contra hn
@@ -989,12 +1026,12 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       apply Bool.eq_false_iff.mpr
       intro htrue
       have hmx : gateVal n C m x = true :=
-        (val_or (n := n) (by simp) hml hmo).mpr ⟨_, hin, hlt, htrue⟩
+        (val_or (n := n) (by simp -congrConsts) hml hmo).mpr ⟨_, hin, hlt, htrue⟩
       exact Bool.false_ne_true (hf.symm.trans (firingTop least.1 ha' hp hw x hmx hx))
     exact falseJunkCover least.1 top only hm x j (by omega) hj uniform hjx
   have reachVal {n : ℕ} {C : Circuit} {w h : ℕ} {x : Fin n → Bool} (hr : OrReaches n C w h)
       (hh : gateVal n C h x = true) : val C (List.ofFn x) w = true :=
-    orStep_up (n := n) (by simp) (orReaches_reach h _ hr).1 hh
+    orStep_up (n := n) (by simp -congrConsts) (orReaches_reach h _ hr).1 hh
   have orInTrans {n : ℕ} {C : Circuit} {w z : ℕ} (hr : Relation.ReflTransGen (OrStep n C) w z) :
       orIn n C z ⊆ orIn n C w :=
     fun x hx => reach_mem_orIn x (hr.trans (mem_orIn_reach x hx))
@@ -1051,7 +1088,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     intro hl
     rcases Finset.mem_filter.mp hl with ⟨_, h0, h1, _⟩
     apply hmix
-    simp only [← Finset.not_nonempty_iff_eq_empty, h0, h1]
+    simp -congrConsts only [← Finset.not_nonempty_iff_eq_empty, h0, h1]
   have mixingAlong {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} (hAO : IsAO2 n C) {w j : ℕ} (hr : OrReaches n C w j)
       (hj : (gateAt C j).op = GateOp.and) (hw : (orIn n C w).Nonempty) :
       ∃ m ∈ mixing G C, OrReaches n C w m ∧ OrReaches n C (n + m) j ∧
@@ -1079,11 +1116,11 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
             · change side (n := n) C k 0 = ∅ at hempty
               have h1 : side (n := n) C k 1 ≠ ∅ := by
                 rwa [hempty, Finset.empty_union, Finset.nonempty_iff_ne_empty] at hboth
-              simp [hempty, h1]
+              simp -congrConsts [hempty, h1]
             · change side (n := n) C k 1 = ∅ at hempty
               have h0 : side (n := n) C k 0 ≠ ∅ := by
                 rwa [hempty, Finset.union_empty, Finset.nonempty_iff_ne_empty] at hboth
-              simp [hempty, h0]
+              simp -congrConsts [hempty, h0]
           exact ⟨k, hm, (orReaches_iff n C k k).mpr ⟨hk, Or.inl rfl⟩, hr, hw⟩
   have memGammaInterUstar {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} {u v : Fin n} {g : ℕ} (he : s(u, v) ∈ Ustar G C)
       (hv : gateVal n C g (pairInput u v) = true) :
@@ -1094,11 +1131,11 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       (S.biUnion f).card ≤ S.card := by
     calc (S.biUnion f).card ≤ ∑ x ∈ S, (f x).card := Finset.card_biUnion_le
       _ ≤ ∑ _x ∈ S, 1 := Finset.sum_le_sum h1
-      _ = S.card := by simp
+      _ = S.card := by simp -congrConsts
   have commonUnique {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] (h4 : NoFourCycle G) {a b p q : Fin n}
       (hab : a ≠ b) (hap : G.Adj a p) (hbp : G.Adj b p)
       (haq : G.Adj a q) (hbq : G.Adj b q) : p = q :=
-    Finset.card_le_one.mp (h4 a b hab) p (by simp [hap,hbp]) q (by simp [haq,hbq])
+    Finset.card_le_one.mp (h4 a b hab) p (by simp -congrConsts [hap,hbp]) q (by simp -congrConsts [haq,hbq])
   let Responder {n : ℕ} (G : SimpleGraph (Fin n)) [DecidableRel G.Adj]
       (U : Finset (Sym2 (Fin n))) (w : Fin n) : Prop :=
     ∀ x : Fin n → Bool, x w = true → graphFun G ∅ x = false →
@@ -1154,7 +1191,8 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
   have oneOutside {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} (least : IsLeastAO G C) (top : TopForm G C)
       (h4 : NoFourCycle G) (color : Fin n → Bool) (bip : ∀ u v, G.Adj u v → color u ≠ color v)
       (empty : centreless G C = ∅) (only : (orN G C \ lam G C).card ≤ 1) : (Ustar G C).card ≤ 1 := by
-    by_contra! big
+    by_contra big
+    replace big := not_le.mp big
     obtain ⟨e, he, f, hf, nef⟩ := Finset.one_lt_card.mp big
     have existsEdge : ∃ u v : Fin n, s(u,v) ∈ Ustar G C := by
       induction e using Sym2.ind with
@@ -1195,7 +1233,8 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     have no4 : NoFourCycle plane := by
       convert planeFour using 1
     have hr : 2 ≤ (orN plane C \ lam plane C).card := by
-      by_contra! small
+      by_contra small
+      replace small := not_le.mp small
       have := oneOutside least top no4 color26 planeBip empty (by omega)
       omega
     exact ⟨hr,by omega⟩
@@ -1260,7 +1299,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
   have existsMinCover (G : SimpleGraph (Fin 26)) : ∃ K, IsMinCover G K := by
     classical
     let P (m : ℕ) := ∃ K : Finset (Fin 26), G.IsVertexCover (↑K) ∧ K.card = m
-    have ex : ∃ m, P m := ⟨_, Finset.univ, by simp, rfl⟩
+    have ex : ∃ m, P m := ⟨_, Finset.univ, by simp -congrConsts, rfl⟩
     obtain ⟨K,hK,hcard⟩ := Nat.find_spec ex
     exact ⟨K,hK,fun T hT => hcard.trans_le (Nat.find_min' ex ⟨T,hT,rfl⟩)⟩
   have planeCount : plane.edgeFinset.card = 52 := by decide +kernel
@@ -1268,7 +1307,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     calc
       _ ≤ ∑ k ∈ K, (incidentEdges k).card := Finset.card_biUnion_le
       _ ≤ ∑ _k ∈ K, 4 := Finset.sum_le_sum (fun v _ => incident_count v)
-      _ = _ := by simp [Nat.mul_comm]
+      _ = _ := by simp -congrConsts [Nat.mul_comm]
   have coverIncidence {U : Finset (Sym2 (Fin 26))} {K : Finset (Fin 26)}
       (cover : (plane.deleteEdges ↑U).IsVertexCover (K : Set (Fin 26))) :
       plane.edgeFinset \ U ⊆ K.biUnion incidentEdges := by
@@ -1348,7 +1387,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
         have adj := SimpleGraph.mem_edgeFinset.mp heG
         have h := planeBip _ _ adj
         have mem (v : Fin 26) : v ∈ colorClass c ↔ color26 v = c := by
-          simp only [colorClass, color26, Finset.mem_filter, Finset.mem_univ, true_and]
+          simp -congrConsts only [colorClass, color26, Finset.mem_filter, Finset.mem_univ, true_and]
         by_cases ac : color26 a = c
         · exact ⟨a,Sym2.mem_iff.mpr (Or.inl rfl),(mem _).mpr ac⟩
         · have two : ∀ x y z : Bool, x ≠ y → x ≠ z → y = z := by decide
@@ -1434,7 +1473,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       exact Finset.mem_image.mpr ⟨(r,k),Finset.mem_product.mpr ⟨hrR,Finset.mem_univ _⟩,by dsimp; omega⟩
     have capSlots : D.card ≤ 2 * R.card := by
       have h := (Finset.card_le_card slots).trans Finset.card_image_le
-      simpa [Finset.card_product,Nat.mul_comm] using h
+      simpa -congrConsts [Finset.card_product,Nat.mul_comm] using h
     have capJ : D.card ≤ (junk G C).card := Finset.card_le_card (Finset.filter_subset _ _)
     obtain ⟨j,hD,heavy⟩ : ∃ j ∈ D, 2 ≤ (E j).card := by
       by_contra! light
@@ -1635,7 +1674,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
   have signalPair {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} {r : ℕ} {u v : Fin n} (h : FiresOn G C r s(u,v)) :
       Signal G C r (pairInput u v) := by
     obtain ⟨p,q,eq,h⟩ := h
-    have swap (a b : Fin n) : pairInput a b = pairInput b a := by funext t; simp [pairInput,or_comm]
+    have swap (a b : Fin n) : pairInput a b = pairInput b a := by funext t; simp -congrConsts [pairInput_d,or_comm]
     rcases Sym2.eq_iff.mp eq with ⟨rfl,rfl⟩|⟨rfl,rfl⟩
     · exact h
     · rw [swap] at h
@@ -1644,15 +1683,15 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       {x : Fin n → Bool} (h : Signal G C r x) : gateVal n C r x = true := by
     obtain ⟨j,_,reads,hj⟩ := h
     obtain ⟨rl,ro,_⟩ := orData hr
-    exact (val_or (n := n) (by simp) rl ro).mpr ⟨_,reads,ao.2.1 r rl _ reads,hj⟩
+    exact (val_or (n := n) (by simp -congrConsts) rl ro).mpr ⟨_,reads,ao.2.1 r rl _ reads,hj⟩
   have sourceVal {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} (ao : IsAO2 n C) {r j : ℕ} (hr : r ∈ mixing G C)
       (hj : j ∈ junk G C) (reads : n+j ∈ (gateAt C r).inputs)
       {x : Fin n → Bool} (on : Signal G C r x) : gateVal n C j x = true := by
     obtain ⟨k,hk,hkr,hv⟩ := on
     obtain ⟨_,_,raw⟩ := mixingCopies ao hr
-    simpa only [singleJunkInput ao (mixingNotLam hr) raw hk hj hkr reads] using hv
+    simpa -congrConsts only [singleJunkInput ao (mixingNotLam hr) raw hk hj hkr reads] using hv
   have emptyObs {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} (x : Fin n → Bool) : Obstructs G (Ustar G C) ∅ x :=
-    ⟨∅,Or.inl (by simp),by simp,by simp⟩
+    ⟨∅,Or.inl (by simp -congrConsts),by simp -congrConsts,by simp -congrConsts⟩
   have sourceCert {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} (ao : IsAO2 n C) (top : TopForm G C) {s : ℕ} (hs : s ∈ mixing G C)
       (E : Finset (Sym2 (Fin n))) (fires : ∀ e ∈ E, FiresOn G C s e) {x : Fin n → Bool}
       (off : ¬Signal G C s x)
@@ -1694,7 +1733,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       have on : Signal G C k (pairInput u v) := signalPair fire
       have rawAt : c k ∈ side C a b :=
         reach_mem_orIn _ (path.trans (mem_orIn_reach _ (raw k hk)))
-      have casesR {t : ℕ} (ht : t ∈ orN G C \ lam G C) : t = r ∨ t = s := by simpa [both] using ht
+      have casesR {t : ℕ} (ht : t ∈ orN G C \ lam G C) : t = r ∨ t = s := by simpa -congrConsts [both] using ht
       obtain ⟨al,op,sound⟩ := topData ha
       have ob := (andValOperands least.1 al op _).mp hav (1-b)
       rcases operandSupport least.1 top al op ob with ⟨w,hw,ends⟩|⟨l,hl,pathL,lv⟩
@@ -1712,8 +1751,8 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
           apply sound x ((andValOperands least.1 al op x).mpr ?_)
           intro z
           rcases opposite b z with rfl|rfl
-          · exact orStep_up (n := n) (by simp) path vk
-          · exact orStep_up (n := n) (by simp) pathq vq
+          · exact orStep_up (n := n) (by simp -congrConsts) path vk
+          · exact orStep_up (n := n) (by simp -congrConsts) pathq vq
         have neq : k ≠ q := by
           rintro rfl
           exact (orData hk).2.2 (fun x hx => joint _ hx hx)
@@ -1733,15 +1772,15 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     obtain ⟨_,_,p,hp⟩ := mixingCopies least.1 hr
     obtain ⟨_,_,q,hq⟩ := mixingCopies least.1 hs
     let c (k : ℕ) : Fin n := if k = r then p else q
-    have casesR {t : ℕ} (ht : t ∈ orN G C \ lam G C) : t = r ∨ t = s := by simpa [both] using ht
+    have casesR {t : ℕ} (ht : t ∈ orN G C \ lam G C) : t = r ∨ t = s := by simpa -congrConsts [both] using ht
     have allM {t : ℕ} (ht : t ∈ orN G C \ lam G C) : t ∈ mixing G C := by
       rcases casesR ht with rfl|rfl
       · exact hr
       · exact hs
     have raw (k : ℕ) (hk : k ∈ orN G C \ lam G C) : c k ∈ orIn n C (n+k) := by
       rcases casesR hk with rfl|rfl
-      · simpa [c] using hp
-      · simpa [c,rs.ne'] using hq
+      · simpa -congrConsts [c] using hp
+      · simpa -congrConsts [c,rs.ne'] using hq
     let U := Ustar G C
     have graphSub : U ⊆ G.edgeFinset := Finset.sdiff_subset
     let A := U.filter (Single G C r (c r))
@@ -1819,7 +1858,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       Wire C w x ↔ ∃ t ∈ orIn n C w, x t = true := by
     constructor
     · intro h
-      obtain ⟨z,path,on,source⟩ := or_trace (n := n) (C := C) (x := List.ofFn x) (by simp) w h
+      obtain ⟨z,path,on,source⟩ := or_trace (n := n) (C := C) (x := List.ofFn x) (by simp -congrConsts) w h
       rcases source with hz|⟨k,hk,rfl,notOr⟩
       · let t : Fin n := ⟨z,hz⟩
         exact ⟨t,reach_mem_orIn t path,(val_ofFn C x t) ▸ on⟩
@@ -1836,13 +1875,13 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       Wire C (n+r) x ↔ Wire C (opnd C r 0) x ∨ Wire C (opnd C r 1) x := by
     constructor
     · intro on
-      obtain ⟨w,mem,_,west⟩ := (val_or (n := n) (by simp) rl op).mp on
+      obtain ⟨w,mem,_,west⟩ := (val_or (n := n) (by simp -congrConsts) rl op).mp on
       obtain ⟨b,rfl⟩ := inputsAsOpnd ao rl mem
       fin_cases b
       · exact Or.inl west
       · exact Or.inr west
     · intro on
-      apply (val_or (n := n) (by simp) rl op).mpr
+      apply (val_or (n := n) (by simp -congrConsts) rl op).mpr
       rcases on with left|right
       · exact ⟨_,opndMem ao rl 0,opndBound ao rl 0,left⟩
       · exact ⟨_,opndMem ao rl 1,opndBound ao rl 1,right⟩
@@ -1873,11 +1912,11 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     change (side (n := n) C m 0 = ∅) ≠ (side (n := n) C m 1 = ∅) at mix
     by_cases h0 : side (n := n) C m 0 = ∅
     · have h1 : side (n := n) C m 1 ≠ ∅ := fun h => mix (propext ⟨fun _ => h,fun _ => h0⟩)
-      exact ⟨0,fun d => by fin_cases d <;> simp [h0,h1]⟩
+      exact ⟨0,fun d => by fin_cases d <;> simp -congrConsts [h0,h1]⟩
     · have h1 : side (n := n) C m 1 = ∅ := by
         by_contra hn
         exact mix (propext ⟨fun h => (h0 h).elim,fun h => (hn h).elim⟩)
-      exact ⟨1,fun d => by fin_cases d <;> simp [h0,h1]⟩
+      exact ⟨1,fun d => by fin_cases d <;> simp -congrConsts [h0,h1]⟩
   have onlyMixWitness {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} (least : IsLeastAO G C) (top : TopForm G C) (empty : centreless G C = ∅)
       {m : ℕ} (hm : m ∈ mixing G C) (only : ∀ q ∈ mixing G C, q = m) {c : Fin n}
       (rawC : c ∈ orIn n C (n+m)) {b : Fin 2} (emptyAt : ∀ d : Fin 2, side (n := n) C m d = ∅ ↔ d = b)
@@ -1896,7 +1935,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       have ja := junkData hj
       have jm : j ≠ m := by
         rintro rfl
-        simp [mr.2.1] at ja
+        simp -congrConsts [mr.2.1] at ja
       obtain ⟨_,same|⟨_,t,ht,lt,tj⟩⟩ := (orReaches_iff n C m j).mp kj
       · exact (jm same).elim
       obtain ⟨i,rfl⟩ := inputsAsOpnd least.1 mr.1 ht
@@ -1918,11 +1957,11 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       have sound (x : Fin n → Bool) (wx : x w = true) (on : Wire C (opnd C m b) x) :
           graphFun G ∅ x = true := by
         apply firingTop least.1 ha path hw x _ wx
-        exact (val_or (n := n) (by simp) mr.1 mr.2.1).mpr
+        exact (val_or (n := n) (by simp -congrConsts) mr.1 mr.2.1).mpr
           ⟨_,opndMem least.1 mr.1 b, opndBound least.1 mr.1 b,on⟩
       rcases ends with rfl|rfl
       · exact ⟨_,_,rfl,child,cleanAdj least.1 ha d cside hw,sound⟩
-      · have swap (a b : Fin n) : pairInput a b = pairInput b a := by funext t; simp [pairInput,or_comm]
+      · have swap (a b : Fin n) : pairInput a b = pairInput b a := by funext t; simp -congrConsts [pairInput_d,or_comm]
         exact ⟨_,_,Sym2.eq_swap,by rwa [swap],cleanAdj least.1 ha d cside hw,sound⟩
   have traceMono {n : ℕ} {C : Circuit} (ao : IsAO2 n C) {x y : Fin n → Bool}
       (xy : ∀ t, x t = true → y t = true) : ∀ w < n+C.gates.length, Wire C w x → Wire C w y := by
@@ -1964,12 +2003,12 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       refine ⟨0,c,hc,?_⟩
       change crossSet C a = (side (n := n) C a 1).image _
       ext e
-      simp [crossSet,hc]
+      simp -congrConsts [crossSet,hc]
     · obtain ⟨c,hc⟩ := get 1 h
       refine ⟨1,c,hc,?_⟩
       change crossSet C a = (side (n := n) C a 0).image _
       ext e
-      simp [crossSet,hc,Sym2.eq_swap]
+      simp -congrConsts [crossSet,hc,Sym2.eq_swap]
   have saturatedTops (C : Circuit) (ao : IsAO2 26 C) (empty : centreless plane C = ∅)
       (twelve : (tops plane C).card = 12) (four : (Ustar plane C).card = 4) :
       ∀ a ∈ tops plane C, ∃ b : Fin 2, ∃ c : Fin 26, side C a b = {c} ∧
@@ -1998,7 +2037,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       have rest : (∑ t ∈ T.erase a, (crossSet (n := 26) C t).card) ≤ 44 := by
         calc
           _ ≤ ∑ _t ∈ T.erase a, 4 := Finset.sum_le_sum (fun t ht => small t (Finset.mem_of_mem_erase ht))
-          _ = _ := by simp [ea]
+          _ = _ := by simp -congrConsts [ea]
       have sum := Finset.add_sum_erase T (fun t => (crossSet (n := 26) C t).card) ha
       omega
     obtain ⟨b,c,hc,eq⟩ := shape ha
@@ -2075,7 +2114,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
           intro hj off on
           have neg : val C (List.ofFn x) (opnd C j (f j)) = false := by
             have h := And.intro hj off
-            simpa only [f,dif_pos h] using (operand hj off).choose_spec
+            simpa -congrConsts only [f,dif_pos h] using (operand hj off).choose_spec
           have data := junkData hj
           have pos := (andValOperands least.1 data.1 data.2.1 _).mp on (f j)
           rcases operandSupport least.1 top data.1 data.2.1 pos with ⟨t,ht,eq⟩|⟨k,hk,hr,kv⟩
@@ -2195,11 +2234,11 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
   have paidBound {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} (ao : IsAO2 n C) {w z : ℕ} (h : PaidStep G C w z) : z < w := by
     obtain ⟨⟨j,rfl,hj⟩,b,rfl⟩ := h
     have hl : j < C.gates.length := ((Finset.mem_union.mp hj).elim (fun h => (junkData h).1) (fun h => (orData h).1))
-    simpa using opndBound ao hl b
+    simpa -congrConsts using opndBound ao hl b
   have paidUnder {n : ℕ} {G : SimpleGraph (Fin n)} [DecidableRel G.Adj] {C : Circuit} (ao : IsAO2 n C) {w z : ℕ} (h : PaidStep G C w z) (under : UnderAnd n C w) :
       UnderAnd n C z := by
     obtain ⟨⟨j,rfl,hj⟩,b,rfl⟩ := h
-    simp only [Nat.add_sub_cancel_left]
+    simp -congrConsts only [Nat.add_sub_cancel_left]
     rcases Finset.mem_union.mp hj with junk|orr
     · exact ⟨j,(junkData junk).1,(junkData junk).2.1,b,.refl⟩
     · have v := orData orr
@@ -2212,9 +2251,9 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     intro x
     by_cases non : (orIn n C w).Nonempty
     · exact rawValue ao first before non x
-    refine ⟨fun on => ?_,fun ⟨t,ht,_⟩ => (non ⟨t,ht⟩).elim⟩
+    refine ⟨fun on => ?_,fun h => (non (Exists.elim h fun t ht => ⟨t, ht.1⟩)).elim⟩
     exfalso
-    obtain ⟨z,path,_,source⟩ := or_trace (n := n) (C := C) (x := List.ofFn x) (by simp) w on
+    obtain ⟨z,path,_,source⟩ := or_trace (n := n) (C := C) (x := List.ofFn x) (by simp -congrConsts) w on
     rcases source with hz|⟨k,kl,rfl,notOr⟩
     · exact non ⟨⟨z,hz⟩,reach_mem_orIn ⟨z,hz⟩ path⟩
     have andK := (ao.1 _ (gateAt_mem kl)).resolve_right notOr
@@ -2231,7 +2270,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
         obtain ⟨_,_,y,ky,off⟩ := junkData hj
         exact Bool.false_ne_true (off.symm.trans (hb y (reachVal reach ky)))
       have onN : l ∈ orN G C := by
-        simpa only [orN,gatesWhere,Finset.mem_filter,Finset.mem_range] using And.intro vl ⟨hop,nb⟩
+        simpa -congrConsts only [orN_d,gatesWhere_d,Finset.mem_filter,Finset.mem_range] using And.intro vl ⟨hop,nb⟩
       have notL : l ∉ lam G C := by
         intro h
         obtain ⟨_,⟨t,ht⟩,_,_⟩ := Finset.mem_filter.mp h
@@ -2267,12 +2306,12 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       · exact (ne eq).elim
       · obtain ⟨paid,b,rfl⟩ := step
         refine Finset.mem_biUnion.mpr ⟨w,Finset.mem_filter.mpr ⟨mem.mpr wr,paid⟩,?_⟩
-        fin_cases b <;> simp
+        fin_cases b <;> simp -congrConsts
     have fork := (Finset.card_le_card children).trans Finset.card_biUnion_le
     have count : (∑ w ∈ I, ({opnd C (w-n) 0,opnd C (w-n) 1} : Finset ℕ).card) ≤ 2*I.card := by
       calc
-        _ ≤ ∑ _ ∈ I, 2 := Finset.sum_le_sum (fun w _ => (Finset.card_insert_le _ _).trans (by simp))
-        _ = _ := by simp [Nat.mul_comm]
+        _ ≤ ∑ _ ∈ I, 2 := Finset.sum_le_sum (fun w _ => (Finset.card_insert_le _ _).trans (by simp -congrConsts))
+        _ = _ := by simp -congrConsts [Nat.mul_comm]
     have isub : I ⊆ D := Finset.filter_subset _ _
     have frontier : F.card ≤ I.card+1 := by
       have er := Finset.card_erase_add_one rootIn
@@ -2318,7 +2357,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
               · exact ⟨0,a,fun h => wy ((wireOr ao rd.1 rd.2.1 y).mpr (Or.inl h))⟩
               · exact ⟨1,b,fun h => wy ((wireOr ao rd.1 rd.2.1 y).mpr (Or.inr h))⟩
           obtain ⟨b,bx,by'⟩ := down
-          have step : PaidStep G C (n+j) (opnd C j b) := ⟨⟨j,rfl,hj⟩,b,by simp⟩
+          have step : PaidStep G C (n+j) (opnd C j b) := ⟨⟨j,rfl,hj⟩,b,by simp -congrConsts⟩
           exact ih _ (paidBound ao step) (mem.mpr ((mem.mp din).tail step)) bx by'
         · exact ⟨w,Finset.mem_sdiff.mpr ⟨din,fun h => paid (Finset.mem_filter.mp h).2⟩,wx,wy⟩
     obtain ⟨z,hz,zx,zy⟩ := witness root rootIn on off
@@ -2368,7 +2407,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     have a := Finset.card_image_le (f := matchIndex d) (s := K)
     have b := Finset.card_image_le (f := matchIndex d) (s := W.erase w)
     have er := Finset.card_erase_add_one hw
-    simp only [Finset.card_univ,Fintype.card_fin] at h
+    simp -congrConsts only [Finset.card_univ,Fintype.card_fin] at h
     omega
   have cardSeparation {α β : Type} [DecidableEq α] [DecidableEq β] (W : Finset α) (A : Finset β)
       (contains : β → α → Prop) [DecidableRel contains] (small : W.card ≤ 4) (two : 2 ≤ W.card)
@@ -2386,7 +2425,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     obtain ⟨z,hz,yes,no⟩ := sep _ (we.symm i).property _ (we.symm j).property diff
     let t := ae ⟨z,hz⟩
     have tk : t.val < k.val-1 := by have := t.isLt; dsimp [k]; omega
-    refine ⟨⟨t.val,tk⟩,?_,?_⟩ <;> simp [f,t,t.isLt,yes,no]
+    refine ⟨⟨t.val,tk⟩,?_,?_⟩ <;> simp -congrConsts [f,t,t.isLt,yes,no]
   have fanShapes {U : Finset (Sym2 (Fin 26))} {W V : Finset (Fin 26)} {c : Fin 26}
       {F : Finset ℕ} (S : ℕ → Finset (Fin 26))
       (leafCount : U.card ≤ V.card) (two : 2 ≤ W.card) (small : W.card ≤ 4)
@@ -2457,7 +2496,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       rw [←eq']
       exact hh t.val t.property
     have card := Fintype.card_le_of_injective _ inj
-    simp only [Fintype.card_coe] at card
+    simp -congrConsts only [Fintype.card_coe] at card
     have af : A ⊆ F := Finset.filter_subset _ _
     have sum := Finset.card_sdiff_add_card_eq_card af
     omega
@@ -2544,9 +2583,9 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
       let f : ↥U := ⟨s(p,q),h⟩
       have h' : s(p,q) = s(w f,v f) := eq f
       rcases Sym2.eq_iff.mp h' with a|a
-      · simpa only [a.1,a.2] using on f
-      · have swap (i j : Fin 26) : pairInput i j = pairInput j i := by funext t; simp [pairInput,or_comm]
-        simpa only [a.1,a.2,swap (v f) (w f)] using on f
+      · simpa -congrConsts only [a.1,a.2] using on f
+      · have swap (i j : Fin 26) : pairInput i j = pairInput j i := by funext t; simp -congrConsts [pairInput_d,or_comm]
+        simpa -congrConsts only [a.1,a.2,swap (v f) (w f)] using on f
     have use := fanShapes (U := U) (W := W) (V := V) (F := F) (fun z => orIn 26 C z)
       sizeV two small center (fun t ht => by
         obtain ⟨f,_,rfl⟩ := Finset.mem_image.mp ht
@@ -2555,12 +2594,12 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
         exact ⟨_,wmem f,edge f⟩) sub shape (by
       intro t ht l hl he u hu
       let x (i : Fin 26) := decide (i = u ∨ i ∈ V ∧ ¬plane.Adj u i)
-      have ux : x u = true := by simp [x]
+      have ux : x u = true := by simp -congrConsts [x]
       have off : graphFun plane ∅ x = false := by
         apply Bool.eq_false_iff.mpr
         intro positive
         have witness : ∃ i j : Fin 26, plane.Adj i j ∧ x i = true ∧ x j = true := by
-          simpa only [graphFun,Finset.notMem_empty,false_and,exists_false,decide_false,Bool.false_or,
+          simpa -congrConsts only [graphFun_d,Finset.notMem_empty,false_and,exists_false,decide_false,Bool.false_or,
             decide_eq_true_eq] using positive
         obtain ⟨i,j,ij,oi,oj⟩ := witness
         have pi : i = u ∨ i ∈ V ∧ ¬plane.Adj u i := of_decide_eq_true oi
@@ -2578,7 +2617,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
         · exact Or.inl (eq ▸ hp)
         · exact Or.inr (eq ▸ hp)
       · intro i hi noI mem
-        have yes : x i = true := by simp [x,hi,noI]
+        have yes : x i = true := by simp -congrConsts [x,hi,noI]
         exact Bool.false_ne_true ((avoid i mem).symm.trans yes))
     change (tops plane C).card + (junk plane C).card + (orN plane C \ lam plane C).card ≤ 13 + U.card at cost
     omega
@@ -2632,32 +2671,35 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     have ie : di = planeInst := Subsingleton.elim _ _
     subst di
     have many : 2 ≤ (mixing plane C).card := by
-      by_contra! low
+      by_contra low
+      replace low := not_le.mp low
       obtain ⟨m,hm⟩ := non
       exact uniqueMixImpossible C least top empty m hm
         (fun q hq => Finset.card_le_one.mp (by omega) q hq m hm) old.2 cost cover
     have r : 3 ≤ (orN plane C \ lam plane C).card := by
-      by_contra! h
+      by_contra h
+      replace h := not_le.mp h
       have equal : (orN plane C \ lam plane C).card = 2 := by omega
       have inc : mixing plane C ⊆ orN plane C \ lam plane C := fun _ h => mixingNotLam h
       have all := Finset.eq_of_subset_of_card_le inc (equal ▸ many)
       obtain ⟨p,q,ne,pair⟩ := Finset.card_eq_two.mp equal
-      have hp : p ∈ mixing plane C := by rw [all,pair]; simp
-      have hq : q ∈ mixing plane C := by rw [all,pair]; simp
+      have hp : p ∈ mixing plane C := by rw [all,pair]; simp -congrConsts
+      have hq : q ∈ mixing plane C := by rw [all,pair]; simp -congrConsts
       have h3 : (Ustar plane C).card ≤ 3 := by
         rcases lt_or_gt_of_ne ne with lt|lt
         · exact twoMixBound least top empty planeFour color26 planeBip lt pair hp hq
         · exact twoMixBound least top empty planeFour color26 planeBip lt (pair.trans (Finset.pair_comm _ _)) hq hp
       omega
     refine ⟨r,?_,many⟩
-    by_contra! small
+    by_contra small
+    replace small := not_le.mp small
     exact fourMany rfl least top empty twoJ non (by omega) many r cost edges cover
   obtain ⟨bigR,bigU,bigM⟩ := bump G C heq least top empty twoJ oneM threeU cost edgeBound cover
   obtain ⟨g,hg,m,hm,a,ha,b,hmPath,hgPath,sub,e,he,f,hf,nef,se,sf⟩ := sharedService least top empty threeU cost edgeBound
   have clause : ∀ z ∈ ({e, f} : Finset (Sym2 (Fin 26))), z ∈ Ustar G C ∧ z ∈ gammaE G C g ∧
       ∃ t ∈ tops G C, ∃ d : Fin 2, z ∈ gammaE G C t ∧ OrReaches 26 C (opnd C t d) g := by
     intro z hz
-    have hz' : z = e ∨ z = f := by simpa using hz
+    have hz' : z = e ∨ z = f := by simpa -congrConsts using hz
     have hzg : z ∈ gammaE G C g ∩ Ustar G C := by
       rcases hz' with rfl|rfl
       · exact he
