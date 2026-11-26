@@ -1,32 +1,30 @@
+import Mathlib
 import PEqualNP.Defs
 
-open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
+open PEqualNP.CircuitLowerBounds
+open PEqualNP.MetaComplexity
 
-namespace PEqualNP.Outside.L_meta_19506
+theorem PEqualNP.Outside.L_meta_19506 :
+    ∃ C : Circuit,
+      FanInTwo C ∧ C.size ≤ 10 ∧
+      PEqualNP.Represents.Represents (fun u v : Fin 5 => (16221265 : ℕ).testBit (5 * u.val + v.val)) C := by
+  let C : Circuit :=
+    { gates := [⟨GateOp.or, [1, 9]⟩,
+      ⟨GateOp.or, [3, 4]⟩,
+      ⟨GateOp.not, [10]⟩,
+      ⟨GateOp.or, [5, 11]⟩,
+      ⟨GateOp.or, [13, 10]⟩,
+      ⟨GateOp.and, [14, 2]⟩,
+      ⟨GateOp.or, [12, 0]⟩,
+      ⟨GateOp.or, [16, 6]⟩,
+      ⟨GateOp.and, [14, 17]⟩,
+      ⟨GateOp.not, [18]⟩],
+      output := 18 }
+  have hfan : FanInTwo C := by
+    intro g hg
+    simp only [C, List.mem_cons, List.not_mem_nil, or_false] at hg
+    rcases hg with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+    all_goals exact ⟨by simp only [Set.mem_insert_iff, Set.mem_singleton_iff]; simp, by decide⟩
+  refine ⟨C, hfan, by decide, ?_⟩
+  decide +kernel
 
-def witness : Circuit :=
-  ⟨[⟨.and, [4, 8]⟩, ⟨.or, [1, 9]⟩, ⟨.or, [0, 6]⟩, ⟨.not, [11]⟩, ⟨.or, [1, 13]⟩, ⟨.and, [11, 12]⟩, ⟨.or, [3, 4]⟩, ⟨.or, [5, 16]⟩, ⟨.and, [13, 17]⟩, ⟨.or, [15, 18]⟩], 19⟩
-
-def acceptedOp (g : Gate) : Bool :=
-  match g.op with
-  | .and | .or | .not => true
-  | _ => false
-
-theorem acceptedOpSound (g : Gate) (ok : acceptedOp g = true) :
-    g.op = .and ∨ g.op = .or ∨ g.op = .not := by
-  cases h : g.op <;> simp [acceptedOp, h] at ok ⊢
-
-theorem witnessFit : FanInTwo witness := by
-  have legal : witness.gates.all (fun g => acceptedOp g && decide (g.inputs.length ≤ 2)) = true := by
-    decide +kernel
-  intro g hg
-  have passed := List.all_eq_true.mp legal g hg
-  simp only [Bool.and_eq_true, decide_eq_true_eq] at passed
-  exact ⟨by simpa only [Set.mem_insert_iff, Set.mem_singleton_iff] using acceptedOpSound g passed.1,
-    passed.2⟩
-
-end PEqualNP.Outside.L_meta_19506
-
-open PEqualNP.Outside.L_meta_19506 in
-theorem PEqualNP.Outside.L_meta_19506 : ∃ C : PEqualNP.CircuitLowerBounds.Circuit, PEqualNP.MetaComplexity.FanInTwo C ∧ C.size ≤ 10 ∧ PEqualNP.Represents.Represents (fun u v : Fin 5 => (16221265 : ℕ).testBit (5 * u.val + v.val)) C := by
-  exact ⟨witness, witnessFit, by decide, by decide +kernel⟩
