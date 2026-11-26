@@ -1,5 +1,4 @@
 import PEqualNP.Defs
-import PEqualNP.Defs.GenericRejection
 
 open PEqualNP.CircuitLowerBounds
 open PEqualNP.MetaComplexity
