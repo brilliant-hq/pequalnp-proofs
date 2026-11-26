@@ -1,10 +1,109 @@
-import PEqualNP.Defs.Represents
-import PEqualNP.MetaComplexity.Helpers.CoverCircuitList
+import PEqualNP.Defs
 
-namespace PEqualNP.Outside.Power19402
+namespace PEqualNP.Outside.L_meta_19402_aux
 
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity PEqualNP.Represents
-open PEqualNP.MetaComplexity.CoverCircuit
+def orChain (start first : ℕ) (rest : List ℕ) : List Gate :=
+  rest.foldl
+    (fun gs v => gs ++ [⟨GateOp.or, [if gs.length = 0 then first else start + gs.length - 1, v]⟩])
+    []
+
+/-- The wire at the end of `orChain start first rest`. -/
+def chainOut (start first : ℕ) (rest : List ℕ) : ℕ :=
+  if rest.length = 0 then first else start + rest.length - 1
+
+def run (gs : List Gate) (w : List Bool) : List Bool :=
+  gs.foldl (fun w g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]) w
+
+theorem wires_eq (C : Circuit) (x : List Bool) : C.wires x = run C.gates x := rfl
+
+theorem run_append (a b : List Gate) (w : List Bool) : run (a ++ b) w = run b (run a w) := by
+  unfold run; rw [List.foldl_append]
+
+theorem run_nil (w : List Bool) : run [] w = w := rfl
+
+theorem run_singleton (g : Gate) (w : List Bool) :
+    run [g] w = w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)] := rfl
+
+theorem run_prefix (gs : List Gate) :
+    ∀ w : List Bool, ∃ t, run gs w = w ++ t ∧ t.length = gs.length := by
+  induction gs with
+  | nil => intro w; exact ⟨[], by simp [run]⟩
+  | cons g gs ih =>
+    intro w
+    obtain ⟨t, ht, hl⟩ := ih (w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)])
+    refine ⟨g.op.eval (g.inputs.map fun i => w.getD i false) :: t, ?_, ?_⟩
+    · rw [show g :: gs = [g] ++ gs from rfl, run_append, run_singleton, ht]; simp
+    · simp [hl]
+
+theorem run_length (gs : List Gate) (w : List Bool) : (run gs w).length = w.length + gs.length := by
+  obtain ⟨t, ht, hl⟩ := run_prefix gs w
+  rw [ht, List.length_append, hl]
+
+theorem getD_run (gs : List Gate) (w : List Bool) (i : ℕ) (hi : i < w.length) :
+    (run gs w).getD i false = w.getD i false := by
+  obtain ⟨t, ht, _⟩ := run_prefix gs w
+  rw [ht]; simp [List.getD_eq_getElem?_getD, List.getElem?_append_left hi]
+
+theorem getD_snoc_length (l : List Bool) (a : Bool) : (l ++ [a]).getD l.length false = a := by
+  simp
+
+theorem eval_or2 (a b : Bool) : GateOp.eval GateOp.or [a, b] = (a || b) := by
+  cases a <;> cases b <;> rfl
+
+theorem eval_and2 (a b : Bool) : GateOp.eval GateOp.and [a, b] = (a && b) := by
+  cases a <;> cases b <;> rfl
+
+theorem orChain_snoc_aux (s f : ℕ) (r : List ℕ) (v : ℕ) :
+    orChain s f (r ++ [v]) = orChain s f r ++
+      [⟨GateOp.or, [if (orChain s f r).length = 0 then f else s + (orChain s f r).length - 1, v]⟩] := by
+  unfold orChain; rw [List.foldl_append]; rfl
+
+theorem orChain_length (s f : ℕ) (r : List ℕ) : (orChain s f r).length = r.length := by
+  induction r using List.reverseRecOn with
+  | nil => rfl
+  | append_singleton r v ih => rw [orChain_snoc_aux]; simp [ih]
+
+theorem orChain_snoc (s f : ℕ) (r : List ℕ) (v : ℕ) :
+    orChain s f (r ++ [v]) = orChain s f r ++ [⟨GateOp.or, [chainOut s f r, v]⟩] := by
+  rw [orChain_snoc_aux, orChain_length]; rfl
+
+theorem orChain_ops (s f : ℕ) (r : List ℕ) :
+    ∀ g ∈ orChain s f r, g.op = GateOp.or ∧ g.inputs.length = 2 := by
+  induction r using List.reverseRecOn with
+  | nil => intro g hg; simp [orChain] at hg
+  | append_singleton r v ih =>
+    intro g hg
+    rw [orChain_snoc, List.mem_append, List.mem_singleton] at hg
+    rcases hg with hg | rfl
+    · exact ih g hg
+    · exact ⟨rfl, rfl⟩
+
+theorem chainOut_lt (s f : ℕ) (r : List ℕ) (hf : f < s) : chainOut s f r < s + r.length := by
+  unfold chainOut; split <;> omega
+
+theorem orChain_eval (s f : ℕ) (r : List ℕ) (w : List Bool) (hw : w.length = s) (hf : f < s)
+    (hr : ∀ v ∈ r, v < s) :
+    (run (orChain s f r) w).getD (chainOut s f r) false =
+      (w.getD f false || r.any (fun v => w.getD v false)) := by
+  induction r using List.reverseRecOn with
+  | nil => simp [orChain, run_nil, chainOut]
+  | append_singleton r v ih =>
+    have hr' : ∀ u ∈ r, u < s := fun u hu => hr u (List.mem_append_left _ hu)
+    have hv : v < s := hr v (by simp)
+    rw [orChain_snoc, run_append, run_singleton]
+    have hlen : (run (orChain s f r) w).length = s + r.length := by
+      rw [run_length, orChain_length, hw]
+    have hco : chainOut s f (r ++ [v]) = (run (orChain s f r) w).length := by
+      rw [hlen]; simp [chainOut]
+    rw [hco, getD_snoc_length]
+    have hv' : (run (orChain s f r) w).getD v false = w.getD v false :=
+      getD_run _ _ _ (by omega)
+    simp only [List.map_cons, List.map_nil, eval_or2]
+    rw [ih hr', hv', List.any_append]
+    simp only [List.any_cons, List.any_nil, Bool.or_false, Bool.or_assoc]
+
+
 theorem early (l : List Bool) (b : Bool) (i : ℕ) (h : i < l.length) :
     (l ++ [b]).getD i false = l.getD i false := by
   simp only [List.getD_eq_getElem?_getD, List.getElem?_append_left h]
@@ -278,8 +377,8 @@ theorem correct (n k : ℕ) (hn : n = k+4) (u v : Fin n) :
   simp only [Bool.or_eq_true,Bool.and_eq_true,decide_eq_true_eq]
   omega
 
-end PEqualNP.Outside.Power19402
-open PEqualNP.Outside.Power19402 PEqualNP.MetaComplexity.CoverCircuit
+end PEqualNP.Outside.L_meta_19402_aux
+open PEqualNP.Outside.L_meta_19402_aux
 theorem PEqualNP.Outside.L_meta_19402 : ∀ n : ℕ, 4 ≤ n → PEqualNP.Represents.RepSizeAtMost (fun (u : Fin n) (v : Fin n) => decide ((u.val = 0 ∧ (v.val = 1 ∨ v.val = 2)) ∨ (u.val = 1 ∧ ¬ (v.val = 1 ∨ v.val = 2)) ∨ (2 ≤ u.val ∧ v.val ≤ 2))) (2 * n + 1) := by
   intro n hn
   refine ⟨circ n (n-4), mono _ _, ?_, correct _ _ (by omega)⟩
