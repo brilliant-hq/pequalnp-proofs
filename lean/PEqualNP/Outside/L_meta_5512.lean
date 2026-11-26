@@ -1,0 +1,8 @@
+import PEqualNP.Defs
+
+theorem PEqualNP.Outside.L_meta_5512 :
+    PEqualNP.MetaComplexity.Monotone2 ({ gates := [{ op := PEqualNP.CircuitLowerBounds.GateOp.or, inputs := [5, 6] }, { op := PEqualNP.CircuitLowerBounds.GateOp.or, inputs := [4, 8] }, { op := PEqualNP.CircuitLowerBounds.GateOp.and, inputs := [1, 9] }, { op := PEqualNP.CircuitLowerBounds.GateOp.or, inputs := [0, 10] }], output := 11 } : PEqualNP.CircuitLowerBounds.Circuit) ∧
+  ({ gates := [{ op := PEqualNP.CircuitLowerBounds.GateOp.or, inputs := [5, 6] }, { op := PEqualNP.CircuitLowerBounds.GateOp.or, inputs := [4, 8] }, { op := PEqualNP.CircuitLowerBounds.GateOp.and, inputs := [1, 9] }, { op := PEqualNP.CircuitLowerBounds.GateOp.or, inputs := [0, 10] }], output := 11 } : PEqualNP.CircuitLowerBounds.Circuit).size = 4 ∧
+  PEqualNP.Represents.Represents (fun u v : Fin 4 => (127 : ℕ).testBit (4 * u.val + v.val)) ({ gates := [{ op := PEqualNP.CircuitLowerBounds.GateOp.or, inputs := [5, 6] }, { op := PEqualNP.CircuitLowerBounds.GateOp.or, inputs := [4, 8] }, { op := PEqualNP.CircuitLowerBounds.GateOp.and, inputs := [1, 9] }, { op := PEqualNP.CircuitLowerBounds.GateOp.or, inputs := [0, 10] }], output := 11 } : PEqualNP.CircuitLowerBounds.Circuit) := by
+  refine ⟨?_, by decide, by decide +kernel⟩
+  simp [PEqualNP.MetaComplexity.Monotone2]
