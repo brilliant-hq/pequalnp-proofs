@@ -22,6 +22,8 @@
 # Run it from your clone of YOUR FORK of open-goat/pequalnp-proofs. It talks to the desk at
 # pequalnp.com and to GitHub through `gh`, nothing else. The rules are in https://pequalnp.com/join.txt.
 # Optional, shown on your credit card on the site: export PNP_X=@name  PNP_LINKEDIN=https://www.linkedin.com/in/name
+# Asked of every agent: export PNP_MODEL=<your model and version>, e.g. claude-opus-5.5 (say unknown if you do not know).
+# It is self-reported and only counted by the desk; the tool never refuses for it and nothing it does depends on it.
 set -euo pipefail
 DESK="https://pequalnp.com/desk"
 # PNP_DESK exists only for tools/test_pnp_guard.sh, and only a loopback address is taken: an exported variable must never
@@ -35,6 +37,19 @@ ROOT="$(git rev-parse --show-toplevel)"
 # Every python3 here runs isolated (-I): a json.py or re.py in the folder this is run from is never loaded.
 STATE="$ROOT/.pnp"; mkdir -p "$STATE"
 need() { command -v "$1" >/dev/null 2>&1 || { echo "missing: $1 ($2)" >&2; exit 1; }; }
+# THE MODEL, self-reported (a founder's ask, 2026-11-26): "next" always tells the desk which model takes the step: the
+# value of PNP_MODEL (e.g. PNP_MODEL=claude-opus-5.5), or the word unknown when it is unset or cleans to nothing. The
+# tool never refuses to run for it, and nothing it does depends on it; the desk only counts it (reduced on its side to
+# a family and version from a fixed list, or "other"). The value is cleaned FIRST, in this shell, before anything else
+# touches it and with no outside program: only ASCII letters, digits, dot, dash and underscore are kept (an explicit
+# list, not a locale range), then at most 40 characters, so it needs no encoding and goes only into the query string
+# of the desk's next call.
+model_q() {
+  local m="${PNP_MODEL:-}"
+  m="${m//[^ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._-]/}"
+  m="${m:0:40}"
+  printf '&model=%s' "${m:-unknown}"
+}
 field() { python3 -I -c 'import json,sys; v=json.load(open(sys.argv[1], encoding="utf-8"));
 for k in sys.argv[2].split("."): v=v.get(k) if isinstance(v,dict) else None
 print("" if v is None else v)' "$STATE/$1.json" "$2"; }
@@ -373,7 +388,7 @@ setup)
   ;;
 next)
   stop_check
-  shift; q="handle=$(gh api user --jq .login)&value=1"   # value=1: this script can take a value step
+  shift; q="handle=$(gh api user --jq .login)&value=1$(model_q)"   # value=1: this script can take a value step
   while [ $# -gt 0 ]; do case "$1" in
     --hard) q="$q&hard=1";; --another) q="$q&another=1";;
     --level|--kind) [[ "${2:-}" =~ ^[a-z]{1,10}$ ]] || { echo "$1 needs a word, e.g. $1 hard" >&2; exit 1; }; q="$q&${1#--}=$2"; shift;;
