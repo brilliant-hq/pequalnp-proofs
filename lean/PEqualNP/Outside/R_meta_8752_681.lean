@@ -56,7 +56,10 @@ theorem PEqualNP.Outside.R_meta_8752_681
   have val (P L : Finset (Fin 13)) : B.eval (List.ofFn (inp P L)) =
       PEqualNP.CircuitLowerBounds.GateOp.or.eval (W.map fun i => (C.wires (List.ofFn (inp P L))).getD i false) := by
     let v := C.wires (List.ofFn (inp P L))
-    have len : v.length = 26+C.gates.length := by simpa [v, PEqualNP.CircuitLowerBounds.Circuit.wires] using wlen C.gates (List.ofFn (inp P L))
+    have len : v.length = 26+C.gates.length := by
+      have hlen := wlen C.gates (List.ofFn (inp P L))
+      change v.length = (List.ofFn (inp P L)).length+C.gates.length at hlen
+      simpa only [List.length_ofFn] using hlen
     change List.getD ((C.gates ++ [K]).foldl
       (fun (w : List Bool) g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)])
       (List.ofFn (inp P L))) (26+C.gates.length) false = _
