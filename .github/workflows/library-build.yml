@@ -95,7 +95,10 @@ jobs:
           get "pulls/$PR" "$W/api/pr.json"
           get "pulls/$PR/files?per_page=100" "$W/api/files.json"
           # OURS: an owner or member opened it, its head is in this repository (not a fork), its base is the default branch.
-          case "$(jq -r '.author_association // ""' "$W/api/pr.json")" in OWNER|MEMBER) ;; *) echo "REFUSED: the pull request's author is not an owner or member of the repository"; exit 1 ;; esac
+          # The association as THIS run's token sees it: a member whose organisation membership is private is reported as
+          # COLLABORATOR to the workflow's token (measured on #26264), so a collaborator is accepted too. An outside author
+          # is CONTRIBUTOR, FIRST_TIME_CONTRIBUTOR, FIRST_TIMER or NONE, never COLLABORATOR (that is granted access).
+          case "$(jq -r '.author_association // ""' "$W/api/pr.json")" in OWNER|MEMBER|COLLABORATOR) ;; *) echo "REFUSED: the pull request's author is not an owner, member or collaborator of the repository"; exit 1 ;; esac
           [ "$(jq -r '.head.repo.full_name // ""' "$W/api/pr.json")" = "$GITHUB_REPOSITORY" ] || { echo "REFUSED: the pull request's head is not in $GITHUB_REPOSITORY (a fork is never built here)"; exit 1; }
           [ "$(jq -r '.base.repo.full_name // ""' "$W/api/pr.json")" = "$GITHUB_REPOSITORY" ] && [ "$(jq -r '.base.ref // ""' "$W/api/pr.json")" = "$DEFAULT_BRANCH" ] || { echo "REFUSED: the pull request does not target $DEFAULT_BRANCH of $GITHUB_REPOSITORY"; exit 1; }
           head=$(jq -r '.head.sha // ""' "$W/api/pr.json"); base=$(jq -r '.base.sha // ""' "$W/api/pr.json")

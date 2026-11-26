@@ -122,7 +122,17 @@ test('library-build.yml: hand start only, read-only, no action, no secret, the s
   for (const p of ['lean/PEqualNP/Defs/X.lean', 'lean/PEqualNP/Defs.lean', 'lean/PEqualNP/Outside/L_x_1.lean', '.github/workflows/x.yml', 'lean/lakefile.toml', 'lean/PEqualNP/Library/a/b/X.lean']) assert.ok(!re('LIB_PATH').test(p), p);
   assert.ok(re('DEFS_PATH').test('lean/PEqualNP/Defs/X.lean') && !re('DEFS_PATH').test('lean/PEqualNP/Defs/a/X.lean') && !re('DEFS_PATH').test('lean/PEqualNP/Library/X.lean'));
   assert.match(library, /select\(\(\.status != "added"\) or \(\.previous_filename != null\) or \(\(\.filename \| test\(env\.LIB_PATH\)\) \| not\)\)/, 'the empty mode refuses all but an added library file');
-  assert.match(library, /case "\$\(jq -r '\.author_association \/\/ ""' "\$W\/api\/pr\.json"\)" in OWNER\|MEMBER\)/, 'owner or member only');
+  // The association rule, run as the workflow runs it: OWNER, MEMBER and COLLABORATOR pass; an outside author does not.
+  const assoc = library.match(/(case "\$\(jq -r '\.author_association \/\/ ""' "\$W\/api\/pr\.json"\)" in [^\n]+ esac)/);
+  assert.ok(assoc, 'the association rule is not where the test looks');
+  for (const [v, ok] of [['OWNER', true], ['MEMBER', true], ['COLLABORATOR', true], ['CONTRIBUTOR', false], ['FIRST_TIME_CONTRIBUTOR', false], ['FIRST_TIMER', false], ['NONE', false], ['', false]]) {
+    const dir = mkdtempSync(join(tmpdir(), 'assoc-')); const W = dir;
+    try {
+      mkdirSync(join(W, 'api')); writeFileSync(join(W, 'api', 'pr.json'), JSON.stringify(v ? { author_association: v } : {}));
+      const r = spawnSync('bash', ['-c', `${assoc[1]}\necho PASSED`], { env: { ...process.env, W }, encoding: 'utf8' });
+      assert.equal(r.stdout.includes('PASSED'), ok, `${v || '(none)'}: ${r.stdout}`);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  }
 });
 
 // THE IMPORT CHECK (seat-redteam-1 R1, seat-redteam-2 A): the reader takes the leading blank and import lines; a later
