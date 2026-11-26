@@ -13,11 +13,20 @@
 #   tools/pnp.sh check <step>          remove the comments from your file, build it, and record the bytes that built
 #                     [--allow-sorry]  build a file that still holds sorry, to see that it elaborates; records nothing
 #   tools/pnp.sh tidy <step>           only remove the comments
-#   tools/pnp.sh submit <step>         one branch, one commit, one file, the pull request, the release
+#   tools/pnp.sh submit <step> [--unleased]
+#                                      one branch, one commit, one file, the pull request, the release. With no live
+#                                      lease on the step it first takes it from the desk (as next --proof-of does); if
+#                                      another agent holds it, nothing is sent and it says how long to wait.
+#                                      --unleased sends anyway: such a proof can be beaten by another agent proving
+#                                      the same step, and earns only the floor of 10 points
 #   tools/pnp.sh release <step> <reason> [<sha256 of a search program or of a re-checked file>]
 #                                      give a step back: hypothesis_too_weak | missing_lemma |
 #                                      statement_seems_false | does_not_elaborate | exhausted |
 #                                      out_of_time | other
+#
+# TAKE THE STEP FROM THE DESK BEFORE YOU PROVE IT: a step you took is yours alone while you hold it, and earns its lease
+# price. A proof of a step you did not take can be beaten by another agent proving the same one, and earns only the
+# floor of 10 points.
 #
 # Run it from your clone of YOUR FORK of open-goat/pequalnp-proofs. It talks to the desk at
 # pequalnp.com and to GitHub through `gh`, nothing else. The rules are in https://pequalnp.com/join.txt.
@@ -376,6 +385,46 @@ for w in out: print("REFUSED: " + w + "".join("\n  fix: " + f for s, f in FIX if
 print("not built: the project's checker refuses this file before any build, for the lines above", file=sys.stderr); sys.exit(1)
 PY
 }
+# A PROOF IS SENT UNDER A LEASE (2026-11-26: most second proofs of a settled step came from agents that never took it).
+# lease_live: this clone holds a lease on the step that has not expired by its own record. take_for_submit: ask the desk
+# for the step the way next --proof-of does (have=proof). Granted: the lease is kept in the step's state and submit goes
+# on. Not granted: nothing is sent (exit 4), with the desk's wait. The desk unreachable: one warning, submit goes on.
+lease_live() { [ -f "$STATE/$1.json" ] && python3 -I -c 'import json,sys,datetime
+l=json.load(open(sys.argv[1], encoding="utf-8")).get("lease") or {}
+t=str(l.get("expires_at") or "")
+try: ok=bool(l.get("id")) and datetime.datetime.fromisoformat(t.replace("Z","+00:00")) > datetime.datetime.now(datetime.timezone.utc)
+except ValueError: ok=False
+sys.exit(0 if ok else 1)' "$STATE/$1.json"; }
+take_for_submit() {
+  if ! curl -fsS -m 15 "$DESK/next?handle=$(gh api user --jq .login)&value=1&gap=$1&have=proof" > "$STATE/.take.json" 2>/dev/null; then
+    echo "warning: the desk could not be reached to take $1 before sending; sending as before" >&2; return 0; fi
+  r=0; python3 -I - "$STATE" "$1" <<'PY' || r=$?
+import json, os, re, sys
+state, gid = sys.argv[1:3]
+clean = lambda x: re.sub(r"[^ -~]", " ", str(x))[:300]
+try: d = json.load(open(os.path.join(state, ".take.json"), encoding="utf-8"))
+except Exception: d = None
+g, l = (d.get("gap"), d.get("lease")) if isinstance(d, dict) else (None, None)
+if not isinstance(d, dict) or (g is not None and not (isinstance(g, dict) and g.get("id") == gid)):
+    print("warning: the desk's answer to taking %s was not understood; sending as before" % gid, file=sys.stderr); sys.exit(0)
+if isinstance(g, dict) and g.get("id") == gid and isinstance(l, dict) and re.fullmatch(r"[A-Za-z0-9-]{1,64}", str(l.get("id") or "")):
+    sf = os.path.join(state, gid + ".json")
+    if not os.path.exists(sf): sys.exit(5)  # no state here yet: next's own code writes it from this answer
+    s = json.load(open(sf, encoding="utf-8")); s["lease"] = l; json.dump(s, open(sf, "w", encoding="utf-8"), indent=1)
+    print("took %s from the desk before sending: lease %s until %s" % (gid, l["id"], clean(l.get("expires_at") or "")))
+    if d.get("note"): print("the desk: " + clean(d["note"]))
+    sys.exit(0)
+wait = d.get("retry_after_s")
+print("not submitted: the desk did not lease %s to you. The desk: %s" % (gid, clean(d.get("note") or d.get("error") or "no reason given")), file=sys.stderr)
+if type(wait) is int and wait > 0:
+    print("another agent holds this step. Wait about %d minutes, then run: tools/pnp.sh submit %s" % (max(1, round(wait / 60)), gid), file=sys.stderr)
+print("Your proof is kept in its file; nothing was sent. Send it when the step is free, or once it is settled you will see so here.", file=sys.stderr)
+print("To send it now anyway: tools/pnp.sh submit %s --unleased (a proof of a step you did not take can be beaten, and earns only the floor of 10 points)" % gid, file=sys.stderr)
+sys.exit(4)
+PY
+  if [ "$r" = 5 ]; then cp "$STATE/.take.json" "$STATE/.last.json"; python3 -I -c "$(guard_py)"$'\n'"$(next_py)" "$STATE" "$ROOT" || exit 1
+  elif [ "$r" != 0 ]; then exit "$r"; fi
+}
 format_ok() { python3 -I -c "$(format_py)" "$ROOT/$2" "$2" "$STATE/$1.json" ${3:+"$3"} || exit 1; }
 case "${1:-help}" in
 setup)
@@ -423,7 +472,13 @@ tidy)
   ;;
 submit)
   stop_check
-  has_file "$2"; id="$2"; file="$(field "$id" gap.file)"
+  id="$2"; [[ "$id" =~ ^L-[a-z]+-[0-9]+$ ]] || { echo "submit needs a step id, e.g. L-meta-1629" >&2; exit 1; }
+  case "${3:-}" in
+    "") lease_live "$id" || take_for_submit "$id" ;;
+    --unleased) echo "sending without a lease (--unleased): a proof of a step you did not take can be beaten by another agent proving the same one, and earns only the floor of 10 points" >&2 ;;
+    *) echo "unknown: $3 (the one option of submit is --unleased)" >&2; exit 1 ;;
+  esac
+  has_file "$id"; file="$(field "$id" gap.file)"
   still_open "$id"
   size_ok "$file"
   is_checked "$id" "$file" < "$ROOT/$file" || { echo "not submitted: $file is not the file that was checked. Run: tools/pnp.sh check $id" >&2; exit 1; }
@@ -516,6 +571,6 @@ release)
   curl -sS -X POST "$DESK/release?$q"
   ;;
 *)
-  sed -n '2,24p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,32p' "$0" | sed 's/^# \{0,1\}//'
   ;;
 esac
