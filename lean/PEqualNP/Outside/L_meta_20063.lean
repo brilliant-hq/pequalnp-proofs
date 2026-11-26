@@ -1,0 +1,10 @@
+import Mathlib
+import PEqualNP.Defs
+
+set_option maxHeartbeats 0 in
+theorem PEqualNP.Outside.L_meta_20063 : PEqualNP.Represents.RepSizeAtMost (fun u v : Fin 8 => (10768418131862349930 : ℕ).testBit (8 * u.val + v.val)) 31 := by
+  refine ⟨⟨[⟨PEqualNP.CircuitLowerBounds.GateOp.or, [3, 2]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [14, 7]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [10, 0]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [18, 5]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [8, 2]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [11, 19]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [8, 1]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [19, 16]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [15, 6]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [9, 4]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [17, 3]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [12, 22]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [21, 27]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [24, 18]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [16, 13]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [20, 17]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [24, 31]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [11, 13]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [17, 30]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [32, 24]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [5, 32]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [29, 34]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [33, 36]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [37, 26]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [3, 17]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [28, 38]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [12, 33]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [42, 23]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [25, 43]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [41, 39]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [44, 45]⟩], 46⟩, ?_, by decide, ?_⟩
+  · intro g hg
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at hg
+    rcases hg with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> simp
+  · decide +kernel
