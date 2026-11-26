@@ -4,9 +4,7 @@ import PEqualNP.Defs
 open PEqualNP.CircuitLowerBounds
 open PEqualNP.MetaComplexity
 
-namespace PEqualNP.Outside
-
-theorem L_meta_19351 :
+theorem PEqualNP.Outside.L_meta_19351 :
     ∃ C : Circuit,
       FanInTwo C ∧ C.size ≤ 9 ∧
       PEqualNP.Represents.Represents (fun u v : Fin 5 => (7595814 : ℕ).testBit (5 * u.val + v.val)) C := by
@@ -28,5 +26,3 @@ theorem L_meta_19351 :
     all_goals exact ⟨by simp only [Set.mem_insert_iff, Set.mem_singleton_iff]; simp, by decide⟩
   refine ⟨C, hfan, by decide, ?_⟩
   decide +kernel
-
-end PEqualNP.Outside
