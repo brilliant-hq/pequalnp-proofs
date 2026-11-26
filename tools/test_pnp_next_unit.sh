@@ -18,7 +18,12 @@ class H(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/": return self.send(b"{}")
         open(os.environ["LOG"], "a").write("GET " + self.path + "\n")
-        if open(os.environ["MODE"]).read().strip() == "no":
+        m = open(os.environ["MODE"]).read().strip()
+        if m == "empty60": return self.send(json.dumps({"gap": None, "retry_after_s": 60}).encode())
+        if m == "emptynote": return self.send(json.dumps({"gap": None, "note": "Every unit is taken.", "retry_after_s": 60}).encode())
+        if m == "emptybad": return self.send(json.dumps({"gap": None, "retry_after_s": 99999}).encode())
+        if m == "emptystr": return self.send(json.dumps({"gap": None, "retry_after_s": "60; rm -rf"}).encode())
+        if m == "no":
             return self.send(json.dumps({"gap": None, "note": "That unit is held by another agent until 12:30 UTC.\x1b[31m", "retry_after_s": 900}).encode())
         return self.send(json.dumps({"gap": {"id": "L-x-7", "title": "t", "statement": "1 = 1", "file": "lean/PEqualNP/Outside/L_x_7.lean", "module": "PEqualNP.Outside.L_x_7", "imports": []},
                                      "lease": {"id": "abc", "expires_at": "2099-01-01T00:00:00Z"}}).encode())
@@ -49,4 +54,15 @@ for bad in 'L-x-7&hard=1' '../x' 'L-X-7' ''; do pnp next --unit "$bad"; [ "$rc" 
 pnp next --unit L-x-7 --proof-of L-x-7; [ "$rc" = 1 ] && grep -qx 'give --unit or --proof-of, not both: --proof-of brings a proof you already have, --unit takes a unit to prove' "$t/err" || fail "both"
 [ ! -s "$LOG" ] || fail "a request was sent for a refused call"
 echo "ok refused before any request"
+# 4. a plain empty next names the desk's wait in seconds (a whole number from 1 to 3600 only) and exits 0; anything else
+#    in that field gives the old sentence; an exact-unit take with no lease is unchanged (case 2)
+for mode in empty60 emptynote emptybad emptystr; do echo "$mode" > "$MODE"; rm -rf "$R/.pnp"; pnp next; [ "$rc" = 0 ] || fail "$mode: exit $rc"
+  case "$mode" in
+    empty60) [ "$(cat "$t/out")" = 'no unit right now; ask again in about 60 seconds' ] || fail "$mode: said" ;;
+    emptynote) [ "$(cat "$t/out")" = $'Every unit is taken.\nno unit right now; ask again in about 60 seconds' ] || fail "$mode: said" ;;
+    *) [ "$(cat "$t/out")" = 'no unit right now; ask again in a few minutes' ] || fail "$mode: said" ;;
+  esac
+  [ ! -e "$R/.pnp/L-x-7.json" ] || fail "$mode: something was written"
+done
+echo "ok a plain empty next names the wait"
 echo "pnp next unit: pass"

@@ -229,6 +229,12 @@ d = json.load(open(os.path.join(state, ".last.json"), encoding="utf-8"))
 g = d.get("gap")
 want = os.environ.get("PNP_WANT_UNIT", "")  # next --unit <id>: that exact unit or nothing
 if not g:
+    # A plain empty answer names when to ask again (retry_after_s, a whole number of seconds from 1 to 3600): it is said
+    # in our own words with that number only. An exact-unit take is answered as before.
+    wait = d.get("retry_after_s")
+    if not want and type(wait) is int and 1 <= wait <= 3600:
+        if d.get("note") or d.get("error"): print(clean(d.get("note") or d.get("error")))
+        print("no unit right now; ask again in about %d seconds" % wait); sys.exit(0)
     print(("not leased: " if want else "") + clean(d.get("note") or d.get("error") or "no unit right now; ask again in a few minutes")); sys.exit(4 if want else 0)
 if want and (not isinstance(g, dict) or g.get("id") != want):
     print("not leased: the desk answered another unit than %s; nothing was written" % want, file=sys.stderr); sys.exit(4)
