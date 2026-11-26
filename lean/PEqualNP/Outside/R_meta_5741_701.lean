@@ -67,11 +67,15 @@ theorem PEqualNP.Outside.R_meta_5741_701
               simp only [Nat.sub_self, List.getElem_cons_zero]
               rcases hg with hand | hor
               · rw [hand] at hk ⊢
-                simp only [GateOp.eval, List.all_eq_true, List.mem_map, id_eq] at hk ⊢
+                change (g.inputs.map fun i => w1.getD i false).all id = true at hk
+                change (g.inputs.map fun i => w2.getD i false).all id = true
+                simp only [List.all_eq_true, List.mem_map, id_eq] at hk ⊢
                 rintro _ ⟨i, hi, rfl⟩
                 exact hw i (hk _ ⟨i, hi, rfl⟩)
               · rw [hor] at hk ⊢
-                simp only [GateOp.eval, List.any_eq_true, List.mem_map, id_eq] at hk ⊢
+                change (g.inputs.map fun i => w1.getD i false).any id = true at hk
+                change (g.inputs.map fun i => w2.getD i false).any id = true
+                simp only [List.any_eq_true, List.mem_map, id_eq] at hk ⊢
                 obtain ⟨_, ⟨i, hi, rfl⟩, h1⟩ := hk
                 exact ⟨_, ⟨i, hi, rfl⟩, hw i h1⟩
             · rw [List.getD_eq_default _ _ (by simp; omega)] at hk
@@ -112,7 +116,9 @@ theorem PEqualNP.Outside.R_meta_5741_701
   have hExact : circuitFun 26 C = graphFun G ∅ := by
     funext x
     apply Bool.eq_iff_iff.mpr
-    simp only [graphFun, Finset.notMem_empty, false_and, exists_false, decide_false, Bool.false_or, decide_eq_true_eq]
+    change circuitFun 26 C x = true ↔
+      (decide (∃ a ∈ (∅ : Finset (Fin 26)), x a = true) || decide (∃ u v, G.Adj u v ∧ x u = true ∧ x v = true)) = true
+    simp only [Finset.notMem_empty, false_and, exists_false, decide_false, Bool.false_or, decide_eq_true_eq]
     constructor
     · intro hCx
       by_contra hNoEdge
