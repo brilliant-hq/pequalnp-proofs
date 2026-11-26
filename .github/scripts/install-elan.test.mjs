@@ -103,14 +103,24 @@ test('both workflows: no unpinned installer, the same pins, no action, the scrip
 });
 
 const library = readFileSync(new URL('../workflows/library-build.yml', import.meta.url), 'utf8');
-test('library-build.yml: the same elan pins as authoritative, no action, the locked build, no secret', () => {
+test('library-build.yml: hand start only, read-only, no action, no secret, the same elan pins, both modes through lake-locked.sh, an empty mode refuses a Defs path', () => {
   const pin = (wf, k) => { const m = wf.match(new RegExp(`^\\s+${k}: (\\S+)$`, 'm')); assert.ok(m, `no ${k}`); return m[1]; };
   assert.equal(pin(library, 'ELAN_VERSION'), pin(workflow, 'ELAN_VERSION'));
   assert.equal(pin(library, 'ELAN_SHA256'), pin(workflow, 'ELAN_SHA256'));
   assert.doesNotMatch(library, /^\s+(?:- )?uses:/m, 'uses an action');
   assert.doesNotMatch(library, /secrets\./, 'names a secret');
   assert.match(library, /^on:\n  workflow_dispatch:\n/m, 'started by hand only');
-  assert.match(library, /^permissions:\n  contents: read\n  pull-requests: read\n/m);
-  assert.match(library, /sh "\$W\/base\/\.github\/scripts\/lake-locked\.sh" build "\$@"/, 'the changed files compile through lake-locked.sh');
+  assert.doesNotMatch(library, /^\s+(push|pull_request|pull_request_target|schedule|workflow_run):/m, 'another trigger');
+  assert.match(library, /^permissions:\n  contents: read\n  pull-requests: read\n\n/m);
+  // Both modes: the one locked compile step takes the empty mode's changed modules and the full mode's whole tree.
+  assert.match(library, /if \[ "\$MODE" = full \]; then\n\s+set -- PEqualNP\n[\s\S]+?else\n\s+set --; while IFS= read -r m; do set -- "\$@" "\$m"; done < "\$W\/in\/modules\.txt"[\s\S]+?sh "\$W\/base\/\.github\/scripts\/lake-locked\.sh" build "\$@"/);
+  assert.match(library, /sh "\$W\/base\/\.github\/scripts\/lake-locked\.sh" build "\$m"/, 'the sample compiles through lake-locked.sh');
   assert.match(library, /sh "\$W\/base\/\.github\/scripts\/install-elan\.sh" "\$ELAN_VERSION" "\$ELAN_SHA256" "\$ELAN_HOME"/);
+  // An empty mode takes ADDED library files only: a Defs path, the root, an outside path or a workflow never match.
+  const re = (k) => new RegExp(library.match(new RegExp(`^\\s+${k}: '(.+)'$`, 'm'))[1]);
+  for (const p of ['lean/PEqualNP/Library/X.lean', 'lean/PEqualNP/Library/Sub/X.lean']) assert.ok(re('LIB_PATH').test(p), p);
+  for (const p of ['lean/PEqualNP/Defs/X.lean', 'lean/PEqualNP/Defs.lean', 'lean/PEqualNP/Outside/L_x_1.lean', '.github/workflows/x.yml', 'lean/lakefile.toml', 'lean/PEqualNP/Library/a/b/X.lean']) assert.ok(!re('LIB_PATH').test(p), p);
+  assert.ok(re('DEFS_PATH').test('lean/PEqualNP/Defs/X.lean') && !re('DEFS_PATH').test('lean/PEqualNP/Defs/a/X.lean') && !re('DEFS_PATH').test('lean/PEqualNP/Library/X.lean'));
+  assert.match(library, /select\(\(\.status != "added"\) or \(\.previous_filename != null\) or \(\(\.filename \| test\(env\.LIB_PATH\)\) \| not\)\)/, 'the empty mode refuses all but an added library file');
+  assert.match(library, /case "\$\(jq -r '\.author_association \/\/ ""' "\$W\/api\/pr\.json"\)" in OWNER\|MEMBER\)/, 'owner or member only');
 });
