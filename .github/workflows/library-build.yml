@@ -1,0 +1,235 @@
+# LIBRARY BUILD of one pull request of OUR OWN that adds or changes Lean files under lean/PEqualNP/Library/. Started by
+# hand (workflow_dispatch) from the base repository, with the pull request number. The authoritative workflow judges one
+# outside proof under lean/PEqualNP/Outside/; nothing else compiled a library pull request once the advisory workflow
+# was made hand-start-only, and a Lean file nobody compiled is never merged. This one compiles the changed files and
+# prints one verdict line the merger can pin to (the head commit and each file's blob id).
+#
+# It keeps authoritative.yml's rules (read it first; every guard here is one of its guards, cut to this case):
+# - Everything is read through the API before any checkout. The run REFUSES unless the head repository IS this
+#   repository (no fork), and every changed file is ADDED or MODIFIED, a plain file, under lean/PEqualNP/Library/ (one
+#   folder level at most), ending in .lean, at most 5 files and 512 KiB each. So no workflow, script, lakefile,
+#   manifest, toolchain or Outside path can be in it.
+# - Only the BASE is checked out (plain git, at the pull request's base commit, no stored credential). The head is
+#   never checked out: each file's bytes are fetched by blob id and checked against it.
+# - The trusted part (Mathlib, PEqualNP.Defs and every base module the files import) is built with the folder of
+#   outside files moved aside, as authoritative's base build. The changed files are compiled only as the locked
+#   account (lake-locked.sh: no network, an empty environment, write access to nothing but the output folders of the
+#   changed files), also with the outside folder aside. Our own file should be safe; the guard that it is ours is one
+#   API field, so the lock stays.
+# No secret is used anywhere: the run's own read-only token, in the API steps only.
+name: library-build
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Pull request number (one of ours, adding or changing files under lean/PEqualNP/Library/ only)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: library-build-${{ inputs.pr }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      PR: ${{ inputs.pr }}
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      API: https://api.github.com
+      W: /opt/pnp
+      # THE PINNED ELAN: the same two lines as authoritative.yml; change both files together.
+      ELAN_VERSION: v4.4.0
+      ELAN_SHA256: 0e8250aa2be86c7af929ade68db617af9edc8b9ccf6eaf5ece228250d0d032e2
+      MAX_FILES: "5"
+    steps:
+      - name: Refuse a malformed input and a run from another branch
+        run: |
+          set -eu
+          printf '%s' "$PR" | grep -Eqx '[1-9][0-9]{0,6}' || { echo "REFUSED: pr must be a number"; exit 1; }
+          [ "$GITHUB_REF" = "refs/heads/$DEFAULT_BRANCH" ] || { echo "REFUSED: start this run from $DEFAULT_BRANCH"; exit 1; }
+          sudo mkdir -p "$W" && sudo chown "$(id -u):$(id -g)" "$W"
+          mkdir -p "$W/in" "$W/api"
+
+      - name: Read the pull request through the API and refuse anything but our own library files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          get() { curl -sSf --proto '=https' --max-redirs 0 --max-filesize 20000000 \
+                    -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+                    -H "X-GitHub-Api-Version: 2022-11-28" -o "$2" "$API/repos/$GITHUB_REPOSITORY/$1"; }
+          get "pulls/$PR" "$W/api/pr.json"
+          get "pulls/$PR/files?per_page=100" "$W/api/files.json"
+          # OURS: the head repository is this repository, not a fork; the base is the default branch.
+          [ "$(jq -r '.head.repo.full_name // ""' "$W/api/pr.json")" = "$GITHUB_REPOSITORY" ] || { echo "REFUSED: the pull request's head is not in $GITHUB_REPOSITORY (a fork is never built here)"; exit 1; }
+          [ "$(jq -r '.base.repo.full_name // ""' "$W/api/pr.json")" = "$GITHUB_REPOSITORY" ] && [ "$(jq -r '.base.ref // ""' "$W/api/pr.json")" = "$DEFAULT_BRANCH" ] || { echo "REFUSED: the pull request does not target $DEFAULT_BRANCH of $GITHUB_REPOSITORY"; exit 1; }
+          head=$(jq -r '.head.sha // ""' "$W/api/pr.json"); base=$(jq -r '.base.sha // ""' "$W/api/pr.json")
+          printf '%s %s' "$head" "$base" | grep -Eqx '[0-9a-f]{40} [0-9a-f]{40}' || { echo "REFUSED: the pull request has no head or base commit"; exit 1; }
+          # THE FILES: 1 to MAX_FILES, all of them listed (changed_files agrees), each added or modified, no rename, a
+          # name of plain characters under lean/PEqualNP/Library/ (one folder level at most) ending in .lean.
+          n=$(jq 'length' "$W/api/files.json")
+          [ "$n" -ge 1 ] && [ "$n" -le "$MAX_FILES" ] && [ "$(jq -r '.changed_files' "$W/api/pr.json")" = "$n" ] || { echo "REFUSED: a library build takes 1 to $MAX_FILES changed files; this pull request changes $(jq -r '.changed_files' "$W/api/pr.json")"; exit 1; }
+          bad=$(jq -r '.[] | select((.status != "added" and .status != "modified") or (.previous_filename != null)
+                  or ((.filename | test("^lean/PEqualNP/Library/[A-Za-z0-9_]+(/[A-Za-z0-9_]+)?\\.lean$")) | not)) | .filename' "$W/api/files.json" | head -n 3 | tr -cd 'A-Za-z0-9_./\n-')
+          [ -z "$bad" ] || { echo "REFUSED: every changed file must be added or modified under lean/PEqualNP/Library/ and end in .lean; not: $(printf '%s' "$bad" | tr '\n' ' ')"; exit 1; }
+          # Each path in the head's own tree: a plain file (mode 100644, never a link or an executable), at most 512 KiB.
+          get "git/trees/$head?recursive=1" "$W/api/tree.json"
+          [ "$(jq -r '.truncated' "$W/api/tree.json")" = false ] || { echo "FAULT: the head's tree came back truncated"; exit 1; }
+          : > "$W/in/files.txt"
+          jq -r '.[].filename' "$W/api/files.json" | while IFS= read -r f; do
+            e=$(jq -c --arg p "$f" '[.tree[] | select(.path == $p)]' "$W/api/tree.json")
+            [ "$(printf '%s' "$e" | jq 'length')" = 1 ] && [ "$(printf '%s' "$e" | jq -r '.[0].type + " " + .[0].mode')" = "blob 100644" ] \
+              || { echo "REFUSED: $f is not one plain file in the head commit"; exit 1; }
+            [ "$(printf '%s' "$e" | jq -r '.[0].size')" -le 524288 ] || { echo "REFUSED: $f is larger than 512 KiB"; exit 1; }
+            blob=$(printf '%s' "$e" | jq -r '.[0].sha'); printf '%s' "$blob" | grep -Eqx '[0-9a-f]{40}' || { echo "REFUSED: $f has no blob id"; exit 1; }
+            printf '%s %s\n' "$blob" "$f" >> "$W/in/files.txt"
+          done
+          printf '%s\n' "$head" > "$W/in/head"; printf '%s\n' "$base" > "$W/in/base"
+          echo "pull request $PR: head $head, base $base, $n file(s) under lean/PEqualNP/Library/"
+
+      - name: Check out the BASE at the pull request's base commit (plain git, no stored credentials)
+        run: |
+          set -eu
+          base=$(cat "$W/in/base")
+          git init -q "$W/base"
+          git -C "$W/base" fetch -q --depth 1 "https://github.com/${GITHUB_REPOSITORY}.git" "$base"
+          git -C "$W/base" checkout -q --detach FETCH_HEAD
+          [ "$(git -C "$W/base" rev-parse HEAD)" = "$base" ]
+          echo "base commit: $base"
+
+      - name: Download the files as data, by blob id, and read their imports
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          mkdir -p "$W/in/files"; : > "$W/in/modules.txt"; : > "$W/in/base-imports.txt"
+          i=0
+          while read -r blob f; do
+            i=$((i + 1)); out="$W/in/files/$i.lean"
+            curl -sSf --proto '=https' --max-redirs 0 --max-filesize 524288 \
+              -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" -o "$out" "$API/repos/$GITHUB_REPOSITORY/git/blobs/$blob"
+            [ "$(git hash-object "$out")" = "$blob" ] || { echo "REFUSED: the downloaded bytes of $f are not its blob"; exit 1; }
+            m=$(printf '%s' "${f#lean/}" | sed 's/\.lean$//' | tr / .); printf '%s\n' "$m" >> "$W/in/modules.txt"
+          done < "$W/in/files.txt"
+          # THE IMPORTS, read as text from the top lines: Mathlib or a PEqualNP module, never an outside one. A base module
+          # imported (not one of the changed files) is built in the trusted step; the changed ones only in the locked step.
+          i=0
+          while read -r blob f; do
+            i=$((i + 1))
+            awk '/^[ \t]*$/ { next } /^import / { print $2; next } { exit }' "$W/in/files/$i.lean" | while IFS= read -r m; do
+              printf '%s' "$m" | grep -Eqx '(Mathlib|PEqualNP)(\.[A-Za-z0-9_]+)*' || { echo "REFUSED: $f imports something that is not a Mathlib or PEqualNP module"; exit 1; }
+              case "$m" in PEqualNP.Outside|PEqualNP.Outside.*) echo "REFUSED: $f imports an outside module; a library file never does"; exit 1 ;; esac
+              case "$m" in PEqualNP.*) grep -qx "$m" "$W/in/modules.txt" || printf '%s\n' "$m" >> "$W/in/base-imports.txt" ;; esac
+            done
+          done < "$W/in/files.txt"
+          sort -u -o "$W/in/base-imports.txt" "$W/in/base-imports.txt"
+
+      - name: Install the pinned Lean toolchain
+        run: |
+          set -eu
+          export ELAN_HOME="$W/elan"
+          sh "$W/base/.github/scripts/install-elan.sh" "$ELAN_VERSION" "$ELAN_SHA256" "$ELAN_HOME" "$(cat "$W/base/lean/lean-toolchain")"
+          cd "$W/base/lean"
+          tc=$(dirname "$("$ELAN_HOME/bin/elan" which lake)")
+          [ -x "$tc/lake" ] && [ -x "$tc/lean" ]
+          echo "TC_BIN=$tc" >> "$GITHUB_ENV"
+
+      - name: Fetch the prebuilt Mathlib and build the trusted parts (the outside folder aside)
+        run: |
+          set -eu
+          cd "$W/base/lean"
+          export PATH="$TC_BIN:$PATH" PEQUALNP_REAL_LAKE="$TC_BIN/lake" PEQUALNP_HOME="$W/queue" LAKE_ARTIFACT_CACHE=false
+          "$TC_BIN/lake" exe cache get
+          # Base code only: Mathlib, the definitions, and the base modules the files import. No changed file is in the
+          # tree yet (the base's own copy of a MODIFIED file is, and is built from the base, which is trusted).
+          set -- +Mathlib +PEqualNP.Defs
+          while IFS= read -r m; do if [ -n "$m" ]; then set -- "$@" "+$m"; fi; done < "$W/in/base-imports.txt"
+          # CONTAINMENT, as authoritative's base build: the folder of outside-written files is out of the tree.
+          aside="$W/aside"; mkdir "$aside"
+          restore() {
+            if [ -e "$aside/Outside" ]; then
+              if [ -e PEqualNP/Outside ] || [ -L PEqualNP/Outside ]; then echo "FAULT: a folder of outside files appeared during the base build; the saved one was not put back"; exit 1; fi
+              mv "$aside/Outside" PEqualNP/Outside
+            fi
+          }
+          trap restore EXIT
+          [ ! -e PEqualNP/Outside ] || mv PEqualNP/Outside "$aside/Outside"
+          [ ! -e PEqualNP/Outside ] || { echo "FAULT: the folder of outside files could not be moved aside"; exit 1; }
+          ../tools/bin/lake build "$@"
+          restore; trap - EXIT
+          if [ -n "$(find .lake/build/lib/lean/PEqualNP/Outside .lake/build/ir/PEqualNP/Outside -type f 2>/dev/null | head -n 1)" ]; then
+            echo "FAULT: the base step built an outside-written module"; exit 1
+          fi
+
+      - name: Put the files in place and lock the tree
+        run: |
+          set -eu
+          i=0; dirs=""
+          while read -r blob f; do
+            i=$((i + 1)); install -m 0644 "$W/in/files/$i.lean" "$W/base/$f"
+            d=$(dirname "${f#lean/}"); case ":$dirs:" in *":$d:"*) ;; *) dirs="${dirs:+$dirs:}$d" ;; esac
+          done < "$W/in/files.txt"
+          printf '[safe]\n\tdirectory = *\n' > "$W/in/gitconfig"
+          sudo useradd --system --create-home --shell /usr/sbin/nologin outsider
+          chmod -R a+rX,go-w "$W"
+          # The locked account writes only the output folders of the changed files (one per folder named).
+          rw=""; IFS=:
+          for d in $dirs; do for k in lib/lean ir; do
+            mkdir -p "$W/base/lean/.lake/build/$k/$d"; sudo chown outsider:outsider "$W/base/lean/.lake/build/$k/$d"
+            rw="${rw:+$rw:}$W/base/lean/.lake/build/$k/$d"
+          done; done; unset IFS
+          echo "PNP_RW_DIRS=$rw" >> "$GITHUB_ENV"
+          mkdir -m 700 -p "$RUNNER_TEMP/builds"
+          PNP_TC_BIN="$TC_BIN" PNP_GITCONFIG="$W/in/gitconfig" PNP_BUILD_LOGS="$RUNNER_TEMP/builds" PNP_RW_DIRS="$rw" \
+            sh "$W/base/.github/scripts/lake-locked.sh" probe || { echo "FAULT: the namespace of the locked build could not be made ready on this runner"; exit 1; }
+
+      - name: Compile the changed files as the locked account (the outside folder aside)
+        id: run
+        timeout-minutes: 60
+        run: |
+          set +e -u
+          export PATH=/usr/bin:/bin
+          cd "$W/base/lean"
+          aside="$W/aside2"; mkdir "$aside"; [ ! -e PEqualNP/Outside ] || mv PEqualNP/Outside "$aside/Outside"
+          set --; while IFS= read -r m; do set -- "$@" "$m"; done < "$W/in/modules.txt"
+          touch "$RUNNER_TEMP/build.marker"
+          # The environment is emptied: no credential of this run is in it. lake-locked.sh runs the build as `outsider`.
+          /usr/bin/env -i HOME="$HOME" LANG=C.UTF-8 PATH="$TC_BIN:/usr/bin:/bin" \
+              PNP_TC_BIN="$TC_BIN" PNP_GITCONFIG="$W/in/gitconfig" PNP_BUILD_LOGS="$RUNNER_TEMP/builds" PNP_RW_DIRS="$PNP_RW_DIRS" \
+            timeout -k 30 3000 sh "$W/base/.github/scripts/lake-locked.sh" build "$@" > "$RUNNER_TEMP/build.out" 2> "$RUNNER_TEMP/build.err"
+          code=$?
+          sudo /usr/bin/pkill -KILL -u outsider || true
+          if [ -e "$aside/Outside" ]; then mv "$aside/Outside" PEqualNP/Outside; fi
+          ls "$RUNNER_TEMP"/builds/*/nsfail >/dev/null 2>&1 && code=97
+          # As authoritative: every file the build wrote is the locked account's, and it wrote something.
+          [ -z "$(find .lake/build -newer "$RUNNER_TEMP/build.marker" -type f ! -user outsider -print -quit 2>/dev/null)" ] || code=98
+          [ "$code" != 0 ] || [ -n "$(find .lake/build -newer "$RUNNER_TEMP/build.marker" -type f -user outsider -print -quit 2>/dev/null)" ] || code=99
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+
+      - name: The verdict
+        if: always()
+        env:
+          CODE: ${{ steps.run.outputs.code }}
+        run: |
+          export PATH=/usr/bin:/bin
+          set -u
+          quoted() { tr -d '\000-\010\013-\037\177' | cut -c1-2000 | sed 's/^/  | /'; }
+          stop="stop-$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+          echo "::stop-commands::$stop"
+          tail -n 60 "$RUNNER_TEMP/build.out" 2>/dev/null | quoted; tail -n 60 "$RUNNER_TEMP/build.err" 2>/dev/null | quoted
+          echo "::$stop::"
+          case "${CODE:-}" in
+            0) v=BUILT ;; 1) v=FAILED ;; '') v="REFUSED OR FAULT (the run stopped before the compile; the failed step above says why)" ;; *) v="FAULT (code $CODE: the build did not run as it must; this says nothing about the files)" ;;
+          esac
+          echo "VERDICT: $v | pull request $PR | head $(cat "$W/in/head" 2>/dev/null) | base $(cat "$W/in/base" 2>/dev/null)" | tee -a "$GITHUB_STEP_SUMMARY"
+          while read -r blob f; do echo "  file $f blob $blob" | tee -a "$GITHUB_STEP_SUMMARY"; done < "$W/in/files.txt" 2>/dev/null
+          echo "Merge only while the pull request's head is still the head commit above and its files have these blob ids."
+          [ "${CODE:-}" = 0 ]

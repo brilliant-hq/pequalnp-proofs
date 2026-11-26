@@ -101,3 +101,16 @@ test('both workflows: no unpinned installer, the same pins, no action, the scrip
   assert.match(advisory, /git show 'HEAD\^1:\.github\/scripts\/install-elan\.sh' > "\$RUNNER_TEMP\/install-elan\.sh"\n\s+sh "\$RUNNER_TEMP\/install-elan\.sh" "\$ELAN_VERSION" "\$ELAN_SHA256"/);
   assert.doesNotMatch(advisory, /sh \.github\/scripts\/install-elan\.sh/);
 });
+
+const library = readFileSync(new URL('../workflows/library-build.yml', import.meta.url), 'utf8');
+test('library-build.yml: the same elan pins as authoritative, no action, the locked build, no secret', () => {
+  const pin = (wf, k) => { const m = wf.match(new RegExp(`^\\s+${k}: (\\S+)$`, 'm')); assert.ok(m, `no ${k}`); return m[1]; };
+  assert.equal(pin(library, 'ELAN_VERSION'), pin(workflow, 'ELAN_VERSION'));
+  assert.equal(pin(library, 'ELAN_SHA256'), pin(workflow, 'ELAN_SHA256'));
+  assert.doesNotMatch(library, /^\s+(?:- )?uses:/m, 'uses an action');
+  assert.doesNotMatch(library, /secrets\./, 'names a secret');
+  assert.match(library, /^on:\n  workflow_dispatch:\n/m, 'started by hand only');
+  assert.match(library, /^permissions:\n  contents: read\n  pull-requests: read\n/m);
+  assert.match(library, /sh "\$W\/base\/\.github\/scripts\/lake-locked\.sh" build "\$@"/, 'the changed files compile through lake-locked.sh');
+  assert.match(library, /sh "\$W\/base\/\.github\/scripts\/install-elan\.sh" "\$ELAN_VERSION" "\$ELAN_SHA256" "\$ELAN_HOME"/);
+});
