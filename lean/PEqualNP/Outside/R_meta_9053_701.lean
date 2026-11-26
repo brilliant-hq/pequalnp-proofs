@@ -86,12 +86,17 @@ theorem PEqualNP.Outside.R_meta_9053_701
           (Fin.castAdd 21 ⟨j.val, by omega⟩ ∈ U ∧ ∃ w ∈ U, G.Adj (Fin.castAdd 21 ⟨j.val, by omega⟩) w) := by
       intro U j
       have hfuel : S.gateVal U j = S.gateValFuel U (20 + 1) j := by
-        unfold AndCountCircuit.gateVal
+        change S.gateValFuel U S.size j = S.gateValFuel U (20 + 1) j
         rw [hSsz]
-      rw [hfuel, AndCountCircuit.gateValFuel, hSlg j, hSrg j, hNoGates, hNoGates, hSlv j, hSrv j]
+      rw [hfuel]
+      change (AndCountCircuit.sideTrue U (S.leftVars j) (S.leftGates j) j (S.gateValFuel U 20) &&
+          AndCountCircuit.sideTrue U (S.rightVars j) (S.rightGates j) j (S.gateValFuel U 20)) = true ↔ _
+      rw [hSlg j, hSrg j, hNoGates, hNoGates, hSlv j, hSrv j]
       simp only [Bool.and_eq_true, decide_eq_true_eq, Finset.mem_singleton, exists_eq_left,
         Finset.mem_filter, Finset.mem_univ, true_and]
-      exact ⟨fun ⟨h1, w, h2, h3⟩ => ⟨h1, w, h3, h2⟩, fun ⟨h1, w, h2, h3⟩ => ⟨h1, w, h3, h2⟩⟩
+      constructor
+      · rintro ⟨h1, w, h2, h3⟩; exact ⟨h1, w, h3, h2⟩
+      · rintro ⟨h1, w, h2, h3⟩; exact ⟨h1, w, h3, h2⟩
     have hSComp : S.Computes G := by
       intro U
       unfold AndCountCircuit.eval
@@ -155,10 +160,16 @@ theorem PEqualNP.Outside.R_meta_9053_701
           ∃ k : Fin D.size, (u ∈ D.leftVars k ∧ v ∈ D.rightVars k) ∨ (v ∈ D.leftVars k ∧ u ∈ D.rightVars k) := by
         intro d
         induction d with
-        | zero => intro _ h; cases h
+        | zero =>
+          intro _ h
+          change false = true at h
+          exact Bool.noConfusion h
         | succ d ih =>
           intro i hi
-          unfold AndCountCircuit.gateValFuel AndCountCircuit.sideTrue at hi
+          change (decide ((∃ w ∈ D.leftVars i, w ∈ ({u, v} : Finset (Fin 42))) ∨
+              ∃ j ∈ D.leftGates i, j < i ∧ D.gateValFuel {u, v} d j = true) &&
+            decide ((∃ w ∈ D.rightVars i, w ∈ ({u, v} : Finset (Fin 42))) ∨
+              ∃ j ∈ D.rightGates i, j < i ∧ D.gateValFuel {u, v} d j = true)) = true at hi
           rw [Bool.and_eq_true, decide_eq_true_eq, decide_eq_true_eq] at hi
           rcases hi with ⟨hL, hR⟩
           rcases hL with ⟨a, haL, haUV⟩ | ⟨k, _, _, hk⟩
