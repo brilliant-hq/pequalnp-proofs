@@ -37,6 +37,10 @@ on:
         description: Leave empty (the checker on two cores, as always). "all" runs a proof or a refutation on every core of the runner; only our own hand dispatches send it (rehearsal of the all-cores change).
         required: false
         type: string
+      open_claims:
+        description: 'For a reduction only, from the intake: a JSON list of the open pull requests of the same step inside the stale window, [{number, createdAt, author, files}] (an empty list is no claims). A reduction run without it is a FAULT.'
+        required: false
+        type: string
 
 # Least privilege: read the code and read the pull request. This run cannot write anything.
 permissions:
@@ -65,6 +69,7 @@ jobs:
       GAP: ${{ inputs.gap }}
       KIND: ${{ inputs.kind }}
       CORES: ${{ inputs.cores }}
+      OPEN_CLAIMS: ${{ inputs.open_claims }}
       DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
       # THE STEP'S ROW, by id (25 Nov): the desk answers the guard's input cut to the one gap id, so the size of the
       # desk's list never bounds a check. The address is the desk Worker's workers.dev name, which belongs to the
@@ -135,31 +140,21 @@ jobs:
           guard pr "$W/api/pr.json" "$W/api/files.json" "$W/api/tree.json" \
             "$GITHUB_REPOSITORY" "$DEFAULT_BRANCH" "$W/in"
           # THE NUMBER OF A REDUCTION (outside-guard.mjs checkCutNumber): a reduction's k must be free on the base and in
-          # every EARLIER open pull request, before the checker spends a minute; the refusal names the free k. The open
-          # pull requests are read whole through GraphQL (100 a page, at most 20 pages), or the run stops as a FAULT.
-          # Only for a reduction file, so a proof or a refutation costs no extra call. Nothing here is free text:
-          # jq writes JSON, and the guard matches each path against the reduction name pattern.
+          # every EARLIER open pull request of the same step, before the checker spends a minute; the refusal names the
+          # free k. The open pull requests that can claim a k come from the intake, which starts this run and holds the
+          # whole open list with each one's files (the input open_claims, already cut to this step and the stale window).
+          # No list call is made here: the whole-list read it replaces ended every reduction run as a FAULT past 2000
+          # open. FAIL CLOSED: a reduction run without the input, or with one the guard does not accept whole
+          # (outside-guard.mjs checkClaims), is a FAULT, never a pass; an empty list [] means no claims. Only for a
+          # reduction file, so a proof or a refutation reads nothing of it. The input reaches the guard as a file.
           case "$(cat "$W/in/pr.file")" in lean/PEqualNP/Outside/R_*)
-            echo '[]' > "$W/api/open.json"; cursor=null; pages=0
-            q='query($o:String!,$n:String!,$c:String){repository(owner:$o,name:$n){pullRequests(states:OPEN,first:100,after:$c){pageInfo{hasNextPage endCursor} nodes{number createdAt author{login} files(first:3){nodes{path}}}}}}'
-            while :; do
-              jq -n --arg q "$q" --arg o "${GITHUB_REPOSITORY%/*}" --arg n "${GITHUB_REPOSITORY#*/}" --argjson c "$cursor" \
-                '{query: $q, variables: {o: $o, n: $n, c: $c}}' > "$W/api/gql.json"
-              curl -sSf --proto '=https' --max-redirs 0 --max-filesize 20000000 -X POST \
-                -H "Authorization: Bearer $GH_TOKEN" -H "Content-Type: application/json" \
-                --data-binary @"$W/api/gql.json" -o "$W/api/page.json" "$API/graphql" \
-                || { echo "FAULT: the list of open pull requests could not be read"; exit 1; }
-              jq -e '(.errors == null) and (.data.repository.pullRequests.nodes | type == "array")' "$W/api/page.json" >/dev/null \
-                || { echo "FAULT: the list of open pull requests came back without its data"; exit 1; }
-              jq -s '.[0] + [.[1].data.repository.pullRequests.nodes[] | {number, createdAt, author: (.author.login // null), files: [(.files.nodes // [])[] | .path]}]' \
-                "$W/api/open.json" "$W/api/page.json" > "$W/api/open.next.json"
-              mv "$W/api/open.next.json" "$W/api/open.json"
-              pages=$((pages + 1))
-              [ "$(jq -r '.data.repository.pullRequests.pageInfo.hasNextPage' "$W/api/page.json")" = true ] || break
-              [ "$pages" -lt 20 ] || { echo "FAULT: more than 2000 open pull requests; the list could not be read whole"; exit 1; }
-              cursor=$(jq -c '.data.repository.pullRequests.pageInfo.endCursor' "$W/api/page.json")
-            done
-            echo "open pull requests read: $(jq length "$W/api/open.json") in $pages page(s)"
+            [ -n "$OPEN_CLAIMS" ] || { echo "FAULT: a reduction run needs the open claims from the intake (input open_claims) and none came; nothing was judged"; exit 1; }
+            [ "${#OPEN_CLAIMS}" -le 40000 ] || { echo "FAULT: the open claims from the intake are longer than 40000 characters; nothing was judged"; exit 1; }
+            printf '%s' "$OPEN_CLAIMS" > "$W/api/claims.in.json"
+            node "$W/base/.github/scripts/outside-guard.mjs" claims "$(cat "$W/in/pr.file")" "$W/api/claims.in.json" "$W/api/open.json" > "$W/api/claims.out" 2>&1 \
+              && [ "$(tail -n 1 "$W/api/claims.out")" = "GUARD OK: claims" ] \
+              || { sed 's/^REFUSED: /  /' "$W/api/claims.out"; echo "FAULT: the open claims from the intake are malformed; nothing was judged"; exit 1; }
+            cat "$W/api/claims.out"
             guard number "$(cat "$W/in/pr.file")" "$W/base" "$W/api/open.json" "$PR"
             ;;
           esac
