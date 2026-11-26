@@ -3,8 +3,6 @@ import PEqualNP.Defs
 
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity PEqualNP.GenericRejection
 
--- First cover each positive-degree meet by existing prefix wires on the thin inputs.
--- Then compress the covers in a circuit computing the same thin function.
 theorem PEqualNP.Outside.R_meta_8998_37
     (cover : let S := fun l : Fin 13 => ({l,l+1,l+3,l+9} : Finset (Fin 13))
       let thin := fun x : Fin 26 → Bool => ∃ l : Fin 13, ∀ k : Fin 13, x (Fin.natAdd 13 k) = true → k = l
