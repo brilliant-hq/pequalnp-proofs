@@ -38,7 +38,7 @@ on:
         required: false
         type: string
       open_claims:
-        description: 'For a reduction only, from the intake: a JSON list of the open pull requests of the same step inside the stale window, [{number, createdAt, author, files}] (an empty list is no claims). A reduction run without it is a FAULT.'
+        description: 'For a reduction only, from the intake: a JSON list of the open pull requests of the same step inside the stale window, [{number, createdAt, author, files}], author the intake 12-hex hash of the sender or null, never a login (an empty list is no claims). A reduction run without it is a FAULT.'
         required: false
         type: string
 

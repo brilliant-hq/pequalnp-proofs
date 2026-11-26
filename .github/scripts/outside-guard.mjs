@@ -11,6 +11,7 @@
 //   node outside-guard.mjs closure <base dir> <imports.json> <judged file path> <out dir> [kind]
 //   node outside-guard.mjs number <file path> <base dir> <open.json> <pr number>   (a reduction's k is free)
 //   node outside-guard.mjs claims <file path> <claims json> <out open.json>   (the intake's open claims, whole or refused)
+//       (each claim's author is sha256 of the lowercased login cut to 12 lowercase hex, or null: never the login itself)
 //
 // KINDS. A proof (check) or a refutation (refute) of a posted step S is the file of its gap row,
 // lean/PEqualNP/Outside/L_<gap>.lean. A REDUCTION of S (kind reduce, ships dark) is
@@ -184,9 +185,11 @@ export function checkCutNumber(file, onBase, open, pr, now = Date.now()) {
 // as a dispatch input the intake writes (it holds the whole open list with each one's files, refreshed every minute,
 // and it alone starts the run), already cut to this step and the stale window. Taken whole or not at all: a JSON list
 // of at most MAX_CLAIMS entries, each exactly { number, createdAt, author, files }, number a pull request number (no
-// two alike), createdAt an ISO time in UTC, author a login or null, files 1 to 3 reduction files of THIS step. Anything
-// else refuses the whole list (the workflow then ends as a FAULT), so a list that was cut wrong is never half used.
+// two alike), createdAt an ISO time in UTC, author the intake's 12-hex hash of the sender or null (red team C2: a login
+// is a stranger's text and the input is public on the run's page; the count of three per account needs only equality),
+// files 1 to 3 reduction files of THIS step. Anything else refuses the whole list (the workflow then ends as a FAULT), so a list that was cut wrong is never half used.
 export const MAX_CLAIMS = 150;
+const AUTHOR_HASH_RE = /^[0-9a-f]{12}$/;
 const ISO_RE = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,3})?Z$/;
 export function checkClaims(v, file) {
   const m = R_PARTS_RE.exec(file ?? '');
@@ -200,7 +203,7 @@ export function checkClaims(v, file) {
     if (!Number.isInteger(o.number) || o.number < 1 || o.number > 9999999 || seen.has(o.number)) refuse(`${at} has a malformed or repeated number`);
     seen.add(o.number);
     if (typeof o.createdAt !== 'string' || !ISO_RE.test(o.createdAt) || !Number.isFinite(Date.parse(o.createdAt))) refuse(`${at} has a malformed time`);
-    if (o.author !== null && (typeof o.author !== 'string' || !LOGIN_RE.test(o.author))) refuse(`${at} has a malformed author`);
+    if (o.author !== null && (typeof o.author !== 'string' || !AUTHOR_HASH_RE.test(o.author))) refuse(`${at} has a malformed author`);
     if (!Array.isArray(o.files) || o.files.length < 1 || o.files.length > 3) refuse(`${at} must list 1 to 3 files`);
     for (const f of o.files) {
       const q = R_PARTS_RE.exec(typeof f === 'string' ? f : '');
