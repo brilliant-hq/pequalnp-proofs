@@ -3,23 +3,6 @@ import PEqualNP.Defs
 
 open PEqualNP.CircuitLowerBounds PEqualNP.GenericRejection PEqualNP.TopForm PEqualNP.HeptadCover
 
-namespace PEqualNP.Outside.R_meta_8746_1
-
-theorem card_one {n : ℕ} {X : Finset (Fin n)} {p : Fin n}
-    (hp : p ∈ X) (hUnique : ∀ q ∈ X, q ≠ p → False) : X.card = 1 := by
-  have he : X = {p} := by
-    ext q
-    simp only [Finset.mem_singleton]
-    constructor
-    · intro hq
-      by_contra hne
-      exact hUnique q hq hne
-    · rintro rfl
-      exact hp
-  simp [he]
-
-end PEqualNP.Outside.R_meta_8746_1
-
 theorem PEqualNP.Outside.R_meta_8746_1
     (hTests : ∃ (n : ℕ) (B : Fin n → Finset (Fin n)) (C : Circuit),
       (∀ i, i ∈ B i) ∧
@@ -44,6 +27,18 @@ theorem PEqualNP.Outside.R_meta_8746_1
         x4.card = (1 : ℕ) ∧ x5.card = (1 : ℕ)) ∧
       x2.size + (1 : ℕ) < (PEqualNP.HeptadCover.incidences x3).card + x1 := by
   classical
+  have cardOne {n : ℕ} {X : Finset (Fin n)} {p : Fin n}
+      (hp : p ∈ X) (hUnique : ∀ q ∈ X, q ≠ p → False) : X.card = 1 := by
+    have he : X = {p} := by
+      ext q
+      simp only [Finset.mem_singleton]
+      constructor
+      · intro hq
+        by_contra hne
+        exact hUnique q hq hne
+      · rintro rfl
+        exact hp
+    simp [he]
   obtain ⟨n, B, C, diag, hLinear, ao, budget, pos, neg⟩ := hTests
   have exactness (X Y : Finset (Fin n)) :
       C.eval (incidenceInput X Y) = true ↔ ∃ p ∈ X, ∃ l ∈ Y, p ∈ B l := by
@@ -77,13 +72,13 @@ theorem PEqualNP.Outside.R_meta_8746_1
   intro X Y h hX hY
   obtain ⟨p, hp, l, hl, he⟩ := (exactness X Y).mp h
   constructor
-  · apply PEqualNP.Outside.R_meta_8746_1.card_one hp
+  · apply cardOne hp
     intro q hq hne
     have bad := (exactness (X.erase q) Y).mpr
       ⟨p, Finset.mem_erase.mpr ⟨Ne.symm hne, hp⟩, l, hl, he⟩
     rw [hX q hq] at bad
     cases bad
-  · apply PEqualNP.Outside.R_meta_8746_1.card_one hl
+  · apply cardOne hl
     intro q hq hne
     have bad := (exactness X (Y.erase q)).mpr
       ⟨p, hp, l, Finset.mem_erase.mpr ⟨Ne.symm hne, hl⟩, he⟩
