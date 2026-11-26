@@ -32,7 +32,41 @@ theorem PEqualNP.Outside.R_meta_2401_347
         ∀ x : Fin 26 → Bool, PEqualNP.MetaComplexity.circuitFun 27 D (feed x) = true ↔
           PEqualNP.MetaComplexity.circuitFun 27 C (feed x) = true ∨ ∃ p l : Fin 13,
             7 ≤ l.val ∧ I p l ∧ x (Fin.castAdd 13 p) = true ∧ x (Fin.natAdd 13 l) = true) :
-    ∃ (x1 : Fin (4 : ℕ)) (x2 : PEqualNP.CircuitLowerBounds.Circuit),   PEqualNP.MetaComplexity.Monotone2 x2 ∧     PEqualNP.MetaComplexity.NestedCover.ReadsBack (27 : ℕ) x2 ∧       x2.size ≤ (62 : ℕ) ∧         have x3 : Finset (Fin (13 : ℕ)) := {(0 : Fin (13 : ℕ)), (1 : Fin (13 : ℕ)), (3 : Fin (13 : ℕ)), (9 : Fin (13 : ℕ))};         have x4 : Fin (13 : ℕ) → Fin (13 : ℕ) → Prop := fun (x4 x5 : Fin (13 : ℕ)) => ∃ x6 ∈ x3, x4 = x5 + x6;         have x5 : Fin (26 : ℕ) := if ↑x1 = (1 : ℕ) then (1 : Fin (26 : ℕ)) else if ↑x1 = (3 : ℕ) then (14 : Fin (26 : ℕ)) else (13 : Fin (26 : ℕ));         have x6 : Bool := Decidable.decide (↑x1 = (0 : ℕ));         have x7 : (Fin (26 : ℕ) → Bool) → Fin (27 : ℕ) → Bool := fun (x7 : Fin (26 : ℕ) → Bool) (x8 : Fin ((26 : ℕ) + (1 : ℕ))) => Fin.lastCases (if x6 = Bool.true then x7 (0 : Fin (26 : ℕ)) && x7 x5 else x7 (0 : Fin (26 : ℕ)) || x7 x5) x7 x8;         (∀ (x8 x9 : Fin (13 : ℕ)), x4 x8 x9 → PEqualNP.MetaComplexity.circuitFun (27 : ℕ) x2 (x7 fun (x11 : Fin (26 : ℕ)) => Decidable.decide (x11 = Fin.castAdd (13 : ℕ) x8 ∨ x11 = Fin.natAdd (13 : ℕ) x9)) = Bool.true) ∧           ∀ (x8 : Finset (Fin (13 : ℕ))),             have x9 : Fin (13 : ℕ) → Prop := fun (x9 : Fin (13 : ℕ)) => ∀ x10 ∈ x8, ¬x4 x10 x9;             (∀ x10 ∉ x8, ∃ (x12 : Fin (13 : ℕ)), x9 x12 ∧ x4 x10 x12) → ((¬∃ (x11 : Fin (13 : ℕ)), ∀ x12 ∈ x8, x4 x12 x11) ∧ ¬∃ (x11 : Fin (13 : ℕ)), ∀ (x12 : Fin (13 : ℕ)), x9 x12 → x4 x11 x12) → ∀ (x12 : Fin (26 : ℕ) → Bool), (∀ (x13 : Fin (26 : ℕ)), x12 x13 = Bool.true ↔ (∃ x14 ∈ x8, x13 = Fin.castAdd (13 : ℕ) x14) ∨ ∃ (x14 : Fin (13 : ℕ)), x13 = Fin.natAdd (13 : ℕ) x14 ∧ x9 x14) → PEqualNP.MetaComplexity.circuitFun (27 : ℕ) x2 (x7 x12) = Bool.false := by
+    ∃ (x1 : Fin (4 : ℕ)) (x2 : PEqualNP.CircuitLowerBounds.Circuit),
+      PEqualNP.MetaComplexity.Monotone2 x2 ∧
+      PEqualNP.MetaComplexity.NestedCover.ReadsBack (27 : ℕ) x2 ∧
+      x2.size ≤ (62 : ℕ) ∧
+      have x3 : Finset (Fin (13 : ℕ)) := {(0 : Fin (13 : ℕ)), (1 : Fin (13 : ℕ)),
+        (3 : Fin (13 : ℕ)), (9 : Fin (13 : ℕ))};
+      have x4 : Fin (13 : ℕ) → Fin (13 : ℕ) → Prop :=
+        fun (x4 x5 : Fin (13 : ℕ)) => ∃ x6 ∈ x3, x4 = x5 + x6;
+      have x5 : Fin (26 : ℕ) :=
+        if ↑x1 = (1 : ℕ) then (1 : Fin (26 : ℕ))
+        else if ↑x1 = (3 : ℕ) then (14 : Fin (26 : ℕ))
+        else (13 : Fin (26 : ℕ));
+      have x6 : Bool := Decidable.decide (↑x1 = (0 : ℕ));
+      have x7 : (Fin (26 : ℕ) → Bool) → Fin (27 : ℕ) → Bool :=
+        fun (x7 : Fin (26 : ℕ) → Bool) (x8 : Fin ((26 : ℕ) + (1 : ℕ))) =>
+          Fin.lastCases
+            (if x6 = Bool.true then x7 (0 : Fin (26 : ℕ)) && x7 x5
+             else x7 (0 : Fin (26 : ℕ)) || x7 x5)
+            x7 x8;
+      (∀ (x8 x9 : Fin (13 : ℕ)), x4 x8 x9 →
+        PEqualNP.MetaComplexity.circuitFun (27 : ℕ) x2
+          (x7 fun (x11 : Fin (26 : ℕ)) =>
+            Decidable.decide (x11 = Fin.castAdd (13 : ℕ) x8
+              ∨ x11 = Fin.natAdd (13 : ℕ) x9)) = Bool.true) ∧
+      ∀ (x8 : Finset (Fin (13 : ℕ))),
+        have x9 : Fin (13 : ℕ) → Prop := fun (x9 : Fin (13 : ℕ)) =>
+          ∀ x10 ∈ x8, ¬x4 x10 x9;
+        (∀ x10 ∉ x8, ∃ (x12 : Fin (13 : ℕ)), x9 x12 ∧ x4 x10 x12) →
+        ((¬∃ (x11 : Fin (13 : ℕ)), ∀ x12 ∈ x8, x4 x12 x11) ∧
+          ¬∃ (x11 : Fin (13 : ℕ)), ∀ (x12 : Fin (13 : ℕ)), x9 x12 → x4 x11 x12) →
+        ∀ (x12 : Fin (26 : ℕ) → Bool),
+          (∀ (x13 : Fin (26 : ℕ)), x12 x13 = Bool.true ↔
+            (∃ x14 ∈ x8, x13 = Fin.castAdd (13 : ℕ) x14) ∨
+            ∃ (x14 : Fin (13 : ℕ)), x13 = Fin.natAdd (13 : ℕ) x14 ∧ x9 x14) →
+          PEqualNP.MetaComplexity.circuitFun (27 : ℕ) x2 (x7 x12) = Bool.false := by
   let I := fun p l : Fin 13 => ∃ d ∈ ({0, 1, 3, 9} : Finset (Fin 13)), p = l + d
   let feed : (Fin 26 → Bool) → Fin 27 → Bool := fun x => Fin.lastCases (x 0 || x 1) x
   obtain ⟨C, hC, hbC, hsC, validOutput, hpC, hnC⟩ := hlocal
@@ -40,7 +74,8 @@ theorem PEqualNP.Outside.R_meta_2401_347
   refine ⟨1, D, hD, hbD, by omega, ?_⟩
   constructor
   · intro p l hI
-    let x : Fin 26 → Bool := fun i => decide (i = Fin.castAdd 13 p ∨ i = Fin.natAdd 13 l)
+    let x : Fin 26 → Bool := fun i =>
+      decide (i = Fin.castAdd 13 p ∨ i = Fin.natAdd 13 l)
     change PEqualNP.MetaComplexity.circuitFun 27 D (feed x) = true
     apply (evalD x).mpr
     by_cases hl : l.val < 7
@@ -69,7 +104,8 @@ theorem PEqualNP.Outside.R_meta_2401_347
           change 13 + l.val = 13 + k.val at ev
           exact (Fin.ext (by omega) : l = k) ▸ hk
       · exact fun hl => Or.inr ⟨l, rfl, hl⟩
-    have noEdge (p l : Fin 13) (hi : I p l) (hp : x (Fin.castAdd 13 p) = true)
+    have noEdge (p l : Fin 13) (hi : I p l)
+        (hp : x (Fin.castAdd 13 p) = true)
         (hl : x (Fin.natAdd 13 l) = true) : False :=
       (lines l).mp hl p ((points p).mp hp) hi
     have notLine : ¬ ∃ l : Fin 13, ∀ p, x (Fin.castAdd 13 p) = true → I p l :=
