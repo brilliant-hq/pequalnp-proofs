@@ -107,14 +107,16 @@ theorem PEqualNP.Outside.R_meta_8468_1
         intro hgs w1 w2 h
         simp only [List.foldl_cons]
         have hop : g.op = PEqualNP.CircuitLowerBounds.GateOp.or := hgs g (by simp)
+        have hev : ∀ (l : List Bool),
+            PEqualNP.CircuitLowerBounds.GateOp.eval PEqualNP.CircuitLowerBounds.GateOp.or l = l.any id :=
+          fun _ => rfl
         have e : (List.zipWith (fun a b => a || b) w1 w2 ++
             [g.op.eval (g.inputs.map fun i => (List.zipWith (fun a b => a || b) w1 w2).getD i false)]) =
             List.zipWith (fun a b => a || b)
               (w1 ++ [g.op.eval (g.inputs.map fun i => w1.getD i false)])
               (w2 ++ [g.op.eval (g.inputs.map fun i => w2.getD i false)]) := by
-          rw [List.zipWith_append h]
-          simp only [hgetD_zip w1 w2 h, hop, PEqualNP.CircuitLowerBounds.GateOp.eval, hany_or,
-            List.zipWith_cons_cons, List.zipWith_nil_left]
+          rw [List.zipWith_append h, hop, hev, hev, hev]
+          simp only [hgetD_zip w1 w2 h, hany_or, List.zipWith_cons_cons, List.zipWith_nil_left]
         rw [e]
         exact ih (fun g' hg' => hgs g' (by simp [hg'])) _ _ (by simp [h])
     have heval_hom : C.eval (List.ofFn fun i : Fin 42 => decide (i = 0) || decide (i = 21)) =
