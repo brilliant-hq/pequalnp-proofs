@@ -1,0 +1,10 @@
+import Mathlib
+import PEqualNP.Defs
+
+set_option maxHeartbeats 0 in
+theorem PEqualNP.Outside.L_meta_20121 : PEqualNP.Represents.RepSizeAtMost (fun u v : Fin 8 => (5580678593250014130 : ℕ).testBit (8 * u.val + v.val)) 29 := by
+  refine ⟨⟨[⟨PEqualNP.CircuitLowerBounds.GateOp.or, [9, 5]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [15, 1]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [7, 12]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [4, 14]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [10, 15]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [2, 18]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [20, 13]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [21, 16]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [3, 18]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [20, 2]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [0, 8]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [26, 17]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [26, 1]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [11, 6]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [10, 19]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [19, 26]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [28, 29]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [23, 13]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [16, 19]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [29, 25]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [33, 32]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [34, 35]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [37, 27]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [22, 3]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [10, 27]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [24, 30]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [36, 38]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [41, 42]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [39, 43]⟩], 44⟩, ?_, by decide, ?_⟩
+  · intro g hg
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at hg
+    rcases hg with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> simp
+  · decide +kernel
