@@ -171,14 +171,20 @@ theorem PEqualNP.Outside.R_meta_5176_263
         wval x ((C.gates.getD j dGate).inputs.getD 1 0)) := by
     intro x j hj hor
     have h := wval_gate x j hj
-    dsimp only at h; rw [h, hor]; simp [PEqualNP.CircuitLowerBounds.GateOp.eval]
+    dsimp only at h; rw [h, hor]
+    change [wval x ((C.gates.getD j dGate).inputs.getD 0 0),
+      wval x ((C.gates.getD j dGate).inputs.getD 1 0)].any id = _
+    simp only [List.any_cons, List.any_nil, Bool.or_false, id_eq]
   have wval_gate_and : ∀ (x : Fin 26 → Bool) (j : ℕ), j < C.gates.length →
       (C.gates.getD j dGate).op = PEqualNP.CircuitLowerBounds.GateOp.and →
       wval x (26 + j) = (wval x ((C.gates.getD j dGate).inputs.getD 0 0) &&
         wval x ((C.gates.getD j dGate).inputs.getD 1 0)) := by
     intro x j hj hand
     have h := wval_gate x j hj
-    dsimp only at h; rw [h, hand]; simp [PEqualNP.CircuitLowerBounds.GateOp.eval]
+    dsimp only at h; rw [h, hand]
+    change [wval x ((C.gates.getD j dGate).inputs.getD 0 0),
+      wval x ((C.gates.getD j dGate).inputs.getD 1 0)].all id = _
+    simp only [List.all_cons, List.all_nil, Bool.and_true, id_eq]
   have hOutBd : 26 ≤ C.output ∧ C.output < 26 + C.gates.length := by
     constructor
     · by_contra hlt26
@@ -396,11 +402,20 @@ theorem PEqualNP.Outside.R_meta_5176_263
       let x013 : List Bool := (List.range 26).map fun i => i == 0 || i == 13
       let lpStep : List (Bool × Bool) → PEqualNP.CircuitLowerBounds.Gate → List (Bool × Bool) := fun w g =>
         let ins := g.inputs.map fun i => w.getD i (false, false)
-        w ++ [match g.op with
-          | PEqualNP.CircuitLowerBounds.GateOp.or => (ins.any (·.1), ins.any (·.2))
-          | PEqualNP.CircuitLowerBounds.GateOp.and => ins.foldl (fun (acc : Bool × Bool) p =>
-                (acc.1 && p.1, (acc.1 && p.2) || (acc.2 && p.1))) (true, false)
-          | _ => (false, false)]
+        w ++ [PEqualNP.CircuitLowerBounds.GateOp.casesOn g.op
+          (ins.foldl (fun (acc : Bool × Bool) p =>
+            (acc.1 && p.1, (acc.1 && p.2) || (acc.2 && p.1))) (true, false))
+          (ins.any (·.1), ins.any (·.2))
+          (false, false) (fun _ => (false, false)) (false, false)]
+      have lpFoldEq (isL : ℕ → Bool) (x : List Bool) :
+          PEqualNP.ReadK.linearParts C isL x =
+            C.gates.foldl lpStep ((x.zipIdx).map fun bi =>
+              if isL bi.2 then (false, bi.1) else (bi.1, false)) := by
+        unfold PEqualNP.ReadK.linearParts
+        congr 1
+        funext w g
+        dsimp only [lpStep]
+        cases g.op <;> rfl
       have lpStep_len : ∀ (gs : List PEqualNP.CircuitLowerBounds.Gate) (u : List (Bool × Bool)),
           (gs.foldl lpStep u).length = u.length + gs.length := by
         intro gs
@@ -441,7 +456,7 @@ theorem PEqualNP.Outside.R_meta_5176_263
           hAO.2.1 j hj _ (by change _ ∈ (C.gates.getD j dGate).inputs; rw [hgEq]; simp)
         have hcLt : (C.gates.getD j dGate).inputs.getD 1 0 < 26 + j :=
           hAO.2.1 j hj _ (by change _ ∈ (C.gates.getD j dGate).inputs; rw [hgEq]; simp)
-        let init : List (Bool × Bool) := (x.zipIdx).map fun (b, i) => if isL i then (false, b) else (b, false)
+        let init : List (Bool × Bool) := (x.zipIdx).map fun bi => if isL bi.2 then (false, bi.1) else (bi.1, false)
         have hInitLen : init.length = 26 := by simp [init, hx]
         let pref := (C.gates.take j).foldl lpStep init
         have hpreLen : pref.length = 26 + j := by
@@ -452,6 +467,7 @@ theorem PEqualNP.Outside.R_meta_5176_263
           rw [← List.getElem_cons_drop hj, List.getD_eq_getElem _ _ hj]
         have hAt : (PEqualNP.ReadK.linearParts C isL x).getD (26 + j) (false, false) =
             (lpStep pref (C.gates.getD j dGate)).getD (26 + j) (false, false) := by
+          rw [lpFoldEq]
           change (C.gates.foldl lpStep init).getD (26 + j) (false, false) = _
           conv_lhs => rw [← List.take_append_drop j C.gates, List.foldl_append, hd, List.foldl_cons]
           exact lpStep_prefix (C.gates.drop (j + 1)) _ (26 + j) (by rw [hstepLen]; omega)
@@ -463,6 +479,7 @@ theorem PEqualNP.Outside.R_meta_5176_263
         have hPre : ∀ i, i < 26 + j → pref.getD i (false, false) =
             (PEqualNP.ReadK.linearParts C isL x).getD i (false, false) := by
           intro i hi
+          rw [lpFoldEq]
           exact lpStep_take j C.gates init i (by rw [hInitLen, List.length_take]; omega)
         constructor
         · intro hor
@@ -482,9 +499,10 @@ theorem PEqualNP.Outside.R_meta_5176_263
         induction k using Nat.strong_induction_on with
         | ind k ih =>
           intro hk
-          let init : List (Bool × Bool) := (x013.zipIdx).map fun (b, i) => if isLine i then (false, b) else (b, false)
+          let init : List (Bool × Bool) := (x013.zipIdx).map fun bi => if isLine bi.2 then (false, bi.1) else (bi.1, false)
           by_cases hk26 : k < 26
-          · change ((C.gates.foldl lpStep init).getD k (false, false)).1 = maskWval 1 k
+          · rw [lpFoldEq]
+            change ((C.gates.foldl lpStep init).getD k (false, false)).1 = maskWval 1 k
             rw [lpStep_prefix _ _ _ (by simp [init, x013]; exact hk26)]
             dsimp only [maskWval]; rw [wval_input (maskVec 1) k hk26]
             have hDec : ∀ i : Fin 26, (init.getD i.val (false, false)).1 = (1 : ℕ).testBit i.val := by decide
@@ -513,9 +531,10 @@ theorem PEqualNP.Outside.R_meta_5176_263
         induction k using Nat.strong_induction_on with
         | ind k ih =>
           intro hk
-          let init : List (Bool × Bool) := (x013.zipIdx).map fun (b, i) => if !isLine i then (false, b) else (b, false)
+          let init : List (Bool × Bool) := (x013.zipIdx).map fun bi => if !isLine bi.2 then (false, bi.1) else (bi.1, false)
           by_cases hk26 : k < 26
-          · change ((C.gates.foldl lpStep init).getD k (false, false)).1 = maskWval 8192 k
+          · rw [lpFoldEq]
+            change ((C.gates.foldl lpStep init).getD k (false, false)).1 = maskWval 8192 k
             rw [lpStep_prefix _ _ _ (by simp [init, x013]; exact hk26)]
             dsimp only [maskWval]; rw [wval_input (maskVec 8192) k hk26]
             have hDec : ∀ i : Fin 26, (init.getD i.val (false, false)).1 = (8192 : ℕ).testBit i.val := by decide
@@ -544,10 +563,11 @@ theorem PEqualNP.Outside.R_meta_5176_263
         induction k using Nat.strong_induction_on with
         | ind k ih =>
           intro hk hsk
-          let init : List (Bool × Bool) := (x013.zipIdx).map fun (b, i) => if isLine i then (false, b) else (b, false)
+          let init : List (Bool × Bool) := (x013.zipIdx).map fun bi => if isLine bi.2 then (false, bi.1) else (bi.1, false)
           by_cases hk26 : k < 26
           · rw [sMax_init 0 k hk26] at hsk
             simp only [↓reduceIte, Bool.not_eq_true'] at hsk
+            rw [lpFoldEq]
             change (C.gates.foldl lpStep init).getD k (false, false) = (false, false)
             rw [lpStep_prefix _ _ _ (by simp [init, x013]; exact hk26)]
             have hDec : ∀ i : Fin 26, (25034751 : ℕ).testBit i.val = false →
@@ -589,10 +609,11 @@ theorem PEqualNP.Outside.R_meta_5176_263
         induction k using Nat.strong_induction_on with
         | ind k ih =>
           intro hk hsk
-          let init : List (Bool × Bool) := (x013.zipIdx).map fun (b, i) => if !isLine i then (false, b) else (b, false)
+          let init : List (Bool × Bool) := (x013.zipIdx).map fun bi => if !isLine bi.2 then (false, bi.1) else (bi.1, false)
           by_cases hk26 : k < 26
           · rw [sMax_init 13 k hk26] at hsk
             simp only [show ¬ (13 : ℕ) = 0 by decide, ↓reduceIte, Bool.not_eq_true'] at hsk
+            rw [lpFoldEq]
             change (C.gates.foldl lpStep init).getD k (false, false) = (false, false)
             rw [lpStep_prefix _ _ _ (by simp [init, x013]; exact hk26)]
             have hDec : ∀ i : Fin 26, (67108341 : ℕ).testBit i.val = false →
@@ -668,7 +689,8 @@ theorem PEqualNP.Outside.R_meta_5176_263
       have graphFun_pgGraph : ∀ z : Fin 26 → Bool,
           PEqualNP.MetaComplexity.NestedCover.graphFun G ∅ z = true ↔ pgFun z = true := by
         intro z
-        unfold PEqualNP.MetaComplexity.NestedCover.graphFun
+        change (decide (∃ a ∈ (∅ : Finset (Fin 26)), z a = true) ||
+          decide (∃ u v, G.Adj u v ∧ z u = true ∧ z v = true)) = true ↔ pgFun z = true
         dsimp only [pgFun]
         simp only [Finset.notMem_empty, false_and, exists_false, decide_false, Bool.false_or,
           decide_eq_true_eq]
@@ -692,7 +714,7 @@ theorem PEqualNP.Outside.R_meta_5176_263
           refine ⟨?_, Or.inl ((mem_pgEdges_iff _ _).mpr ⟨p, l, hpl, rfl, by simp [Fin.natAdd]⟩)⟩
           intro heq
           have := congrArg Fin.val heq
-          simp [Fin.castAdd, Fin.natAdd] at this
+          change p.val = 13 + l.val at this
           omega
       have hCircuitFun : PEqualNP.MetaComplexity.circuitFun 26 C =
           PEqualNP.MetaComplexity.NestedCover.graphFun G ∅ := by
@@ -805,16 +827,17 @@ theorem PEqualNP.Outside.R_meta_5176_263
               · exact Or.inl (ih _ (by omega) (by omega) v h1 hxv)
               · exact Or.inr (ih _ (by omega) (by omega) v h2 hxv)
       have lp_snd_of_mem_orReach : ∀ (isL : ℕ → Bool) (v : Fin 26),
-          (((x013.zipIdx).map fun (b, i) => if isL i then (false, b) else (b, false)).getD v.val (false, false)).2 = true →
+          (((x013.zipIdx).map fun bi => if isL bi.2 then (false, bi.1) else (bi.1, false)).getD v.val (false, false)).2 = true →
           ∀ w < 26 + C.gates.length, v ∈ orReach w →
             ((PEqualNP.ReadK.linearParts C isL x013).getD w (false, false)).2 = true := by
         intro isL v hvInit w
         induction w using Nat.strong_induction_on with
         | ind w ih =>
           intro hw hv
-          let init : List (Bool × Bool) := (x013.zipIdx).map fun (b, i) => if isL i then (false, b) else (b, false)
+          let init : List (Bool × Bool) := (x013.zipIdx).map fun bi => if isL bi.2 then (false, bi.1) else (bi.1, false)
           by_cases hw26 : w < 26
           · rw [orReach_input w hw26, Finset.mem_singleton] at hv
+            rw [lpFoldEq]
             change ((C.gates.foldl lpStep init).getD w (false, false)).2 = true
             rw [lpStep_prefix _ _ _ (by simp [init, x013]; exact hw26)]
             have hwv : w = v.val := by rw [hv]
@@ -861,7 +884,12 @@ theorem PEqualNP.Outside.R_meta_5176_263
         intro gs
         induction gs with
         | nil => intro u; rfl
-        | cons g gs ih => intro u; rw [List.foldl_cons, ih]; simp [PEqualNP.EdgeOwnership.coneStep]; omega
+        | cons g gs ih =>
+          intro u
+          rw [List.foldl_cons, ih]
+          change (u ++ [_]).length + gs.length = u.length + (g :: gs).length
+          simp only [List.length_append, List.length_cons, List.length_nil, Nat.add_zero]
+          omega
       have coneStep_prefix : ∀ (gs : List PEqualNP.CircuitLowerBounds.Gate) (u : List (List ℕ)) (i : ℕ),
           i < u.length → (gs.foldl (PEqualNP.EdgeOwnership.coneStep 26) u).getD i [] = u.getD i [] := by
         intro gs
@@ -871,7 +899,9 @@ theorem PEqualNP.Outside.R_meta_5176_263
           intro u i hi
           rw [List.foldl_cons, ih]
           · dsimp only [PEqualNP.EdgeOwnership.coneStep]; rw [List.getD_append _ _ _ _ hi]
-          · simp [PEqualNP.EdgeOwnership.coneStep]; omega
+          · change i < (u ++ [_]).length
+            simp only [List.length_append, List.length_cons, List.length_nil, Nat.add_zero]
+            omega
       have coneStep_take : ∀ (n : ℕ) (gs : List PEqualNP.CircuitLowerBounds.Gate) (u : List (List ℕ)) (i : ℕ),
           i < u.length + (gs.take n).length →
           ((gs.take n).foldl (PEqualNP.EdgeOwnership.coneStep 26) u).getD i [] =
@@ -1003,8 +1033,8 @@ theorem PEqualNP.Outside.R_meta_5176_263
           have ht := hbf x hgx; rw [hfx] at ht; cases ht
         · rintro ⟨hj, hand, hnot⟩
           refine ⟨hj, hand, hj, ?_⟩
-          push Not at hnot
-          obtain ⟨x, hgx, hfx⟩ := hnot
+          obtain ⟨x, hx⟩ := not_forall.mp hnot
+          obtain ⟨hgx, hfx⟩ := not_imp.mp hx
           exact ⟨x, hgx, Bool.eq_false_iff.mpr hfx⟩
       have noActive_orReach : ∀ w < 26 + C.gates.length,
           (∀ i < C.gates.length, (C.gates.getD i dGate).op = PEqualNP.CircuitLowerBounds.GateOp.and →
@@ -1113,7 +1143,8 @@ theorem PEqualNP.Outside.R_meta_5176_263
           (∃ v ∈ orReach w, maskVec 8193 v = true) →
           (PEqualNP.ReadK.linearParts C isLine x013).getD w (false, false) ≠ (false, false) ∧
           (PEqualNP.ReadK.linearParts C (fun i => !isLine i) x013).getD w (false, false) ≠ (false, false) := by
-        intro w hw ⟨v, hv, hvE⟩
+        intro w hw hExOR
+        obtain ⟨v, hv, hvE⟩ := hExOR
         rcases hE0bits v hvE with h0 | h13
         · have hvEq : v = ⟨0, by decide⟩ := Fin.ext h0
           rw [hvEq] at hv
