@@ -551,3 +551,62 @@ test('both workflows: the row by id from the one desk address, and the advisory 
     assert.ok(rowOfFileRow(file)({ id, file }), `${file} is not the row of ${id}`);
   }
 });
+
+// THE GUARD MUST SHOW ITS WORK (2026-11-26, the operator's order, security first; redteam-1's spec, section 4).
+// (a) main is decided by REAL path, so a symlinked call or a path with '#' or a space runs the checks; a run that
+//     names the guard but is not main is a FAULT (exit 3), never a silent 0. (b) every mode ends on GUARD OK: <mode>.
+import { cpSync, mkdirSync, symlinkSync } from 'node:fs';
+import { ranAsScript } from './outside-guard.mjs';
+{
+  const okLine = (r, mode) => { assert.equal(r.status, 0, r.stdout + r.stderr); assert.equal(r.stdout.trimEnd().split('\n').at(-1), `GUARD OK: ${mode}`); };
+  const fixtures = (d) => {
+    wf(pj(d, 'row.json'), JSON.stringify(krow(undefined)));
+    wf(pj(d, 'imports.json'), '[]');
+    wf(pj(d, 'clean.lean'), 'import Mathlib\ntheorem PEqualNP.Outside.L_meta_632 : True := trivial\n');
+    wf(pj(d, 'evil.lean'), 'import Mathlib\n#eval 1\ntheorem PEqualNP.Outside.L_meta_632 : True := trivial\n');
+    const sha = 'a'.repeat(40), blob = 'b'.repeat(40);
+    wf(pj(d, 'pr.json'), JSON.stringify({ state: 'open', base: { repo: { full_name: 'o/r' }, ref: 'main' }, head: { sha }, user: { login: 'someone' }, changed_files: 1 }));
+    wf(pj(d, 'files.json'), JSON.stringify([{ filename: KF, status: 'added', sha: blob }]));
+    wf(pj(d, 'tree.json'), JSON.stringify({ truncated: false, tree: [{ path: KF, type: 'blob', mode: '100644', sha: blob, size: 60 }] }));
+    mkdirSync(pj(d, 'out'), { recursive: true });
+  };
+  const every = (call, d) => {
+    okLine(call('pr', pj(d, 'pr.json'), pj(d, 'files.json'), pj(d, 'tree.json'), 'o/r', 'main', pj(d, 'out')), 'pr');
+    okLine(call('gap', pj(d, 'row.json'), 'L-meta-632', KF, pj(d, 'out'), 'check'), 'gap');
+    okLine(call('gap-of-file', pj(d, 'row.json'), KF, pj(d, 'out')), 'gap-of-file');
+    okLine(call('imports', pj(d, 'clean.lean'), pj(d, 'imports.json'), KF, 'check'), 'imports');
+    okLine(call('closure', d, pj(d, 'imports.json'), KF, pj(d, 'out'), 'check'), 'closure');
+    const bad = call('imports', pj(d, 'evil.lean'), pj(d, 'imports.json'), KF, 'check');
+    assert.equal(bad.status, 1); assert.match(bad.stdout, /^REFUSED: /); assert.doesNotMatch(bad.stdout, /GUARD OK/);
+  };
+  test('guard shows its work: every mode ends on GUARD OK: <mode>, and a refusal never does', () => {
+    const d = mkdtempSync(pj(tmpdir(), 'guard-ok-')); fixtures(d); every(cli, d);
+  });
+  for (const [name, dirName] of [['a symlinked path', null], ['a path with a hash sign', 'a#b'], ['a path with a space', 'a b']]) {
+    test(`guard shows its work: called through ${name}, the checks run (no silent 0)`, () => {
+      const d = mkdtempSync(pj(tmpdir(), 'guard-path-')); fixtures(d);
+      let g;
+      if (dirName === null) { g = pj(d, 'linked-guard.mjs'); symlinkSync(GUARD, g); }
+      else { mkdirSync(pj(d, dirName)); g = pj(d, dirName, 'outside-guard.mjs'); cpSync(GUARD, g); }
+      every((...args) => spawnSync(process.execPath, [g, ...args], { encoding: 'utf8' }), d);
+    });
+  }
+  test('guard shows its work: through a symlinked FOLDER as well (the Mac /tmp case)', () => {
+    const d = mkdtempSync(pj(tmpdir(), 'guard-dirlink-')); fixtures(d);
+    mkdirSync(pj(d, 'real')); cpSync(GUARD, pj(d, 'real', 'outside-guard.mjs')); symlinkSync(pj(d, 'real'), pj(d, 'link'));
+    every((...args) => spawnSync(process.execPath, [pj(d, 'link', 'outside-guard.mjs'), ...args], { encoding: 'utf8' }), d);
+  });
+  test('guard shows its work: a run that names the guard but does not reach main is a FAULT, exit 3', () => {
+    const d = mkdtempSync(pj(tmpdir(), 'guard-skip-')); mkdirSync(pj(d, 'w'));
+    wf(pj(d, 'w', 'outside-guard.mjs'), `import ${JSON.stringify(GUARD)};\n`);   // another file of that name that only imports it
+    const r = spawnSync(process.execPath, [pj(d, 'w', 'outside-guard.mjs'), 'imports', 'x', 'y', KF], { encoding: 'utf8' });
+    assert.equal(r.status, 3); assert.match(r.stdout, /^FAULT: the guard was started but did not run its checks/); assert.doesNotMatch(r.stdout, /GUARD OK/);
+  });
+  test('guard shows its work: ranAsScript compares real paths and is false when imported', () => {
+    const d = mkdtempSync(pj(tmpdir(), 'guard-ras-')); symlinkSync(GUARD, pj(d, 'l.mjs'));
+    const url = new URL(`file://${GUARD}`).href;
+    assert.equal(ranAsScript(url, pj(d, 'l.mjs')), true);
+    assert.equal(ranAsScript(url, pj(d, 'missing.mjs')), false);
+    assert.equal(ranAsScript(url, undefined), false);
+  });
+}

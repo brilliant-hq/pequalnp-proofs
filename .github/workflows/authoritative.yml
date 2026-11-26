@@ -128,7 +128,11 @@ jobs:
           get "git/trees/$head?recursive=1" "$W/api/tree.json"
           # One place decides: exactly one file, added, under lean/PEqualNP/Outside/, the allowed
           # name (so no path can climb out with ..), a plain file, at most 512 KiB, nothing else.
-          node "$W/base/.github/scripts/outside-guard.mjs" pr "$W/api/pr.json" "$W/api/files.json" "$W/api/tree.json" \
+          # THE GUARD MUST SHOW ITS WORK (2026-11-26): a call passes only on exit 0 AND its fixed last line
+          # "GUARD OK: <mode>"; anything else, silence included, stops the run.
+          guard() { local out; out=$(node "$W/base/.github/scripts/outside-guard.mjs" "$@") || { printf '%s\n' "$out"; exit 1; }
+                    printf '%s\n' "$out"; [ "$(printf '%s\n' "$out" | tail -n 1)" = "GUARD OK: $1" ] || { echo "FAULT: the guard did not say GUARD OK: $1; nothing passed"; exit 1; }; }
+          guard pr "$W/api/pr.json" "$W/api/files.json" "$W/api/tree.json" \
             "$GITHUB_REPOSITORY" "$DEFAULT_BRANCH" "$W/in"
           [ ! -e "$W/base/$(cat "$W/in/pr.file")" ] || { echo "REFUSED: the file already exists in the base"; exit 1; }
 
@@ -158,13 +162,17 @@ jobs:
           # The run's kind goes to the guard, which refuses it unless the desk's row agrees: check or
           # refute as the desk posts the step; reduce only for an R_<gap>_<n> file of a step posted to be
           # proved whose row carries reductions: true (DARK: absent, every reduction run is refused).
-          node "$W/base/.github/scripts/outside-guard.mjs" gap "$W/in/gaps.json" "$GAP" "$(cat "$W/in/pr.file")" "$W/in" "${KIND:-check}"
+          # THE GUARD MUST SHOW ITS WORK (2026-11-26): a call passes only on exit 0 AND its fixed last line
+          # "GUARD OK: <mode>"; anything else, silence included, stops the run.
+          guard() { local out; out=$(node "$W/base/.github/scripts/outside-guard.mjs" "$@") || { printf '%s\n' "$out"; exit 1; }
+                    printf '%s\n' "$out"; [ "$(printf '%s\n' "$out" | tail -n 1)" = "GUARD OK: $1" ] || { echo "FAULT: the guard did not say GUARD OK: $1; nothing passed"; exit 1; }; }
+          guard gap "$W/in/gaps.json" "$GAP" "$(cat "$W/in/pr.file")" "$W/in" "${KIND:-check}"
           # The kind is the desk's, never the caller's alone: a refutation run is only for a refutation step,
           # and a refutation step is only judged as one; a reduction run only for a step open to reductions.
           [ "$(cat "$W/in/gap.kind")" = "${KIND:-check}" ] || { echo "REFUSED: the run's kind is not the kind the desk posts for this step"; exit 1; }
           # Before anything is built: the file may import Mathlib and the modules the gap lists,
           # and every helper sits inside the file's own namespace (named from its path).
-          node "$W/base/.github/scripts/outside-guard.mjs" imports "$W/in/proof.lean" "$W/in/imports.json" "$(cat "$W/in/pr.file")" "$(cat "$W/in/gap.kind")"
+          guard imports "$W/in/proof.lean" "$W/in/imports.json" "$(cat "$W/in/pr.file")" "$(cat "$W/in/gap.kind")"
           # A listed module may itself be outside-written (under PEqualNP.Outside, merged on the
           # base). Such a module runs code when it compiles, like the judged file, so it is never
           # built before the locked step. This splits what the listed modules import, read as
@@ -172,7 +180,7 @@ jobs:
           # (in/outside-imports.txt, built only by the checker's build in the locked step, as the
           # locked account). It refuses an outside module whose text fails the proof-file rules,
           # and a base module that imports an outside one.
-          node "$W/base/.github/scripts/outside-guard.mjs" closure "$W/base" "$W/in/imports.json" "$(cat "$W/in/pr.file")" "$W/in" "$(cat "$W/in/gap.kind")"
+          guard closure "$W/base" "$W/in/imports.json" "$(cat "$W/in/pr.file")" "$W/in" "$(cat "$W/in/gap.kind")"
 
       - name: Install the pinned Lean toolchain
         run: |

@@ -292,3 +292,24 @@ test('the list itself: shape refused whole', () => {
   assert.throws(() => parseList(JSON.stringify([{ ...ok, login: 'x[bot]' }])), /plain account/);
   assert.throws(() => parseList(JSON.stringify([{ ...ok, step: 'L-meta-9; rm' }])), /step id/);
 });
+
+// RUN AS A SCRIPT, BY REAL PATH (2026-11-26): through a symlink the script runs (here it stops as a FAULT for want of
+// its settings, which shows it ran), and a file of the same name that only imports it is a FAULT, never a silent 0.
+{
+  const { spawnSync } = await import('node:child_process');
+  const { mkdtempSync, symlinkSync, writeFileSync, mkdirSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os'); const { join } = await import('node:path');
+  const LBP = new URL('./land-by-push.mjs', import.meta.url).pathname;
+  const env = { PATH: process.env.PATH, HOME: process.env.HOME };
+  test('land-by-push: called through a symlink it runs (a FAULT without its settings, not a silent 0)', () => {
+    const d = mkdtempSync(join(tmpdir(), 'lbp-link-')); symlinkSync(LBP, join(d, 'l.mjs'));
+    const r = spawnSync(process.execPath, [join(d, 'l.mjs')], { encoding: 'utf8', env });
+    assert.equal(r.status, 3, r.stdout + r.stderr); assert.match(r.stdout, /^FAULT: /); assert.doesNotMatch(r.stdout, /LAND OK/);
+  });
+  test('land-by-push: a file of its name that does not reach main is a FAULT, exit 3', () => {
+    const d = mkdtempSync(join(tmpdir(), 'lbp-skip-')); mkdirSync(join(d, 'w'));
+    writeFileSync(join(d, 'w', 'land-by-push.mjs'), `import ${JSON.stringify(LBP)};\n`);
+    const r = spawnSync(process.execPath, [join(d, 'w', 'land-by-push.mjs')], { encoding: 'utf8', env });
+    assert.equal(r.status, 3); assert.match(r.stdout, /^FAULT: land-by-push was started but did not run/);
+  });
+}

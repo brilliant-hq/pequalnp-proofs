@@ -32,8 +32,9 @@
 // an author fixes all of them in one push; at most MAX_PROBLEMS lines, then `... and N more`, and
 // at most MAX_REFUSAL characters in all. The first line is the sentence a one-reason refusal gave.
 // Exit 3: bad usage.
-import { lstatSync, readFileSync, writeFileSync } from 'node:fs';
+import { lstatSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // An outside file: L_<gap>.lean (a proof or refutation) or R_<gap>_<n>.lean (a reduction).
 export const FILE_RE = /^lean\/PEqualNP\/Outside\/(L_[a-z0-9_]+|R_[a-z0-9_]+_[1-9][0-9]{0,2})\.lean$/;
@@ -594,9 +595,25 @@ const main = () => {
     process.stderr.write('usage: outside-guard.mjs pr|gap|gap-of-file|imports|closure ... (see the header)\n');
     process.exit(3);
   }
+  // ONE FIXED LAST LINE ON SUCCESS (2026-11-26): the workflows require it after every call, so a silent exit 0 is
+  // never read as a pass, whatever changes in how the guard is called.
+  process.stdout.write(`GUARD OK: ${cmd}\n`);
 };
 
-if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+// RUN AS A SCRIPT, BY REAL PATH (2026-11-26, the operator's order, security first). This used to compare its own URL
+// with the called path as text, so a call through a symlinked path (a linked work folder, the Mac's /tmp) skipped
+// main, printed nothing and exited 0: a door that passes by saying nothing. Now both sides are resolved to real paths,
+// and a run that names this file but still is not main stops as a FAULT, never as a pass. Imported (the tests), it
+// does nothing, as before. The workflows also require each call's verdict line or files, so a silent 0 cannot pass.
+export const ranAsScript = (url, argv1) => {
+  if (!argv1) return false;
+  try { return realpathSync(fileURLToPath(url)) === realpathSync(argv1); } catch { return false; }
+};
+if (!ranAsScript(import.meta.url, process.argv[1]) && process.argv[1] && /(^|[\/\\])outside-guard\.mjs$/.test(process.argv[1])) {
+  process.stdout.write('FAULT: the guard was started but did not run its checks (its own path and the called path differ); nothing passed\n');
+  process.exit(3);
+}
+if (ranAsScript(import.meta.url, process.argv[1])) {
   try { main(); } catch (e) {
     if (!(e instanceof Refused)) throw e;
     process.stdout.write(e.message.split('\n').map((l) => `REFUSED: ${l}\n`).join(''));

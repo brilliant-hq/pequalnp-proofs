@@ -67,8 +67,12 @@ jobs:
           # The gap id from the file name the step above allowed: L_<a>_<b>.lean is gap L-<a>-<b> (ids hold no underscore).
           gap="L-$(basename "$FILE" .lean | cut -c3- | tr _ -)"
           curl -sSf --proto '=https' --max-redirs 0 --max-filesize 1000000 --retry 3 --retry-all-errors -o "$RUNNER_TEMP/in/gaps.json" "$ROW_URL$gap"
-          node .github/scripts/outside-guard.mjs gap-of-file "$RUNNER_TEMP/in/gaps.json" "$FILE" "$RUNNER_TEMP/in"
-          node .github/scripts/outside-guard.mjs imports "$FILE" "$RUNNER_TEMP/in/imports.json" "$FILE"
+          # THE GUARD MUST SHOW ITS WORK (2026-11-26): a call passes only on exit 0 AND its fixed last line
+          # "GUARD OK: <mode>"; anything else, silence included, stops the run.
+          guard() { local out; out=$(node .github/scripts/outside-guard.mjs "$@") || { printf '%s\n' "$out"; exit 1; }
+                    printf '%s\n' "$out"; [ "$(printf '%s\n' "$out" | tail -n 1)" = "GUARD OK: $1" ] || { echo "FAULT: the guard did not say GUARD OK: $1; nothing passed"; exit 1; }; }
+          guard gap-of-file "$RUNNER_TEMP/in/gaps.json" "$FILE" "$RUNNER_TEMP/in"
+          guard imports "$FILE" "$RUNNER_TEMP/in/imports.json" "$FILE"
           echo "gap: $(cat "$RUNNER_TEMP/in/gap.id")"
 
       - name: Install the pinned Lean toolchain
