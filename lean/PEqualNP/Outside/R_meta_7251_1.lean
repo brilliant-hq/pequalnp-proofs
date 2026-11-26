@@ -31,7 +31,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
         ⦃_ : OrReaches 26 C (26 + m) g⦄
         ⦃_ : gammaE G C g ∩ U ⊆ gammaE G C m⦄
         ⦃_ : e ≠ f⦄
-        ⦃_ : ∀ z ∈ ({e, f} : Finset (Sym2 (Fin 26))), z ∈ U ∧ z ∈ gammaE G C g ∧ ∃ t ∈ T, ∃ d : Fin 2, z ∈ gammaE G C t ∧ OrReaches 26 C (opnd C t d) g⦄
+        ⦃_ : ∀ z : Sym2 (Fin 26), z = e ∨ z = f → z ∈ U ∧ z ∈ gammaE G C g ∧ ∃ t ∈ T, ∃ d : Fin 2, z ∈ gammaE G C t ∧ OrReaches 26 C (opnd C t d) g⦄
         ⦃_ : ∃ v : Fin 26, v ∈ e ∧ v ∈ f⦄, False) →
     (∀ (G : SimpleGraph (Fin 26)) [DecidableRel G.Adj] (C : Circuit) (g m a : ℕ) (b : Fin 2) (e f : Sym2 (Fin 26)) (U : Finset (Sym2 (Fin 26))) (T : Finset ℕ),
       G = SimpleGraph.fromRel (fun p l : Fin 26 => p.val < 13 ∧ 13 ≤ l.val ∧
@@ -57,7 +57,7 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
         ⦃_ : OrReaches 26 C (26 + m) g⦄
         ⦃_ : gammaE G C g ∩ U ⊆ gammaE G C m⦄
         ⦃_ : e ≠ f⦄
-        ⦃_ : ∀ z ∈ ({e, f} : Finset (Sym2 (Fin 26))), z ∈ U ∧ z ∈ gammaE G C g ∧ ∃ t ∈ T, ∃ d : Fin 2, z ∈ gammaE G C t ∧ OrReaches 26 C (opnd C t d) g⦄
+        ⦃_ : ∀ z : Sym2 (Fin 26), z = e ∨ z = f → z ∈ U ∧ z ∈ gammaE G C g ∧ ∃ t ∈ T, ∃ d : Fin 2, z ∈ gammaE G C t ∧ OrReaches 26 C (opnd C t d) g⦄
         ⦃_ : ¬ ∃ v : Fin 26, v ∈ e ∧ v ∈ f⦄, False) →
     ∀ (x1 : SimpleGraph (Fin (26 : ℕ))) [x2 : DecidableRel x1.Adj] (x3 : PEqualNP.CircuitLowerBounds.Circuit),   (x1 = SimpleGraph.fromRel fun (x4 x5 : Fin (26 : ℕ)) => ↑x4 < (13 : ℕ) ∧ (13 : ℕ) ≤ ↑x5 ∧ (↑x4 + (26 : ℕ) - ↑x5) % (13 : ℕ) ∈ [(0 : ℕ), (1 : ℕ), (3 : ℕ), (9 : ℕ)]) →     PEqualNP.TopForm.IsLeastAO x1 x3 →       PEqualNP.TopForm.TopForm x1 x3 →         x3.size ≤ (64 : ℕ) →           have x8 : Finset ℕ := PEqualNP.TopForm.tops x1 x3;           have x9 : Finset ℕ := PEqualNP.TopForm.junk x1 x3;           have x10 : Finset (Sym2 (Fin (26 : ℕ))) := PEqualNP.TopForm.Ustar x1 x3;           have x11 : Finset ℕ := PEqualNP.TopForm.orN x1 x3 \ PEqualNP.TopForm.lam x1 x3;           PEqualNP.TopForm.centreless x1 x3 = ∅ → (2 : ℕ) ≤ x9.card → (1 : ℕ) ≤ (PEqualNP.TopForm.mixing x1 x3).card → (3 : ℕ) ≤ x10.card → x8.card + x9.card + x11.card ≤ (13 : ℕ) + x10.card → (52 : ℕ) ≤ (4 : ℕ) * x8.card + x10.card → (∀ (x18 : Finset (Fin (26 : ℕ))), PEqualNP.MetaComplexity.NestedCover.IsMinCover (x1.deleteEdges ↑x10) x18 → x18.card ≤ x8.card) → False := by
   have gateAt_d : ∀ (C : Circuit) (j : ℕ), gateAt C j = C.gates.getD j ⟨GateOp.or, []⟩ := by
@@ -2696,10 +2696,9 @@ theorem PEqualNP.Outside.R_meta_7251_1 :
     exact fourMany rfl least top empty twoJ non (by omega) many r cost edges cover
   obtain ⟨bigR,bigU,bigM⟩ := bump G C heq least top empty twoJ oneM threeU cost edgeBound cover
   obtain ⟨g,hg,m,hm,a,ha,b,hmPath,hgPath,sub,e,he,f,hf,nef,se,sf⟩ := sharedService least top empty threeU cost edgeBound
-  have clause : ∀ z ∈ ({e, f} : Finset (Sym2 (Fin 26))), z ∈ Ustar G C ∧ z ∈ gammaE G C g ∧
+  have clause : ∀ z : Sym2 (Fin 26), z = e ∨ z = f → z ∈ Ustar G C ∧ z ∈ gammaE G C g ∧
       ∃ t ∈ tops G C, ∃ d : Fin 2, z ∈ gammaE G C t ∧ OrReaches 26 C (opnd C t d) g := by
-    intro z hz
-    have hz' : z = e ∨ z = f := by simpa -congrConsts using hz
+    intro z hz'
     have hzg : z ∈ gammaE G C g ∩ Ustar G C := by
       rcases hz' with rfl|rfl
       · exact he
