@@ -50,14 +50,17 @@ theorem PEqualNP.Outside.R_meta_5777_318
     let X := Finset.univ.filter fun u : Fin 7 => x (Fin.castAdd 7 u) = true
     let Y := Finset.univ.filter fun v : Fin 7 => x (Fin.natAdd 7 v) = true
     have bits : incidenceInput X Y = List.ofFn x := by
-      rw [incidenceInput,← List.ofFn_fin_append]
+      change List.ofFn (fun u : Fin 7 => decide (u ∈ X)) ++
+        List.ofFn (fun v : Fin 7 => decide (v ∈ Y)) = List.ofFn x
+      rw [← List.ofFn_fin_append]
       congr 1
       funext i
       refine Fin.addCases (fun u => ?_) (fun v => ?_) i
       · rw [Fin.append_left]; simp [X]
       · rw [Fin.append_right]; simp [Y]
     rw [← bits,comp X Y]
-    simp only [incidenceFun,decide_eq_true_eq,X,Y,Finset.mem_filter,Finset.mem_univ,true_and]
+    change decide (∃ u ∈ X, ∃ v ∈ Y, u ∈ fanoLines v) = true ↔ _
+    simp only [decide_eq_true_eq,X,Y,Finset.mem_filter,Finset.mem_univ,true_and]
     constructor
     · rintro ⟨u,hu,v,hv,h⟩; exact ⟨u,v,h,hu,hv⟩
     · rintro ⟨u,v,h,hu,hv⟩; exact ⟨u,hu,v,hv,h⟩
