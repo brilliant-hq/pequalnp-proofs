@@ -1,18 +1,30 @@
+import Mathlib
 import PEqualNP.Defs
 
-namespace PEqualNP.Outside.L_meta_19507_aux
+open PEqualNP.CircuitLowerBounds
+open PEqualNP.MetaComplexity
 
-open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
+theorem PEqualNP.Outside.L_meta_19507 :
+    ∃ C : Circuit,
+      FanInTwo C ∧ C.size ≤ 10 ∧
+      PEqualNP.Represents.Represents (fun u v : Fin 5 => (16221393 : ℕ).testBit (5 * u.val + v.val)) C := by
+  let C : Circuit :=
+    { gates := [⟨GateOp.or, [5, 8]⟩,
+      ⟨GateOp.and, [0, 9]⟩,
+      ⟨GateOp.and, [1, 10]⟩,
+      ⟨GateOp.or, [12, 9]⟩,
+      ⟨GateOp.or, [0, 2]⟩,
+      ⟨GateOp.or, [14, 13]⟩,
+      ⟨GateOp.not, [15]⟩,
+      ⟨GateOp.or, [16, 11]⟩,
+      ⟨GateOp.and, [14, 5]⟩,
+      ⟨GateOp.or, [17, 18]⟩],
+      output := 19 }
+  have hfan : FanInTwo C := by
+    intro g hg
+    simp only [C, List.mem_cons, List.not_mem_nil, or_false] at hg
+    rcases hg with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+    all_goals exact ⟨by simp only [Set.mem_insert_iff, Set.mem_singleton_iff]; simp, by decide⟩
+  refine ⟨C, hfan, by decide, ?_⟩
+  decide +kernel
 
-def circuit : Circuit :=
-  ⟨[⟨.and, [0, 9]⟩, ⟨.or, [10, 5]⟩, ⟨.not, [11]⟩, ⟨.or, [0, 2]⟩, ⟨.or, [13, 9]⟩, ⟨.and, [12, 14]⟩, ⟨.or, [5, 8]⟩, ⟨.and, [16, 1]⟩, ⟨.or, [15, 17]⟩, ⟨.not, [18]⟩], 19⟩
-
-theorem fan : FanInTwo circuit := by
-  intro g hg
-  simp only [circuit, List.mem_cons, List.not_mem_nil, or_false] at hg
-  rcases hg with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> simp
-
-end PEqualNP.Outside.L_meta_19507_aux
-
-theorem PEqualNP.Outside.L_meta_19507 : ∃ C : PEqualNP.CircuitLowerBounds.Circuit, PEqualNP.MetaComplexity.FanInTwo C ∧ C.size ≤ 10 ∧ PEqualNP.Represents.Represents (fun u v : Fin 5 => (16221393 : ℕ).testBit (5 * u.val + v.val)) C := by
-  exact ⟨PEqualNP.Outside.L_meta_19507_aux.circuit, PEqualNP.Outside.L_meta_19507_aux.fan, by decide, by decide +kernel⟩
