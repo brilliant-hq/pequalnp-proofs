@@ -8,8 +8,9 @@ theorem PEqualNP.Outside.R_meta_909_698
          {1,3,5,9}, {1,8,9}, {0,2,8,9}]
       ∃ C : PEqualNP.AndCount.AndCountCircuit 10, ∃ safe : Finset (Fin C.size),
         C.WellFormed ∧ C.size ≤ 6 ∧
-        (∀ v : Fin 10, (Finset.univ.filter
-          (fun i : Fin C.size => v ∈ C.leftVars i ∨ v ∈ C.rightVars i)).card ≤ 2) ∧
+        (∀ v : Fin 10, Multiset.card (Multiset.filter
+          (fun i : Fin C.size => v ∈ C.leftVars i ∨ v ∈ C.rightVars i)
+          (Finset.univ : Finset (Fin C.size)).val) ≤ 2) ∧
         C.outVars = ∅ ∧ C.outGates = safe ∧
         (∀ i, i ∈ safe ↔ ∀ I ∈ rows, C.gateVal I i = false) ∧
         (∀ i j, j ∈ C.leftGates i ∨ j ∈ C.rightGates i → j ∉ safe) ∧
