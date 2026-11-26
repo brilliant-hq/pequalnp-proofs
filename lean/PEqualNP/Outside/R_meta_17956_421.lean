@@ -3,7 +3,7 @@ import PEqualNP.Defs
 
 open PEqualNP.CircuitLowerBounds PEqualNP.TopForm PEqualNP.BlindGate
 
-/-- Delete the four incidences on line zero. The prefix can share gates
+/-- Delete the four incidences on line zero. The circuit can share gates
 between the residual and the four-point star; two final ORs restore the
 deleted rectangle, one using its point side and one using its line side. -/
 theorem PEqualNP.Outside.R_meta_17956_421
