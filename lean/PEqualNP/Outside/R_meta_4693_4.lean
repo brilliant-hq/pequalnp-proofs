@@ -28,8 +28,10 @@ theorem PEqualNP.Outside.R_meta_4693_4
     intro X Y
     let x := Fin.append (fun p : Fin 7 => decide (p ∈ X)) (fun l : Fin 7 => decide (l ∈ Y))
     have hrow : List.ofFn x = incidenceInput X Y := List.ofFn_fin_append _ _
+    change C.eval (incidenceInput X Y) =
+      decide (∃ p ∈ X, ∃ l ∈ Y, p ∈ fanoLines l)
     rw [← hrow, Bool.eq_iff_iff, hEval x]
-    simp only [x, Fin.append_left, Fin.append_right, incidenceFun, decide_eq_true_eq]
+    simp only [x, Fin.append_left, Fin.append_right, decide_eq_true_eq]
     constructor
     · rintro ⟨p, l, he, hp, hl⟩
       exact ⟨p, hp, l, hl, (hFano p l).mpr he⟩
