@@ -1,7 +1,7 @@
 import Mathlib
 import PEqualNP.Defs
 
-theorem PEqualNP.Outside.R_meta_6752_1
+theorem PEqualNP.Outside.R_meta_6752_2
     (h_two :
       let x1 : SimpleGraph (Fin 11) := PEqualNP.EdgeOwnership.edgeGraph 11
         [(0, 9), (0, 10), (1, 4), (1, 8), (2, 5), (2, 10), (3, 6), (3, 7),
