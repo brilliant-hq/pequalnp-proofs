@@ -14,3 +14,5 @@ theorem PEqualNP.Outside.R_meta_17591_1 :
   by_cases h : (∃ (g : PEqualNP.CircuitLowerBounds.Gate), x1.gates[1]? = Option.some g)
   · apply h1 <;> assumption
   · apply h2 <;> assumption
+
+-- reduction for L-meta-17591; re-checked against the current base.
