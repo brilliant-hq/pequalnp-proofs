@@ -23,8 +23,11 @@ theorem PEqualNP.Outside.R_meta_18383_726
     rw [spec]
     have hp : ∀ p : Fin 13, P p ≠ 0 ↔ p ≠ 0 := by decide +kernel
     have hl : ∀ l : Fin 13, L l ≠ 0 := by decide +kernel
-    exact ⟨fun ⟨p,l,h,hp',_,a,b⟩ => ⟨p,l,h,(hp p).mp hp',a,b⟩,
-      fun ⟨p,l,h,hp',a,b⟩ => ⟨p,l,h,(hp p).mpr hp',hl l,a,b⟩⟩
+    constructor
+    · rintro ⟨p,l,h,hp',_,a,b⟩
+      exact ⟨p,l,h,(hp p).mp hp',a,b⟩
+    · rintro ⟨p,l,h,hp',a,b⟩
+      exact ⟨p,l,h,(hp p).mpr hp',hl l,a,b⟩
   · let π : Fin 26 → Option (Fin 26) := Fin.addCases (motive := fun _ => Option (Fin 26))
           (fun p : Fin 13 => some (L (-p)))
           (fun l : Fin 13 => if l = 0 then none else some (P (-l)))
