@@ -1,5 +1,4 @@
-﻿-- Self-contained: no imports beyond Defs; base is a hypothesis.
-import Mathlib
+﻿import Mathlib
 import PEqualNP.Defs
 
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
