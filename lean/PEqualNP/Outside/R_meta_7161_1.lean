@@ -63,9 +63,14 @@ theorem PEqualNP.Outside.R_meta_7161_1
       relation p l ∧ x (Fin.castAdd 13 p) = true ∧ x (Fin.natAdd 13 l) = true)
   let read := fun s t => GateOp.or.eval
     [(E.wires (vec s t)).getD a false, (E.wires (vec s t)).getD b false]
+  have hOrEval (u v : Bool) : GateOp.or.eval [u, v] = (u || v) := by
+    change List.any [u, v] id = (u || v)
+    simp only [List.any_cons, List.any_nil, Bool.or_false, id_eq]
   have hRead (s t : Finset (Fin 13)) :
       read s t = (B.eval (ix.map (bit s t)) || special (bit s t)) := by
-    simpa [read, vec, special, relation, ix, GateOp.eval] using hExtend (bit s t)
+    dsimp [read, vec]
+    rw [hOrEval]
+    simpa [special, relation, ix] using hExtend (bit s t)
   have hCoreFalse (s t : Finset (Fin 13))
       (hno : ∀ p ∈ s, ∀ l ∈ t, ¬ relation p l) :
       B.eval (ix.map (bit s t)) = false := by
