@@ -306,8 +306,8 @@ end PEqualNP.Outside.L_meta_27339.ZH
 # Gate elimination
 
 Helper for `L-meta-014`. The last input of a circuit on `n + 1` inputs is fixed to `b`. One
-pass over the gates gives every old wire a status: a constant, or an alias of a wire of the
-new circuit on `n` inputs. A gate that reads a constant becomes a constant or an alias and is
+pass over the gates gives every old wire a status: a constant, or a copy of a wire of the
+new circuit on `n` inputs. A gate that reads a constant becomes a constant or a copy and is
 not emitted, so if some gate reads the fixed input the new circuit is smaller. If no gate
 reads it, the supports of `Support.lean` show the function does not depend on it.
 -/
