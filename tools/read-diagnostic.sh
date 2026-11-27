@@ -60,7 +60,8 @@ probe look 'import json, os, socket, resource, sys
 def can(f):
     try: f(); return True
     except BaseException: return False
-st = dict(l.split(":", 1) for l in open("/proc/self/status").read().splitlines() if ":" in l)
+try: st = dict(l.split(":", 1) for l in open("/proc/self/status").read().splitlines() if ":" in l)
+except OSError: st = {}
 def net():
     s = socket.socket(); s.settimeout(3); s.connect(("140.82.112.3", 443))
 def w(p):
