@@ -12,14 +12,11 @@ theorem PEqualNP.Outside.R_meta_18209_2
       have ind : (Fin (13 : ℕ) → Fin (13 : ℕ) → Bool) → (Fin (13 : ℕ) → Bool) → Fin (13 : ℕ) → Bool := fun q s b =>
         r.all fun a => !s a || !q a b
       have sep : ((Fin (26 : ℕ) → Bool) → Bool) → PEqualNP.CircuitLowerBounds.Circuit → Prop := fun f c =>
+        have ev : (Fin (26 : ℕ) → Bool) → Bool := fun v => c.eval (List.ofFn v ++ [f v])
         PEqualNP.MetaComplexity.Monotone2 c ∧ c.size ≤ (62 : ℕ) ∧
-        (∀ a b : Fin (13 : ℕ), pg a b = Bool.true → c.eval (List.ofFn (evec a b) ++ [f (evec a b)]) = Bool.true) ∧
-        (∀ s : Fin (13 : ℕ) → Bool, arc pg s →
-          have v : Fin (26 : ℕ) → Bool := Fin.append s (ind pg s)
-          c.eval (List.ofFn v ++ [f v]) = Bool.false) ∧
-        (∀ s : Fin (13 : ℕ) → Bool, arc (fun a b => pg b a) s →
-          have v : Fin (26 : ℕ) → Bool := Fin.append (ind (fun a b => pg b a) s) s
-          c.eval (List.ofFn v ++ [f v]) = Bool.false)
+        (∀ a b : Fin (13 : ℕ), pg a b = Bool.true → ev (evec a b) = Bool.true) ∧
+        (∀ s : Fin (13 : ℕ) → Bool, arc pg s → ev (Fin.append s (ind pg s)) = Bool.false) ∧
+        (∀ s : Fin (13 : ℕ) → Bool, arc (fun a b => pg b a) s → ev (Fin.append (ind (fun a b => pg b a) s) s) = Bool.false)
       ∀ (f : (Fin (26 : ℕ) → Bool) → Bool) (c : PEqualNP.CircuitLowerBounds.Circuit),
         ((∀ v, f v = Bool.true) ∨ (∃ k : Fin (26 : ℕ), ∀ v, f v = v k) ∨
           (∀ a b : Fin (13 : ℕ), pg a b = Bool.true → f (evec a b) = Bool.false)) →
@@ -35,14 +32,11 @@ theorem PEqualNP.Outside.R_meta_18209_2
       have ind : (Fin (13 : ℕ) → Fin (13 : ℕ) → Bool) → (Fin (13 : ℕ) → Bool) → Fin (13 : ℕ) → Bool := fun q s b =>
         r.all fun a => !s a || !q a b
       have sep : ((Fin (26 : ℕ) → Bool) → Bool) → PEqualNP.CircuitLowerBounds.Circuit → Prop := fun f c =>
+        have ev : (Fin (26 : ℕ) → Bool) → Bool := fun v => c.eval (List.ofFn v ++ [f v])
         PEqualNP.MetaComplexity.Monotone2 c ∧ c.size ≤ (62 : ℕ) ∧
-        (∀ a b : Fin (13 : ℕ), pg a b = Bool.true → c.eval (List.ofFn (evec a b) ++ [f (evec a b)]) = Bool.true) ∧
-        (∀ s : Fin (13 : ℕ) → Bool, arc pg s →
-          have v : Fin (26 : ℕ) → Bool := Fin.append s (ind pg s)
-          c.eval (List.ofFn v ++ [f v]) = Bool.false) ∧
-        (∀ s : Fin (13 : ℕ) → Bool, arc (fun a b => pg b a) s →
-          have v : Fin (26 : ℕ) → Bool := Fin.append (ind (fun a b => pg b a) s) s
-          c.eval (List.ofFn v ++ [f v]) = Bool.false)
+        (∀ a b : Fin (13 : ℕ), pg a b = Bool.true → ev (evec a b) = Bool.true) ∧
+        (∀ s : Fin (13 : ℕ) → Bool, arc pg s → ev (Fin.append s (ind pg s)) = Bool.false) ∧
+        (∀ s : Fin (13 : ℕ) → Bool, arc (fun a b => pg b a) s → ev (Fin.append (ind (fun a b => pg b a) s) s) = Bool.false)
       ∀ (p q : Fin (13 : ℕ)) (c : PEqualNP.CircuitLowerBounds.Circuit),
         pg p q = Bool.true →
         sep (fun v => v (Fin.castAdd (13 : ℕ) p) && v (Fin.natAdd (13 : ℕ) q)) c → False) :
@@ -58,14 +52,11 @@ theorem PEqualNP.Outside.R_meta_18209_2
   let ind : (Fin 13 → Fin 13 → Bool) → (Fin 13 → Bool) → Fin 13 → Bool := fun q s b =>
     r.all fun a => !s a || !q a b
   let sep : ((Fin 26 → Bool) → Bool) → PEqualNP.CircuitLowerBounds.Circuit → Prop := fun f c =>
+    have ev : (Fin 26 → Bool) → Bool := fun v => c.eval (List.ofFn v ++ [f v])
     PEqualNP.MetaComplexity.Monotone2 c ∧ c.size ≤ 62 ∧
-    (∀ a b : Fin 13, pg a b = true → c.eval (List.ofFn (evec a b) ++ [f (evec a b)]) = true) ∧
-    (∀ s : Fin 13 → Bool, arc pg s →
-      have v : Fin 26 → Bool := Fin.append s (ind pg s)
-      c.eval (List.ofFn v ++ [f v]) = false) ∧
-    (∀ s : Fin 13 → Bool, arc (fun a b => pg b a) s →
-      have v : Fin 26 → Bool := Fin.append (ind (fun a b => pg b a) s) s
-      c.eval (List.ofFn v ++ [f v]) = false)
+    (∀ a b : Fin 13, pg a b = true → ev (evec a b) = true) ∧
+    (∀ s : Fin 13 → Bool, arc pg s → ev (Fin.append s (ind pg s)) = false) ∧
+    (∀ s : Fin 13 → Bool, arc (fun a b => pg b a) s → ev (Fin.append (ind (fun a b => pg b a) s) s) = false)
   let f : (Fin 26 → Bool) → Bool := fun v =>
     x4.op.eval (List.map (fun k => (List.ofFn v).getD k false) x4.inputs)
   have hcard : ∀ p : Fin 13 → Bool,
@@ -86,6 +77,7 @@ theorem PEqualNP.Outside.R_meta_18209_2
     intro g hfg
     refine ⟨hMono, hSz, ?_, ?_, ?_⟩
     · intro a b hab
+      dsimp only
       rw [← hfg]
       exact hPos a b (of_decide_eq_true hab)
     · intro s hsh
