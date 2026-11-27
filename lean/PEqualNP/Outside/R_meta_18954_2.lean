@@ -6,12 +6,12 @@ theorem PEqualNP.Outside.R_meta_18954_2
         (x1 = SimpleGraph.fromRel fun (x4 x5 : Fin (26 : ℕ)) =>
           ↑x4 < (13 : ℕ) ∧ (13 : ℕ) ≤ ↑x5 ∧ (↑x4 + (26 : ℕ) - ↑x5) % (13 : ℕ) ∈ [(0 : ℕ), (1 : ℕ), (3 : ℕ), (9 : ℕ)]) →
         (∀ (u v : Fin (26 : ℕ)), x1.Adj u v → (↑u < (13 : ℕ) ∧ (13 : ℕ) ≤ ↑v) ∨ ((13 : ℕ) ≤ ↑u ∧ ↑v < (13 : ℕ))) ∧
-        (∀ (u : Fin (26 : ℕ)), (Finset.univ.filter (fun (v : Fin (26 : ℕ)) => x1.Adj u v)).card = (4 : ℕ)) ∧
+        (∀ (u : Fin (26 : ℕ)), x1.degree u = (4 : ℕ)) ∧
         (∀ (u v w z : Fin (26 : ℕ)), x1.Adj u v → x1.Adj v w → x1.Adj w z → x1.Adj z u → u = w ∨ v = z))
     (hC4FreeMixedVC :
       ∀ (x1 : SimpleGraph (Fin (26 : ℕ))) [x2 : DecidableRel x1.Adj] (x3 : PEqualNP.CircuitLowerBounds.Circuit),
         ((∀ (u v : Fin (26 : ℕ)), x1.Adj u v → (↑u < (13 : ℕ) ∧ (13 : ℕ) ≤ ↑v) ∨ ((13 : ℕ) ≤ ↑u ∧ ↑v < (13 : ℕ))) ∧
-         (∀ (u : Fin (26 : ℕ)), (Finset.univ.filter (fun (v : Fin (26 : ℕ)) => x1.Adj u v)).card = (4 : ℕ)) ∧
+         (∀ (u : Fin (26 : ℕ)), x1.degree u = (4 : ℕ)) ∧
          (∀ (u v w z : Fin (26 : ℕ)), x1.Adj u v → x1.Adj v w → x1.Adj w z → x1.Adj z u → u = w ∨ v = z)) →
         PEqualNP.TopForm.IsLeastAO x1 x3 →
         PEqualNP.TopForm.TopForm x1 x3 →
