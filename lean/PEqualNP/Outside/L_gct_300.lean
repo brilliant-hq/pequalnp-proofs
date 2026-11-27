@@ -216,7 +216,7 @@ private lemma line_charpoly {V : Type*} [AddCommGroup V] [Module ℂ V]
     rw [map_smul, heig, smul_smul, smul_smul, mul_comm]
   rw [hscalar, scalar_charpoly, finrank_span_singleton hnz, pow_one]
 
-private lemma square_root_factor {value : ℂ} {root other : ℂ[X]}
+private lemma linear_factor_of_square {value : ℂ} {root other : ℂ[X]}
     (hf : root ^ 2 = (X - C value) * other) :
     ∃ factor : ℂ[X], root = (X - C value) * factor ∧
       other = (X - C value) * factor ^ 2 := by
@@ -253,7 +253,7 @@ private lemma isotropic_eigenvector {V : Type*} [AddCommGroup V] [Module ℂ V]
     rw [← hsquare, charpoly_factor operator orth horth,
       charpoly_orthogonal_quotient form symmetric nondegenerate operator adjoint line hline,
       line_charpoly operator hnz heig, mul_comm]
-  obtain ⟨factor, _, hfactor⟩ := square_root_factor hfactor
+  obtain ⟨factor, _, hfactor⟩ := linear_factor_of_square hfactor
   have hvalue' : restricted.HasEigenvalue value := by
     rw [Module.End.hasEigenvalue_iff_isRoot_charpoly, hfactor]
     simp [Polynomial.IsRoot]
@@ -353,7 +353,7 @@ private lemma plane_of_square {V : Type*} [AddCommGroup V] [Module ℂ V]
     rw [← hsquare, houter, hquot, line_charpoly operator hnz heig, hinner, hlineChar]
     change ((X - C value) * quotientOp.charpoly) * (X - C value) = _
     ring
-  obtain ⟨quotientRoot, _, hroot⟩ := square_root_factor (value := value)
+  obtain ⟨quotientRoot, _, hroot⟩ := linear_factor_of_square (value := value)
     (other := (X - C value) * quotientOp.charpoly) (by rw [hfactor, pow_two, mul_assoc])
   have hsquareQuotient : quotientOp.charpoly = quotientRoot ^ 2 :=
     mul_left_cancel₀ (X_sub_C_ne_zero value) hroot
