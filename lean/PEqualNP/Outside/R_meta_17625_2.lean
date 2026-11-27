@@ -55,7 +55,7 @@ theorem PEqualNP.Outside.R_meta_17625_2
   have hNE : x2.edgeFinset.Nonempty := by
     have hEx := hWit.choose_spec.2.2.2
     exact ⟨s(hEx.choose.1, hEx.choose.2),
-      SimpleGraph.mem_edgeFinset.mpr (hEx.choose_spec.choose_spec.2 hEx.choose (by simp)).1⟩
+      SimpleGraph.mem_edgeFinset.mpr (hEx.choose_spec.choose_spec.2 hEx.choose List.mem_cons_self).1⟩
   have hAcc := @hAccount x1 x2 x3 x4 hC4 hNE hLeast hTop
   have hChg := @hUstarCharge x1 x2 x3 x4 hBip hCyc hC4 hLeast hTop hWit x11 x12 hInj hEdges
   have hWire := hWireBudget x1 x4 hLeast.1 hPos
