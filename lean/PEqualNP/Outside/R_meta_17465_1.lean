@@ -22,19 +22,21 @@ theorem PEqualNP.Outside.R_meta_17465_1
         E.card + X.card + Y.card ≤ ∑ i : Fin k, ((A i).card + (B i).card))
     (hCore : ∀ (x1 x2 : ℕ) (E : Finset (Fin x1 × Fin x2)) (C : PEqualNP.CircuitLowerBounds.Circuit)
       (X : Finset (Fin x1)) (Y : Finset (Fin x2)),
+      have G : SimpleGraph (Fin (x1 + x2)) := SimpleGraph.fromRel fun (u v : Fin (x1 + x2)) => ∃ e ∈ E, u = Fin.castAdd x2 e.1 ∧ v = Fin.natAdd x1 e.2;
+      have S : Set (Fin x1 × Fin x2) := {e : Fin x1 × Fin x2 | e ∈ E ∧ ∃ (C' : PEqualNP.CircuitLowerBounds.Circuit), C'.size < C.size ∧ PEqualNP.TopForm.IsAO2 (x1 + x2) C' ∧ PEqualNP.MetaComplexity.circuitFun (x1 + x2) C' = PEqualNP.ReadTwo.fpl x1 (fun (a : Fin x1) (b : Fin x2) => (a, b) ∈ E.erase e)};
       (6 : ℕ) ≤ E.card →
       (∀ e ∈ E, ¬((∀ e' ∈ E, e'.1 = e.1 → e' = e) ∨ ∀ e' ∈ E, e'.2 = e.2 → e' = e)) →
       C.size + (3 : ℕ) ≤ (2 : ℕ) * E.card →
       PEqualNP.TopForm.IsAO2 (x1 + x2) C →
       PEqualNP.MetaComplexity.circuitFun (x1 + x2) C = PEqualNP.ReadTwo.fpl x1 (fun (a : Fin x1) (b : Fin x2) => (a, b) ∈ E) →
       (PEqualNP.ReadTwo.Lin fun (a : Fin x1) (b : Fin x2) => (a, b) ∈ E) →
-      ¬(SimpleGraph.fromRel fun (u v : Fin (x1 + x2)) => ∃ e ∈ E, u = Fin.castAdd x2 e.1 ∧ v = Fin.natAdd x1 e.2).IsAcyclic →
+      ¬G.IsAcyclic →
       (∀ (v : Fin (x1 + x2)),
-        have d : ℕ := ((SimpleGraph.fromRel fun (u w : Fin (x1 + x2)) => ∃ e ∈ E, u = Fin.castAdd x2 e.1 ∧ w = Fin.natAdd x1 e.2).neighborSet v).ncard;
+        have d : ℕ := (G.neighborSet v).ncard;
         have r : Finset ℕ := PEqualNP.TopForm.readers (0 : ℕ) C ↑v;
         (2 : ℕ) ≤ d → r.card ≤ d ∧ (d = r.card → ∀ g ∈ r, (PEqualNP.MetaComplexity.NestedCover.gateAt C g).op = PEqualNP.CircuitLowerBounds.GateOp.and → PEqualNP.TopForm.readers (x1 + x2) C g ⊆ r)) →
-      Set.InjOn Prod.fst {e : Fin x1 × Fin x2 | e ∈ E ∧ ∃ (C' : PEqualNP.CircuitLowerBounds.Circuit), C'.size < C.size ∧ PEqualNP.TopForm.IsAO2 (x1 + x2) C' ∧ PEqualNP.MetaComplexity.circuitFun (x1 + x2) C' = PEqualNP.ReadTwo.fpl x1 (fun (a : Fin x1) (b : Fin x2) => (a, b) ∈ E.erase e)} →
-      Set.InjOn Prod.snd {e : Fin x1 × Fin x2 | e ∈ E ∧ ∃ (C' : PEqualNP.CircuitLowerBounds.Circuit), C'.size < C.size ∧ PEqualNP.TopForm.IsAO2 (x1 + x2) C' ∧ PEqualNP.MetaComplexity.circuitFun (x1 + x2) C' = PEqualNP.ReadTwo.fpl x1 (fun (a : Fin x1) (b : Fin x2) => (a, b) ∈ E.erase e)} →
+      Set.InjOn Prod.fst S →
+      Set.InjOn Prod.snd S →
       (∀ e ∈ E, e.1 ∈ X ∨ e.2 ∈ Y) →
       E.card + X.card + Y.card ≤ C.size + (1 : ℕ) →
       X.card + Y.card + (2 : ℕ) ≤ E.card →
