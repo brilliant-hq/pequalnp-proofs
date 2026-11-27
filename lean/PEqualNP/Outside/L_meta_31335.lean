@@ -3840,480 +3840,186 @@ def l2Data (i : ℕ) : L2Cell :=
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 50000000 in
 theorem lcBloc (a n k : ℕ) (g : l2Span l2Data a n) (d : l2Span l2Data (a+n) k) : l2Span l2Data a (n+k) := l2SpanAdd g d
-theorem lp0 : l2Span l2Data 0 11 := by decide +kernel
-theorem lp11 : l2Span l2Data 11 6 := by decide +kernel
-theorem lp17 : l2Span l2Data 17 6 := by decide +kernel
-theorem lp23 : l2Span l2Data 23 6 := by decide +kernel
-theorem lp29 : l2Span l2Data 29 6 := by decide +kernel
-theorem lp35 : l2Span l2Data 35 1 := by decide +kernel
-theorem lp36 : l2Span l2Data 36 1 := by decide +kernel
-theorem lp37 : l2Span l2Data 37 3 := by decide +kernel
-theorem lp40 : l2Span l2Data 40 2 := by decide +kernel
-theorem lp42 : l2Span l2Data 42 7 := by decide +kernel
-theorem lp49 : l2Span l2Data 49 10 := by decide +kernel
-theorem lp59 : l2Span l2Data 59 8 := by decide +kernel
-theorem lp67 : l2Span l2Data 67 9 := by decide +kernel
-theorem lp76 : l2Span l2Data 76 5 := by decide +kernel
-theorem lp81 : l2Span l2Data 81 6 := by decide +kernel
-theorem lp87 : l2Span l2Data 87 2 := by decide +kernel
-theorem lp89 : l2Span l2Data 89 2 := by decide +kernel
-theorem lp91 : l2Span l2Data 91 3 := by decide +kernel
-theorem lp94 : l2Span l2Data 94 8 := by decide +kernel
-theorem lp102 : l2Span l2Data 102 7 := by decide +kernel
-theorem lp109 : l2Span l2Data 109 3 := by decide +kernel
-theorem lp112 : l2Span l2Data 112 1 := by decide +kernel
-theorem lp113 : l2Span l2Data 113 8 := by decide +kernel
-theorem lp121 : l2Span l2Data 121 2 := by decide +kernel
-theorem lp123 : l2Span l2Data 123 8 := by decide +kernel
-theorem lp131 : l2Span l2Data 131 2 := by decide +kernel
-theorem lp133 : l2Span l2Data 133 8 := by decide +kernel
-theorem lp141 : l2Span l2Data 141 1 := by decide +kernel
-theorem lp142 : l2Span l2Data 142 4 := by decide +kernel
-theorem lp146 : l2Span l2Data 146 10 := by decide +kernel
-theorem lp156 : l2Span l2Data 156 10 := by decide +kernel
-theorem lp166 : l2Span l2Data 166 5 := by decide +kernel
-theorem lp171 : l2Span l2Data 171 9 := by decide +kernel
-theorem lp180 : l2Span l2Data 180 3 := by decide +kernel
-theorem lp183 : l2Span l2Data 183 5 := by decide +kernel
-theorem lp188 : l2Span l2Data 188 9 := by decide +kernel
-theorem lp197 : l2Span l2Data 197 3 := by decide +kernel
-theorem lp200 : l2Span l2Data 200 4 := by decide +kernel
-theorem lp204 : l2Span l2Data 204 2 := by decide +kernel
-theorem lp206 : l2Span l2Data 206 1 := by decide +kernel
-theorem lp207 : l2Span l2Data 207 12 := by decide +kernel
-theorem lp219 : l2Span l2Data 219 8 := by decide +kernel
-theorem lp227 : l2Span l2Data 227 6 := by decide +kernel
-theorem lp233 : l2Span l2Data 233 4 := by decide +kernel
-theorem lp237 : l2Span l2Data 237 7 := by decide +kernel
-theorem lp244 : l2Span l2Data 244 5 := by decide +kernel
-theorem lp249 : l2Span l2Data 249 2 := by decide +kernel
-theorem lp251 : l2Span l2Data 251 2 := by decide +kernel
-theorem lp253 : l2Span l2Data 253 1 := by decide +kernel
-theorem lp254 : l2Span l2Data 254 6 := by decide +kernel
-theorem lp260 : l2Span l2Data 260 9 := by decide +kernel
-theorem lp269 : l2Span l2Data 269 8 := by decide +kernel
-theorem lp277 : l2Span l2Data 277 11 := by decide +kernel
-theorem lp288 : l2Span l2Data 288 3 := by decide +kernel
-theorem lp291 : l2Span l2Data 291 6 := by decide +kernel
-theorem lp297 : l2Span l2Data 297 6 := by decide +kernel
-theorem lp303 : l2Span l2Data 303 7 := by decide +kernel
-theorem lp310 : l2Span l2Data 310 1 := by decide +kernel
-theorem lp311 : l2Span l2Data 311 1 := by decide +kernel
-theorem lp312 : l2Span l2Data 312 4 := by decide +kernel
-theorem lp316 : l2Span l2Data 316 9 := by decide +kernel
-theorem lp325 : l2Span l2Data 325 10 := by decide +kernel
-theorem lp335 : l2Span l2Data 335 6 := by decide +kernel
-theorem lp341 : l2Span l2Data 341 11 := by decide +kernel
-theorem lp352 : l2Span l2Data 352 4 := by decide +kernel
-theorem lp356 : l2Span l2Data 356 8 := by decide +kernel
-theorem lp364 : l2Span l2Data 364 12 := by decide +kernel
-theorem lp376 : l2Span l2Data 376 6 := by decide +kernel
-theorem lp382 : l2Span l2Data 382 8 := by decide +kernel
-theorem lp390 : l2Span l2Data 390 3 := by decide +kernel
-theorem lp393 : l2Span l2Data 393 4 := by decide +kernel
-theorem lp397 : l2Span l2Data 397 2 := by decide +kernel
-theorem lp399 : l2Span l2Data 399 7 := by decide +kernel
-theorem lp406 : l2Span l2Data 406 2 := by decide +kernel
-theorem lp408 : l2Span l2Data 408 7 := by decide +kernel
-theorem lp415 : l2Span l2Data 415 1 := by decide +kernel
-theorem lp416 : l2Span l2Data 416 5 := by decide +kernel
-theorem lp421 : l2Span l2Data 421 5 := by decide +kernel
-theorem lp426 : l2Span l2Data 426 3 := by decide +kernel
-theorem lp429 : l2Span l2Data 429 4 := by decide +kernel
-theorem lp433 : l2Span l2Data 433 2 := by decide +kernel
-theorem lp435 : l2Span l2Data 435 1 := by decide +kernel
-theorem lp436 : l2Span l2Data 436 9 := by decide +kernel
-theorem lp445 : l2Span l2Data 445 2 := by decide +kernel
-theorem lp447 : l2Span l2Data 447 2 := by decide +kernel
-theorem lp449 : l2Span l2Data 449 1 := by decide +kernel
-theorem lp450 : l2Span l2Data 450 6 := by decide +kernel
-theorem lp456 : l2Span l2Data 456 4 := by decide +kernel
-theorem lp460 : l2Span l2Data 460 6 := by decide +kernel
-theorem lp466 : l2Span l2Data 466 9 := by decide +kernel
-theorem lp475 : l2Span l2Data 475 9 := by decide +kernel
-theorem lp484 : l2Span l2Data 484 7 := by decide +kernel
-theorem lp491 : l2Span l2Data 491 5 := by decide +kernel
-theorem lp496 : l2Span l2Data 496 1 := by decide +kernel
-theorem lp497 : l2Span l2Data 497 6 := by decide +kernel
-theorem lp503 : l2Span l2Data 503 4 := by decide +kernel
-theorem lp507 : l2Span l2Data 507 8 := by decide +kernel
-theorem lp515 : l2Span l2Data 515 6 := by decide +kernel
-theorem lp521 : l2Span l2Data 521 2 := by decide +kernel
-theorem lp523 : l2Span l2Data 523 6 := by decide +kernel
-theorem lp529 : l2Span l2Data 529 10 := by decide +kernel
-theorem lp539 : l2Span l2Data 539 1 := by decide +kernel
-theorem lp540 : l2Span l2Data 540 1 := by decide +kernel
-theorem lp541 : l2Span l2Data 541 2 := by decide +kernel
-theorem lp543 : l2Span l2Data 543 7 := by decide +kernel
-theorem lp550 : l2Span l2Data 550 1 := by decide +kernel
-theorem lp551 : l2Span l2Data 551 6 := by decide +kernel
-theorem lp557 : l2Span l2Data 557 1 := by decide +kernel
-theorem lp558 : l2Span l2Data 558 7 := by decide +kernel
-theorem lp565 : l2Span l2Data 565 2 := by decide +kernel
-theorem lp567 : l2Span l2Data 567 2 := by decide +kernel
-theorem lp569 : l2Span l2Data 569 6 := by decide +kernel
-theorem lp575 : l2Span l2Data 575 1 := by decide +kernel
-theorem lp576 : l2Span l2Data 576 9 := by decide +kernel
-theorem lp585 : l2Span l2Data 585 6 := by decide +kernel
-theorem lp591 : l2Span l2Data 591 8 := by decide +kernel
-theorem lp599 : l2Span l2Data 599 8 := by decide +kernel
-theorem lp607 : l2Span l2Data 607 7 := by decide +kernel
-theorem lp614 : l2Span l2Data 614 7 := by decide +kernel
-theorem lp621 : l2Span l2Data 621 9 := by decide +kernel
-theorem lp630 : l2Span l2Data 630 8 := by decide +kernel
-theorem lp638 : l2Span l2Data 638 8 := by decide +kernel
-theorem lp646 : l2Span l2Data 646 4 := by decide +kernel
-theorem lp650 : l2Span l2Data 650 3 := by decide +kernel
-theorem lp653 : l2Span l2Data 653 3 := by decide +kernel
-theorem lp656 : l2Span l2Data 656 8 := by decide +kernel
-theorem lp664 : l2Span l2Data 664 6 := by decide +kernel
-theorem lp670 : l2Span l2Data 670 3 := by decide +kernel
-theorem lp673 : l2Span l2Data 673 6 := by decide +kernel
-theorem lp679 : l2Span l2Data 679 7 := by decide +kernel
-theorem lp686 : l2Span l2Data 686 1 := by decide +kernel
-theorem lp687 : l2Span l2Data 687 4 := by decide +kernel
-theorem lp691 : l2Span l2Data 691 5 := by decide +kernel
-theorem lp696 : l2Span l2Data 696 4 := by decide +kernel
-theorem lp700 : l2Span l2Data 700 3 := by decide +kernel
-theorem lp703 : l2Span l2Data 703 3 := by decide +kernel
-theorem lp706 : l2Span l2Data 706 3 := by decide +kernel
-theorem lp709 : l2Span l2Data 709 7 := by decide +kernel
-theorem lp716 : l2Span l2Data 716 1 := by decide +kernel
-theorem lp717 : l2Span l2Data 717 4 := by decide +kernel
-theorem lp721 : l2Span l2Data 721 1 := by decide +kernel
-theorem lp722 : l2Span l2Data 722 4 := by decide +kernel
-theorem lp726 : l2Span l2Data 726 1 := by decide +kernel
-theorem lp727 : l2Span l2Data 727 4 := by decide +kernel
-theorem lp731 : l2Span l2Data 731 7 := by decide +kernel
-theorem lp738 : l2Span l2Data 738 4 := by decide +kernel
-theorem lp742 : l2Span l2Data 742 2 := by decide +kernel
-theorem lp744 : l2Span l2Data 744 1 := by decide +kernel
-theorem lp745 : l2Span l2Data 745 4 := by decide +kernel
-theorem lp749 : l2Span l2Data 749 7 := by decide +kernel
-theorem lp756 : l2Span l2Data 756 2 := by decide +kernel
-theorem lp758 : l2Span l2Data 758 12 := by decide +kernel
-theorem lp770 : l2Span l2Data 770 11 := by decide +kernel
-theorem lp781 : l2Span l2Data 781 7 := by decide +kernel
-theorem lp788 : l2Span l2Data 788 3 := by decide +kernel
-theorem lp791 : l2Span l2Data 791 5 := by decide +kernel
-theorem lp796 : l2Span l2Data 796 5 := by decide +kernel
-theorem lp801 : l2Span l2Data 801 4 := by decide +kernel
-theorem lp805 : l2Span l2Data 805 5 := by decide +kernel
-theorem lp810 : l2Span l2Data 810 7 := by decide +kernel
-theorem lp817 : l2Span l2Data 817 4 := by decide +kernel
-theorem lp821 : l2Span l2Data 821 10 := by decide +kernel
-theorem lp831 : l2Span l2Data 831 1 := by decide +kernel
-theorem lp832 : l2Span l2Data 832 1 := by decide +kernel
-theorem lp833 : l2Span l2Data 833 9 := by decide +kernel
-theorem lp842 : l2Span l2Data 842 9 := by decide +kernel
-theorem lp851 : l2Span l2Data 851 3 := by decide +kernel
-theorem lp854 : l2Span l2Data 854 8 := by decide +kernel
-theorem lp862 : l2Span l2Data 862 3 := by decide +kernel
-theorem lp865 : l2Span l2Data 865 6 := by decide +kernel
-theorem lp871 : l2Span l2Data 871 7 := by decide +kernel
-theorem lp878 : l2Span l2Data 878 1 := by decide +kernel
-theorem lp879 : l2Span l2Data 879 9 := by decide +kernel
-theorem lp888 : l2Span l2Data 888 11 := by decide +kernel
-theorem lp899 : l2Span l2Data 899 9 := by decide +kernel
-theorem lp908 : l2Span l2Data 908 3 := by decide +kernel
-theorem lp911 : l2Span l2Data 911 4 := by decide +kernel
-theorem lp915 : l2Span l2Data 915 2 := by decide +kernel
-theorem lp917 : l2Span l2Data 917 4 := by decide +kernel
-theorem lp921 : l2Span l2Data 921 2 := by decide +kernel
-theorem lp923 : l2Span l2Data 923 6 := by decide +kernel
-theorem lp929 : l2Span l2Data 929 5 := by decide +kernel
-theorem lp934 : l2Span l2Data 934 3 := by decide +kernel
-theorem lp937 : l2Span l2Data 937 3 := by decide +kernel
-theorem lp940 : l2Span l2Data 940 5 := by decide +kernel
-theorem lp945 : l2Span l2Data 945 6 := by decide +kernel
-theorem lp951 : l2Span l2Data 951 1 := by decide +kernel
-theorem lp952 : l2Span l2Data 952 5 := by decide +kernel
-theorem lp957 : l2Span l2Data 957 9 := by decide +kernel
-theorem lp966 : l2Span l2Data 966 3 := by decide +kernel
-theorem lp969 : l2Span l2Data 969 1 := by decide +kernel
-theorem lp970 : l2Span l2Data 970 1 := by decide +kernel
-theorem lp971 : l2Span l2Data 971 1 := by decide +kernel
-theorem lp972 : l2Span l2Data 972 3 := by decide +kernel
-theorem lp975 : l2Span l2Data 975 2 := by decide +kernel
-theorem lp977 : l2Span l2Data 977 3 := by decide +kernel
-theorem lp980 : l2Span l2Data 980 5 := by decide +kernel
-theorem lp985 : l2Span l2Data 985 2 := by decide +kernel
-theorem lp987 : l2Span l2Data 987 3 := by decide +kernel
-theorem lp990 : l2Span l2Data 990 1 := by decide +kernel
-theorem lp991 : l2Span l2Data 991 2 := by decide +kernel
-theorem lp993 : l2Span l2Data 993 1 := by decide +kernel
-theorem lp994 : l2Span l2Data 994 1 := by decide +kernel
-theorem lp995 : l2Span l2Data 995 3 := by decide +kernel
-theorem lp998 : l2Span l2Data 998 4 := by decide +kernel
-theorem lp1002 : l2Span l2Data 1002 1 := by decide +kernel
-theorem lp1003 : l2Span l2Data 1003 3 := by decide +kernel
-theorem lp1006 : l2Span l2Data 1006 3 := by decide +kernel
-theorem lp1009 : l2Span l2Data 1009 4 := by decide +kernel
-theorem lp1013 : l2Span l2Data 1013 5 := by decide +kernel
-theorem lp1018 : l2Span l2Data 1018 2 := by decide +kernel
-theorem lp1020 : l2Span l2Data 1020 2 := by decide +kernel
-theorem lp1022 : l2Span l2Data 1022 4 := by decide +kernel
-theorem lp1026 : l2Span l2Data 1026 3 := by decide +kernel
-theorem lp1029 : l2Span l2Data 1029 1 := by decide +kernel
-theorem lp1030 : l2Span l2Data 1030 1 := by decide +kernel
-theorem lp1031 : l2Span l2Data 1031 2 := by decide +kernel
-theorem lp1033 : l2Span l2Data 1033 2 := by decide +kernel
-theorem lp1035 : l2Span l2Data 1035 3 := by decide +kernel
-theorem lp1038 : l2Span l2Data 1038 5 := by decide +kernel
-theorem lp1043 : l2Span l2Data 1043 1 := by decide +kernel
-theorem lp1044 : l2Span l2Data 1044 6 := by decide +kernel
-theorem lp1050 : l2Span l2Data 1050 1 := by decide +kernel
-theorem lp1051 : l2Span l2Data 1051 1 := by decide +kernel
-theorem lp1052 : l2Span l2Data 1052 6 := by decide +kernel
-theorem lp1058 : l2Span l2Data 1058 1 := by decide +kernel
-theorem lp1059 : l2Span l2Data 1059 2 := by decide +kernel
-theorem lp1061 : l2Span l2Data 1061 5 := by decide +kernel
-theorem lp1066 : l2Span l2Data 1066 11 := by decide +kernel
-theorem lp1077 : l2Span l2Data 1077 4 := by decide +kernel
-theorem lp1081 : l2Span l2Data 1081 3 := by decide +kernel
-theorem lp1084 : l2Span l2Data 1084 1 := by decide +kernel
-theorem lp1085 : l2Span l2Data 1085 4 := by decide +kernel
-theorem lp1089 : l2Span l2Data 1089 4 := by decide +kernel
-theorem lp1093 : l2Span l2Data 1093 2 := by decide +kernel
-theorem lp1095 : l2Span l2Data 1095 2 := by decide +kernel
-theorem lp1097 : l2Span l2Data 1097 4 := by decide +kernel
-theorem lp1101 : l2Span l2Data 1101 2 := by decide +kernel
-theorem lp1103 : l2Span l2Data 1103 4 := by decide +kernel
-theorem lp1107 : l2Span l2Data 1107 3 := by decide +kernel
-theorem lp1110 : l2Span l2Data 1110 1 := by decide +kernel
-theorem lp1111 : l2Span l2Data 1111 8 := by decide +kernel
-theorem lp1119 : l2Span l2Data 1119 2 := by decide +kernel
-theorem lp1121 : l2Span l2Data 1121 1 := by decide +kernel
-theorem lp1122 : l2Span l2Data 1122 1 := by decide +kernel
-theorem lp1123 : l2Span l2Data 1123 5 := by decide +kernel
-theorem lp1128 : l2Span l2Data 1128 5 := by decide +kernel
-theorem lp1133 : l2Span l2Data 1133 1 := by decide +kernel
-theorem lp1134 : l2Span l2Data 1134 1 := by decide +kernel
-theorem lp1135 : l2Span l2Data 1135 5 := by decide +kernel
-theorem lp1140 : l2Span l2Data 1140 2 := by decide +kernel
-theorem lp1142 : l2Span l2Data 1142 1 := by decide +kernel
-theorem lp1143 : l2Span l2Data 1143 1 := by decide +kernel
-theorem lp1144 : l2Span l2Data 1144 7 := by decide +kernel
-theorem lp1151 : l2Span l2Data 1151 4 := by decide +kernel
-theorem lp1155 : l2Span l2Data 1155 4 := by decide +kernel
-theorem lp1159 : l2Span l2Data 1159 1 := by decide +kernel
-theorem lp1160 : l2Span l2Data 1160 7 := by decide +kernel
-theorem lp1167 : l2Span l2Data 1167 5 := by decide +kernel
-theorem lp1172 : l2Span l2Data 1172 3 := by decide +kernel
-theorem lp1175 : l2Span l2Data 1175 1 := by decide +kernel
-theorem lp1176 : l2Span l2Data 1176 2 := by decide +kernel
-theorem lp1178 : l2Span l2Data 1178 7 := by decide +kernel
-theorem lp1185 : l2Span l2Data 1185 5 := by decide +kernel
-theorem lp1190 : l2Span l2Data 1190 4 := by decide +kernel
-theorem lp1194 : l2Span l2Data 1194 1 := by decide +kernel
-theorem lp1195 : l2Span l2Data 1195 1 := by decide +kernel
-theorem lp1196 : l2Span l2Data 1196 2 := by decide +kernel
-theorem lp1198 : l2Span l2Data 1198 1 := by decide +kernel
-theorem lp1199 : l2Span l2Data 1199 5 := by decide +kernel
-theorem lp1204 : l2Span l2Data 1204 4 := by decide +kernel
-theorem lp1208 : l2Span l2Data 1208 2 := by decide +kernel
-theorem lp1210 : l2Span l2Data 1210 1 := by decide +kernel
-theorem lp1211 : l2Span l2Data 1211 4 := by decide +kernel
-theorem lp1215 : l2Span l2Data 1215 2 := by decide +kernel
-theorem lp1217 : l2Span l2Data 1217 3 := by decide +kernel
-theorem lp1220 : l2Span l2Data 1220 1 := by decide +kernel
-theorem lp1221 : l2Span l2Data 1221 1 := by decide +kernel
-theorem lp1222 : l2Span l2Data 1222 1 := by decide +kernel
-theorem lp1223 : l2Span l2Data 1223 3 := by decide +kernel
-theorem lp1226 : l2Span l2Data 1226 6 := by decide +kernel
-theorem lp1232 : l2Span l2Data 1232 1 := by decide +kernel
-theorem lp1233 : l2Span l2Data 1233 3 := by decide +kernel
-theorem lp1236 : l2Span l2Data 1236 1 := by decide +kernel
-theorem lp1237 : l2Span l2Data 1237 1 := by decide +kernel
-theorem lp1238 : l2Span l2Data 1238 5 := by decide +kernel
-theorem lp1243 : l2Span l2Data 1243 2 := by decide +kernel
-theorem lp1245 : l2Span l2Data 1245 9 := by decide +kernel
-theorem lp1254 : l2Span l2Data 1254 2 := by decide +kernel
-theorem lp1256 : l2Span l2Data 1256 3 := by decide +kernel
-theorem lp1259 : l2Span l2Data 1259 11 := by decide +kernel
-theorem lp1270 : l2Span l2Data 1270 2 := by decide +kernel
-theorem lp1272 : l2Span l2Data 1272 4 := by decide +kernel
-theorem lp1276 : l2Span l2Data 1276 5 := by decide +kernel
-theorem lp1281 : l2Span l2Data 1281 2 := by decide +kernel
-theorem lp1283 : l2Span l2Data 1283 5 := by decide +kernel
-theorem lp1288 : l2Span l2Data 1288 11 := by decide +kernel
-theorem lp1299 : l2Span l2Data 1299 5 := by decide +kernel
-theorem lp1304 : l2Span l2Data 1304 2 := by decide +kernel
-theorem lp1306 : l2Span l2Data 1306 1 := by decide +kernel
-theorem lp1307 : l2Span l2Data 1307 4 := by decide +kernel
-theorem lp1311 : l2Span l2Data 1311 1 := by decide +kernel
-theorem lp1312 : l2Span l2Data 1312 1 := by decide +kernel
-theorem lp1313 : l2Span l2Data 1313 2 := by decide +kernel
-theorem lp1315 : l2Span l2Data 1315 3 := by decide +kernel
-theorem lp1318 : l2Span l2Data 1318 5 := by decide +kernel
-theorem lp1323 : l2Span l2Data 1323 3 := by decide +kernel
-theorem lp1326 : l2Span l2Data 1326 3 := by decide +kernel
-theorem lp1329 : l2Span l2Data 1329 3 := by decide +kernel
-theorem lp1332 : l2Span l2Data 1332 2 := by decide +kernel
-theorem lp1334 : l2Span l2Data 1334 1 := by decide +kernel
-theorem lp1335 : l2Span l2Data 1335 1 := by decide +kernel
-theorem lp1336 : l2Span l2Data 1336 2 := by decide +kernel
-theorem lp1338 : l2Span l2Data 1338 2 := by decide +kernel
-theorem lp1340 : l2Span l2Data 1340 1 := by decide +kernel
-theorem lp1341 : l2Span l2Data 1341 3 := by decide +kernel
-theorem lp1344 : l2Span l2Data 1344 1 := by decide +kernel
-theorem lp1345 : l2Span l2Data 1345 4 := by decide +kernel
-theorem lp1349 : l2Span l2Data 1349 6 := by decide +kernel
-theorem lp1355 : l2Span l2Data 1355 3 := by decide +kernel
-theorem lp1358 : l2Span l2Data 1358 2 := by decide +kernel
-theorem lp1360 : l2Span l2Data 1360 7 := by decide +kernel
-theorem lp1367 : l2Span l2Data 1367 5 := by decide +kernel
-theorem lp1372 : l2Span l2Data 1372 6 := by decide +kernel
-theorem lp1378 : l2Span l2Data 1378 3 := by decide +kernel
-theorem lp1381 : l2Span l2Data 1381 2 := by decide +kernel
-theorem lp1383 : l2Span l2Data 1383 8 := by decide +kernel
-theorem lp1391 : l2Span l2Data 1391 2 := by decide +kernel
-theorem lp1393 : l2Span l2Data 1393 3 := by decide +kernel
-theorem lp1396 : l2Span l2Data 1396 2 := by decide +kernel
-theorem lp1398 : l2Span l2Data 1398 1 := by decide +kernel
-theorem lp1399 : l2Span l2Data 1399 5 := by decide +kernel
-theorem lp1404 : l2Span l2Data 1404 1 := by decide +kernel
-theorem lp1405 : l2Span l2Data 1405 2 := by decide +kernel
-theorem lp1407 : l2Span l2Data 1407 1 := by decide +kernel
-theorem lp1408 : l2Span l2Data 1408 1 := by decide +kernel
-theorem lp1409 : l2Span l2Data 1409 1 := by decide +kernel
-theorem lp1410 : l2Span l2Data 1410 3 := by decide +kernel
-theorem lp1413 : l2Span l2Data 1413 1 := by decide +kernel
-theorem lp1414 : l2Span l2Data 1414 6 := by decide +kernel
-theorem lp1420 : l2Span l2Data 1420 3 := by decide +kernel
-theorem lp1423 : l2Span l2Data 1423 3 := by decide +kernel
-theorem lp1426 : l2Span l2Data 1426 2 := by decide +kernel
-theorem lp1428 : l2Span l2Data 1428 1 := by decide +kernel
-theorem lp1429 : l2Span l2Data 1429 4 := by decide +kernel
-theorem lp1433 : l2Span l2Data 1433 9 := by decide +kernel
-theorem lp1442 : l2Span l2Data 1442 4 := by decide +kernel
-theorem lp1446 : l2Span l2Data 1446 4 := by decide +kernel
-theorem lp1450 : l2Span l2Data 1450 4 := by decide +kernel
-theorem lp1454 : l2Span l2Data 1454 5 := by decide +kernel
-theorem lp1459 : l2Span l2Data 1459 9 := by decide +kernel
-theorem lp1468 : l2Span l2Data 1468 2 := by decide +kernel
-theorem lp1470 : l2Span l2Data 1470 3 := by decide +kernel
-theorem lp1473 : l2Span l2Data 1473 3 := by decide +kernel
-theorem lp1476 : l2Span l2Data 1476 8 := by decide +kernel
-theorem lp1484 : l2Span l2Data 1484 11 := by decide +kernel
-theorem lp1495 : l2Span l2Data 1495 2 := by decide +kernel
-theorem lp1497 : l2Span l2Data 1497 5 := by decide +kernel
-theorem lp1502 : l2Span l2Data 1502 4 := by decide +kernel
-theorem lp1506 : l2Span l2Data 1506 3 := by decide +kernel
-theorem lp1509 : l2Span l2Data 1509 1 := by decide +kernel
-theorem lp1510 : l2Span l2Data 1510 7 := by decide +kernel
-theorem lp1517 : l2Span l2Data 1517 1 := by decide +kernel
-theorem lp1518 : l2Span l2Data 1518 3 := by decide +kernel
-theorem lp1521 : l2Span l2Data 1521 1 := by decide +kernel
-theorem lp1522 : l2Span l2Data 1522 1 := by decide +kernel
-theorem lp1523 : l2Span l2Data 1523 4 := by decide +kernel
-theorem lp1527 : l2Span l2Data 1527 2 := by decide +kernel
-theorem lp1529 : l2Span l2Data 1529 2 := by decide +kernel
-theorem lp1531 : l2Span l2Data 1531 1 := by decide +kernel
-theorem lp1532 : l2Span l2Data 1532 12 := by decide +kernel
-theorem lp1544 : l2Span l2Data 1544 1 := by decide +kernel
-theorem lp1545 : l2Span l2Data 1545 6 := by decide +kernel
-theorem lp1551 : l2Span l2Data 1551 3 := by decide +kernel
-theorem lp1554 : l2Span l2Data 1554 5 := by decide +kernel
-theorem lp1559 : l2Span l2Data 1559 4 := by decide +kernel
-theorem lp1563 : l2Span l2Data 1563 5 := by decide +kernel
-theorem lp1568 : l2Span l2Data 1568 2 := by decide +kernel
-theorem lp1570 : l2Span l2Data 1570 1 := by decide +kernel
-theorem lp1571 : l2Span l2Data 1571 6 := by decide +kernel
-theorem lp1577 : l2Span l2Data 1577 7 := by decide +kernel
-theorem lp1584 : l2Span l2Data 1584 3 := by decide +kernel
-theorem lp1587 : l2Span l2Data 1587 4 := by decide +kernel
-theorem lp1591 : l2Span l2Data 1591 5 := by decide +kernel
-theorem lp1596 : l2Span l2Data 1596 3 := by decide +kernel
-theorem lp1599 : l2Span l2Data 1599 2 := by decide +kernel
-theorem lp1601 : l2Span l2Data 1601 2 := by decide +kernel
-theorem lp1603 : l2Span l2Data 1603 2 := by decide +kernel
-theorem lp1605 : l2Span l2Data 1605 5 := by decide +kernel
-theorem lp1610 : l2Span l2Data 1610 1 := by decide +kernel
-theorem lp1611 : l2Span l2Data 1611 4 := by decide +kernel
-theorem lp1615 : l2Span l2Data 1615 1 := by decide +kernel
-theorem lp1616 : l2Span l2Data 1616 12 := by decide +kernel
-theorem lp1628 : l2Span l2Data 1628 6 := by decide +kernel
-theorem lp1634 : l2Span l2Data 1634 7 := by decide +kernel
-theorem lp1641 : l2Span l2Data 1641 4 := by decide +kernel
-theorem lp1645 : l2Span l2Data 1645 7 := by decide +kernel
-theorem lp1652 : l2Span l2Data 1652 6 := by decide +kernel
-theorem lp1658 : l2Span l2Data 1658 4 := by decide +kernel
-theorem lp1662 : l2Span l2Data 1662 6 := by decide +kernel
-theorem lp1668 : l2Span l2Data 1668 2 := by decide +kernel
-theorem lp1670 : l2Span l2Data 1670 1 := by decide +kernel
-theorem lp1671 : l2Span l2Data 1671 1 := by decide +kernel
-theorem lp1672 : l2Span l2Data 1672 4 := by decide +kernel
-theorem lp1676 : l2Span l2Data 1676 1 := by decide +kernel
-theorem lp1677 : l2Span l2Data 1677 1 := by decide +kernel
-theorem lp1678 : l2Span l2Data 1678 3 := by decide +kernel
-theorem lp1681 : l2Span l2Data 1681 2 := by decide +kernel
-theorem lp1683 : l2Span l2Data 1683 1 := by decide +kernel
-theorem lp1684 : l2Span l2Data 1684 1 := by decide +kernel
-theorem lp1685 : l2Span l2Data 1685 1 := by decide +kernel
-theorem lp1686 : l2Span l2Data 1686 1 := by decide +kernel
-theorem lp1687 : l2Span l2Data 1687 1 := by decide +kernel
-theorem lp1688 : l2Span l2Data 1688 1 := by decide +kernel
-theorem lp1689 : l2Span l2Data 1689 3 := by decide +kernel
-theorem lp1692 : l2Span l2Data 1692 12 := by decide +kernel
-theorem lp1704 : l2Span l2Data 1704 12 := by decide +kernel
-theorem lp1716 : l2Span l2Data 1716 5 := by decide +kernel
-theorem lp1721 : l2Span l2Data 1721 1 := by decide +kernel
-theorem lp1722 : l2Span l2Data 1722 2 := by decide +kernel
-theorem lp1724 : l2Span l2Data 1724 6 := by decide +kernel
-theorem lp1730 : l2Span l2Data 1730 12 := by decide +kernel
-theorem lp1742 : l2Span l2Data 1742 7 := by decide +kernel
-theorem lp1749 : l2Span l2Data 1749 12 := by decide +kernel
-theorem lp1761 : l2Span l2Data 1761 6 := by decide +kernel
-theorem lp1767 : l2Span l2Data 1767 5 := by decide +kernel
-theorem lp1772 : l2Span l2Data 1772 6 := by decide +kernel
-theorem lp1778 : l2Span l2Data 1778 2 := by decide +kernel
-theorem lp1780 : l2Span l2Data 1780 1 := by decide +kernel
-theorem lp1781 : l2Span l2Data 1781 2 := by decide +kernel
-theorem lp1783 : l2Span l2Data 1783 3 := by decide +kernel
-theorem lp1786 : l2Span l2Data 1786 2 := by decide +kernel
-theorem lp1788 : l2Span l2Data 1788 2 := by decide +kernel
-theorem lp1790 : l2Span l2Data 1790 5 := by decide +kernel
-theorem lp1795 : l2Span l2Data 1795 4 := by decide +kernel
-theorem lp1799 : l2Span l2Data 1799 1 := by decide +kernel
-theorem lp1800 : l2Span l2Data 1800 5 := by decide +kernel
-theorem lp1805 : l2Span l2Data 1805 8 := by decide +kernel
-theorem lp1813 : l2Span l2Data 1813 1 := by decide +kernel
-theorem lp1814 : l2Span l2Data 1814 1 := by decide +kernel
-theorem lp1815 : l2Span l2Data 1815 1 := by decide +kernel
-theorem lp1816 : l2Span l2Data 1816 1 := by decide +kernel
-theorem lp1817 : l2Span l2Data 1817 1 := by decide +kernel
-theorem lp1818 : l2Span l2Data 1818 1 := by decide +kernel
-theorem lp1819 : l2Span l2Data 1819 1 := by decide +kernel
-theorem lp1820 : l2Span l2Data 1820 1 := by decide +kernel
-theorem lp1821 : l2Span l2Data 1821 1 := by decide +kernel
-theorem lp1822 : l2Span l2Data 1822 1 := by decide +kernel
-theorem lp1823 : l2Span l2Data 1823 1 := by decide +kernel
-theorem lp1824 : l2Span l2Data 1824 1 := by decide +kernel
-theorem lp1825 : l2Span l2Data 1825 1 := by decide +kernel
-theorem lp1826 : l2Span l2Data 1826 1 := by decide +kernel
-theorem lp1827 : l2Span l2Data 1827 1 := by decide +kernel
-theorem lp1828 : l2Span l2Data 1828 1 := by decide +kernel
-theorem lp1829 : l2Span l2Data 1829 3 := by decide +kernel
-theorem lp1832 : l2Span l2Data 1832 1 := by decide +kernel
-theorem lp1833 : l2Span l2Data 1833 1 := by decide +kernel
-theorem lp1834 : l2Span l2Data 1834 1 := by decide +kernel
-theorem lp1835 : l2Span l2Data 1835 1 := by decide +kernel
-theorem lp1836 : l2Span l2Data 1836 1 := by decide +kernel
-theorem lp1837 : l2Span l2Data 1837 1 := by decide +kernel
-theorem lp1838 : l2Span l2Data 1838 3 := by decide +kernel
-theorem lp1841 : l2Span l2Data 1841 1 := by decide +kernel
-theorem lp1842 : l2Span l2Data 1842 1 := by decide +kernel
-theorem lp1843 : l2Span l2Data 1843 1 := by decide +kernel
-theorem lp1844 : l2Span l2Data 1844 1 := by decide +kernel
-theorem lp1845 : l2Span l2Data 1845 1 := by decide +kernel
-theorem lp1846 : l2Span l2Data 1846 1 := by decide +kernel
-theorem lp1847 : l2Span l2Data 1847 1 := by decide +kernel
-theorem lp1848 : l2Span l2Data 1848 1 := by decide +kernel
-theorem lp1849 : l2Span l2Data 1849 2 := by decide +kernel
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 50000000 in
-theorem l2All : l2Span l2Data 0 1851 := (lcBloc 0 1095 756 (lcBloc 0 607 488 (lcBloc 0 311 296 (lcBloc 0 146 165 (lcBloc 0 81 65 (lcBloc 0 37 44 (lcBloc 0 23 14 (lcBloc 0 11 12 lp0 (lcBloc 11 6 6 lp11 lp17)) (lcBloc 23 12 2 (lcBloc 23 6 6 lp23 lp29) (lcBloc 35 1 1 lp35 lp36))) (lcBloc 37 12 32 (lcBloc 37 3 9 lp37 (lcBloc 40 2 7 lp40 lp42)) (lcBloc 49 18 14 (lcBloc 49 10 8 lp49 lp59) (lcBloc 67 9 5 lp67 lp76)))) (lcBloc 81 31 34 (lcBloc 81 10 21 (lcBloc 81 6 4 lp81 (lcBloc 87 2 2 lp87 lp89)) (lcBloc 91 11 10 (lcBloc 91 3 8 lp91 lp94) (lcBloc 102 7 3 lp102 lp109))) (lcBloc 112 19 15 (lcBloc 112 9 10 (lcBloc 112 1 8 lp112 lp113) (lcBloc 121 2 8 lp121 lp123)) (lcBloc 131 10 5 (lcBloc 131 2 8 lp131 lp133) (lcBloc 141 1 4 lp141 lp142))))) (lcBloc 146 87 78 (lcBloc 146 51 36 (lcBloc 146 25 26 (lcBloc 146 10 15 lp146 (lcBloc 156 10 5 lp156 lp166)) (lcBloc 171 12 14 (lcBloc 171 9 3 lp171 lp180) (lcBloc 183 5 9 lp183 lp188))) (lcBloc 197 9 27 (lcBloc 197 3 6 lp197 (lcBloc 200 4 2 lp200 lp204)) (lcBloc 206 13 14 (lcBloc 206 1 12 lp206 lp207) (lcBloc 219 8 6 lp219 lp227)))) (lcBloc 233 27 51 (lcBloc 233 16 11 (lcBloc 233 4 12 lp233 (lcBloc 237 7 5 lp237 lp244)) (lcBloc 249 4 7 (lcBloc 249 2 2 lp249 lp251) (lcBloc 253 1 6 lp253 lp254))) (lcBloc 260 31 20 (lcBloc 260 17 14 (lcBloc 260 9 8 lp260 lp269) (lcBloc 277 11 3 lp277 lp288)) (lcBloc 291 12 8 (lcBloc 291 6 6 lp291 lp297) (lcBloc 303 7 1 lp303 lp310)))))) (lcBloc 311 145 151 (lcBloc 311 88 57 (lcBloc 311 45 43 (lcBloc 311 14 31 (lcBloc 311 1 13 lp311 (lcBloc 312 4 9 lp312 lp316)) (lcBloc 325 16 15 (lcBloc 325 10 6 lp325 lp335) (lcBloc 341 11 4 lp341 lp352))) (lcBloc 356 26 17 (lcBloc 356 8 18 lp356 (lcBloc 364 12 6 lp364 lp376)) (lcBloc 382 11 6 (lcBloc 382 8 3 lp382 lp390) (lcBloc 393 4 2 lp393 lp397)))) (lcBloc 399 30 27 (lcBloc 399 16 14 (lcBloc 399 7 9 lp399 (lcBloc 406 2 7 lp406 lp408)) (lcBloc 415 6 8 (lcBloc 415 1 5 lp415 lp416) (lcBloc 421 5 3 lp421 lp426))) (lcBloc 429 16 11 (lcBloc 429 6 10 (lcBloc 429 4 2 lp429 lp433) (lcBloc 435 1 9 lp435 lp436)) (lcBloc 445 4 7 (lcBloc 445 2 2 lp445 lp447) (lcBloc 449 1 6 lp449 lp450))))) (lcBloc 456 84 67 (lcBloc 456 41 43 (lcBloc 456 19 22 (lcBloc 456 4 15 lp456 (lcBloc 460 6 9 lp460 lp466)) (lcBloc 475 16 6 (lcBloc 475 9 7 lp475 lp484) (lcBloc 491 5 1 lp491 lp496))) (lcBloc 497 24 19 (lcBloc 497 10 14 (lcBloc 497 6 4 lp497 lp503) (lcBloc 507 8 6 lp507 lp515)) (lcBloc 521 8 11 (lcBloc 521 2 6 lp521 lp523) (lcBloc 529 10 1 lp529 lp539)))) (lcBloc 540 25 42 (lcBloc 540 10 15 (lcBloc 540 1 9 lp540 (lcBloc 541 2 7 lp541 lp543)) (lcBloc 550 7 8 (lcBloc 550 1 6 lp550 lp551) (lcBloc 557 1 7 lp557 lp558))) (lcBloc 565 11 31 (lcBloc 565 4 7 (lcBloc 565 2 2 lp565 lp567) (lcBloc 569 6 1 lp569 lp575)) (lcBloc 576 15 16 (lcBloc 576 9 6 lp576 lp585) (lcBloc 591 8 8 lp591 lp599))))))) (lcBloc 607 304 184 (lcBloc 607 135 169 (lcBloc 607 80 55 (lcBloc 607 46 34 (lcBloc 607 23 23 (lcBloc 607 7 16 lp607 (lcBloc 614 7 9 lp614 lp621)) (lcBloc 630 16 7 (lcBloc 630 8 8 lp630 lp638) (lcBloc 646 4 3 lp646 lp650))) (lcBloc 653 17 17 (lcBloc 653 3 14 lp653 (lcBloc 656 8 6 lp656 lp664)) (lcBloc 670 9 8 (lcBloc 670 3 6 lp670 lp673) (lcBloc 679 7 1 lp679 lp686)))) (lcBloc 687 29 26 (lcBloc 687 13 16 (lcBloc 687 4 9 lp687 (lcBloc 691 5 4 lp691 lp696)) (lcBloc 700 6 10 (lcBloc 700 3 3 lp700 lp703) (lcBloc 706 3 7 lp706 lp709))) (lcBloc 716 10 16 (lcBloc 716 5 5 (lcBloc 716 1 4 lp716 lp717) (lcBloc 721 1 4 lp721 lp722)) (lcBloc 726 5 11 (lcBloc 726 1 4 lp726 lp727) (lcBloc 731 7 4 lp731 lp738))))) (lcBloc 742 79 90 (lcBloc 742 39 40 (lcBloc 742 7 32 (lcBloc 742 2 5 lp742 (lcBloc 744 1 4 lp744 lp745)) (lcBloc 749 9 23 (lcBloc 749 7 2 lp749 lp756) (lcBloc 758 12 11 lp758 lp770))) (lcBloc 781 20 20 (lcBloc 781 10 10 (lcBloc 781 7 3 lp781 lp788) (lcBloc 791 5 5 lp791 lp796)) (lcBloc 801 9 11 (lcBloc 801 4 5 lp801 lp805) (lcBloc 810 7 4 lp810 lp817)))) (lcBloc 821 41 49 (lcBloc 821 12 29 (lcBloc 821 10 2 lp821 (lcBloc 831 1 1 lp831 lp832)) (lcBloc 833 18 11 (lcBloc 833 9 9 lp833 lp842) (lcBloc 851 3 8 lp851 lp854))) (lcBloc 862 17 32 (lcBloc 862 9 8 (lcBloc 862 3 6 lp862 lp865) (lcBloc 871 7 1 lp871 lp878)) (lcBloc 879 20 12 (lcBloc 879 9 11 lp879 lp888) (lcBloc 899 9 3 lp899 lp908)))))) (lcBloc 911 91 93 (lcBloc 911 58 33 (lcBloc 911 26 32 (lcBloc 911 10 16 (lcBloc 911 4 6 lp911 (lcBloc 915 2 4 lp915 lp917)) (lcBloc 921 8 8 (lcBloc 921 2 6 lp921 lp923) (lcBloc 929 5 3 lp929 lp934))) (lcBloc 937 14 18 (lcBloc 937 3 11 lp937 (lcBloc 940 5 6 lp940 lp945)) (lcBloc 951 6 12 (lcBloc 951 1 5 lp951 lp952) (lcBloc 957 9 3 lp957 lp966)))) (lcBloc 969 16 17 (lcBloc 969 3 13 (lcBloc 969 1 2 lp969 (lcBloc 970 1 1 lp970 lp971)) (lcBloc 972 5 8 (lcBloc 972 3 2 lp972 lp975) (lcBloc 977 3 5 lp977 lp980))) (lcBloc 985 8 9 (lcBloc 985 5 3 (lcBloc 985 2 3 lp985 lp987) (lcBloc 990 1 2 lp990 lp991)) (lcBloc 993 2 7 (lcBloc 993 1 1 lp993 lp994) (lcBloc 995 3 4 lp995 lp998))))) (lcBloc 1002 41 52 (lcBloc 1002 20 21 (lcBloc 1002 7 13 (lcBloc 1002 1 6 lp1002 (lcBloc 1003 3 3 lp1003 lp1006)) (lcBloc 1009 9 4 (lcBloc 1009 4 5 lp1009 lp1013) (lcBloc 1018 2 2 lp1018 lp1020))) (lcBloc 1022 9 12 (lcBloc 1022 7 2 (lcBloc 1022 4 3 lp1022 lp1026) (lcBloc 1029 1 1 lp1029 lp1030)) (lcBloc 1031 4 8 (lcBloc 1031 2 2 lp1031 lp1033) (lcBloc 1035 3 5 lp1035 lp1038)))) (lcBloc 1043 18 34 (lcBloc 1043 8 10 (lcBloc 1043 1 7 lp1043 (lcBloc 1044 6 1 lp1044 lp1050)) (lcBloc 1051 7 3 (lcBloc 1051 1 6 lp1051 lp1052) (lcBloc 1058 1 2 lp1058 lp1059))) (lcBloc 1061 23 11 (lcBloc 1061 16 7 (lcBloc 1061 5 11 lp1061 lp1066) (lcBloc 1077 4 3 lp1077 lp1081)) (lcBloc 1084 5 6 (lcBloc 1084 1 4 lp1084 lp1085) (lcBloc 1089 4 2 lp1089 lp1093)))))))) (lcBloc 1095 378 378 (lcBloc 1095 186 192 (lcBloc 1095 95 91 (lcBloc 1095 40 55 (lcBloc 1095 24 16 (lcBloc 1095 8 16 (lcBloc 1095 2 6 lp1095 (lcBloc 1097 4 2 lp1097 lp1101)) (lcBloc 1103 7 9 (lcBloc 1103 4 3 lp1103 lp1107) (lcBloc 1110 1 8 lp1110 lp1111))) (lcBloc 1119 4 12 (lcBloc 1119 2 2 lp1119 (lcBloc 1121 1 1 lp1121 lp1122)) (lcBloc 1123 10 2 (lcBloc 1123 5 5 lp1123 lp1128) (lcBloc 1133 1 1 lp1133 lp1134)))) (lcBloc 1135 24 31 (lcBloc 1135 8 16 (lcBloc 1135 5 3 lp1135 (lcBloc 1140 2 1 lp1140 lp1142)) (lcBloc 1143 8 8 (lcBloc 1143 1 7 lp1143 lp1144) (lcBloc 1151 4 4 lp1151 lp1155))) (lcBloc 1159 16 15 (lcBloc 1159 8 8 (lcBloc 1159 1 7 lp1159 lp1160) (lcBloc 1167 5 3 lp1167 lp1172)) (lcBloc 1175 3 12 (lcBloc 1175 1 2 lp1175 lp1176) (lcBloc 1178 7 5 lp1178 lp1185))))) (lcBloc 1190 33 58 (lcBloc 1190 18 15 (lcBloc 1190 6 12 (lcBloc 1190 4 2 lp1190 (lcBloc 1194 1 1 lp1194 lp1195)) (lcBloc 1196 3 9 (lcBloc 1196 2 1 lp1196 lp1198) (lcBloc 1199 5 4 lp1199 lp1204))) (lcBloc 1208 9 6 (lcBloc 1208 3 6 (lcBloc 1208 2 1 lp1208 lp1210) (lcBloc 1211 4 2 lp1211 lp1215)) (lcBloc 1217 4 2 (lcBloc 1217 3 1 lp1217 lp1220) (lcBloc 1221 1 1 lp1221 lp1222)))) (lcBloc 1223 20 38 (lcBloc 1223 10 10 (lcBloc 1223 3 7 lp1223 (lcBloc 1226 6 1 lp1226 lp1232)) (lcBloc 1233 4 6 (lcBloc 1233 3 1 lp1233 lp1236) (lcBloc 1237 1 5 lp1237 lp1238))) (lcBloc 1243 16 22 (lcBloc 1243 11 5 (lcBloc 1243 2 9 lp1243 lp1245) (lcBloc 1254 2 3 lp1254 lp1256)) (lcBloc 1259 13 9 (lcBloc 1259 11 2 lp1259 lp1270) (lcBloc 1272 4 5 lp1272 lp1276)))))) (lcBloc 1281 91 101 (lcBloc 1281 48 43 (lcBloc 1281 30 18 (lcBloc 1281 18 12 (lcBloc 1281 2 16 lp1281 (lcBloc 1283 5 11 lp1283 lp1288)) (lcBloc 1299 7 5 (lcBloc 1299 5 2 lp1299 lp1304) (lcBloc 1306 1 4 lp1306 lp1307))) (lcBloc 1311 4 14 (lcBloc 1311 1 3 lp1311 (lcBloc 1312 1 2 lp1312 lp1313)) (lcBloc 1315 8 6 (lcBloc 1315 3 5 lp1315 lp1318) (lcBloc 1323 3 3 lp1323 lp1326)))) (lcBloc 1329 12 31 (lcBloc 1329 6 6 (lcBloc 1329 3 3 lp1329 (lcBloc 1332 2 1 lp1332 lp1334)) (lcBloc 1335 3 3 (lcBloc 1335 1 2 lp1335 lp1336) (lcBloc 1338 2 1 lp1338 lp1340))) (lcBloc 1341 14 17 (lcBloc 1341 4 10 (lcBloc 1341 3 1 lp1341 lp1344) (lcBloc 1345 4 6 lp1345 lp1349)) (lcBloc 1355 5 12 (lcBloc 1355 3 2 lp1355 lp1358) (lcBloc 1360 7 5 lp1360 lp1367))))) (lcBloc 1372 41 60 (lcBloc 1372 26 15 (lcBloc 1372 11 15 (lcBloc 1372 6 5 lp1372 (lcBloc 1378 3 2 lp1378 lp1381)) (lcBloc 1383 10 5 (lcBloc 1383 8 2 lp1383 lp1391) (lcBloc 1393 3 2 lp1393 lp1396))) (lcBloc 1398 9 6 (lcBloc 1398 6 3 (lcBloc 1398 1 5 lp1398 lp1399) (lcBloc 1404 1 2 lp1404 lp1405)) (lcBloc 1407 2 4 (lcBloc 1407 1 1 lp1407 lp1408) (lcBloc 1409 1 3 lp1409 lp1410)))) (lcBloc 1413 20 40 (lcBloc 1413 10 10 (lcBloc 1413 1 9 lp1413 (lcBloc 1414 6 3 lp1414 lp1420)) (lcBloc 1423 5 5 (lcBloc 1423 3 2 lp1423 lp1426) (lcBloc 1428 1 4 lp1428 lp1429))) (lcBloc 1433 21 19 (lcBloc 1433 13 8 (lcBloc 1433 9 4 lp1433 lp1442) (lcBloc 1446 4 4 lp1446 lp1450)) (lcBloc 1454 14 5 (lcBloc 1454 5 9 lp1454 lp1459) (lcBloc 1468 2 3 lp1468 lp1470))))))) (lcBloc 1473 214 164 (lcBloc 1473 114 100 (lcBloc 1473 54 60 (lcBloc 1473 36 18 (lcBloc 1473 22 14 (lcBloc 1473 3 19 lp1473 (lcBloc 1476 8 11 lp1476 lp1484)) (lcBloc 1495 7 7 (lcBloc 1495 2 5 lp1495 lp1497) (lcBloc 1502 4 3 lp1502 lp1506))) (lcBloc 1509 9 9 (lcBloc 1509 1 8 lp1509 (lcBloc 1510 7 1 lp1510 lp1517)) (lcBloc 1518 4 5 (lcBloc 1518 3 1 lp1518 lp1521) (lcBloc 1522 1 4 lp1522 lp1523)))) (lcBloc 1527 27 33 (lcBloc 1527 5 22 (lcBloc 1527 2 3 lp1527 (lcBloc 1529 2 1 lp1529 lp1531)) (lcBloc 1532 13 9 (lcBloc 1532 12 1 lp1532 lp1544) (lcBloc 1545 6 3 lp1545 lp1551))) (lcBloc 1554 16 17 (lcBloc 1554 9 7 (lcBloc 1554 5 4 lp1554 lp1559) (lcBloc 1563 5 2 lp1563 lp1568)) (lcBloc 1570 7 10 (lcBloc 1570 1 6 lp1570 lp1571) (lcBloc 1577 7 3 lp1577 lp1584))))) (lcBloc 1587 65 35 (lcBloc 1587 23 42 (lcBloc 1587 12 11 (lcBloc 1587 4 8 lp1587 (lcBloc 1591 5 3 lp1591 lp1596)) (lcBloc 1599 4 7 (lcBloc 1599 2 2 lp1599 lp1601) (lcBloc 1603 2 5 lp1603 lp1605))) (lcBloc 1610 18 24 (lcBloc 1610 5 13 (lcBloc 1610 1 4 lp1610 lp1611) (lcBloc 1615 1 12 lp1615 lp1616)) (lcBloc 1628 13 11 (lcBloc 1628 6 7 lp1628 lp1634) (lcBloc 1641 4 7 lp1641 lp1645)))) (lcBloc 1652 24 11 (lcBloc 1652 16 8 (lcBloc 1652 6 10 lp1652 (lcBloc 1658 4 6 lp1658 lp1662)) (lcBloc 1668 3 5 (lcBloc 1668 2 1 lp1668 lp1670) (lcBloc 1671 1 4 lp1671 lp1672))) (lcBloc 1676 7 4 (lcBloc 1676 2 5 (lcBloc 1676 1 1 lp1676 lp1677) (lcBloc 1678 3 2 lp1678 lp1681)) (lcBloc 1683 2 2 (lcBloc 1683 1 1 lp1683 lp1684) (lcBloc 1685 1 1 lp1685 lp1686)))))) (lcBloc 1687 129 35 (lcBloc 1687 85 44 (lcBloc 1687 35 50 (lcBloc 1687 5 30 (lcBloc 1687 1 4 lp1687 (lcBloc 1688 1 3 lp1688 lp1689)) (lcBloc 1692 24 6 (lcBloc 1692 12 12 lp1692 lp1704) (lcBloc 1716 5 1 lp1716 lp1721))) (lcBloc 1722 20 30 (lcBloc 1722 2 18 lp1722 (lcBloc 1724 6 12 lp1724 lp1730)) (lcBloc 1742 19 11 (lcBloc 1742 7 12 lp1742 lp1749) (lcBloc 1761 6 5 lp1761 lp1767)))) (lcBloc 1772 18 26 (lcBloc 1772 9 9 (lcBloc 1772 6 3 lp1772 (lcBloc 1778 2 1 lp1778 lp1780)) (lcBloc 1781 5 4 (lcBloc 1781 2 3 lp1781 lp1783) (lcBloc 1786 2 2 lp1786 lp1788))) (lcBloc 1790 15 11 (lcBloc 1790 9 6 (lcBloc 1790 5 4 lp1790 lp1795) (lcBloc 1799 1 5 lp1799 lp1800)) (lcBloc 1805 9 2 (lcBloc 1805 8 1 lp1805 lp1813) (lcBloc 1814 1 1 lp1814 lp1815))))) (lcBloc 1816 17 18 (lcBloc 1816 7 10 (lcBloc 1816 3 4 (lcBloc 1816 1 2 lp1816 (lcBloc 1817 1 1 lp1817 lp1818)) (lcBloc 1819 2 2 (lcBloc 1819 1 1 lp1819 lp1820) (lcBloc 1821 1 1 lp1821 lp1822))) (lcBloc 1823 4 6 (lcBloc 1823 2 2 (lcBloc 1823 1 1 lp1823 lp1824) (lcBloc 1825 1 1 lp1825 lp1826)) (lcBloc 1827 2 4 (lcBloc 1827 1 1 lp1827 lp1828) (lcBloc 1829 3 1 lp1829 lp1832)))) (lcBloc 1833 9 9 (lcBloc 1833 3 6 (lcBloc 1833 1 2 lp1833 (lcBloc 1834 1 1 lp1834 lp1835)) (lcBloc 1836 2 4 (lcBloc 1836 1 1 lp1836 lp1837) (lcBloc 1838 3 1 lp1838 lp1841))) (lcBloc 1842 4 5 (lcBloc 1842 2 2 (lcBloc 1842 1 1 lp1842 lp1843) (lcBloc 1844 1 1 lp1844 lp1845)) (lcBloc 1846 2 3 (lcBloc 1846 1 1 lp1846 lp1847) (lcBloc 1848 1 2 lp1848 lp1849)))))))))
+theorem spanFrom0 : l2Span l2Data 0 40 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom40 : l2Span l2Data 40 49 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom89 : l2Span l2Data 89 34 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom123 : l2Span l2Data 123 48 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom171 : l2Span l2Data 171 36 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom207 : l2Span l2Data 207 46 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom253 : l2Span l2Data 253 50 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom303 : l2Span l2Data 303 49 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom352 : l2Span l2Data 352 47 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom399 : l2Span l2Data 399 34 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom433 : l2Span l2Data 433 27 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom460 : l2Span l2Data 460 47 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom507 : l2Span l2Data 507 36 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom543 : l2Span l2Data 543 32 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom575 : l2Span l2Data 575 55 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom630 : l2Span l2Data 630 43 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom673 : l2Span l2Data 673 33 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom706 : l2Span l2Data 706 25 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom731 : l2Span l2Data 731 39 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom770 : l2Span l2Data 770 47 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom817 : l2Span l2Data 817 45 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom862 : l2Span l2Data 862 49 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom911 : l2Span l2Data 911 29 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom940 : l2Span l2Data 940 31 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom971 : l2Span l2Data 971 20 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom991 : l2Span l2Data 991 18 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1009 : l2Span l2Data 1009 22 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1031 : l2Span l2Data 1031 21 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1052 : l2Span l2Data 1052 33 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1085 : l2Span l2Data 1085 25 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1110 : l2Span l2Data 1110 24 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1134 : l2Span l2Data 1134 25 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1159 : l2Span l2Data 1159 31 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1190 : l2Span l2Data 1190 20 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1210 : l2Span l2Data 1210 16 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1226 : l2Span l2Data 1226 28 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1254 : l2Span l2Data 1254 34 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1288 : l2Span l2Data 1288 27 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1315 : l2Span l2Data 1315 21 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1336 : l2Span l2Data 1336 22 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1358 : l2Span l2Data 1358 35 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1393 : l2Span l2Data 1393 16 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1409 : l2Span l2Data 1409 20 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1429 : l2Span l2Data 1429 41 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1470 : l2Span l2Data 1470 39 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1509 : l2Span l2Data 1509 20 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1529 : l2Span l2Data 1529 34 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1563 : l2Span l2Data 1563 33 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1596 : l2Span l2Data 1596 20 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1616 : l2Span l2Data 1616 52 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1668 : l2Span l2Data 1668 15 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1683 : l2Span l2Data 1683 21 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1704 : l2Span l2Data 1704 57 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1761 : l2Span l2Data 1761 27 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1788 : l2Span l2Data 1788 27 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1815 : l2Span l2Data 1815 8 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1823 : l2Span l2Data 1823 10 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1833 : l2Span l2Data 1833 10 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem spanFrom1843 : l2Span l2Data 1843 8 := by decide +kernel
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 50000000 in
+theorem l2All : l2Span l2Data 0 1851 := (lcBloc 0 1085 766 (lcBloc 0 575 510 (lcBloc 0 303 272 (lcBloc 0 123 180 (lcBloc 0 40 83 spanFrom0 (lcBloc 40 49 34 spanFrom40 spanFrom89)) (lcBloc 123 84 96 (lcBloc 123 48 36 spanFrom123 spanFrom171) (lcBloc 207 46 50 spanFrom207 spanFrom253))) (lcBloc 303 130 142 (lcBloc 303 49 81 spanFrom303 (lcBloc 352 47 34 spanFrom352 spanFrom399)) (lcBloc 433 74 68 (lcBloc 433 27 47 spanFrom433 spanFrom460) (lcBloc 507 36 32 spanFrom507 spanFrom543)))) (lcBloc 575 287 223 (lcBloc 575 131 156 (lcBloc 575 55 76 spanFrom575 (lcBloc 630 43 33 spanFrom630 spanFrom673)) (lcBloc 706 64 92 (lcBloc 706 25 39 spanFrom706 spanFrom731) (lcBloc 770 47 45 spanFrom770 spanFrom817))) (lcBloc 862 129 94 (lcBloc 862 78 51 (lcBloc 862 49 29 spanFrom862 spanFrom911) (lcBloc 940 31 20 spanFrom940 spanFrom971)) (lcBloc 991 40 54 (lcBloc 991 18 22 spanFrom991 spanFrom1009) (lcBloc 1031 21 33 spanFrom1031 spanFrom1052))))) (lcBloc 1085 385 381 (lcBloc 1085 169 216 (lcBloc 1085 74 95 (lcBloc 1085 25 49 spanFrom1085 (lcBloc 1110 24 25 spanFrom1110 spanFrom1134)) (lcBloc 1159 51 44 (lcBloc 1159 31 20 spanFrom1159 spanFrom1190) (lcBloc 1210 16 28 spanFrom1210 spanFrom1226))) (lcBloc 1254 104 112 (lcBloc 1254 61 43 (lcBloc 1254 34 27 spanFrom1254 spanFrom1288) (lcBloc 1315 21 22 spanFrom1315 spanFrom1336)) (lcBloc 1358 51 61 (lcBloc 1358 35 16 spanFrom1358 spanFrom1393) (lcBloc 1409 20 41 spanFrom1409 spanFrom1429)))) (lcBloc 1470 213 168 (lcBloc 1470 93 120 (lcBloc 1470 39 54 spanFrom1470 (lcBloc 1509 20 34 spanFrom1509 spanFrom1529)) (lcBloc 1563 53 67 (lcBloc 1563 33 20 spanFrom1563 spanFrom1596) (lcBloc 1616 52 15 spanFrom1616 spanFrom1668))) (lcBloc 1683 132 36 (lcBloc 1683 78 54 (lcBloc 1683 21 57 spanFrom1683 spanFrom1704) (lcBloc 1761 27 27 spanFrom1761 spanFrom1788)) (lcBloc 1815 18 18 (lcBloc 1815 8 10 spanFrom1815 spanFrom1823) (lcBloc 1833 10 8 spanFrom1833 spanFrom1843))))))
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 50000000 in
 theorem l2R5 (ih : l2IH 5) : Wide 208 (lb 5-1) (basis 5) := by
