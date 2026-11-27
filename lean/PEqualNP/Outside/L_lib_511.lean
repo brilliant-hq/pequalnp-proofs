@@ -7,7 +7,7 @@ import Mathlib.Data.Bool.Basic
 import Mathlib.Data.Fintype.EquivFin
 import PEqualNP.Defs
 
-namespace LocalLib511
+namespace PEqualNP.Outside.L_lib_511_aux
 
 abbrev Word (n : ℕ) := Fin n → Bool
 abbrev Lit (n : ℕ) := Fin n × Bool
@@ -64,9 +64,6 @@ theorem indistinguishable {n s : ℕ} {pool : Finset (Word n)} (A B : Fml n)
   rw [eq,hh] at hl
   contradiction
 
-end LocalLib511
-
-namespace LocalLib511
 
 def cube {n : ℕ} (S : Finset (Fin n)) (pat : Word n) : Finset (Word n) :=
   Finset.univ.filter fun w => ∀ i ∈ S, w i = pat i
@@ -95,9 +92,6 @@ theorem cube_card {n : ℕ} (S : Finset (Fin n)) (pat : Word n) :
   have e := Fintype.card_congr (cubeEquiv S pat)
   simpa [hc,Fintype.card_fun] using e
 
-end LocalLib511
-
-namespace LocalLib511
 
 def covers {n s : ℕ} (pool : Finset (Word n)) : Prop :=
   ∀ S : Finset (Fin n), S.card ≤ s → ∀ pat : Word n,
@@ -221,9 +215,6 @@ theorem classifier_implies_covers {n s : ℕ} {pool : Finset (Word n)} (hs : 1 �
     exact missed_no_classifier hs hsn {i} (by simpa using hs) i (by simp) pat hm h
   · exact missed_no_classifier hs hsn S hS i hi pat missed h
 
-end LocalLib511
-
-namespace LocalLib511
 
 theorem pair_at {V : Type*} [DecidableEq V] {S : Finset V} (hc : S.card=2) {i : V} (hi : i∈S) :
     ∃ j, j≠i ∧ S={i,j} := by
@@ -281,9 +272,6 @@ theorem edges_intersect_star_or_triangle {V : Type*} [DecidableEq V] (G : Finset
     Finset.eq_of_subset_of_card_le subt (by rw [hc t ht]; simp [Ne.symm hki])
   exact Or.inr ⟨i,j,k,hij,hki,hkj,he,hf,et.symm ▸ ht⟩
 
-end LocalLib511
-
-namespace LocalLib511
 
 abbrev Clause (n : ℕ) := Lit n × Lit n
 
@@ -384,9 +372,6 @@ theorem improper_taut {n : ℕ} (hn : 1 ≤ n) {A : Fml n} (hd : 2^n < 2*count A
     obtain ⟨x,y⟩ := (Finset.mem_filter.mp hw).2
     exact b (x.symm.trans (e ▸ y))
 
-end LocalLib511
-
-namespace LocalLib511
 
 def occurs {n : ℕ} (A : Fml n) (i : Fin n) (v : Bool) : Prop :=
   ∃ c ∈ A, proper c ∧ (i,v) ∈ ends c
@@ -457,9 +442,6 @@ theorem normalize_graph {n : ℕ} (hn : 2 ≤ n) (A : Fml n) (high : 2^n < 2*cou
     · rw [improper_taut (by omega) high hc hp]
       simp
 
-end LocalLib511
-
-namespace LocalLib511
 
 theorem g_off {n : ℕ} {col : Word n} {G : Finset (Finset (Fin n))} {e : Finset (Fin n)}
     (he : e∈G) : Disjoint (graphSol col G) (cube e col) := by
@@ -608,9 +590,6 @@ theorem triangle_at_most_half {n : ℕ} (col : Word n) (G : Finset (Finset (Fin 
   rw [popcount] at hn
   omega
 
-end LocalLib511
-
-namespace LocalLib511
 
 def vertices {n : ℕ} (G : Finset (Finset (Fin n))) : Finset (Fin n) := G.biUnion id
 def starPat {n : ℕ} (i : Fin n) (col : Word n) : Word n :=
@@ -708,9 +687,6 @@ theorem star_support_bound {n s : ℕ} (hs : 1≤s) (hsn : s≤n)
     (show n-(vertices G).card < n-s from by omega)
   omega
 
-end LocalLib511
-
-namespace LocalLib511
 
 abbrev Gap (n s N : ℕ) : Prop := (2:ℕ)^n*(2^(s-1)+1) ≤ 2^s*N
 
@@ -887,9 +863,6 @@ theorem decode_gap {n s : ℕ} {pool : Finset (Word n)} (hs : 3≤s) (hsn : s≤
   rw [res] at hi eq gap
   exact disjoint_decode_true (disjoint_gap_s hs b (sizes e he) (sizes f hf) hdis gap) hcover eq hi
 
-end LocalLib511
-
-namespace LocalLib511
 
 def Target : Prop :=
   ∀ (n s : ℕ), 3 ≤ s → s ≤ n →
@@ -913,9 +886,6 @@ def Target : Prop :=
       decide (Q < 2 * (Finset.univ.filter hull).card)
     ((∃ classify, correct classify) ↔ covers) ∧ (covers → correct decoder)
 
-end LocalLib511
-
-namespace LocalLib511
 
 theorem decoder_correct {n s : ℕ} {pool : Finset (Word n)} (hs : 3≤s) (hsn : s≤n)
     (hc : covers (s:=s) pool) : correct (s:=s) (pool:=pool) decode := by
@@ -960,7 +930,7 @@ theorem solveTarget : Target := by
     · intro high
       exact he.symm.trans (good.2 high)
 
-end LocalLib511
+end PEqualNP.Outside.L_lib_511_aux
 
 theorem PEqualNP.Outside.L_lib_511 :
   ∀ (n s : ℕ), 3 ≤ s → s ≤ n →
@@ -982,5 +952,5 @@ theorem PEqualNP.Outside.L_lib_511 :
       let hull := fun z : W => ∀ i j : Fin n, ∃ v : ↥pool,
         label v = true ∧ v.val i = z i ∧ v.val j = z j
       decide (Q < 2 * (Finset.univ.filter hull).card)
-    ((∃ classify, correct classify) ↔ covers) ∧ (covers → correct decoder) := LocalLib511.solveTarget
+    ((∃ classify, correct classify) ↔ covers) ∧ (covers → correct decoder) := PEqualNP.Outside.L_lib_511_aux.solveTarget
 
