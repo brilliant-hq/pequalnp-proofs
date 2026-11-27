@@ -3,59 +3,38 @@ import PEqualNP.Defs
 
 theorem PEqualNP.Outside.R_meta_17467_1
     (hTranspose :
-      ∀ (x1 x2 : ℕ),
-        have x3 : Finset (Fin x1 × Fin x2) → SimpleGraph (Fin (x1 + x2)) := fun (x3 : Finset (Fin x1 × Fin x2)) => SimpleGraph.fromRel fun (x4 x5 : Fin (x1 + x2)) => ∃ x6 ∈ x3, x4 = Fin.castAdd x2 x6.1 ∧ x5 = Fin.natAdd x1 x6.2;
-        have x4 : Finset (Fin x1 × Fin x2) → PEqualNP.CircuitLowerBounds.Circuit → Prop := fun (x4 : Finset (Fin x1 × Fin x2)) (x5 : PEqualNP.CircuitLowerBounds.Circuit) => PEqualNP.TopForm.IsAO2 (x1 + x2) x5 ∧ PEqualNP.MetaComplexity.circuitFun (x1 + x2) x5 = PEqualNP.ReadTwo.fpl x1 fun (x6 : Fin x1) (x7 : Fin x2) => (x6, x7) ∈ x4;
-        have x5 : Finset (Fin x1 × Fin x2) → Fin x1 × Fin x2 → Prop := fun (x5 : Finset (Fin x1 × Fin x2)) (x6 : Fin x1 × Fin x2) => (∀ x7 ∈ x5, x7.1 = x6.1 → x7 = x6) ∨ ∀ x7 ∈ x5, x7.2 = x6.2 → x7 = x6;
-        have x6 : Finset (Fin x1 × Fin x2) → Prop := fun (x6 : Finset (Fin x1 × Fin x2)) =>
-          (6 : ℕ) ≤ x6.card ∧
-            ∃ (x7 : PEqualNP.CircuitLowerBounds.Circuit),
-              have x8 : Set (Fin x1 × Fin x2) := {x8 : Fin x1 × Fin x2 | x8 ∈ x6 ∧ (x5 x6 x8 ∨ ∃ (x9 : PEqualNP.CircuitLowerBounds.Circuit), x9.size < x7.size ∧ x4 (x6.erase x8) x9)};
-              x7.size + (3 : ℕ) ≤ (2 : ℕ) * x6.card ∧
-                x4 x6 x7 ∧
-                  (PEqualNP.ReadTwo.Lin fun (x9 : Fin x1) (x10 : Fin x2) => (x9, x10) ∈ x6) ∧
-                    ¬(x3 x6).IsAcyclic ∧
-                      (∀ (x9 : Fin (x1 + x2)),
-                          have x10 : ℕ := ((x3 x6).neighborSet x9).ncard;
-                          have x11 : Finset ℕ := PEqualNP.TopForm.readers (0 : ℕ) x7 ↑x9;
-                          (2 : ℕ) ≤ x10 → x11.card ≤ x10 ∧ (x10 = x11.card → ∀ x14 ∈ x11, (PEqualNP.MetaComplexity.NestedCover.gateAt x7 x14).op = PEqualNP.CircuitLowerBounds.GateOp.and → PEqualNP.TopForm.readers (x1 + x2) x7 x14 ⊆ x11)) ∧
-                        Set.InjOn Prod.fst x8 ∧ Set.InjOn Prod.snd x8;
-        have y3 : Finset (Fin x2 × Fin x1) → SimpleGraph (Fin (x2 + x1)) := fun (y3 : Finset (Fin x2 × Fin x1)) => SimpleGraph.fromRel fun (y4 y5 : Fin (x2 + x1)) => ∃ y6 ∈ y3, y4 = Fin.castAdd x1 y6.1 ∧ y5 = Fin.natAdd x2 y6.2;
-        have y4 : Finset (Fin x2 × Fin x1) → PEqualNP.CircuitLowerBounds.Circuit → Prop := fun (y4 : Finset (Fin x2 × Fin x1)) (y5 : PEqualNP.CircuitLowerBounds.Circuit) => PEqualNP.TopForm.IsAO2 (x2 + x1) y5 ∧ PEqualNP.MetaComplexity.circuitFun (x2 + x1) y5 = PEqualNP.ReadTwo.fpl x2 fun (y6 : Fin x2) (y7 : Fin x1) => (y6, y7) ∈ y4;
-        have y5 : Finset (Fin x2 × Fin x1) → Fin x2 × Fin x1 → Prop := fun (y5 : Finset (Fin x2 × Fin x1)) (y6 : Fin x2 × Fin x1) => (∀ y7 ∈ y5, y7.1 = y6.1 → y7 = y6) ∨ ∀ y7 ∈ y5, y7.2 = y6.2 → y7 = y6;
-        have y6 : Finset (Fin x2 × Fin x1) → Prop := fun (y6 : Finset (Fin x2 × Fin x1)) =>
-          (6 : ℕ) ≤ y6.card ∧
-            ∃ (y7 : PEqualNP.CircuitLowerBounds.Circuit),
-              have y8 : Set (Fin x2 × Fin x1) := {y8 : Fin x2 × Fin x1 | y8 ∈ y6 ∧ (y5 y6 y8 ∨ ∃ (y9 : PEqualNP.CircuitLowerBounds.Circuit), y9.size < y7.size ∧ y4 (y6.erase y8) y9)};
-              y7.size + (3 : ℕ) ≤ (2 : ℕ) * y6.card ∧
-                y4 y6 y7 ∧
-                  (PEqualNP.ReadTwo.Lin fun (y9 : Fin x2) (y10 : Fin x1) => (y9, y10) ∈ y6) ∧
-                    ¬(y3 y6).IsAcyclic ∧
-                      (∀ (y9 : Fin (x2 + x1)),
-                          have y10 : ℕ := ((y3 y6).neighborSet y9).ncard;
-                          have y11 : Finset ℕ := PEqualNP.TopForm.readers (0 : ℕ) y7 ↑y9;
-                          (2 : ℕ) ≤ y10 → y11.card ≤ y10 ∧ (y10 = y11.card → ∀ y14 ∈ y11, (PEqualNP.MetaComplexity.NestedCover.gateAt y7 y14).op = PEqualNP.CircuitLowerBounds.GateOp.and → PEqualNP.TopForm.readers (x2 + x1) y7 y14 ⊆ y11)) ∧
-                        Set.InjOn Prod.fst y8 ∧ Set.InjOn Prod.snd y8;
-        ∀ (E : Finset (Fin x1 × Fin x2)), x6 E → y6 (E.image Prod.swap))
+      have P : ∀ (a b : ℕ), Finset (Fin a × Fin b) → Prop := fun a b E =>
+        have G : SimpleGraph (Fin (a + b)) := SimpleGraph.fromRel fun u v => ∃ e ∈ E, u = Fin.castAdd b e.1 ∧ v = Fin.natAdd a e.2;
+        have comp : Finset (Fin a × Fin b) → PEqualNP.CircuitLowerBounds.Circuit → Prop := fun F C =>
+          PEqualNP.TopForm.IsAO2 (a + b) C ∧ PEqualNP.MetaComplexity.circuitFun (a + b) C = PEqualNP.ReadTwo.fpl a fun i j => (i, j) ∈ F;
+        (6 : ℕ) ≤ E.card ∧
+          ∃ (C : PEqualNP.CircuitLowerBounds.Circuit),
+            have S : Set (Fin a × Fin b) := {e | e ∈ E ∧ (((∀ f ∈ E, f.1 = e.1 → f = e) ∨ ∀ f ∈ E, f.2 = e.2 → f = e) ∨ ∃ D, D.size < C.size ∧ comp (E.erase e) D)};
+            C.size + (3 : ℕ) ≤ (2 : ℕ) * E.card ∧ comp E C ∧
+            (PEqualNP.ReadTwo.Lin fun i j => (i, j) ∈ E) ∧ ¬G.IsAcyclic ∧
+            (∀ (v : Fin (a + b)),
+              have d : ℕ := (G.neighborSet v).ncard;
+              have R : Finset ℕ := PEqualNP.TopForm.readers (0 : ℕ) C ↑v;
+              (2 : ℕ) ≤ d → R.card ≤ d ∧ (d = R.card → ∀ k ∈ R, (PEqualNP.MetaComplexity.NestedCover.gateAt C k).op = PEqualNP.CircuitLowerBounds.GateOp.and → PEqualNP.TopForm.readers (a + b) C k ⊆ R)) ∧
+            Set.InjOn Prod.fst S ∧ Set.InjOn Prod.snd S;
+      ∀ (a b : ℕ) (E : Finset (Fin a × Fin b)), P a b E → P b a (E.image Prod.swap))
     (hLeftLeaf :
-      ∀ (x1 x2 : ℕ),
-        have x3 : Finset (Fin x1 × Fin x2) → SimpleGraph (Fin (x1 + x2)) := fun (x3 : Finset (Fin x1 × Fin x2)) => SimpleGraph.fromRel fun (x4 x5 : Fin (x1 + x2)) => ∃ x6 ∈ x3, x4 = Fin.castAdd x2 x6.1 ∧ x5 = Fin.natAdd x1 x6.2;
-        have x4 : Finset (Fin x1 × Fin x2) → PEqualNP.CircuitLowerBounds.Circuit → Prop := fun (x4 : Finset (Fin x1 × Fin x2)) (x5 : PEqualNP.CircuitLowerBounds.Circuit) => PEqualNP.TopForm.IsAO2 (x1 + x2) x5 ∧ PEqualNP.MetaComplexity.circuitFun (x1 + x2) x5 = PEqualNP.ReadTwo.fpl x1 fun (x6 : Fin x1) (x7 : Fin x2) => (x6, x7) ∈ x4;
-        have x5 : Finset (Fin x1 × Fin x2) → Fin x1 × Fin x2 → Prop := fun (x5 : Finset (Fin x1 × Fin x2)) (x6 : Fin x1 × Fin x2) => (∀ x7 ∈ x5, x7.1 = x6.1 → x7 = x6) ∨ ∀ x7 ∈ x5, x7.2 = x6.2 → x7 = x6;
-        have x6 : Finset (Fin x1 × Fin x2) → Prop := fun (x6 : Finset (Fin x1 × Fin x2)) =>
-          (6 : ℕ) ≤ x6.card ∧
-            ∃ (x7 : PEqualNP.CircuitLowerBounds.Circuit),
-              have x8 : Set (Fin x1 × Fin x2) := {x8 : Fin x1 × Fin x2 | x8 ∈ x6 ∧ (x5 x6 x8 ∨ ∃ (x9 : PEqualNP.CircuitLowerBounds.Circuit), x9.size < x7.size ∧ x4 (x6.erase x8) x9)};
-              x7.size + (3 : ℕ) ≤ (2 : ℕ) * x6.card ∧
-                x4 x6 x7 ∧
-                  (PEqualNP.ReadTwo.Lin fun (x9 : Fin x1) (x10 : Fin x2) => (x9, x10) ∈ x6) ∧
-                    ¬(x3 x6).IsAcyclic ∧
-                      (∀ (x9 : Fin (x1 + x2)),
-                          have x10 : ℕ := ((x3 x6).neighborSet x9).ncard;
-                          have x11 : Finset ℕ := PEqualNP.TopForm.readers (0 : ℕ) x7 ↑x9;
-                          (2 : ℕ) ≤ x10 → x11.card ≤ x10 ∧ (x10 = x11.card → ∀ x14 ∈ x11, (PEqualNP.MetaComplexity.NestedCover.gateAt x7 x14).op = PEqualNP.CircuitLowerBounds.GateOp.and → PEqualNP.TopForm.readers (x1 + x2) x7 x14 ⊆ x11)) ∧
-                        Set.InjOn Prod.fst x8 ∧ Set.InjOn Prod.snd x8;
-        ∀ (E : Finset (Fin x1 × Fin x2)), x6 E → (∃ e ∈ E, ∀ f ∈ E, f.1 = e.1 → f = e) → ∃ E' ⊂ E, x6 E') :
+      ∀ (a b : ℕ),
+        have P : Finset (Fin a × Fin b) → Prop := fun E =>
+          have G : SimpleGraph (Fin (a + b)) := SimpleGraph.fromRel fun u v => ∃ e ∈ E, u = Fin.castAdd b e.1 ∧ v = Fin.natAdd a e.2;
+          have comp : Finset (Fin a × Fin b) → PEqualNP.CircuitLowerBounds.Circuit → Prop := fun F C =>
+            PEqualNP.TopForm.IsAO2 (a + b) C ∧ PEqualNP.MetaComplexity.circuitFun (a + b) C = PEqualNP.ReadTwo.fpl a fun i j => (i, j) ∈ F;
+          (6 : ℕ) ≤ E.card ∧
+            ∃ (C : PEqualNP.CircuitLowerBounds.Circuit),
+              have S : Set (Fin a × Fin b) := {e | e ∈ E ∧ (((∀ f ∈ E, f.1 = e.1 → f = e) ∨ ∀ f ∈ E, f.2 = e.2 → f = e) ∨ ∃ D, D.size < C.size ∧ comp (E.erase e) D)};
+              C.size + (3 : ℕ) ≤ (2 : ℕ) * E.card ∧ comp E C ∧
+              (PEqualNP.ReadTwo.Lin fun i j => (i, j) ∈ E) ∧ ¬G.IsAcyclic ∧
+              (∀ (v : Fin (a + b)),
+                have d : ℕ := (G.neighborSet v).ncard;
+                have R : Finset ℕ := PEqualNP.TopForm.readers (0 : ℕ) C ↑v;
+                (2 : ℕ) ≤ d → R.card ≤ d ∧ (d = R.card → ∀ k ∈ R, (PEqualNP.MetaComplexity.NestedCover.gateAt C k).op = PEqualNP.CircuitLowerBounds.GateOp.and → PEqualNP.TopForm.readers (a + b) C k ⊆ R)) ∧
+              Set.InjOn Prod.fst S ∧ Set.InjOn Prod.snd S;
+        ∀ (E : Finset (Fin a × Fin b)), P E → (∃ e ∈ E, ∀ f ∈ E, f.1 = e.1 → f = e) → ∃ E' ⊂ E, P E') :
     (∀ (x1 x2 : ℕ),   have x3 : Finset (Fin x1 × Fin x2) → SimpleGraph (Fin (x1 + x2)) := fun (x3 : Finset (Fin x1 × Fin x2)) => SimpleGraph.fromRel fun (x4 x5 : Fin (x1 + x2)) => ∃ x6 ∈ x3, x4 = Fin.castAdd x2 x6.1 ∧ x5 = Fin.natAdd x1 x6.2;   have x4 : Finset (Fin x1 × Fin x2) → PEqualNP.CircuitLowerBounds.Circuit → Prop := fun (x4 : Finset (Fin x1 × Fin x2)) (x5 : PEqualNP.CircuitLowerBounds.Circuit) => PEqualNP.TopForm.IsAO2 (x1 + x2) x5 ∧ PEqualNP.MetaComplexity.circuitFun (x1 + x2) x5 = PEqualNP.ReadTwo.fpl x1 fun (x6 : Fin x1) (x7 : Fin x2) => (x6, x7) ∈ x4;   have x5 : Finset (Fin x1 × Fin x2) → Fin x1 × Fin x2 → Prop := fun (x5 : Finset (Fin x1 × Fin x2)) (x6 : Fin x1 × Fin x2) => (∀ x7 ∈ x5, x7.1 = x6.1 → x7 = x6) ∨ ∀ x7 ∈ x5, x7.2 = x6.2 → x7 = x6;   have x6 : Finset (Fin x1 × Fin x2) → Prop := fun (x6 : Finset (Fin x1 × Fin x2)) =>     (6 : ℕ) ≤ x6.card ∧       ∃ (x7 : PEqualNP.CircuitLowerBounds.Circuit),         have x8 : Set (Fin x1 × Fin x2) := {x8 : Fin x1 × Fin x2 | x8 ∈ x6 ∧ (x5 x6 x8 ∨ ∃ (x9 : PEqualNP.CircuitLowerBounds.Circuit), x9.size < x7.size ∧ x4 (x6.erase x8) x9)};         x7.size + (3 : ℕ) ≤ (2 : ℕ) * x6.card ∧           x4 x6 x7 ∧             (PEqualNP.ReadTwo.Lin fun (x9 : Fin x1) (x10 : Fin x2) => (x9, x10) ∈ x6) ∧               ¬(x3 x6).IsAcyclic ∧                 (∀ (x9 : Fin (x1 + x2)),                     have x10 : ℕ := ((x3 x6).neighborSet x9).ncard;                     have x11 : Finset ℕ := PEqualNP.TopForm.readers (0 : ℕ) x7 ↑x9;                     (2 : ℕ) ≤ x10 → x11.card ≤ x10 ∧ (x10 = x11.card → ∀ x14 ∈ x11, (PEqualNP.MetaComplexity.NestedCover.gateAt x7 x14).op = PEqualNP.CircuitLowerBounds.GateOp.and → PEqualNP.TopForm.readers (x1 + x2) x7 x14 ⊆ x11)) ∧                   Set.InjOn Prod.fst x8 ∧ Set.InjOn Prod.snd x8;   ∀ (x7 : Finset (Fin x1 × Fin x2)), x6 x7 → (∃ x9 ∈ x7, x5 x7 x9) → ∃ x10 ⊂ x7, x6 x10) := by
   intro x1 x2 x3 x4 x5 x6 E hE hLeaf
   exact Exists.elim hLeaf (fun e he =>
