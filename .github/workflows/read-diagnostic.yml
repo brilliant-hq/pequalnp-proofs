@@ -1,0 +1,24 @@
+# THE RUNNER READER'S LINUX DIAGNOSTIC (27 Nov; redteam-2 round two). Started by hand only. It reads no pull request
+# and no outside file: tools/read-diagnostic.sh writes every fixture and probe itself and runs the read job's own
+# scripts on them, on a fresh ubuntu-24.04 runner. No credential is used (plain git, no token in any step).
+name: read-diagnostic
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out this commit (plain git, no stored credentials)
+        run: |
+          set -eu
+          git init -q "$RUNNER_TEMP/base"
+          git -C "$RUNNER_TEMP/base" fetch -q --depth 1 "https://github.com/${GITHUB_REPOSITORY}.git" "$GITHUB_SHA"
+          git -C "$RUNNER_TEMP/base" checkout -q --detach FETCH_HEAD
+      - name: Run the diagnostic on team-authored files
+        run: bash "$RUNNER_TEMP/base/tools/read-diagnostic.sh" "$RUNNER_TEMP/base"

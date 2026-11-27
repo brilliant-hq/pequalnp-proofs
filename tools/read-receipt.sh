@@ -46,7 +46,7 @@ if [ "$ok" = yes ]; then dec=$(jq -c . "$d"); else
   dec=$(jq -cn --slurpfile v "$vocab" '{classifier: $v[0].classifier, authorized: $v[0].authorized, decision: "HOLD", classes: [], shapes: [[0, "ERROR", "empty", "empty"]], nshapes: 1}')
 fi
 producer='{}'
-for p in .github/workflows/authoritative.yml .github/scripts/outside-guard.mjs tools/read-decision.py tools/outside-read.py tools/read-receipt.sh tools/read-sandbox.sh; do
+for p in .github/workflows/authoritative.yml .github/scripts/outside-guard.mjs tools/read-decision.py tools/outside-read.py tools/read-receipt.sh tools/read-sandbox.sh tools/read-parse.sh; do
   o=$(git -C "$base" rev-parse "HEAD:$p"); printf '%s' "$o" | grep -Eqx '[0-9a-f]{40}' || { echo "READ-JOB: a producer file is missing; no receipt"; exit 1; }
   producer=$(printf '%s' "$producer" | jq -c --arg p "$p" --arg o "$o" '. + {($p): $o}')
 done

@@ -93,7 +93,7 @@ class Decision(unittest.TestCase):
         closed(self, o); self.assertEqual(o['decision'], 'HOLD'); self.assertNotIn(marker, out)
 
 PRODUCERS = ('.github/workflows/authoritative.yml', '.github/scripts/outside-guard.mjs', 'tools/read-decision.py', 'tools/outside-read.py',
-             'tools/read-receipt.sh', 'tools/read-sandbox.sh')
+             'tools/read-receipt.sh', 'tools/read-sandbox.sh', 'tools/read-parse.sh')
 
 class Receipt(unittest.TestCase):
     """tools/read-receipt.sh: the check record, the parse status, the closed check of the parse's line, the receipt line."""
@@ -179,8 +179,8 @@ class Sandbox(unittest.TestCase):
     def test_workflow_wiring(self):
         w = open(os.path.join(BASE, '.github/workflows/authoritative.yml')).read()
         read = w[w.index('\n  read:\n'):]
-        for must in ('needs: check', 'CHECK_RECORD: ${{ needs.check.outputs.record }}', 'sudo -n /usr/bin/env -i PATH=/usr/bin:/bin /bin/sh "$W/base/tools/read-sandbox.sh"',
-                     'echo "$rc" > "$W/rd/status"', '"$W/rd/status"'):
+        for must in ('needs: check', 'CHECK_RECORD: ${{ needs.check.outputs.record }}', 'bash "$W/base/tools/read-parse.sh" "$W/base/tools" "$W/rd/proof.lean" "$judge" "$W/rd"',
+                     '"$W/rd/status"'):
             self.assertIn(must, read)
         self.assertNotIn('uses:', read); self.assertNotIn('upload-artifact', w)
         self.assertIn('record: ${{ steps.verdict.outputs.record }}', w); self.assertIn('id: verdict', w)

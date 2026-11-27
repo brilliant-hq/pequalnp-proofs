@@ -769,9 +769,9 @@ jobs:
   # the check job, never runs contributor code, and shares no workspace, cache, credential or artifact with it: from the
   # check job it takes only the bounded check record (its output, bound by Actions to that job of this attempt), and
   # issues no receipt unless that record is ACCEPTED and names the same pull request, head, file and blob this job read
-  # for itself. The parse runs in tools/read-sandbox.sh: a clean environment, nobody, no network, a private filesystem
-  # view (the runtime under /usr and /etc, a read-only copy of the two classifier files and the one blob, everything
-  # else hidden), limits. The RECEIPT is ONE canonical JSON line in this job's own log, "READ-RECEIPT <json>", whose
+  # for itself. The parse runs through tools/read-parse.sh in tools/read-sandbox.sh: a clean environment, nobody, no
+  # network, a restricted root holding only /usr (read only), the jail (a read-only copy of the two classifier files and
+  # the one blob, the working directory), /proc and a small /tmp, limits; a nonzero status is a fixed ERROR hold. The RECEIPT is ONE canonical JSON line in this job's own log, "READ-RECEIPT <json>", whose
   # fields are numbers, hashes, ids this job validated, or words of the closed vocabulary; it names the git objects of
   # every producer file at this base, which the intake checks against the base and a reviewed allowlist. Nothing the
   # pull request wrote is printed: the guard's words go to a file.
@@ -834,22 +834,12 @@ jobs:
           [ "$(git hash-object "$W/rd/proof.lean")" = "$blob" ] || { echo "READ-JOB: the bytes are not the named blob; no receipt"; exit 1; }
           chmod 0444 "$W/rd/proof.lean"
 
-      - name: Read the file as data (tools/read-sandbox.sh)
+      - name: Read the file as data (tools/read-parse.sh, tools/read-sandbox.sh)
         run: |
-          set -u
-          export PATH=/usr/bin:/bin
+          # The parse's status is taken by an explicit conditional inside read-parse.sh (this shell runs with errexit),
+          # and anything but 0 discards the output: tools/read-receipt.sh then issues the fixed HOLD with ERROR.
           judge=$(git -C "$W/base" rev-parse HEAD:tools/check-lean.mjs)
-          # The jail: a read-only copy of the two classifier files and the one blob, nothing else. The sandbox's
-          # standard output goes to a file this account owns, its errors are dropped, and its exit status is kept:
-          # anything but 0 discards the output (tools/read-receipt.sh then issues the fixed HOLD with ERROR).
-          J="$W/jail"; mkdir -p "$J/tools" "$J/in"
-          cp "$W/base/tools/read-decision.py" "$W/base/tools/outside-read.py" "$J/tools/"; cp "$W/rd/proof.lean" "$J/in/proof.lean"
-          chmod 0444 "$J/tools/"* "$J/in/proof.lean"; chmod 0555 "$J/tools" "$J/in" "$J"
-          sudo -n /usr/bin/env -i PATH=/usr/bin:/bin /bin/sh "$W/base/tools/read-sandbox.sh" "$J" "$judge" > "$W/rd/decision.json" 2>/dev/null
-          rc=$?
-          echo "$rc" > "$W/rd/status"
-          echo "parse exit $rc"
-          exit 0
+          bash "$W/base/tools/read-parse.sh" "$W/base/tools" "$W/rd/proof.lean" "$judge" "$W/rd"
 
       - name: Check the decision and print the receipt
         run: |
