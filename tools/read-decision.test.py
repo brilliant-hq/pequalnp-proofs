@@ -16,15 +16,15 @@ VOCAB = json.loads(subprocess.run([sys.executable, '-I', RD, '--vocab'], capture
 def run(body, judge=TESTED, raw=None):
     with tempfile.TemporaryDirectory() as d:
         f = os.path.join(d, 'L_x_1.lean')
-        open(f, 'wb').write(raw if raw is not None else (HEAD + body + TAIL).encode())
-        r = subprocess.run([sys.executable, '-I', RD, f, judge], capture_output=True, text=True, timeout=120)
+        put(f, raw if raw is not None else (HEAD + body + TAIL).encode(), 'wb')
+        r = subprocess.run([sys.executable, '-I', '-S', RD, f, judge], capture_output=True, text=True, timeout=120)
     assert r.returncode == 0 and r.stderr == '', (r.returncode, r.stderr[:200])
     lines = r.stdout.split('\n')
     assert len(lines) == 2 and lines[1] == '', 'not exactly one line'
     return r.stdout, json.loads(lines[0])
 
-def put(p, v):
-    with open(p, 'w') as h: h.write(v)
+def put(p, v, mode='w'):
+    with open(p, mode) as h: h.write(v)
 
 def closed(t, o):
     t.assertEqual(sorted(o), ['authorized', 'classes', 'classifier', 'decision', 'nshapes', 'shapes'])
@@ -92,34 +92,48 @@ class Decision(unittest.TestCase):
         out, o = run(None, raw=(HEAD + f'\x1b[2J{marker}\rREAD-RECEIPT\x00 {marker}\n' + TAIL).encode())
         closed(self, o); self.assertEqual(o['decision'], 'HOLD'); self.assertNotIn(marker, out)
 
+PRODUCERS = ('.github/workflows/authoritative.yml', '.github/scripts/outside-guard.mjs', 'tools/read-decision.py', 'tools/outside-read.py',
+             'tools/read-receipt.sh', 'tools/read-sandbox.sh')
+
 class Receipt(unittest.TestCase):
-    """tools/read-receipt.sh: the closed check of the parse's line and the receipt it writes."""
+    """tools/read-receipt.sh: the check record, the parse status, the closed check of the parse's line, the receipt line."""
     def setUp(self):
         self.d = tempfile.mkdtemp(); self.f = os.path.join(self.d, 'proof.lean')
-        open(self.f, 'wb').write((HEAD + 'theorem a : 1 = 1 := rfl\n' + TAIL).encode()); os.chmod(self.f, 0o444)
+        put(self.f, HEAD + 'theorem a : 1 = 1 := rfl\n' + TAIL); os.chmod(self.f, 0o444)
         self.blob = subprocess.run(['git', 'hash-object', self.f], capture_output=True, text=True).stdout.strip()
+        self.sha = hashlib.sha256(open(self.f, 'rb').read()).hexdigest()
         os.makedirs(f'{self.d}/in')
         for n, v in (('pr.blob', self.blob), ('pr.head', 'c' * 40), ('pr.file', 'lean/PEqualNP/Outside/L_x_1.lean')): put(f'{self.d}/in/{n}', v)
-        self.env = {**os.environ, 'GITHUB_REPOSITORY': 'open-goat/pequalnp-proofs', 'PR': '41', 'GITHUB_RUN_ID': '777', 'GITHUB_RUN_ATTEMPT': '2', 'GITHUB_SHA': 'b' * 40}
-    def receipt(self, line, env=None):
-        dj = os.path.join(self.d, 'decision.json'); put(dj, line); out = os.path.join(self.d, 'receipt.json')
-        r = subprocess.run(['bash', RS, dj, self.f, f'{self.d}/in', BASE, out], capture_output=True, text=True, env=env or self.env)
-        return r, (json.load(open(out)) if r.returncode == 0 else None), out
+        self.rec = {'pr': 41, 'gap': 'L-x-1', 'kind': 'check', 'file': 'lean/PEqualNP/Outside/L_x_1.lean', 'head': 'c' * 40, 'blob': self.blob,
+                    'file_sha256': self.sha, 'verdict': 'ACCEPTED'}
+        self.env = {**os.environ, 'GITHUB_REPOSITORY': 'open-goat/pequalnp-proofs', 'PR': '41', 'GAP': 'L-x-1', 'GITHUB_RUN_ID': '777',
+                    'GITHUB_RUN_ATTEMPT': '2', 'GITHUB_SHA': 'b' * 40, 'CHECK_RECORD': json.dumps(self.rec)}
+    def receipt(self, line, env=None, status='0'):
+        dj = os.path.join(self.d, 'decision.json'); put(dj, line); stf = os.path.join(self.d, 'status'); put(stf, status)
+        r = subprocess.run(['bash', RS, dj, stf, self.f, f'{self.d}/in', BASE], capture_output=True, text=True, env=env or self.env)
+        if r.returncode: return r, None
+        lines = r.stdout.split('\n'); assert len(lines) == 2 and lines[0].startswith('READ-RECEIPT {'), r.stdout
+        return r, json.loads(lines[0][len('READ-RECEIPT '):])
     def good(self, **kw):
         o = {'classifier': VOCAB['classifier'], 'authorized': VOCAB['authorized'], 'decision': 'PLAIN', 'classes': [], 'shapes': [], 'nshapes': 0}
         o.update(kw); return json.dumps(o, separators=(',', ':')) + '\n'
-    def test_a_good_line_becomes_the_receipt_and_the_binding_line(self):
-        r, rc, out = self.receipt(self.good())
-        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
-        self.assertEqual(r.stdout, f'READ-RECEIPT sha256={hashlib.sha256(open(out, "rb").read()).hexdigest()} decision=PLAIN\n')
-        self.assertEqual((rc['pr'], rc['run_id'], rc['run_attempt'], rc['blob'], rc['head'], rc['job']), (41, 777, 2, self.blob, 'c' * 40, 'read'))
-        self.assertEqual(rc['sha256'], hashlib.sha256(open(self.f, 'rb').read()).hexdigest())
-        cl = hashlib.sha256(open(RD, 'rb').read() + open(os.path.join(HERE, 'outside-read.py'), 'rb').read()).hexdigest()
-        self.assertEqual(rc['classifier_sha256'], cl)
+    def test_a_good_line_becomes_one_canonical_receipt_line(self):
+        r, rc = self.receipt(self.good())
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr); self.assertLessEqual(len(r.stdout), 8192)
+        self.assertEqual((rc['pr'], rc['run_id'], rc['run_attempt'], rc['blob'], rc['head'], rc['job'], rc['v'], rc['decision']), (41, 777, 2, self.blob, 'c' * 40, 'read', 2, 'PLAIN'))
+        self.assertEqual(rc['sha256'], self.sha); self.assertEqual(rc['check'], self.rec)
+        want = {p: subprocess.run(['git', '-C', BASE, 'rev-parse', f'HEAD:{p}'], capture_output=True, text=True).stdout.strip() for p in PRODUCERS}
+        self.assertEqual(rc['producer'], want)
+        self.assertEqual(r.stdout[len('READ-RECEIPT '):-1], json.dumps(rc, sort_keys=True, separators=(',', ':')))
     def test_real_decisions_pass_through_whole(self):
         for body in ('theorem b : 1 = 1 := by\n' + 'rfl\n' * 40, 'theorem a : 1 = 1 := rfl -- by the structure of the sum\n'):
-            out, o = run(body); r, rc, _ = self.receipt(out)
+            out, o = run(body); r, rc = self.receipt(out)
             self.assertEqual((rc['decision'], rc['classes'], rc['shapes'], rc['nshapes']), (o['decision'], o['classes'], o['shapes'], o['nshapes']))
+    def test_a_failed_parse_is_the_fixed_hold_whatever_it_printed(self):
+        for status in ('1', '137', '124', '', 'x'):
+            with self.subTest(status=status):
+                r, rc = self.receipt(self.good(), status=status)
+                self.assertEqual((rc['decision'], rc['shapes']), ('HOLD', [[0, 'ERROR', 'empty', 'empty']]))
     def test_anything_else_is_the_fixed_hold(self):
         bad = [
             '', 'not json\n', self.good() + self.good(), self.good(extra=1),
@@ -135,15 +149,41 @@ class Receipt(unittest.TestCase):
         ]
         for i, line in enumerate(bad):
             with self.subTest(i=i):
-                r, rc, _ = self.receipt(line)
+                r, rc = self.receipt(line)
                 self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
                 self.assertEqual((rc['decision'], rc['shapes']), ('HOLD', [[0, 'ERROR', 'empty', 'empty']]))
+    def test_no_receipt_without_a_matching_accepted_check_record(self):
+        cases = [('', 'missing (the check job writes it only on ACCEPTED)')]
+        for k, v in (('verdict', 'REJECTED'), ('pr', 42), ('gap', 'L-x-2'), ('head', 'e' * 40), ('blob', 'f' * 40), ('file_sha256', '0' * 64),
+                     ('file', 'lean/PEqualNP/Outside/L_x_2.lean'), ('kind', 'value'), ('extra', 1)):
+            cases.append((json.dumps({**self.rec, k: v}), k))
+        for rec, why in cases:
+            with self.subTest(why=why):
+                r, rc = self.receipt(self.good(), env={**self.env, 'CHECK_RECORD': rec})
+                self.assertNotEqual(r.returncode, 0); self.assertIsNone(rc); self.assertNotIn('READ-RECEIPT {', r.stdout)
     def test_changed_bytes_or_malformed_values_give_no_receipt(self):
-        os.chmod(self.f, 0o644); open(self.f, 'ab').write(b'-- changed\n')
-        r, rc, _ = self.receipt(self.good()); self.assertNotEqual(r.returncode, 0); self.assertIsNone(rc)
+        os.chmod(self.f, 0o644); put(self.f, '-- changed\n', 'a')
+        r, rc = self.receipt(self.good()); self.assertNotEqual(r.returncode, 0); self.assertIsNone(rc)
         self.setUp()
-        r, rc, _ = self.receipt(self.good(), env={**self.env, 'PR': '41; echo'}); self.assertNotEqual(r.returncode, 0)
-        r, rc, _ = self.receipt(self.good(), env={**self.env, 'GITHUB_SHA': 'nope'}); self.assertNotEqual(r.returncode, 0)
+        for k, v in (('PR', '41; echo'), ('GITHUB_SHA', 'nope'), ('GAP', 'L x')):
+            with self.subTest(k=k):
+                r, rc = self.receipt(self.good(), env={**self.env, k: v}); self.assertNotEqual(r.returncode, 0)
+
+class Sandbox(unittest.TestCase):
+    """What can be checked off Linux: the sandbox refuses bad arguments before it does anything, and the workflow wires
+    the parse status, the clean environment and the jail as reviewed. The boundary itself is the hosted fixture run."""
+    def test_refuses_bad_arguments(self):
+        for args in ([], ['/nonexistent', TESTED], [tempfile.mkdtemp(), 'nope']):
+            with self.subTest(args=args):
+                self.assertEqual(subprocess.run(['sh', os.path.join(HERE, 'read-sandbox.sh'), *args], capture_output=True).returncode, 2)
+    def test_workflow_wiring(self):
+        w = open(os.path.join(BASE, '.github/workflows/authoritative.yml')).read()
+        read = w[w.index('\n  read:\n'):]
+        for must in ('needs: check', 'CHECK_RECORD: ${{ needs.check.outputs.record }}', 'sudo -n /usr/bin/env -i PATH=/usr/bin:/bin /bin/sh "$W/base/tools/read-sandbox.sh"',
+                     'echo "$rc" > "$W/rd/status"', '"$W/rd/status"'):
+            self.assertIn(must, read)
+        self.assertNotIn('uses:', read); self.assertNotIn('upload-artifact', w)
+        self.assertIn('record: ${{ steps.verdict.outputs.record }}', w); self.assertIn('id: verdict', w)
 
 if __name__ == '__main__':
     sys.exit(0 if unittest.main(exit=False, verbosity=1).result.wasSuccessful() else 1)
