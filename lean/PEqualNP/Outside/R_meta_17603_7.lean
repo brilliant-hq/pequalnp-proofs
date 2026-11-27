@@ -12,16 +12,29 @@ theorem PEqualNP.Outside.R_meta_17603_7
     · exact hLow C hm hright hq hd
     · exact hHigh C hm hr hright hq hd
   intro C ins hins x4 hmono hrb hpos hneg
+  have dInc : ∀ X Y : Finset (Fin 13), PEqualNP.GenericRejection.incidenceInput X Y =
+      (List.ofFn fun p : Fin 13 => decide (p ∈ X)) ++ List.ofFn fun l : Fin 13 => decide (l ∈ Y) :=
+    fun _ _ => rfl
+  have dSize : ∀ D : PEqualNP.CircuitLowerBounds.Circuit, D.size = D.gates.length := fun _ => rfl
+  have dGateAt : ∀ (D : PEqualNP.CircuitLowerBounds.Circuit) (j : ℕ), PEqualNP.MetaComplexity.NestedCover.gateAt D j =
+      D.gates.getD j ⟨PEqualNP.CircuitLowerBounds.GateOp.or, []⟩ := fun _ _ => rfl
+  have dEval : ∀ (D : PEqualNP.CircuitLowerBounds.Circuit) (x : List Bool), D.eval x =
+      (D.gates.foldl (fun w g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]) x).getD
+        D.output false := fun _ _ => rfl
+  have dOr : ∀ l : List Bool, PEqualNP.CircuitLowerBounds.GateOp.eval PEqualNP.CircuitLowerBounds.GateOp.or l = l.any id := fun _ => rfl
+  have dAnd : ∀ l : List Bool, PEqualNP.CircuitLowerBounds.GateOp.eval PEqualNP.CircuitLowerBounds.GateOp.and l = l.all id := fun _ => rfl
+  have dMiss : ∀ Q : Finset (Fin 13), PEqualNP.HeptadCover.missLines PEqualNP.HeptadCover.singerLines3 Q =
+      Finset.univ.filter (fun l => Disjoint (PEqualNP.HeptadCover.singerLines3 l) Q) := fun _ => rfl
   have hP : ∀ (X Y : Finset (Fin 13)) (i : Fin 13),
       (PEqualNP.GenericRejection.incidenceInput X Y).getD (i : ℕ) false = decide (i ∈ X) := by
     intro X Y i
-    fin_cases i <;> simp [PEqualNP.GenericRejection.incidenceInput]
+    fin_cases i <;> simp [dInc]
   have hL : ∀ (X Y : Finset (Fin 13)) (i : Fin 13),
       (PEqualNP.GenericRejection.incidenceInput X Y).getD (13 + (i : ℕ)) false = decide (i ∈ Y) := by
     intro X Y i
-    fin_cases i <;> simp [PEqualNP.GenericRejection.incidenceInput]
+    fin_cases i <;> simp [dInc]
   have hlen : ∀ (X Y : Finset (Fin 13)), (PEqualNP.GenericRejection.incidenceInput X Y).length = 26 := by
-    intro X Y; simp [PEqualNP.GenericRejection.incidenceInput]
+    intro X Y; simp [dInc]
   have hbuild : ∀ a b c : ℕ, a < 26 → b < 26 → c < 26 →
       let D : PEqualNP.CircuitLowerBounds.Circuit :=
         ⟨⟨PEqualNP.CircuitLowerBounds.GateOp.or, [a, b]⟩ ::
@@ -33,7 +46,7 @@ theorem PEqualNP.Outside.R_meta_17603_7
             [x.getD c false && (x.getD a false || x.getD b false)]) := by
     intro a b c ha hb hc D
     refine ⟨?_, ?_, ?_, ?_⟩
-    · simp [D, PEqualNP.CircuitLowerBounds.Circuit.size]
+    · simp [D, dSize]
     · intro g hg
       simp only [D, List.mem_cons] at hg
       rcases hg with rfl | rfl | hg
@@ -41,22 +54,19 @@ theorem PEqualNP.Outside.R_meta_17603_7
       · simp
       · exact hmono g hg
     · intro j hj i hi
-      match j, hj, hi with
-      | 0, _, hi =>
-        simp [D, PEqualNP.MetaComplexity.NestedCover.gateAt] at hi
+      rcases j with _ | _ | k
+      · simp [D, dGateAt] at hi
         omega
-      | 1, _, hi =>
-        simp [D, PEqualNP.MetaComplexity.NestedCover.gateAt] at hi
+      · simp [D, dGateAt] at hi
         omega
-      | k + 2, hj, hi =>
-        have hk : k < C.gates.length := by simp [D] at hj; omega
-        have := hrb k hk i (by simpa [D, PEqualNP.MetaComplexity.NestedCover.gateAt] using hi)
+      · have hk : k < C.gates.length := by simp [D] at hj; omega
+        have := hrb k hk i (by simpa [D, dGateAt] using hi)
         omega
     · intro x hx
-      simp only [D, PEqualNP.CircuitLowerBounds.Circuit.eval, PEqualNP.CircuitLowerBounds.Circuit.wires,
-        List.foldl_cons]
+      rw [dEval, dEval]
+      simp only [D, List.foldl_cons]
       congr 2
-      simp [PEqualNP.CircuitLowerBounds.GateOp.eval, List.getD_eq_getElem?_getD,
+      simp [dOr, dAnd, List.getD_eq_getElem?_getD,
         List.getElem?_append_left, List.getElem?_append_right, hx, ha, hb, hc]
   have l00 : (0 : Fin 13) ∈ PEqualNP.HeptadCover.singerLines3 0 := by decide
   have l10 : (1 : Fin 13) ∈ PEqualNP.HeptadCover.singerLines3 0 := by decide
@@ -64,7 +74,7 @@ theorem PEqualNP.Outside.R_meta_17603_7
   have notMiss : ∀ (Q : Finset (Fin 13)) (l p : Fin 13), p ∈ PEqualNP.HeptadCover.singerLines3 l → p ∈ Q →
       l ∉ PEqualNP.HeptadCover.missLines PEqualNP.HeptadCover.singerLines3 Q := by
     intro Q l p hpl hpQ hm
-    simp only [PEqualNP.HeptadCover.missLines, Finset.mem_filter] at hm
+    rw [dMiss, Finset.mem_filter] at hm
     exact Finset.disjoint_left.mp hm.2 hpl hpQ
   rcases hins with rfl | rfl
   · obtain ⟨hsz, hm, hr, hev⟩ := hbuild 0 1 13 (by norm_num) (by norm_num) (by norm_num)
