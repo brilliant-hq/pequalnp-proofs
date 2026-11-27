@@ -21,7 +21,7 @@ abbrev Form (n : ℕ) := Vec n →ₗ[F] F
 
 def bit (b : Bool) : F := if b then 1 else 0
 
-def IsAffine (f : Z → Vec m → Bool) : Prop :=
+def IsAffine {Z : Type*} {m : ℕ} (f : Z → Vec m → Bool) : Prop :=
   ∃ (l : Form m) (a : Z → F), ∀ z x, bit (f z x) = l x + a z
 
 def goodGate (g : Gate) : Prop :=
@@ -142,7 +142,7 @@ private theorem gateBinary_cut {Z : Type*} {n : ℕ} {f g : Z → Vec (n + 1) �
     ring
 
 theorem gate_affine_on_cut {Z : Type*} {m : ℕ} {g : Gate} {W : Z → Vec (m + 1) → List Bool}
-    (_hg : goodGate g) (hc : charged g = true)
+    (hc : charged g = true)
     (hW : ∀ i : ℕ, IsAffine (fun z x => (W z x).getD i false)) :
     ∃ ℓ : Form (m + 1), ∃ c : Z → F, ℓ ≠ 0 ∧
       ∀ b : F, ∃ l : Form (m + 1), ∃ a : Z → F,
@@ -490,7 +490,7 @@ private theorem partition (gs : List Gate) (hg : ∀ g ∈ gs, goodGate g)
         | succ s =>
           have htail : gs.countP charged = s := by omega
           let localW := fun z x => W z (T.point z x)
-          obtain ⟨l,c,hl,hcut⟩ := gate_affine_on_cut (g := g) (W := localW) hgate hch hwaffine
+          obtain ⟨l,c,hl,hcut⟩ := gate_affine_on_cut (g := g) (W := localW) hch hwaffine
           obtain ⟨E,hE⟩ := cut_exists_split l hl
           let C (e : F) := T.cut E c e
           have hchild (e : F) :
