@@ -3983,6 +3983,7 @@ end PEqualNP.Outside.L_meta_26205.Certificate
 namespace PEqualNP.Outside.L_meta_26205.Certificate
 open PEqualNP.Outside.L_meta_26205.LiveCircuits PEqualNP.Outside.L_meta_26205.GraphTarget
 set_option maxRecDepth 200000 in
+set_option maxHeartbeats 1000000000 in
 theorem allChecks : ∀ j : Nat, j < nodes.size → verify nodes (nodes[j]?.getD default) = true
   | 0, _ => ok0
   | 1, _ => ok1
