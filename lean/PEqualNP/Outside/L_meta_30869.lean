@@ -5112,13 +5112,9 @@ theorem row32 : target (row 32) = false := by decide +kernel
 theorem row36 : target (row 36) = true := by decide +kernel
 theorem row4 : target (row 4) = false := by decide +kernel
 
-def lift (x : Fin 7 → Bool) : Fin 8 → Bool := ![x 6, x 5, false, x 2, x 0, x 1, x 4, x 3]
-
-private def target7 (x : Fin 7 → Bool) : Bool := decide (∃ i < ([0, 3, 1, 3, 0, 4, 2, 4, 0, 5, 1, 5, 3, 5, 1, 6, 2, 6, 3, 6, 4, 6] : List ℕ).length / 2, (List.ofFn x).getD (([0, 3, 1, 3, 0, 4, 2, 4, 0, 5, 1, 5, 3, 5, 1, 6, 2, 6, 3, 6, 4, 6] : List ℕ).getD (2 * i) 0) false = true ∧ (List.ofFn x).getD (([0, 3, 1, 3, 0, 4, 2, 4, 0, 5, 1, 5, 3, 5, 1, 6, 2, 6, 3, 6, 4, 6] : List ℕ).getD (2 * i + 1) 0) false = true)
-
 set_option maxRecDepth 10000 in
 set_option maxHeartbeats 4000000 in
-theorem liftCorrect : ∀ x : Fin 7 → Bool, target (lift x) = target7 x := by
+theorem liftCorrect : ∀ x : Fin 7 → Bool, target (liftSeven x) = target10900 x := by
   decide +kernel
 
 end PEqualNP.Outside.L_meta_30869_aux.Witness
