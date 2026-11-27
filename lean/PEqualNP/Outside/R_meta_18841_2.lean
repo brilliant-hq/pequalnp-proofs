@@ -7,12 +7,12 @@ theorem PEqualNP.Outside.R_meta_18841_2
           ∃ (p l : Fin 13), (p = l ∨ p = l + 1 ∨ p = l + 3 ∨ p = l + 9) ∧
             (u = Fin.castAdd 13 p ∧ v = Fin.natAdd 13 l ∨ v = Fin.castAdd 13 p ∧ u = Fin.natAdd 13 l)) →
         (∀ (a b c d : Fin 26), a ≠ c → b ≠ d → G.Adj a b → G.Adj b c → G.Adj c d → ¬G.Adj d a) ∧
-        (∀ (u : Fin 26), (Finset.univ.filter (fun v : Fin 26 => G.Adj u v)).card = 4) ∧
+        (∀ (u : Fin 26), G.degree u = 4) ∧
         (∀ (u v : Fin 26), G.Adj u v → (u.1 < 13 ∧ 13 ≤ v.1) ∨ (13 ≤ u.1 ∧ v.1 < 13)))
     (hC4FreeJunkLB :
       ∀ (G : SimpleGraph (Fin 26)) [DecidableRel G.Adj] (C : PEqualNP.CircuitLowerBounds.Circuit),
         (∀ (a b c d : Fin 26), a ≠ c → b ≠ d → G.Adj a b → G.Adj b c → G.Adj c d → ¬G.Adj d a) →
-        (∀ (u : Fin 26), (Finset.univ.filter (fun v : Fin 26 => G.Adj u v)).card = 4) →
+        (∀ (u : Fin 26), G.degree u = 4) →
         (∀ (u v : Fin 26), G.Adj u v → (u.1 < 13 ∧ 13 ≤ v.1) ∨ (13 ≤ u.1 ∧ v.1 < 13)) →
         PEqualNP.TopForm.IsLeastAO G C →
         PEqualNP.TopForm.junk G C ≠ ∅ →
