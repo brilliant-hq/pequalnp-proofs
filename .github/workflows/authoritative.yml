@@ -749,3 +749,106 @@ jobs:
           [ "$verdict" = ACCEPTED ] && exit 0
           [ "$verdict" = REJECTED ] && exit 1
           exit 3
+
+  # THE READER, A JOB OF ITS OWN (27 Nov; the red team decisions ISOLATED-READER-redteam1-1354 and -redteam2-1355).
+  # The intake lands an accepted file only on this job's RECEIPT, and never holds the file's bytes itself. This job
+  # runs on its own fresh runner, never runs contributor code, shares no workspace, cache or artifact writer with the
+  # check job (it does not wait for it and takes nothing from it), and reads the one file AS DATA with this base
+  # commit's own tools/read-decision.py and tools/outside-read.py. The parse runs as nobody, inside a network
+  # namespace, with no credential and under limits; what it prints is checked against the closed vocabulary before
+  # anything is written. The receipt is ONE file, receipt.json, in the artifact read-receipt-a<run attempt>, and this
+  # job's own log carries the line "READ-RECEIPT sha256=<hex> decision=<word>" that binds that file to this job.
+  # Nothing the pull request wrote is printed: the guard's output goes to a file, and every receipt field is a number,
+  # a hash, an id this job validated, or a word of the closed vocabulary.
+  read:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: read
+    env:
+      PR: ${{ inputs.pr }}
+      GAP: ${{ inputs.gap }}
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      API: https://api.github.com
+      W: /opt/pnp-read
+    steps:
+      - name: Refuse malformed inputs and a run from another branch
+        run: |
+          set -eu
+          printf '%s' "$PR" | grep -Eqx '[1-9][0-9]{0,6}' || { echo "READ-JOB: pr must be a number; no receipt"; exit 1; }
+          printf '%s' "$GAP" | grep -Eqx 'L-[a-z0-9]+(-[a-z0-9]+)*' || { echo "READ-JOB: malformed gap; no receipt"; exit 1; }
+          [ "$GITHUB_REF" = "refs/heads/$DEFAULT_BRANCH" ] || { echo "READ-JOB: start this run from $DEFAULT_BRANCH; no receipt"; exit 1; }
+          sudo mkdir -p "$W" && sudo chown "$(id -u):$(id -g)" "$W" && chmod 755 "$W"
+          mkdir -p "$W/in" "$W/api" "$W/rd" "$W/receipt"
+
+      - name: Check out the BASE only (plain git, no stored credentials)
+        run: |
+          set -eu
+          git init -q "$W/base"
+          git -C "$W/base" fetch -q --depth 1 "https://github.com/${GITHUB_REPOSITORY}.git" "$GITHUB_SHA"
+          git -C "$W/base" checkout -q --detach FETCH_HEAD
+          [ "$(git -C "$W/base" rev-parse HEAD)" = "$GITHUB_SHA" ]
+          chmod -R a+rX,go-w "$W/base"
+
+      - name: Read the pull request's identity and fetch the one file as data
+        env:
+          GH_TOKEN: ${{ github.token }}   # read only, this step alone
+        run: |
+          set -eu
+          get() { curl -sSf --proto '=https' --max-redirs 0 --max-filesize 20000000 \
+                    -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+                    -H "X-GitHub-Api-Version: 2022-11-28" -o "$2" "$API/repos/$GITHUB_REPOSITORY/$1"; }
+          get "pulls/$PR" "$W/api/pr.json"
+          get "pulls/$PR/files?per_page=100" "$W/api/files.json"
+          head=$(jq -r '.head.sha // ""' "$W/api/pr.json")
+          printf '%s' "$head" | grep -Eqx '[0-9a-f]{40}' || { echo "READ-JOB: no head commit; no receipt"; exit 1; }
+          get "git/trees/$head?recursive=1" "$W/api/tree.json"
+          # The same one place decides what the file is (exactly one added plain file under lean/PEqualNP/Outside/).
+          # Its words are kept out of this log: only its fixed last line is tested.
+          node "$W/base/.github/scripts/outside-guard.mjs" pr "$W/api/pr.json" "$W/api/files.json" "$W/api/tree.json" \
+            "$GITHUB_REPOSITORY" "$DEFAULT_BRANCH" "$W/in" > "$W/api/guard.out" 2>&1 \
+            && [ "$(tail -n 1 "$W/api/guard.out")" = "GUARD OK: pr" ] \
+            || { echo "READ-JOB: the pull request did not pass the guard; no receipt"; exit 1; }
+          blob=$(cat "$W/in/pr.blob")
+          printf '%s' "$blob" | grep -Eqx '[0-9a-f]{40}' || { echo "READ-JOB: no content hash; no receipt"; exit 1; }
+          curl -sSf --proto '=https' --max-redirs 0 --max-filesize 524288 \
+            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github.raw+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" -o "$W/rd/proof.lean" "$API/repos/$GITHUB_REPOSITORY/git/blobs/$blob"
+          [ "$(wc -c < "$W/rd/proof.lean")" -le 524288 ] || { echo "READ-JOB: larger than 512 KiB; no receipt"; exit 1; }
+          [ "$(git hash-object "$W/rd/proof.lean")" = "$blob" ] || { echo "READ-JOB: the bytes are not the named blob; no receipt"; exit 1; }
+          # The bytes are fixed from here: read only, owned by this account, in a folder nobody else may write.
+          chmod 0444 "$W/rd/proof.lean"; chmod 0755 "$W/rd"
+
+      - name: Read the file as data (nobody, no network, no credential, limits)
+        run: |
+          set -u
+          export PATH=/usr/bin:/bin
+          judge=$(git -C "$W/base" rev-parse HEAD:tools/check-lean.mjs)
+          # sudo resets the environment, so no variable of this run reaches the parse. A new network namespace has no
+          # route out; setpriv drops to nobody with no new privileges; prlimit and timeout bound memory, CPU, written
+          # bytes, open files and wall time. Its standard output goes to a file this account owns; its errors are dropped.
+          sudo -n /usr/bin/unshare --net --ipc --pid --fork -- \
+            /usr/bin/setpriv --reuid=65534 --regid=65534 --clear-groups --no-new-privs --inh-caps=-all --bounding-set=-all -- \
+            /usr/bin/prlimit --as=1073741824 --cpu=60 --fsize=65536 --nofile=64 --core=0 -- \
+            /usr/bin/timeout -s KILL 90 /usr/bin/python3 -I "$W/base/tools/read-decision.py" "$W/rd/proof.lean" "$judge" \
+            > "$W/rd/decision.json" 2>/dev/null
+          echo "parse exit $?"
+
+      - name: Check the decision against the closed vocabulary and write the receipt
+        run: |
+          set -eu
+          export PATH=/usr/bin:/bin
+          # tools/read-receipt.sh: the decision line checked word by word against read-decision.py --vocab (anything
+          # else is the fixed HOLD of an error), the bytes checked again against the blob, and the receipt built by jq
+          # from values this job validated. It prints the one binding line READ-RECEIPT sha256=<hex> decision=<word>.
+          bash "$W/base/tools/read-receipt.sh" "$W/rd/decision.json" "$W/rd/proof.lean" "$W/in" "$W/base" "$W/receipt/receipt.json"
+
+      - name: Publish the receipt (an artifact of this job and run attempt)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: read-receipt-a${{ github.run_attempt }}
+          path: ${{ env.W }}/receipt/receipt.json
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: false
