@@ -451,15 +451,6 @@ theorem lift_eq_zero {s : ℕ} {x : Vec (2*s)} :
     lift x = 0 ↔ x = 0 := by
   rw [← lift_zero, lift_injective.eq_iff]
 
-theorem wrong_ne_zero {s : ℕ} (x : Vec (2*s)) : wrong x ≠ 0 := by
-  intro h
-  have hzero : x = 0 := by
-    funext i
-    simpa [wrong, word] using congrFun h i.castSucc
-  subst x
-  rw [wrong_phase, lift_zero, zero_add] at h
-  exact axis_ne_zero _ h
-
 theorem sum_pairs {M : Type} [AddCommMonoid M] {s : ℕ} (f : Fin (2*s) → M) :
     (∑ i, f i) = ∑ j : Fin s, (f (first j) + f (second j)) := by
   let e : Fin s ⊕ Fin s → Fin (2*s) := Sum.elim first second
@@ -1608,10 +1599,6 @@ private def firstBase {t : ℕ} (j : Fin t) : Fin (2*t) := ⟨2*j.val, by omega�
 
 private def secondBase {t : ℕ} (j : Fin t) : Fin (2*t) := ⟨2*j.val+1, by omega⟩
 
-private theorem first_base {t : ℕ} (j : Fin t) : (firstBase j).castSucc = first j := rfl
-
-private theorem second_base {t : ℕ} (j : Fin t) : (secondBase j).castSucc = second j := rfl
-
 private theorem normal_form (T : Mixed (N+N)) :
     ∃ H : Vec (2*T.nonlinear) → F, ∀ i j,
       T.eval (onehot i j) =
@@ -2219,9 +2206,6 @@ private def asBool (x : Bit) : Bool := decide (x = 1)
 
 @[simp] private theorem asBool_bit (b : Bool) : asBool (bit b) = b := by
   cases b <;> rfl
-
-private theorem bit_xor (a b : Bool) : bit (xor a b) = bit a + bit b := by
-  cases a <;> cases b <;> decide
 
 private theorem bit_injective : Function.Injective bit := by
   intro a b h
@@ -2961,7 +2945,6 @@ private theorem boolHot_list (i j : Fin N) :
 end PEqualNP.Outside.L_meta_25800_aux
 
 open PEqualNP.Outside.L_meta_25800_aux PEqualNP.CircuitLowerBounds in
-
 theorem PEqualNP.Outside.L_meta_25800 : (∀ s : ℕ, 1 ≤ s →
   let k := 2*s
   let N := 2^k
