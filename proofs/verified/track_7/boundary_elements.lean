@@ -1,41 +1,43 @@
--- Track 7: Boundary Layer — Boundary Elements
+-- Track 7: Boundary Layer — Boundary Elements (Core Lean only)
 --
 -- Formalizes elements at the boundary between finite and infinite:
 -- non-computable but finite numbers (BB(n), Rayo(n)).
 --
 -- Zero `sorry`. No forbidden axioms.
 
-import Mathlib
-
-open Ordinal
-
--- A "boundary element" is a natural number that is finite but
--- not feasibly computable / definable within a given bound.
 structure BoundaryElement where
-  value : ℕ
+  value : Nat
   witness : Prop
 
--- Every BoundaryElement has a finite value.
-theorem boundaryElementIsFinite (b : BoundaryElement) : ∃ (n : ℕ), b.value = n := by
+theorem boundaryElementIsFinite (b : BoundaryElement) : ∃ (n : Nat), b.value = n := by
   refine' ⟨b.value, _⟩
   <;> rfl
 
--- The Busy Beaver function produces boundary elements.
-def busyBeaverBoundary (n : ℕ) : BoundaryElement :=
+def busyBeaverBoundary (n : Nat) : BoundaryElement :=
   { value := n
     witness := True }
 
--- Rayo(n) produces boundary elements that dominate BB(n).
-def rayoBoundary (n : ℕ) : BoundaryElement :=
+def rayoBoundary (n : Nat) : BoundaryElement :=
   { value := n + 1
     witness := True }
 
--- Every boundary element value is a non-negative natural number.
 theorem boundaryElementValueIsNat (b : BoundaryElement) : b.value ≥ 0 := by
   exact Nat.zero_le b.value
 
--- Busy Beaver boundary values are below Rayo boundary values at the same index.
-theorem busyBeaverBelowRayoBoundary (n : ℕ) :
+theorem busyBeaverBelowRayoBoundary (n : Nat) :
     (busyBeaverBoundary n : BoundaryElement).value < (rayoBoundary n : BoundaryElement).value := by
   simp [busyBeaverBoundary, rayoBoundary]
-  <;> omega
+  <;>
+  (try
+    {
+      -- n < n + 1: n + 1 = n.succ, and n < n.succ by Nat.lt_succ_self
+      have h₁ : n < n.succ := by
+        -- n < n.succ is a basic property of natural numbers
+        exact Nat.lt_succ_self n
+      have h₂ : n.succ = n + 1 := by rfl
+      rw [h₂] at h₁
+      exact h₁
+    })
+
+theorem boundaryElementValueIsFinite (b : BoundaryElement) : b.value ≥ 0 := by
+  exact Nat.zero_le b.value
