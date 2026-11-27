@@ -79,7 +79,9 @@ theorem PEqualNP.Outside.R_meta_18209_2
       (List.ofFn v).getD k false = if hk : k < 26 then v ⟨k, hk⟩ else false := by
     intro v k
     rw [List.getD_eq_getElem?_getD, List.getElem?_ofFn]
-    split <;> rfl
+    by_cases hk : k < 26
+    · simp only [hk, ↓reduceDIte, Option.getD_some]
+    · simp only [hk, ↓reduceDIte, Option.getD_none]
   have hSep : ∀ g : (Fin 26 → Bool) → Bool, (∀ v, f v = g v) → sep g x5 := by
     intro g hfg
     refine ⟨hMono, hSz, ?_, ?_, ?_⟩
@@ -152,84 +154,94 @@ theorem PEqualNP.Outside.R_meta_18209_2
       rw [hvec] at hres
       exact hres
   have hSepF : sep f x5 := hSep f (fun _ => rfl)
-  rcases hx4 : x4.inputs with _ | ⟨i, _ | ⟨j, _ | ⟨k, t⟩⟩⟩
-  · refine hNonEdgeAnd f x5 (Or.inl ?_) hSepF
+  cases hx4 : x4.inputs with
+  | nil =>
+    refine hNonEdgeAnd f x5 (Or.inl ?_) hSepF
     intro v
     dsimp only [f]; rw [hOp, hx4]; rfl
-  · by_cases hi : i < 26
-    · refine hNonEdgeAnd f x5 (Or.inr (Or.inl ⟨⟨i, hi⟩, ?_⟩)) hSepF
-      intro v
-      dsimp only [f]; rw [hOp, hx4]
-      change ((List.ofFn v).getD i false && true) = v ⟨i, hi⟩
-      rw [hget, dif_pos hi, Bool.and_true]
-    · refine hNonEdgeAnd f x5 (Or.inr (Or.inr ?_)) hSepF
-      intro a b _
-      dsimp only [f]; rw [hOp, hx4]
-      change ((List.ofFn _).getD i false && true) = false
-      rw [hget, dif_neg hi, Bool.false_and]
-  · by_cases hi : i < 26
-    · by_cases hj : j < 26
-      · by_cases hij : i = j
-        · refine hNonEdgeAnd f x5 (Or.inr (Or.inl ⟨⟨i, hi⟩, ?_⟩)) hSepF
-          intro v
-          subst hij
-          dsimp only [f]; rw [hOp, hx4]
-          change ((List.ofFn v).getD i false && ((List.ofFn v).getD i false && true)) = v ⟨i, hi⟩
-          rw [hget, dif_pos hi, Bool.and_true, Bool.and_self]
-        · by_cases h1 : ∃ (hi13 : i < 13) (hj13 : 13 ≤ j), x1 ⟨i, hi13⟩ ⟨j - 13, by omega⟩
-          · rcases h1 with ⟨hi13, hj13, hpg⟩
-            let p : Fin 13 := ⟨i, hi13⟩
-            let q : Fin 13 := ⟨j - 13, by omega⟩
-            refine hEdgeAnd p q x5 (decide_eq_true hpg)
-              (hSep (fun v => v (Fin.castAdd 13 p) && v (Fin.natAdd 13 q)) ?_)
-            intro v
-            have hp : (⟨i, hi⟩ : Fin 26) = Fin.castAdd 13 p := Fin.ext rfl
-            have hq : (⟨j, hj⟩ : Fin 26) = Fin.natAdd 13 q := Fin.ext (by simp [q]; omega)
-            dsimp only [f]; rw [hOp, hx4]
-            change ((List.ofFn v).getD i false && ((List.ofFn v).getD j false && true)) = _
-            rw [hget, hget, dif_pos hi, dif_pos hj, hp, hq, Bool.and_true]
-          · by_cases h2 : ∃ (hj13 : j < 13) (hi13 : 13 ≤ i), x1 ⟨j, hj13⟩ ⟨i - 13, by omega⟩
-            · rcases h2 with ⟨hj13, hi13, hpg⟩
-              let p : Fin 13 := ⟨j, hj13⟩
-              let q : Fin 13 := ⟨i - 13, by omega⟩
-              refine hEdgeAnd p q x5 (decide_eq_true hpg)
-                (hSep (fun v => v (Fin.castAdd 13 p) && v (Fin.natAdd 13 q)) ?_)
-              intro v
-              have hp : (⟨j, hj⟩ : Fin 26) = Fin.castAdd 13 p := Fin.ext rfl
-              have hq : (⟨i, hi⟩ : Fin 26) = Fin.natAdd 13 q := Fin.ext (by simp [q]; omega)
-              dsimp only [f]; rw [hOp, hx4]
-              change ((List.ofFn v).getD i false && ((List.ofFn v).getD j false && true)) = _
-              rw [hget, hget, dif_pos hi, dif_pos hj, hp, hq, Bool.and_true, Bool.and_comm]
-            · refine hNonEdgeAnd f x5 (Or.inr (Or.inr ?_)) hSepF
-              intro a b hab
-              have hpg : x1 a b := of_decide_eq_true hab
-              apply Bool.eq_false_iff.mpr
-              intro hboth
-              dsimp only [f] at hboth; rw [hOp, hx4] at hboth
-              change ((List.ofFn (evec a b)).getD i false && ((List.ofFn (evec a b)).getD j false && true)) = true at hboth
-              rw [hget, hget, dif_pos hi, dif_pos hj, Bool.and_true] at hboth
-              simp only [evec, Bool.and_eq_true, decide_eq_true_eq, Fin.ext_iff, Fin.val_castAdd, Fin.val_natAdd] at hboth
-              rcases hboth with ⟨hiab | hiab, hjab | hjab⟩
-              · exact hij (hiab.trans hjab.symm)
-              · apply h1
-                refine ⟨by omega, by omega, ?_⟩
-                have ha : (⟨i, by omega⟩ : Fin 13) = a := Fin.ext (by dsimp; omega)
-                have hb : (⟨j - 13, by omega⟩ : Fin 13) = b := Fin.ext (by dsimp; omega)
-                rw [ha, hb]; exact hpg
-              · apply h2
-                refine ⟨by omega, by omega, ?_⟩
-                have ha : (⟨j, by omega⟩ : Fin 13) = a := Fin.ext (by dsimp; omega)
-                have hb : (⟨i - 13, by omega⟩ : Fin 13) = b := Fin.ext (by dsimp; omega)
-                rw [ha, hb]; exact hpg
-              · exact hij (hiab.trans hjab.symm)
+  | cons i t1 =>
+    cases t1 with
+    | nil =>
+      by_cases hi : i < 26
+      · refine hNonEdgeAnd f x5 (Or.inr (Or.inl ⟨⟨i, hi⟩, ?_⟩)) hSepF
+        intro v
+        dsimp only [f]; rw [hOp, hx4]
+        change ((List.ofFn v).getD i false && true) = v ⟨i, hi⟩
+        rw [hget]; simp only [hi, ↓reduceDIte, Bool.and_true]
       · refine hNonEdgeAnd f x5 (Or.inr (Or.inr ?_)) hSepF
         intro a b _
         dsimp only [f]; rw [hOp, hx4]
-        change ((List.ofFn _).getD i false && ((List.ofFn _).getD j false && true)) = false
-        rw [hget, hget, dif_pos hi, dif_neg hj, Bool.false_and, Bool.and_false]
-    · refine hNonEdgeAnd f x5 (Or.inr (Or.inr ?_)) hSepF
-      intro a b _
-      dsimp only [f]; rw [hOp, hx4]
-      change ((List.ofFn _).getD i false && ((List.ofFn _).getD j false && true)) = false
-      rw [hget, dif_neg hi, Bool.false_and]
-  · simp [hx4] at hLen
+        change ((List.ofFn _).getD i false && true) = false
+        rw [hget]; simp only [hi, ↓reduceDIte, Bool.false_and]
+    | cons j t2 =>
+      cases t2 with
+      | nil =>
+        by_cases hi : i < 26
+        · by_cases hj : j < 26
+          · by_cases hij : i = j
+            · refine hNonEdgeAnd f x5 (Or.inr (Or.inl ⟨⟨i, hi⟩, ?_⟩)) hSepF
+              intro v
+              subst hij
+              dsimp only [f]; rw [hOp, hx4]
+              change ((List.ofFn v).getD i false && ((List.ofFn v).getD i false && true)) = v ⟨i, hi⟩
+              rw [hget]; simp only [hi, ↓reduceDIte, Bool.and_true, Bool.and_self]
+            · by_cases h1 : ∃ (hi13 : i < 13) (hj13 : 13 ≤ j), x1 ⟨i, hi13⟩ ⟨j - 13, by omega⟩
+              · rcases h1 with ⟨hi13, hj13, hpg⟩
+                let p : Fin 13 := ⟨i, hi13⟩
+                let q : Fin 13 := ⟨j - 13, by omega⟩
+                refine hEdgeAnd p q x5 (decide_eq_true hpg)
+                  (hSep (fun v => v (Fin.castAdd 13 p) && v (Fin.natAdd 13 q)) ?_)
+                intro v
+                have hp : (⟨i, hi⟩ : Fin 26) = Fin.castAdd 13 p := Fin.ext rfl
+                have hq : (⟨j, hj⟩ : Fin 26) = Fin.natAdd 13 q := Fin.ext (by simp [q]; omega)
+                dsimp only [f]; rw [hOp, hx4]
+                change ((List.ofFn v).getD i false && ((List.ofFn v).getD j false && true)) = _
+                rw [hget, hget]; simp only [hi, hj, ↓reduceDIte, hp, hq, Bool.and_true]
+              · by_cases h2 : ∃ (hj13 : j < 13) (hi13 : 13 ≤ i), x1 ⟨j, hj13⟩ ⟨i - 13, by omega⟩
+                · rcases h2 with ⟨hj13, hi13, hpg⟩
+                  let p : Fin 13 := ⟨j, hj13⟩
+                  let q : Fin 13 := ⟨i - 13, by omega⟩
+                  refine hEdgeAnd p q x5 (decide_eq_true hpg)
+                    (hSep (fun v => v (Fin.castAdd 13 p) && v (Fin.natAdd 13 q)) ?_)
+                  intro v
+                  have hp : (⟨j, hj⟩ : Fin 26) = Fin.castAdd 13 p := Fin.ext rfl
+                  have hq : (⟨i, hi⟩ : Fin 26) = Fin.natAdd 13 q := Fin.ext (by simp [q]; omega)
+                  dsimp only [f]; rw [hOp, hx4]
+                  change ((List.ofFn v).getD i false && ((List.ofFn v).getD j false && true)) = _
+                  rw [hget, hget]; simp only [hi, hj, ↓reduceDIte, hp, hq, Bool.and_true]
+                  exact Bool.and_comm _ _
+                · refine hNonEdgeAnd f x5 (Or.inr (Or.inr ?_)) hSepF
+                  intro a b hab
+                  have hpg : x1 a b := of_decide_eq_true hab
+                  apply Bool.eq_false_iff.mpr
+                  intro hboth
+                  dsimp only [f] at hboth; rw [hOp, hx4] at hboth
+                  change ((List.ofFn (evec a b)).getD i false && ((List.ofFn (evec a b)).getD j false && true)) = true at hboth
+                  rw [hget, hget] at hboth
+                  simp only [hi, hj, ↓reduceDIte, Bool.and_true, evec, Bool.and_eq_true, decide_eq_true_eq,
+                    Fin.ext_iff, Fin.val_castAdd, Fin.val_natAdd] at hboth
+                  rcases hboth with ⟨hiab | hiab, hjab | hjab⟩
+                  · exact hij (hiab.trans hjab.symm)
+                  · apply h1
+                    refine ⟨by omega, by omega, ?_⟩
+                    have ha : (⟨i, by omega⟩ : Fin 13) = a := Fin.ext (by dsimp; omega)
+                    have hb : (⟨j - 13, by omega⟩ : Fin 13) = b := Fin.ext (by dsimp; omega)
+                    rw [ha, hb]; exact hpg
+                  · apply h2
+                    refine ⟨by omega, by omega, ?_⟩
+                    have ha : (⟨j, by omega⟩ : Fin 13) = a := Fin.ext (by dsimp; omega)
+                    have hb : (⟨i - 13, by omega⟩ : Fin 13) = b := Fin.ext (by dsimp; omega)
+                    rw [ha, hb]; exact hpg
+                  · exact hij (hiab.trans hjab.symm)
+          · refine hNonEdgeAnd f x5 (Or.inr (Or.inr ?_)) hSepF
+            intro a b _
+            dsimp only [f]; rw [hOp, hx4]
+            change ((List.ofFn _).getD i false && ((List.ofFn _).getD j false && true)) = false
+            rw [hget, hget]; simp only [hi, hj, ↓reduceDIte, Bool.false_and, Bool.and_false]
+        · refine hNonEdgeAnd f x5 (Or.inr (Or.inr ?_)) hSepF
+          intro a b _
+          dsimp only [f]; rw [hOp, hx4]
+          change ((List.ofFn _).getD i false && ((List.ofFn _).getD j false && true)) = false
+          rw [hget]; simp only [hi, ↓reduceDIte, Bool.false_and]
+      | cons k t3 =>
+        simp [hx4] at hLen
