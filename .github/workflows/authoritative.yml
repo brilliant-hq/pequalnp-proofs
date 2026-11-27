@@ -608,6 +608,7 @@ jobs:
         env:
           CODE: ${{ steps.run.outputs.code }}
           RAN: ${{ steps.run.outcome }}
+          READ: ${{ inputs.read }}
         run: |
           # SECOND WALL: the system's own tools only, whatever the build left on the runner's PATH.
           export PATH=/usr/bin:/bin
@@ -756,21 +757,32 @@ jobs:
             1) case "$last" in REJECTED*) verdict=REJECTED ;; esac ;;
           esac
           echo "VERDICT: $verdict (checker exit $CODE)" | tee -a "$GITHUB_STEP_SUMMARY"
+          # RECORD BLOCK START (tools/read-decision.test.py runs this text). With read off nothing runs between the
+          # VERDICT line and the exit: the accepted branch is the old one. With read on, the check record is written in a
+          # subshell with errexit off, its output redirection inside it, and "|| true" after it, so no failure in it can
+          # change the step's exit; a missing or empty record means no receipt (tools/read-receipt.sh refuses it).
           if [ "$verdict" = ACCEPTED ]; then
-            # The check record (see the job's outputs): only validated or before-the-outside-step values, built by jq.
-            if printf '%s %s %s %s' "$fsha" "$ssha" "$(cat "$W/in/pr.head")" "$(cat "$W/in/pr.blob")" | grep -Eqx '[0-9a-f]{64} [0-9a-f]{64} [0-9a-f]{40} [0-9a-f]{40}'; then
-              # What the hub records, as digests of exactly the lines this step prints for it (each without its "  | "):
-              # the MANIFEST line(s), and the CHILD lines and their count.
-              msha=$(grep -a '^MANIFEST {' "$RUNNER_TEMP/checker.out" | cut -c1-200000 | sha256sum | cut -d' ' -f1)
-              csha=$(grep -a '^CHILD ' "$RUNNER_TEMP/checker.out" | tr -d '\000-\010\013-\037\177' | cut -c1-8200 | sha256sum | cut -d' ' -f1)
-              echo "record=$(jq -cnS --argjson pr "$PR" --arg gap "$GAP" --arg kind "$(cat "$W/in/gap.kind")" --arg file "$file" \
-                --arg head "$(cat "$W/in/pr.head")" --arg blob "$(cat "$W/in/pr.blob")" --arg f "$fsha" --arg s "$ssha" \
-                --arg m "$msha" --argjson n "${children:-0}" --arg c "$csha" \
-                '{pr: $pr, gap: $gap, kind: $kind, file: $file, head: $head, blob: $blob, file_sha256: $f, statement_sha256: $s,
-                  manifest_sha256: $m, children: $n, children_sha256: $c, verdict: "ACCEPTED"}')" >> "$GITHUB_OUTPUT"
+            if [ "${READ:-}" = on ]; then
+              ( set +e
+                # Only validated or before-the-outside-step values, and digests of exactly the lines this step prints for
+                # the hub (each without its "  | ", with one newline): the MANIFEST line(s), the CHILD lines and their
+                # count, and the last line as the "last line" section prints it.
+                if printf '%s %s %s %s' "$fsha" "$ssha" "$(cat "$W/in/pr.head")" "$(cat "$W/in/pr.blob")" | grep -Eqx '[0-9a-f]{64} [0-9a-f]{64} [0-9a-f]{40} [0-9a-f]{40}'; then
+                  msha=$(grep -a '^MANIFEST {' "$RUNNER_TEMP/checker.out" | cut -c1-200000 | sha256sum | cut -d' ' -f1)
+                  csha=$(grep -a '^CHILD ' "$RUNNER_TEMP/checker.out" | tr -d '\000-\010\013-\037\177' | cut -c1-8200 | sha256sum | cut -d' ' -f1)
+                  lsha=$(printf '%s\n' "$last" | tr -d '\000-\010\013-\037\177' | cut -c1-2000 | sha256sum | cut -d' ' -f1)
+                  rec=$(jq -cnS --argjson pr "$PR" --arg gap "$GAP" --arg kind "$(cat "$W/in/gap.kind")" --arg file "$file" \
+                    --arg head "$(cat "$W/in/pr.head")" --arg blob "$(cat "$W/in/pr.blob")" --arg f "$fsha" --arg s "$ssha" \
+                    --arg m "$msha" --argjson n "${children:-0}" --arg c "$csha" --arg l "$lsha" \
+                    '{pr: $pr, gap: $gap, kind: $kind, file: $file, head: $head, blob: $blob, file_sha256: $f, statement_sha256: $s,
+                      manifest_sha256: $m, children: $n, children_sha256: $c, last_sha256: $l, verdict: "ACCEPTED"}')
+                  [ -n "$rec" ] && printf 'record=%s\n' "$rec" >> "$GITHUB_OUTPUT"
+                fi
+              ) || true
             fi
             exit 0
           fi
+          # RECORD BLOCK END
           [ "$verdict" = REJECTED ] && exit 1
           exit 3
 

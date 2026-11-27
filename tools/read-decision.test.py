@@ -106,7 +106,7 @@ class Receipt(unittest.TestCase):
         for n, v in (('pr.blob', self.blob), ('pr.head', 'c' * 40), ('pr.file', 'lean/PEqualNP/Outside/L_x_1.lean')): put(f'{self.d}/in/{n}', v)
         self.rec = {'pr': 41, 'gap': 'L-x-1', 'kind': 'check', 'file': 'lean/PEqualNP/Outside/L_x_1.lean', 'head': 'c' * 40, 'blob': self.blob,
                     'file_sha256': self.sha, 'statement_sha256': 'd' * 64, 'manifest_sha256': 'e' * 64, 'children': 0,
-                    'children_sha256': hashlib.sha256(b'').hexdigest(), 'verdict': 'ACCEPTED'}
+                    'children_sha256': hashlib.sha256(b'').hexdigest(), 'last_sha256': 'f' * 64, 'verdict': 'ACCEPTED'}
         self.env = {**os.environ, 'GITHUB_REPOSITORY': 'open-goat/pequalnp-proofs', 'PR': '41', 'GAP': 'L-x-1', 'GITHUB_RUN_ID': '777',
                     'GITHUB_RUN_ATTEMPT': '2', 'GITHUB_SHA': 'b' * 40, 'CHECK_RECORD': json.dumps(self.rec)}
     def receipt(self, line, env=None, status='0'):
@@ -154,10 +154,11 @@ class Receipt(unittest.TestCase):
                 self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
                 self.assertEqual((rc['decision'], rc['shapes']), ('HOLD', [[0, 'ERROR', 'empty', 'empty']]))
     def test_no_receipt_without_a_matching_accepted_check_record(self):
-        cases = [('', 'missing (the check job writes it only on ACCEPTED)')]
+        cases = [('', 'missing (the check job writes it only on ACCEPTED)'), (json.dumps(self.rec)[:60], 'truncated'), ('null', 'null'), ('{}', 'empty object')]
+        cases.append((json.dumps({k: v for k, v in self.rec.items() if k != 'last_sha256'}), 'no last line digest'))
         for k, v in (('verdict', 'REJECTED'), ('pr', 42), ('gap', 'L-x-2'), ('head', 'e' * 40), ('blob', 'f' * 40), ('file_sha256', '0' * 64),
                      ('file', 'lean/PEqualNP/Outside/L_x_2.lean'), ('kind', 'value'), ('extra', 1), ('statement_sha256', 'x'),
-                     ('manifest_sha256', 'D' * 64), ('children', 2), ('children', 1.5), ('children_sha256', None)):
+                     ('manifest_sha256', 'D' * 64), ('children', 2), ('children', 1.5), ('children_sha256', None), ('last_sha256', 'x')):
             cases.append((json.dumps({**self.rec, k: v}), k))
         for rec, why in cases:
             with self.subTest(why=why):
@@ -170,6 +171,46 @@ class Receipt(unittest.TestCase):
         for k, v in (('PR', '41; echo'), ('GITHUB_SHA', 'nope'), ('GAP', 'L x')):
             with self.subTest(k=k):
                 r, rc = self.receipt(self.good(), env={**self.env, k: v}); self.assertNotEqual(r.returncode, 0)
+
+class RecordBlock(unittest.TestCase):
+    """The verdict step's accepted tail, run from the workflow's own text (between the RECORD BLOCK markers), under the
+    implicit step shell (errexit) and set -u, as on the runner."""
+    def block(self):
+        w = open(os.path.join(BASE, '.github/workflows/authoritative.yml')).read().split('\n')
+        a = next(i for i, l in enumerate(w) if l.strip() == '# RECORD BLOCK START (tools/read-decision.test.py runs this text). With read off nothing runs between the'.strip())
+        b = next(i for i, l in enumerate(w) if l.strip() == '# RECORD BLOCK END')
+        return '\n'.join(l[10:] for l in w[a:b + 1])
+    def run_tail(self, read, out=None, fake_jq=False):
+        d = tempfile.mkdtemp(); os.makedirs(f'{d}/in')
+        put(f'{d}/in/pr.head', 'c' * 40); put(f'{d}/in/pr.blob', 'b' * 40); put(f'{d}/in/gap.kind', 'check')
+        put(f'{d}/checker.out', 'MANIFEST {"lemma":"L-x-1"}\nACCEPTED (check) fine\n')
+        path = os.environ['PATH']
+        if fake_jq:
+            os.makedirs(f'{d}/bin'); put(f'{d}/bin/jq', '#!/bin/sh\nexit 1\n'); os.chmod(f'{d}/bin/jq', 0o755); path = f'{d}/bin:{path}'
+        go = out if out is not None else f'{d}/github_output'
+        if out is None: put(go, '')
+        script = 'set -eu\nverdict=ACCEPTED\nlast="ACCEPTED (check) fine"\nfile=lean/PEqualNP/Outside/L_x_1.lean\nchildren=0\n' + self.block() + '\necho NOT-REACHED; exit 9\n'
+        env = {**os.environ, 'PATH': path, 'READ': read, 'W': d, 'RUNNER_TEMP': d, 'PR': '41', 'GAP': 'L-x-1', 'GITHUB_OUTPUT': go,
+               'fsha': '1' * 64, 'ssha': '2' * 64}
+        script = 'fsha=' + '1' * 64 + '\nssha=' + '2' * 64 + '\n' + script
+        r = subprocess.run(['bash', '-c', script], capture_output=True, text=True, env=env)
+        rec = open(go).read() if os.path.isfile(go) else ''
+        return r, rec
+    def test_read_off_runs_nothing_and_exits_zero(self):
+        for read in ('', 'off', 'ON', 'on '):
+            with self.subTest(read=read):
+                r, rec = self.run_tail(read); self.assertEqual((r.returncode, r.stdout, rec), (0, '', ''))
+    def test_read_on_writes_one_record_with_the_last_line_digest(self):
+        r, rec = self.run_tail('on'); self.assertEqual((r.returncode, r.stdout), (0, ''))
+        self.assertTrue(rec.startswith('record=') and rec.count('\n') == 1, rec)
+        o = json.loads(rec[len('record='):])
+        self.assertEqual(o['last_sha256'], hashlib.sha256(b'ACCEPTED (check) fine\n').hexdigest())
+        self.assertEqual(o['manifest_sha256'], hashlib.sha256(b'MANIFEST {"lemma":"L-x-1"}\n').hexdigest())
+        self.assertEqual(o['children'], 0); self.assertEqual(o['verdict'], 'ACCEPTED')
+    def test_a_failed_write_or_jq_keeps_the_exit_and_leaves_no_record(self):
+        r, _ = self.run_tail('on', out=tempfile.mkdtemp()); self.assertEqual((r.returncode, r.stdout), (0, ''))   # the output path is a folder
+        r, _ = self.run_tail('on', out='/nonexistent/dir/out'); self.assertEqual((r.returncode, r.stdout), (0, ''))
+        r, rec = self.run_tail('on', fake_jq=True); self.assertEqual((r.returncode, r.stdout, rec), (0, '', ''))
 
 class Sandbox(unittest.TestCase):
     """What can be checked off Linux: the sandbox refuses bad arguments before it does anything, and the workflow wires
