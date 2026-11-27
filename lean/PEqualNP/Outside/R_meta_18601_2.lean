@@ -1,7 +1,7 @@
 import Mathlib
 import PEqualNP.Defs
 
-theorem PEqualNP.Outside.R_meta_18601_1
+theorem PEqualNP.Outside.R_meta_18601_2
     (hVC :
       ∀ (x1 : ℕ) (x2 : SimpleGraph (Fin x1)) [x3 : DecidableRel x2.Adj]
         (x4 : PEqualNP.CircuitLowerBounds.Circuit),
