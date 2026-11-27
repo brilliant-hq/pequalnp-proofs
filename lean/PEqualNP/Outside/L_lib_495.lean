@@ -101,20 +101,20 @@ lemma stab (n D N : ℕ) (F : Set (P n)) (hN : Module.finrank (ZMod 2) (Rd n D) 
   have h4 := Submodule.finrank_mono (iter_le_Rd n D F (N + 1))
   omega
 
-def Der (n D : ℕ) (F : Set (P n)) : Submodule (ZMod 2) (P n) where
-  carrier := {p | PCDerivable F D p}
-  zero_mem' := PCDerivable.zero
-  add_mem' := fun hp hq => PCDerivable.add hp hq
-  smul_mem' := by
-    intro c p hp
-    have hc : c = 0 ∨ c = 1 := by
-      revert c
-      decide
-    rcases hc with rfl | rfl
-    · rw [zero_smul]
-      exact PCDerivable.zero
-    · rw [one_smul]
-      exact hp
+lemma der_smul (n D : ℕ) (F : Set (P n)) (c : ZMod 2) (p : P n) (hp : PCDerivable F D p) :
+    PCDerivable F D (c • p) := by
+  have hc : c = 0 ∨ c = 1 := by
+    revert c
+    decide
+  rcases hc with rfl | rfl
+  · rw [zero_smul]
+    exact PCDerivable.zero
+  · rw [one_smul]
+    exact hp
+
+def Der (n D : ℕ) (F : Set (P n)) : Submodule (ZMod 2) (P n) :=
+  { carrier := {p | PCDerivable F D p}, zero_mem' := PCDerivable.zero,
+    smul_mem' := fun c _ hp => der_smul n D F c _ hp, add_mem' := fun hp hq => PCDerivable.add hp hq }
 
 lemma iter_le_Der (n D : ℕ) (F : Set (P n)) (m : ℕ) : (stepF n D)^[m] (baseF n D F) ≤ Der n D F := by
   induction m with
