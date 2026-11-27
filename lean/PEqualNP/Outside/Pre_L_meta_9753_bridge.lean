@@ -1,5 +1,6 @@
 import PEqualNP.Outside.L_meta_25825
 import PEqualNP.Outside.L_meta_25826
+import PEqualNP.Outside.L_meta_971
 import PEqualNP.MetaComplexity.Helpers.PermInputs
 import PEqualNP.MetaComplexity.Helpers.ReadersExport
 import PEqualNP.MetaComplexity.Helpers.ForestBound
@@ -755,8 +756,89 @@ def fullTarget (x : Fin 14 → Bool) : Bool :=
   (x 5 && x 9) || (x 5 && x 10) || (x 5 && x 12) ||
   (x 6 && x 8) || (x 6 && x 9) || (x 6 && x 11)
 
+def fullEdges : List (Nat × Nat) :=
+  [(0, 7), (0, 8), (0, 10), (1, 7), (1, 9), (1, 13), (2, 8),
+   (2, 12), (2, 13), (3, 7), (3, 11), (3, 12), (4, 10), (4, 11),
+   (4, 13), (5, 9), (5, 10), (5, 12), (6, 8), (6, 9), (6, 11)]
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem fullTarget_true_iff : ∀ x : Fin 14 → Bool,
+    fullTarget x = true ↔
+      ∃ u v : Fin 14, (u.val, v.val) ∈ fullEdges ∧ x u = true ∧ x v = true := by
+  decide +kernel
+
+theorem no_monotone_full_26 :
+    ¬ ∃ C : Circuit, Monotone2 C ∧ C.size ≤ 26 ∧
+      ∀ x : Fin 14 → Bool, C.eval (List.ofFn x) = fullTarget x := by
+  rintro ⟨C, hmono, hsize, hev⟩
+  have hlower := PEqualNP.Outside.L_meta_971 C hmono (fun x => by
+    rw [hev x]
+    exact fullTarget_true_iff x)
+  omega
+
+theorem full_26_requires_not (hfull : HasCircuitSize 14 fullTarget 26) :
+    ∃ C : Circuit, FanInTwo C ∧ C.size ≤ 26 ∧
+      (∀ x : Fin 14 → Bool, C.eval (List.ofFn x) = fullTarget x) ∧
+      ∃ g ∈ C.gates, g.op = GateOp.not := by
+  obtain ⟨C, hlegal, hsize, hev⟩ := hfull
+  refine ⟨C, hlegal, hsize, hev, ?_⟩
+  by_contra hn
+  push Not at hn
+  have hmono : Monotone2 C := by
+    intro g hg
+    obtain ⟨hop, hfan⟩ := hlegal g hg
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hop ⊢
+    rcases hop with h | h | h
+    · exact ⟨Or.inl h, hfan⟩
+    · exact ⟨Or.inr h, hfan⟩
+    · exact (hn g hg h).elim
+  exact no_monotone_full_26 ⟨C, hmono, hsize, hev⟩
+
+/-- Delete the four complementary point rows.  Column 11 then becomes irrelevant
+without being fixed separately. -/
+def fourRowsFalse (x : Fin 14 → Bool) : Bool :=
+  fullTarget (Function.update
+    (Function.update
+      (Function.update
+        (Function.update x (3 : Fin 14) false) (4 : Fin 14) false)
+      (5 : Fin 14) false)
+    (6 : Fin 14) false)
+
+/-- Full-input numbering into the surviving local three-star numbering. -/
+def fullToLocal : Fin 14 → Fin 9
+  | ⟨0, _⟩ => 0
+  | ⟨1, _⟩ => 1
+  | ⟨2, _⟩ => 2
+  | ⟨7, _⟩ => 3
+  | ⟨8, _⟩ => 4
+  | ⟨9, _⟩ => 7
+  | ⟨10, _⟩ => 6
+  | ⟨12, _⟩ => 8
+  | ⟨13, _⟩ => 5
+  | _ => 0
+
+theorem fourRowsFalse_eq_local :
+    (fun x : Fin 9 → Bool => fourRowsFalse (x ∘ fullToLocal)) = localTarget := by
+  apply funext
+  decide +kernel
+
+def FourRowsSaveSixteen : Prop :=
+  HasCircuitSize 14 fullTarget 26 → HasCircuitSize 14 fourRowsFalse 10
+
+theorem local_ten_of_four_row_saving (saving : FourRowsSaveSixteen) :
+    HasCircuitSize 14 fullTarget 26 → HasCircuitSize 9 localTarget 10 := by
+  intro hfull
+  have h14 := saving hfull
+  have h9 := relabel_size fullToLocal fourRowsFalse 10 h14
+  rwa [fourRowsFalse_eq_local] at h9
+
 def Full26ToLocalTen : Prop :=
   HasCircuitSize 14 fullTarget 26 → HasCircuitSize 9 localTarget 10
+
+theorem full26ToLocalTen_of_four_row_saving (saving : FourRowsSaveSixteen) :
+    Full26ToLocalTen :=
+  local_ten_of_four_row_saving saving
 
 theorem no_full_26_of_outer (outer : Full26ToLocalTen) :
     ¬ HasCircuitSize 14 fullTarget 26 := by
