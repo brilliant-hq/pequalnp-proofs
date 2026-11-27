@@ -9,7 +9,8 @@ import Mathlib.Tactic.SplitIfs
 import Mathlib.Tactic.Tauto
 import PEqualNP.Defs
 
-namespace PEqualNP.Outside.V_meta_9953__k10_aux
+
+namespace PEqualNP.Outside.V_meta_9953__k10
 
 open PEqualNP.MetaComplexity PEqualNP.CircuitLowerBounds
 
@@ -340,7 +341,6 @@ theorem contraction {d d1 T : Nat} (hd : d &&& mask256 = d) (hsub : d &&& d1 = d
       simp only [List.countP_cons, hna, hnb, Bool.false_eq_true, ite_false] at hle ⊢
       exact ⟨q, next, hq, ht, by omega⟩
 
--- Backward extraction: NatReach d roots p bank + Avail d bank T -> RunD d (T &&& d) s ws!
 theorem mask_idemp (d w : Nat) : (w &&& d) &&& d = w &&& d := by
   simp [Nat.and_assoc, Nat.and_self]
 
@@ -573,7 +573,6 @@ theorem reach_to_run {d : Nat} {roots : List Nat} {T : Nat} {p bank} (hd : d &&&
   obtain ⟨s, ws, hs, hnd, _, hsub', hrun⟩ := reach_to_run_aux hd hr (List.nodup_singleton _) hprop hsub Run.done
   exact ⟨s, ws, by omega, hnd, hsub', hrun⟩
 
--- Essential variable lemma + lower_slice + lower_base + lower_iso!
 theorem runD_bits {d y s ws} (hd : d &&& mask256 = d) (h : RunD d y s ws) (i j : Nat)
     (hi : d.testBit i = true) (hj : d.testBit j = true)
     (hw : ∀ w ∈ ws, w.testBit i = w.testBit j) : y.testBit i = y.testBit j := by
@@ -628,7 +627,6 @@ theorem lower_base {d : Nat} {roots : List Nat} {T : Nat} (h : availB d roots T 
     rw [h] at ht; contradiction
   | succ p => omega
 
--- moveBits & lower_iso!
 def moveBits (tag d w : Nat) : Nat :=
   ((w &&& tag) <<< d) ||| ((w >>> d) &&& tag) |||
     (w ^^^ ((w &&& tag) ||| (w &&& (tag <<< d))))
@@ -807,7 +805,6 @@ theorem lower_iso {d1 d2 T1 T2 L : Nat} {roots1 roots2 : List Nat}
   · have hve : applyMoves ms v &&& d1 = T1 &&& d1 := by rw [← hT, ← hd, ← hand, ← hand, he]
     exact avail_of_eq hve (hbb v hv)
 
--- lower_slice!
 def pairOK (d T : Nat) (p : Nat × Nat) : Bool :=
   d.testBit p.1 && d.testBit p.2 && (T.testBit p.1 != T.testBit p.2)
 
@@ -883,7 +880,6 @@ theorem lower_slice {d dSub T TSub L : Nat} {roots rootsSub : List Nat}
   simp only [List.length_map] at hcnt
   omega
 
--- poolCut (compact 52-bit hint!) + covers + eval6 + bar!
 def runChoices (d : Nat) (pool : List Nat) : Nat → Nat → Option (List Nat)
   | 0, _ => some pool
   | p + 1, bits =>
@@ -978,7 +974,6 @@ theorem checkCutEntry_sound {d dSub T TSub LSub s : Nat} {rootsSub ws : List Nat
     have hL := hprior q next hq (avail_of_eq (by rw [Nat.and_assoc, Nat.and_comm d dSub, hsub, hT]) ht)
     omega
 
--- covers, eval6, hw256, hk, bsr, bar, bar_all!
 def coversP (pairs : List (Nat × Nat)) (s : Nat) (ws : List Nat) : Bool :=
   if ws.length == s + 1 then
     pairs.all (fun p => ws.any (fun w => !w.testBit p.1 && w.testBit p.2))
@@ -1023,7 +1018,6 @@ theorem unorientedCov_ok {d T s : Nat} (hd : d &&& mask256 = d)
   have heq := runD_bits hd h u v hp.1.1.1 hp.1.1.2 hall
   rw [hp.1.2, hp.2] at heq; contradiction
 
--- Fast bitmask-decorated covers (150x faster than per-pair testBit!)
 def maskP (m : Nat) : Nat := 2 ^ m - 1
 
 def projBit (rs : List Nat) (w : Nat) : Nat :=
@@ -1894,7 +1888,6 @@ theorem pickMin_runD {dm Y u} (seed : Nat) (orig : List Nat) (h0 : RunD dm Y u o
     · exact pickMin_runD seed orig h0 rest _ _ hok.2 (applyMoves_runD ms hok.1.1.1 hok.1.1.2 hok.1.2 h0)
     · exact pickMin_runD seed orig h0 rest best bestH hok.2 hb
 
--- Bridge: HasCircuitSize 8 fG s -> Lower mask256 xs256 (enc256 fG) lb -> lb <= s!
 def gvN (w : List Nat) (g : Gate) : Nat :=
   match g.op with
   | .and => g.inputs.foldr (fun i acc => andD mask256 (w.getD i 0) acc) mask256
@@ -1954,7 +1947,6 @@ theorem execN_reach (gs : List Gate) (roots : List Nat)
       intro i; by_cases hi : i < w.length
       · exact hsup _ (getD_mem hi)
       · rw [List.getD_eq_default _ _ (by omega)]; exact Or.inl (Or.inl (by simp))
-    -- Use gvN_step directly on roots=roots:
     have hstep : ∃ p1 bank1, p1 ≤ p + 1 ∧ NatReach mask256 roots p1 bank1 ∧
         (∀ v ∈ w ++ [gvN w g], Avail mask256 bank1 v) := by
       have hg := hfan g List.mem_cons_self
@@ -2056,106 +2048,98 @@ theorem lower_to_circuit (f : (Fin 8 → Bool) → Bool) (T lb : Nat)
 def dom_13 : Nat := 0x3333
 def goal_13 : Nat := 0xfaa0faa0faa0faa0faa0faa0faa0faa0faa0faa0faa0faa0faa0faa0faa0faa0
 def roots_13 : List Nat := [xs256.getD 0 0, xs256.getD 2 0, xs256.getD 3 0]
-
 def dom_28 : Nat := 0x11111111
 def goal_28 : Nat := 0xfff0f000fff0f000fff0f000fff0f000fff0f000fff0f000fff0f000fff0f000
 def roots_28 : List Nat := [xs256.getD 2 0, xs256.getD 3 0, xs256.getD 4 0]
-
 def dom_35 : Nat := 0xf0000000f
 def goal_35 : Nat := 0xeeeeeeee88888888eeeeeeee88888888eeeeeeee88888888eeeeeeee88888888
 def roots_35 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 5 0]
-
-def dom_15 : Nat := 0xffff
-def goal_15 : Nat := 0xfaa8faa8faa8faa8faa8faa8faa8faa8faa8faa8faa8faa8faa8faa8faa8faa8
-def roots_15 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 2 0, xs256.getD 3 0]
-
+def dom_53 : Nat := 0x33003300330033
+def goal_53 : Nat := 0xfafaaaaaf0f0a0a0fafaaaaaf0f0a0a0fafaaaaaf0f0a0a0fafaaaaaf0f0a0a0
+def roots_53 : List Nat := [xs256.getD 0 0, xs256.getD 2 0, xs256.getD 4 0, xs256.getD 5 0]
+def dom_57 : Nat := 0x303030303030303
+def goal_57 : Nat := 0xffaaaaaaff00aa00ffaaaaaaff00aa00ffaaaaaaff00aa00ffaaaaaaff00aa00
+def roots_57 : List Nat := [xs256.getD 0 0, xs256.getD 3 0, xs256.getD 4 0, xs256.getD 5 0]
+def dom_23 : Nat := 0xff00ff
+def goal_23 : Nat := 0xf8f8a8a8f8f8a8a8f8f8a8a8f8f8a8a8f8f8a8a8f8f8a8a8f8f8a8a8f8f8a8a8
+def roots_23 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 2 0, xs256.getD 4 0]
+def dom_27 : Nat := 0xf0f0f0f
+def goal_27 : Nat := 0xff88aa88ff88aa88ff88aa88ff88aa88ff88aa88ff88aa88ff88aa88ff88aa88
+def roots_27 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 3 0, xs256.getD 4 0]
 def dom_29 : Nat := 0x33333333
 def goal_29 : Nat := 0xfff0faa0fff0faa0fff0faa0fff0faa0fff0faa0fff0faa0fff0faa0fff0faa0
 def roots_29 : List Nat := [xs256.getD 0 0, xs256.getD 2 0, xs256.getD 3 0, xs256.getD 4 0]
-
-def dom_39 : Nat := 0xff000000ff
-def goal_39 : Nat := 0xeeeeeeeea8a8a8a8eeeeeeeea8a8a8a8eeeeeeeea8a8a8a8eeeeeeeea8a8a8a8
-def roots_39 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 2 0, xs256.getD 5 0]
-
-def dom_43 : Nat := 0xf0f00000f0f
-def goal_43 : Nat := 0xeeeeeeeeaa88aa88eeeeeeeeaa88aa88eeeeeeeeaa88aa88eeeeeeeeaa88aa88
-def roots_43 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 3 0, xs256.getD 5 0]
-
+def dom_15 : Nat := 0xffff
+def goal_15 : Nat := 0xfaa8faa8faa8faa8faa8faa8faa8faa8faa8faa8faa8faa8faa8faa8faa8faa8
+def roots_15 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 2 0, xs256.getD 3 0]
 def dom_45 : Nat := 0x333300003333
 def goal_45 : Nat := 0xfaaafaaafaa0faa0faaafaaafaa0faa0faaafaaafaa0faa0faaafaaafaa0faa0
 def roots_45 : List Nat := [xs256.getD 0 0, xs256.getD 2 0, xs256.getD 3 0, xs256.getD 5 0]
-
+def dom_39 : Nat := 0xff000000ff
+def goal_39 : Nat := 0xeeeeeeeea8a8a8a8eeeeeeeea8a8a8a8eeeeeeeea8a8a8a8eeeeeeeea8a8a8a8
+def roots_39 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 2 0, xs256.getD 5 0]
+def dom_43 : Nat := 0xf0f00000f0f
+def goal_43 : Nat := 0xeeeeeeeeaa88aa88eeeeeeeeaa88aa88eeeeeeeeaa88aa88eeeeeeeeaa88aa88
+def roots_43 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 3 0, xs256.getD 5 0]
 def dom_31 : Nat := 0xffffffff
 def goal_31 : Nat := 0xfff8faa8fff8faa8fff8faa8fff8faa8fff8faa8fff8faa8fff8faa8fff8faa8
 def roots_31 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 2 0, xs256.getD 3 0, xs256.getD 4 0]
-
-def dom_47 : Nat := 0xffff0000ffff
-def goal_47 : Nat := 0xfeeefeeefaa8faa8feeefeeefaa8faa8feeefeeefaa8faa8feeefeeefaa8faa8
-def roots_47 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 2 0, xs256.getD 3 0, xs256.getD 5 0]
-
-def dom_55 : Nat := 0xff00ff00ff00ff
-def goal_55 : Nat := 0xfefeeeeef8f8a8a8fefeeeeef8f8a8a8fefeeeeef8f8a8a8fefeeeeef8f8a8a8
-def roots_55 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 2 0, xs256.getD 4 0, xs256.getD 5 0]
-
-def dom_62 : Nat := 0x5555555555555555
-def goal_62 : Nat := 0xfffcfcccfff0f000fffcfcccfff0f000fffcfcccfff0f000fffcfcccfff0f000
-def roots_62 : List Nat := [xs256.getD 1 0, xs256.getD 2 0, xs256.getD 3 0, xs256.getD 4 0, xs256.getD 5 0]
-
-def dom_59 : Nat := 0xf0f0f0f0f0f0f0f
-def goal_59 : Nat := 0xffeeeeeeff88aa88ffeeeeeeff88aa88ffeeeeeeff88aa88ffeeeeeeff88aa88
-def roots_59 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 3 0, xs256.getD 4 0, xs256.getD 5 0]
-
 def dom_61 : Nat := 0x3333333333333333
 def goal_61 : Nat := 0xfffafaaafff0faa0fffafaaafff0faa0fffafaaafff0faa0fffafaaafff0faa0
 def roots_61 : List Nat := [xs256.getD 0 0, xs256.getD 2 0, xs256.getD 3 0, xs256.getD 4 0, xs256.getD 5 0]
-
+def dom_55 : Nat := 0xff00ff00ff00ff
+def goal_55 : Nat := 0xfefeeeeef8f8a8a8fefeeeeef8f8a8a8fefeeeeef8f8a8a8fefeeeeef8f8a8a8
+def roots_55 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 2 0, xs256.getD 4 0, xs256.getD 5 0]
+def dom_59 : Nat := 0xf0f0f0f0f0f0f0f
+def goal_59 : Nat := 0xffeeeeeeff88aa88ffeeeeeeff88aa88ffeeeeeeff88aa88ffeeeeeeff88aa88
+def roots_59 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 3 0, xs256.getD 4 0, xs256.getD 5 0]
+def dom_47 : Nat := 0xffff0000ffff
+def goal_47 : Nat := 0xfeeefeeefaa8faa8feeefeeefaa8faa8feeefeeefaa8faa8feeefeeefaa8faa8
+def roots_47 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 2 0, xs256.getD 3 0, xs256.getD 5 0]
+def dom_62 : Nat := 0x5555555555555555
+def goal_62 : Nat := 0xfffcfcccfff0f000fffcfcccfff0f000fffcfcccfff0f000fffcfcccfff0f000
+def roots_62 : List Nat := [xs256.getD 1 0, xs256.getD 2 0, xs256.getD 3 0, xs256.getD 4 0, xs256.getD 5 0]
 def dom_63 : Nat := 0xffffffffffffffff
 def goal_63 : Nat := 0xfffefeeefff8faa8fffefeeefff8faa8fffefeeefff8faa8fffefeeefff8faa8
 def roots_63 : List Nat := [xs256.getD 0 0, xs256.getD 1 0, xs256.getD 2 0, xs256.getD 3 0, xs256.getD 4 0, xs256.getD 5 0]
-
 namespace S_13
 def pairsG : List (Nat × Nat) := [(1, 5), (1, 9), (4, 5), (4, 12), (8, 9), (8, 12)]
 def r1sG : List Nat := [1, 1, 4, 4, 8, 8]
 def r2sG : List Nat := [5, 9, 5, 12, 9, 12]
 def mpG : Nat := 0x3f
-def pool6G : List Nat := [4402476484869]
+def pool6G : List Nat := []
 def xsM : List Nat := roots_13.map (· &&& dom_13)
 def goalM : Nat := goal_13 &&& dom_13
 def NN : Nat → Nat
+  | 2 => 1
   | 3 => 1
   | _ => 0
 def HT : Nat → Nat → Nat
+  | 2, 0 => 0xb9ef265f
   | 3, 0 => 0xb9ef265f
   | _, _ => 0
 def dictB : Nat → Nat → Nat
   | 0, 0 => 0x330000000000000000000000000000000000000000000000000000000000000030300000000000000000000000000000000000000000000000000000000000002222
   | _, _ => 0
-def stateB : Nat → Nat → Nat → Nat
-  | 3, 0, 0 => 0x243
-  | _, _, _ => 0
-def stateW : Nat → Nat
-  | 3 => 10
-  | _ => 0
-def wireAt (i : Nat) : Nat := fld (dictB (i / 128) (i / 8 % 16)) 256 (i % 8)
-def stateWires : Nat → Nat → List Nat
-  | 0, _ => []
-  | n + 1, ids => wireAt (fld ids 2 0) :: stateWires n (ids >>> 2)
-def S (s j : Nat) : List Nat :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWires (packed &&& 15) (packed >>> 4)
-
 def dictP1B : Nat → Nat → Nat
   | 0, 0 => 0x30000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000003
   | _, _ => 0
 def dictP2B : Nat → Nat → Nat
   | 0, 0 => 0x3a000000000000000000000000000000000000000000000000000000000000002d0000000000000000000000000000000000000000000000000000000000000017
   | _, _ => 0
+def stateB : Nat → Nat → Nat → Nat
+  | 2, 0, 0 => 0x243
+  | 3, 0, 0 => 0x243
+  | _, _, _ => 0
+def stateW : Nat → Nat
+  | 2 => 10
+  | 3 => 10
+  | _ => 0
+def wireAt (i : Nat) : Nat := fld (dictB (i / 128) (i / 8 % 16)) 256 (i % 8)
 def p1At (i : Nat) : Nat := fld (dictP1B (i / 128) (i / 8 % 16)) 256 (i % 8)
 def p2At (i : Nat) : Nat := fld (dictP2B (i / 128) (i / 8 % 16)) 256 (i % 8)
-def wireDAt (i : Nat) : Nat × Nat × Nat :=
-  if i < 3 then (wireAt i, p1At i, p2At i) else (0, 0, 0)
-def wireDOK (i : Nat) : Bool :=
-  (p1At i == projBit r1sG (wireAt i)) && (p2At i == projBit r2sG (wireAt i))
+def wireDAt (i : Nat) : Nat × Nat × Nat := if i < 3 then (wireAt i, p1At i, p2At i) else (0, 0, 0)
+def wireDOK (i : Nat) : Bool := (p1At i == projBit r1sG (wireAt i)) && (p2At i == projBit r2sG (wireAt i))
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
 theorem wireD_ok_all : span wireDOK 3 0 = true := by decide +kernel
@@ -2165,12 +2149,8 @@ theorem projBit_zero (rs : List Nat) : projBit rs 0 = 0 := by
   | cons r rs ih => simp only [projBit, List.foldr_cons, Nat.zero_testBit, Bool.false_eq_true, ite_false] at ih ⊢; rw [ih]; rfl
 theorem wireDAt_eq (i : Nat) :
     wireDAt i = (let w := if i < 3 then wireAt i else 0; (w, projBit r1sG w, projBit r2sG w)) := by
-  unfold wireDAt
-  split
-  · next hi =>
-    have h := span_ok wireD_ok_all i (Nat.zero_le i) (by omega)
-    simp only [wireDOK, Bool.and_eq_true, beq_iff_eq] at h
-    simp [h.1, h.2]
+  unfold wireDAt; split
+  · next hi => have h := span_ok wireD_ok_all i (Nat.zero_le i) (by omega); simp only [wireDOK, Bool.and_eq_true, beq_iff_eq] at h; simp [h.1, h.2]
   · simp [projBit_zero]
 def wireSAt (i : Nat) : Nat := if i < 3 then wireAt i else 0
 def stateWiresD : Nat → Nat → List (Nat × Nat × Nat)
@@ -2179,23 +2159,13 @@ def stateWiresD : Nat → Nat → List (Nat × Nat × Nat)
 def stateWiresS : Nat → Nat → List Nat
   | 0, _ => []
   | n + 1, ids => wireSAt (fld ids 2 0) :: stateWiresS n (ids >>> 2)
-def SD (s j : Nat) : List (Nat × Nat × Nat) :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWiresD (packed &&& 15) (packed >>> 4)
-def SS (s j : Nat) : List Nat :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWiresS (packed &&& 15) (packed >>> 4)
-theorem stateWiresD_eq (n ids : Nat) :
-    stateWiresD n ids = (stateWiresS n ids).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := by
-  induction n generalizing ids with
-  | zero => rfl
-  | succ n ih => simp [stateWiresD, stateWiresS, wireSAt, wireDAt_eq, ih]
-theorem SD_eq (s j : Nat) :
-    SD s j = (SS s j).map (fun w => (w, projBit r1sG w, projBit r2sG w)) :=
-  stateWiresD_eq _ _
-
+def SD (s j : Nat) : List (Nat × Nat × Nat) := let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16); stateWiresD (packed &&& 15) (packed >>> 4)
+def SS (s j : Nat) : List Nat := let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16); stateWiresS (packed &&& 15) (packed >>> 4)
+theorem stateWiresD_eq (n ids : Nat) : stateWiresD n ids = (stateWiresS n ids).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := by
+  induction n generalizing ids with | zero => rfl | succ n ih => simp [stateWiresD, stateWiresS, wireSAt, wireDAt_eq, ih]
+theorem SD_eq (s j : Nat) : SD s j = (SS s j).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := stateWiresD_eq _ _
 def htAt (s i : Nat) : Nat := fld (HT s (i / 64)) 32 (i % 64)
-def idxH (s h : Nat) : Nat := bsr (htAt s) h 2 0 (NN s)
+def idxH (s h : Nat) : Nat := bsr (htAt s) h 1 0 (NN s)
 def idx (s : Nat) (zs : List Nat) : Nat := idxH s (hk 0 zs)
 def CN : Nat → Nat
   | _ => 0
@@ -2209,28 +2179,157 @@ def cidx (s : Nat) (zs : List Nat) : Nat := cidxH s (hk 0 zs)
 def checkCutByIdx (s : Nat) (ws : List Nat) (hint : Nat) : Bool :=
   match hint &&& 255 with
   | _ => false
-def cutHitH (s h : Nat) (ws : List Nat) : Bool :=
-  let i := cidxH s h
-  decide (i < CN s) && (chAt s i == h) && checkCutByIdx s ws (fld (CV s (i / 32)) 52 (i % 32))
-
+def cutHitH (s h : Nat) (ws : List Nat) : Bool := let i := cidxH s h; decide (i < CN s) && (chAt s i == h) && checkCutByIdx s ws (fld (CV s (i / 32)) 52 (i % 32))
 def cutHit (s : Nat) (ws : List Nat) : Bool := cutHitH s (hk 0 ws) ws
-
 theorem cutHitH_sound {u ys} (h : cutHitH u (hk 0 ys) ys = true) : ¬ RunD dom_13 goalM u ys := by
-  unfold cutHitH at h
-  simp only [Bool.and_eq_true] at h
-  have hc := h.2
-  unfold checkCutByIdx at hc
-  split at hc
+  unfold cutHitH at h; simp only [Bool.and_eq_true] at h; have hc := h.2; unfold checkCutByIdx at hc; split at hc
   · contradiction
 theorem cutHit_sound {u ys} (h : cutHit u ys = true) : ¬ RunD dom_13 goalM u ys := cutHitH_sound h
-
-def symsG : List (List (Nat × Nat)) := [[(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4)], [(0xa0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a, 3)], [(0xaa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa, 7)], [(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4), (0xaa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa, 7)], [(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4), (0xa0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a, 3)]]
-theorem symsG_ok : symsG.all (fun ms => ms.all moveOK256 && (applyMoves ms dom_13 == dom_13) && (applyMoves ms goalM == goalM)) = true := by decide +kernel
+def symsG : List (List (Nat × Nat)) := []
+theorem symsG_ok : symsG.all (fun ms => ms.all moveOK256 && (applyMoves ms dom_13 == dom_13) && (applyMoves ms goalM == goalM)) = true := by decide
 def ori (zs : List Nat) : List Nat := pickMin 0 zs symsG zs (hk 0 zs)
-theorem ori_ok {u ys} (h : RunD dom_13 goalM u ys) : RunD dom_13 goalM u (ori ys) :=
-  pickMin_runD 0 ys h symsG ys (hk 0 ys) symsG_ok h
-
+theorem ori_ok {u ys} (h : RunD dom_13 goalM u ys) : RunD dom_13 goalM u (ori ys) := pickMin_runD 0 ys h symsG ys (hk 0 ys) symsG_ok h
 def Z (s : Nat) := bar dom_13 goalM pairsG r1sG r2sG mpG SD SS NN htAt idxH ori 0 pool6G cutHitH s
+private theorem z0 : ∀ i, 0 ≤ i → i < 0 → Z 0 i = true := by omega
+private theorem z1 : ∀ i, 0 ≤ i → i < 0 → Z 1 i = true := by omega
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z2 : ∀ i, 0 ≤ i → i < 1 → Z 2 i = true := span_ok (by decide +kernel : span (Z 2) 1 0 = true)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z3 : ∀ i, 0 ≤ i → i < 1 → Z 3 i = true := span_ok (by decide +kernel : span (Z 3) 1 0 = true)
+theorem checked (s : Nat) (hs : s ≤ 3) : ∀ i < NN s, Z s i = true := by
+  interval_cases s
+  · exact fun i hi => z0 i (Nat.zero_le i) hi
+  · exact fun i hi => z1 i (Nat.zero_le i) hi
+  · exact fun i hi => z2 i (Nat.zero_le i) hi
+  · exact fun i hi => z3 i (Nat.zero_le i) hi
+def RootG (s : Nat) : Bool := scr dom_13 goalM s pool6G xsM || cutHit s (ori xsM) || found SS NN idx s (ori xsM)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+theorem rootChecked : span RootG 2 2 = true := by decide +kernel
+theorem proper_failG : ∀ zs ∈ xsM.sublists, zs ≠ xsM → unorientedCov pairsG zs = false := by decide +kernel
+theorem noRunFull (s : Nat) (hs : s ≤ 3) (h : RunD dom_13 goalM s xsM) : False := by
+  have hmin : 2 ≤ s := by have hl := run_len h; change 3 ≤ s + 1 at hl; omega
+  have hr := span_ok rootChecked s hmin (by omega)
+  unfold RootG at hr
+  rw [scr_no pool6G h, Bool.false_or, Bool.or_eq_true] at hr
+  rcases hr with hcut | hf
+  · exact cutHit_sound hcut (ori_ok h)
+  · rw [found, Bool.and_eq_true, decide_eq_true_eq, List.isPerm_iff] at hf
+    exact bar_all (by decide +kernel) rfl rfl (by decide +kernel) SD_eq (by decide +kernel) ori_ok cutHitH_sound checked s hs _ hf.1 (Run.perm hf.2 (ori_ok h))
+theorem noCircuit : Lower dom_13 roots_13 goal_13 4 := by
+  intro p bank hr ha
+  by_contra! hsmall
+  have hnc : ¬ IsConst dom_13 goal_13 := by
+    have h0 : isConstB dom_13 goal_13 = false := by decide +kernel
+    intro h
+    rw [(isConstB_iff _ _).2 h] at h0
+    contradiction
+  obtain ⟨s, ws, hs_le, hnd, hws_sub, hrun⟩ := reach_to_run (by decide +kernel) hnc hr ha
+  have hperm_sub : ∃ zs, zs.Sublist xsM ∧ ws.Perm zs := by
+    refine ⟨xsM.filter (fun x => decide (x ∈ ws)), List.filter_sublist, ?_⟩
+    refine (List.perm_ext_iff_of_nodup hnd (List.Nodup.filter _ (by decide +kernel : xsM.Nodup))).2 ?_
+    intro x; simp only [List.mem_filter, decide_eq_true_eq]; exact ⟨fun hx => ⟨hws_sub x hx, hx⟩, fun h => h.2⟩
+  obtain ⟨zs, hsub, hpz⟩ := hperm_sub
+  have hrun' := Run.perm hpz hrun
+  by_cases heq : zs = xsM
+  · subst heq; exact noRunFull s (by omega) hrun'
+  · have hcov := unorientedCov_ok (by decide +kernel) pairsG (by decide +kernel) hrun'
+    have hbad := proper_failG zs (List.mem_sublists.2 hsub) heq
+    rw [hcov] at hbad; contradiction
+end S_13
+theorem low_13 : Lower dom_13 roots_13 goal_13 4 := S_13.noCircuit
+def isoMv_28 : List (Nat × Nat) := [(0xaaaa0000aaaa0000aaaa0000aaaa0000aaaa0000aaaa0000aaaa0000aaaa, 15)]
+theorem low_28 : Lower dom_28 roots_28 goal_28 4 :=
+  lower_iso isoMv_28 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_13
+def isoMv_35 : List (Nat × Nat) := [(0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c, 2), (0xff00ff0000000000ff00ff0000000000ff00ff0000000000ff00ff00, 24)]
+theorem low_35 : Lower dom_35 roots_35 goal_35 4 :=
+  lower_iso isoMv_35 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_13
+namespace S_53
+def pairsG : List (Nat × Nat) := [(1, 5), (1, 33), (4, 5), (4, 20), (16, 20), (17, 21), (17, 49), (32, 33), (36, 37), (36, 52), (48, 49), (48, 52)]
+def r1sG : List Nat := [1, 1, 4, 4, 16, 17, 17, 32, 36, 36, 48, 48]
+def r2sG : List Nat := [5, 33, 5, 20, 20, 21, 49, 33, 37, 52, 49, 52]
+def mpG : Nat := 0xfff
+def pool6G : List Nat := []
+def xsM : List Nat := roots_53.map (· &&& dom_53)
+def goalM : Nat := goal_53 &&& dom_53
+def NN : Nat → Nat
+  | 3 => 1
+  | _ => 0
+def HT : Nat → Nat → Nat
+  | 3, 0 => 0x531db19e
+  | _, _ => 0
+def dictB : Nat → Nat → Nat
+  | 0, 0 => 0x33003300000000000000000000000000000000000000000000000000000000003300000033000000000000000000000000000000000000000000000000000000300030003000300000000000000000000000000000000000000000000000000022002200220022
+  | _, _ => 0
+def dictP1B : Nat → Nat → Nat
+  | 0, 0 => 0xf800000000000000000000000000000000000000000000000000000000000000c70000000000000000000000000000000000000000000000000000000000000030c0000000000000000000000000000000000000000000000000000000000000063
+  | _, _ => 0
+def dictP2B : Nat → Nat → Nat
+  | 0, 0 => 0xfc20000000000000000000000000000000000000000000000000000000000000e780000000000000000000000000000000000000000000000000000000000000b3d00000000000000000000000000000000000000000000000000000000000005e7
+  | _, _ => 0
+def stateB : Nat → Nat → Nat → Nat
+  | 3, 0, 0 => 0xe44
+  | _, _, _ => 0
+def stateW : Nat → Nat
+  | 3 => 12
+  | _ => 0
+def wireAt (i : Nat) : Nat := fld (dictB (i / 128) (i / 8 % 16)) 256 (i % 8)
+def p1At (i : Nat) : Nat := fld (dictP1B (i / 128) (i / 8 % 16)) 256 (i % 8)
+def p2At (i : Nat) : Nat := fld (dictP2B (i / 128) (i / 8 % 16)) 256 (i % 8)
+def wireDAt (i : Nat) : Nat × Nat × Nat := if i < 4 then (wireAt i, p1At i, p2At i) else (0, 0, 0)
+def wireDOK (i : Nat) : Bool := (p1At i == projBit r1sG (wireAt i)) && (p2At i == projBit r2sG (wireAt i))
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+theorem wireD_ok_all : span wireDOK 4 0 = true := by decide +kernel
+theorem projBit_zero (rs : List Nat) : projBit rs 0 = 0 := by
+  induction rs with
+  | nil => rfl
+  | cons r rs ih => simp only [projBit, List.foldr_cons, Nat.zero_testBit, Bool.false_eq_true, ite_false] at ih ⊢; rw [ih]; rfl
+theorem wireDAt_eq (i : Nat) :
+    wireDAt i = (let w := if i < 4 then wireAt i else 0; (w, projBit r1sG w, projBit r2sG w)) := by
+  unfold wireDAt; split
+  · next hi => have h := span_ok wireD_ok_all i (Nat.zero_le i) (by omega); simp only [wireDOK, Bool.and_eq_true, beq_iff_eq] at h; simp [h.1, h.2]
+  · simp [projBit_zero]
+def wireSAt (i : Nat) : Nat := if i < 4 then wireAt i else 0
+def stateWiresD : Nat → Nat → List (Nat × Nat × Nat)
+  | 0, _ => []
+  | n + 1, ids => wireDAt (fld ids 2 0) :: stateWiresD n (ids >>> 2)
+def stateWiresS : Nat → Nat → List Nat
+  | 0, _ => []
+  | n + 1, ids => wireSAt (fld ids 2 0) :: stateWiresS n (ids >>> 2)
+def SD (s j : Nat) : List (Nat × Nat × Nat) := let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16); stateWiresD (packed &&& 15) (packed >>> 4)
+def SS (s j : Nat) : List Nat := let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16); stateWiresS (packed &&& 15) (packed >>> 4)
+theorem stateWiresD_eq (n ids : Nat) : stateWiresD n ids = (stateWiresS n ids).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := by
+  induction n generalizing ids with | zero => rfl | succ n ih => simp [stateWiresD, stateWiresS, wireSAt, wireDAt_eq, ih]
+theorem SD_eq (s j : Nat) : SD s j = (SS s j).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := stateWiresD_eq _ _
+def htAt (s i : Nat) : Nat := fld (HT s (i / 64)) 32 (i % 64)
+def idxH (s h : Nat) : Nat := bsr (htAt s) h 1 0 (NN s)
+def idx (s : Nat) (zs : List Nat) : Nat := idxH s (hk 0 zs)
+def CN : Nat → Nat
+  | _ => 0
+def CH : Nat → Nat → Nat
+  | _, _ => 0
+def CV : Nat → Nat → Nat
+  | _, _ => 0
+def chAt (s i : Nat) : Nat := fld (CH s (i / 64)) 32 (i % 64)
+def cidxH (s h : Nat) : Nat := bsr (chAt s) h 1 0 (CN s)
+def cidx (s : Nat) (zs : List Nat) : Nat := cidxH s (hk 0 zs)
+def checkCutByIdx (s : Nat) (ws : List Nat) (hint : Nat) : Bool :=
+  match hint &&& 255 with
+  | _ => false
+def cutHitH (s h : Nat) (ws : List Nat) : Bool := let i := cidxH s h; decide (i < CN s) && (chAt s i == h) && checkCutByIdx s ws (fld (CV s (i / 32)) 52 (i % 32))
+def cutHit (s : Nat) (ws : List Nat) : Bool := cutHitH s (hk 0 ws) ws
+theorem cutHitH_sound {u ys} (h : cutHitH u (hk 0 ys) ys = true) : ¬ RunD dom_53 goalM u ys := by
+  unfold cutHitH at h; simp only [Bool.and_eq_true] at h; have hc := h.2; unfold checkCutByIdx at hc; split at hc
+  · contradiction
+theorem cutHit_sound {u ys} (h : cutHit u ys = true) : ¬ RunD dom_53 goalM u ys := cutHitH_sound h
+def symsG : List (List (Nat × Nat)) := []
+theorem symsG_ok : symsG.all (fun ms => ms.all moveOK256 && (applyMoves ms dom_53 == dom_53) && (applyMoves ms goalM == goalM)) = true := by decide
+def ori (zs : List Nat) : List Nat := pickMin 0 zs symsG zs (hk 0 zs)
+theorem ori_ok {u ys} (h : RunD dom_53 goalM u ys) : RunD dom_53 goalM u (ori ys) := pickMin_runD 0 ys h symsG ys (hk 0 ys) symsG_ok h
+def Z (s : Nat) := bar dom_53 goalM pairsG r1sG r2sG mpG SD SS NN htAt idxH ori 0 pool6G cutHitH s
 private theorem z0 : ∀ i, 0 ≤ i → i < 0 → Z 0 i = true := by omega
 private theorem z1 : ∀ i, 0 ≤ i → i < 0 → Z 1 i = true := by omega
 private theorem z2 : ∀ i, 0 ≤ i → i < 0 → Z 2 i = true := by omega
@@ -2243,18 +2342,13 @@ theorem checked (s : Nat) (hs : s ≤ 3) : ∀ i < NN s, Z s i = true := by
   · exact fun i hi => z1 i (Nat.zero_le i) hi
   · exact fun i hi => z2 i (Nat.zero_le i) hi
   · exact fun i hi => z3 i (Nat.zero_le i) hi
-def RootG (s : Nat) : Bool :=
-  scr dom_13 goalM s pool6G xsM || cutHit s (ori xsM) || found SS NN idx s (ori xsM)
-
+def RootG (s : Nat) : Bool := scr dom_53 goalM s pool6G xsM || cutHit s (ori xsM) || found SS NN idx s (ori xsM)
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
-theorem rootChecked : span RootG 2 2 = true := by decide +kernel
-
+theorem rootChecked : span RootG 1 3 = true := by decide +kernel
 theorem proper_failG : ∀ zs ∈ xsM.sublists, zs ≠ xsM → unorientedCov pairsG zs = false := by decide +kernel
-
-theorem noRunFull (s : Nat) (hs : s ≤ 3) (h : RunD dom_13 goalM s xsM) : False := by
-  have hmin : 2 ≤ s := by
-    have hl := run_len h; change 3 ≤ s + 1 at hl; omega
+theorem noRunFull (s : Nat) (hs : s ≤ 3) (h : RunD dom_53 goalM s xsM) : False := by
+  have hmin : 3 ≤ s := by have hl := run_len h; change 4 ≤ s + 1 at hl; omega
   have hr := span_ok rootChecked s hmin (by omega)
   unfold RootG at hr
   rw [scr_no pool6G h, Bool.false_or, Bool.or_eq_true] at hr
@@ -2262,19 +2356,19 @@ theorem noRunFull (s : Nat) (hs : s ≤ 3) (h : RunD dom_13 goalM s xsM) : False
   · exact cutHit_sound hcut (ori_ok h)
   · rw [found, Bool.and_eq_true, decide_eq_true_eq, List.isPerm_iff] at hf
     exact bar_all (by decide +kernel) rfl rfl (by decide +kernel) SD_eq (by decide +kernel) ori_ok cutHitH_sound checked s hs _ hf.1 (Run.perm hf.2 (ori_ok h))
-
-theorem noCircuit : Lower dom_13 roots_13 goal_13 4 := by
+theorem noCircuit : Lower dom_53 roots_53 goal_53 4 := by
   intro p bank hr ha
   by_contra! hsmall
-  have hnc : ¬ IsConst dom_13 goal_13 := by
-    have h0 : isConstB dom_13 goal_13 = false := by decide +kernel
-    intro h; rw [(isConstB_iff _ _).2 h] at h0; contradiction
+  have hnc : ¬ IsConst dom_53 goal_53 := by
+    have h0 : isConstB dom_53 goal_53 = false := by decide +kernel
+    intro h
+    rw [(isConstB_iff _ _).2 h] at h0
+    contradiction
   obtain ⟨s, ws, hs_le, hnd, hws_sub, hrun⟩ := reach_to_run (by decide +kernel) hnc hr ha
   have hperm_sub : ∃ zs, zs.Sublist xsM ∧ ws.Perm zs := by
     refine ⟨xsM.filter (fun x => decide (x ∈ ws)), List.filter_sublist, ?_⟩
     refine (List.perm_ext_iff_of_nodup hnd (List.Nodup.filter _ (by decide +kernel : xsM.Nodup))).2 ?_
-    intro x; simp only [List.mem_filter, decide_eq_true_eq]
-    exact ⟨fun hx => ⟨hws_sub x hx, hx⟩, fun h => h.2⟩
+    intro x; simp only [List.mem_filter, decide_eq_true_eq]; exact ⟨fun hx => ⟨hws_sub x hx, hx⟩, fun h => h.2⟩
   obtain ⟨zs, hsub, hpz⟩ := hperm_sub
   have hrun' := Run.perm hpz hrun
   by_cases heq : zs = xsM
@@ -2282,180 +2376,161 @@ theorem noCircuit : Lower dom_13 roots_13 goal_13 4 := by
   · have hcov := unorientedCov_ok (by decide +kernel) pairsG (by decide +kernel) hrun'
     have hbad := proper_failG zs (List.mem_sublists.2 hsub) heq
     rw [hcov] at hbad; contradiction
-
-end S_13
-
-theorem low_13 : Lower dom_13 roots_13 goal_13 4 := S_13.noCircuit
-
-def isoMv_28 : List (Nat × Nat) := [(0xff000000ff000000ff000000ff000000ff000000ff000000ff000000ff00, 8), (0xf0f00000f0f00000f0f00000f0f00000f0f00000f0f00000f0f00000f0f0, 12), (0xcccc0000cccc0000cccc0000cccc0000cccc0000cccc0000cccc0000cccc, 14), (0x2222222222222222222222222222222222222222222222222222222222222222, 1)]
-theorem low_28 : Lower dom_28 roots_28 goal_28 4 :=
-  lower_iso isoMv_28 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_13
-
-def isoMv_35 : List (Nat × Nat) := [(0xffff000000000000ffff000000000000ffff000000000000ffff0000, 16), (0xff000000ff000000ff000000ff000000ff000000ff000000ff000000ff00, 8), (0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c, 2)]
-theorem low_35 : Lower dom_35 roots_35 goal_35 4 :=
-  lower_iso isoMv_35 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_13
-
+end S_53
+theorem low_53 : Lower dom_53 roots_53 goal_53 4 := S_53.noCircuit
+def isoMv_57 : List (Nat × Nat) := [(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4)]
+theorem low_57 : Lower dom_57 roots_57 goal_57 4 :=
+  lower_iso isoMv_57 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_53
+def isoMv_23 : List (Nat × Nat) := [(0xcccccccc00000000cccccccc00000000cccccccc00000000cccccccc, 30)]
+theorem low_23 : Lower dom_23 roots_23 goal_23 4 :=
+  lower_iso isoMv_23 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_53
+def isoMv_27 : List (Nat × Nat) := [(0xcccccccc00000000cccccccc00000000cccccccc00000000cccccccc, 30), (0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4)]
+theorem low_27 : Lower dom_27 roots_27 goal_27 4 :=
+  lower_iso isoMv_27 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_53
+theorem low_29 : Lower dom_29 roots_29 goal_29 5 :=
+  lower_slice (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel)
+    (by decide +kernel) (by decide +kernel) (by decide +kernel)
+    [(0x33330000, 4, 20)] (by decide +kernel) (by decide +kernel) low_13
 theorem low_15 : Lower dom_15 roots_15 goal_15 5 :=
   lower_slice (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel)
     (by decide +kernel) (by decide +kernel) (by decide +kernel)
     [(0xcccc, 1, 3)] (by decide +kernel) (by decide +kernel) low_13
-
-theorem low_29 : Lower dom_29 roots_29 goal_29 5 :=
+theorem low_45 : Lower dom_45 roots_45 goal_45 5 :=
   lower_slice (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel)
     (by decide +kernel) (by decide +kernel) (by decide +kernel)
-    [(0x22222222, 4, 5)] (by decide +kernel) (by decide +kernel) low_28
-
-def isoMv_39 : List (Nat × Nat) := [(0xffff000000000000ffff000000000000ffff000000000000ffff0000, 16), (0xff000000ff000000ff000000ff000000ff000000ff000000ff000000ff00, 8), (0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c, 2)]
+    [(0x333300000000, 1, 33)] (by decide +kernel) (by decide +kernel) low_13
 theorem low_39 : Lower dom_39 roots_39 goal_39 5 :=
-  lower_iso isoMv_39 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_15
-
-def isoMv_43 : List (Nat × Nat) := [(0xffff000000000000ffff000000000000ffff000000000000ffff0000, 16), (0xff000000ff000000ff000000ff000000ff000000ff000000ff000000ff00, 8), (0xf0f00000f0f00000f0f00000f0f00000f0f00000f0f00000f0f00000f0f0, 12), (0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c, 2)]
+  lower_slice (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel)
+    (by decide +kernel) (by decide +kernel) (by decide +kernel)
+    [(0xf0000000f0, 1, 5)] (by decide +kernel) (by decide +kernel) low_35
 theorem low_43 : Lower dom_43 roots_43 goal_43 5 :=
-  lower_iso isoMv_43 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_15
-
-def isoMv_45 : List (Nat × Nat) := [(0xffff000000000000ffff000000000000ffff000000000000ffff0000, 16), (0xcccc0000cccc0000cccc0000cccc0000cccc0000cccc0000cccc0000cccc, 14)]
-theorem low_45 : Lower dom_45 roots_45 goal_45 5 :=
-  lower_iso isoMv_45 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_15
-
+  lower_slice (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel)
+    (by decide +kernel) (by decide +kernel) (by decide +kernel)
+    [(0xf0000000f00, 1, 9)] (by decide +kernel) (by decide +kernel) low_35
 namespace S_31
 def pairsG : List (Nat × Nat) := [(1, 3), (1, 5), (1, 9), (2, 3), (4, 5), (4, 12), (4, 20), (6, 7), (6, 14), (6, 22), (8, 9), (8, 12), (8, 24), (10, 11), (10, 14), (10, 26), (16, 20), (16, 24), (17, 19), (17, 21), (17, 25), (18, 19), (18, 22), (18, 26)]
 def r1sG : List Nat := [1, 1, 1, 2, 4, 4, 4, 6, 6, 6, 8, 8, 8, 10, 10, 10, 16, 16, 17, 17, 17, 18, 18, 18]
 def r2sG : List Nat := [3, 5, 9, 3, 5, 12, 20, 7, 14, 22, 9, 12, 24, 11, 14, 26, 20, 24, 19, 21, 25, 19, 22, 26]
 def mpG : Nat := 0xffffff
-def pool6G : List Nat := [11021189649420, 4471229645573, 18717770777349, 18734749322264, 18717636824084]
+def pool6G : List Nat := []
 def xsM : List Nat := roots_31.map (· &&& dom_31)
 def goalM : Nat := goal_31 &&& dom_31
 def NN : Nat → Nat
-  | 5 => 3
+  | 3 => 2
+  | 4 => 5
+  | 5 => 8
   | 6 => 1
   | _ => 0
 def HT : Nat → Nat → Nat
-  | 5, 0 => 0x599be9b238e260a0090d6eb4
+  | 3, 0 => 0xaf77dd3b12d3ebc6
+  | 4, 0 => 0xa690455c8480a5f76df9f35f5f84236f09ec53e7
+  | 5, 0 => 0xea902df2ceef2316aa9f924f599be9b2569c8b90564c935638e260a0090d6eb4
   | 6, 0 => 0x1f16380d
   | _, _ => 0
 def dictB : Nat → Nat → Nat
-  | 0, 0 => 0xf0f0f0f00000000000000000000000000000000000000000000000000000000ffccffcc00000000000000000000000000000000000000000000000000000000ffff000000000000000000000000000000000000000000000000000000000000fff0fff000000000000000000000000000000000000000000000000000000000ff00ff0000000000000000000000000000000000000000000000000000000000f0f0f0f000000000000000000000000000000000000000000000000000000000cccccccc00000000000000000000000000000000000000000000000000000000aaaaaaaa
+  | 0, 0 => 0xff00ff0000000000000000000000000000000000000000000000000000000000f0f0f0f000000000000000000000000000000000000000000000000000000000fffff00000000000000000000000000000000000000000000000000000000000aaaaaaaa00000000000000000000000000000000000000000000000000000000ffff000000000000000000000000000000000000000000000000000000000000fff0fff000000000000000000000000000000000000000000000000000000000faaafaaa00000000000000000000000000000000000000000000000000000000cccccccc
+  | 0, 1 => 0xff00ff00000000000000000000000000000000000000000000000000000000fcfcfcfc000000000000000000000000000000000000000000000000000000000f0f0f0f00000000000000000000000000000000000000000000000000000000ffccffcc00000000000000000000000000000000000000000000000000000000fffcfffc00000000000000000000000000000000000000000000000000000000fcccfccc00000000000000000000000000000000000000000000000000000000f000f000
   | _, _ => 0
-def stateB : Nat → Nat → Nat → Nat
-  | 5, 0, 0 => 0x56475173416c6886
-  | 6, 0, 0 => 0x56885
-  | _, _, _ => 0
-def stateW : Nat → Nat
-  | 5 => 22
-  | 6 => 19
-  | _ => 0
-def wireAt (i : Nat) : Nat := fld (dictB (i / 128) (i / 8 % 16)) 256 (i % 8)
-def stateWires : Nat → Nat → List Nat
-  | 0, _ => []
-  | n + 1, ids => wireAt (fld ids 3 0) :: stateWires n (ids >>> 3)
-def S (s j : Nat) : List Nat :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWires (packed &&& 15) (packed >>> 4)
-
 def dictP1B : Nat → Nat → Nat
-  | 0, 0 => 0xfffc0f0000000000000000000000000000000000000000000000000000000000e0ff880000000000000000000000000000000000000000000000000000000000ff0000000000000000000000000000000000000000000000000000000000000000fff0000000000000000000000000000000000000000000000000000000000000fc0000000000000000000000000000000000000000000000000000000000000003f00000000000000000000000000000000000000000000000000000000000e0e38800000000000000000000000000000000000000000000000000000000001c0007
+  | 0, 0 => 0xfc0000000000000000000000000000000000000000000000000000000000000003f00000000000000000000000000000000000000000000000000000000000ff000000000000000000000000000000000000000000000000000000000000001c00070000000000000000000000000000000000000000000000000000000000ff0000000000000000000000000000000000000000000000000000000000000000fff000000000000000000000000000000000000000000000000000000000001c00070000000000000000000000000000000000000000000000000000000000e0e388
+  | 0, 1 => 0xff03ff0000000000000000000000000000000000000000000000000000000000e0e3f80000000000000000000000000000000000000000000000000000000000fffc0f0000000000000000000000000000000000000000000000000000000000e0ff880000000000000000000000000000000000000000000000000000000000e0fff80000000000000000000000000000000000000000000000000000000000e0e3880000000000000000000000000000000000000000000000000000000000000000
   | _, _ => 0
 def dictP2B : Nat → Nat → Nat
-  | 0, 0 => 0xb6b40d0000000000000000000000000000000000000000000000000000000000f6ffad0000000000000000000000000000000000000000000000000000000000ff92400000000000000000000000000000000000000000000000000000000000dbfff6000000000000000000000000000000000000000000000000000000000092fd240000000000000000000000000000000000000000000000000000000000494bf20000000000000000000000000000000000000000000000000000000000e4e38900000000000000000000000000000000000000000000000000000000003c249f
+  | 0, 0 => 0x92fd240000000000000000000000000000000000000000000000000000000000494bf20000000000000000000000000000000000000000000000000000000000ffdb6000000000000000000000000000000000000000000000000000000000003c249f0000000000000000000000000000000000000000000000000000000000ff92400000000000000000000000000000000000000000000000000000000000dbfff600000000000000000000000000000000000000000000000000000000003c6dbf0000000000000000000000000000000000000000000000000000000000e4e389
+  | 0, 1 => 0x6d02db0000000000000000000000000000000000000000000000000000000000edebfb0000000000000000000000000000000000000000000000000000000000b6b40d0000000000000000000000000000000000000000000000000000000000f6ffad0000000000000000000000000000000000000000000000000000000000ffffff0000000000000000000000000000000000000000000000000000000000e4eba90000000000000000000000000000000000000000000000000000000000004920
   | _, _ => 0
+def stateB : Nat → Nat → Nat → Nat
+  | 3, 0, 0 => 0x5204432104
+  | 4, 0, 0 => 0x5760453a7645379645328045371605
+  | 5, 0, 0 => 0x3604e537604e6037d64503704c5376804637604c603b76453276046
+  | 6, 0, 0 => 0x376045
+  | _, _, _ => 0
+def stateW : Nat → Nat
+  | 3 => 20
+  | 4 => 24
+  | 5 => 28
+  | 6 => 24
+  | _ => 0
+def wireAt (i : Nat) : Nat := fld (dictB (i / 128) (i / 8 % 16)) 256 (i % 8)
 def p1At (i : Nat) : Nat := fld (dictP1B (i / 128) (i / 8 % 16)) 256 (i % 8)
 def p2At (i : Nat) : Nat := fld (dictP2B (i / 128) (i / 8 % 16)) 256 (i % 8)
-def wireDAt (i : Nat) : Nat × Nat × Nat :=
-  if i < 8 then (wireAt i, p1At i, p2At i) else (0, 0, 0)
-def wireDOK (i : Nat) : Bool :=
-  (p1At i == projBit r1sG (wireAt i)) && (p2At i == projBit r2sG (wireAt i))
+def wireDAt (i : Nat) : Nat × Nat × Nat := if i < 15 then (wireAt i, p1At i, p2At i) else (0, 0, 0)
+def wireDOK (i : Nat) : Bool := (p1At i == projBit r1sG (wireAt i)) && (p2At i == projBit r2sG (wireAt i))
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
-theorem wireD_ok_all : span wireDOK 8 0 = true := by decide +kernel
+theorem wireD_ok_all : span wireDOK 15 0 = true := by decide +kernel
 theorem projBit_zero (rs : List Nat) : projBit rs 0 = 0 := by
   induction rs with
   | nil => rfl
   | cons r rs ih => simp only [projBit, List.foldr_cons, Nat.zero_testBit, Bool.false_eq_true, ite_false] at ih ⊢; rw [ih]; rfl
 theorem wireDAt_eq (i : Nat) :
-    wireDAt i = (let w := if i < 8 then wireAt i else 0; (w, projBit r1sG w, projBit r2sG w)) := by
-  unfold wireDAt
-  split
-  · next hi =>
-    have h := span_ok wireD_ok_all i (Nat.zero_le i) (by omega)
-    simp only [wireDOK, Bool.and_eq_true, beq_iff_eq] at h
-    simp [h.1, h.2]
+    wireDAt i = (let w := if i < 15 then wireAt i else 0; (w, projBit r1sG w, projBit r2sG w)) := by
+  unfold wireDAt; split
+  · next hi => have h := span_ok wireD_ok_all i (Nat.zero_le i) (by omega); simp only [wireDOK, Bool.and_eq_true, beq_iff_eq] at h; simp [h.1, h.2]
   · simp [projBit_zero]
-def wireSAt (i : Nat) : Nat := if i < 8 then wireAt i else 0
+def wireSAt (i : Nat) : Nat := if i < 15 then wireAt i else 0
 def stateWiresD : Nat → Nat → List (Nat × Nat × Nat)
   | 0, _ => []
-  | n + 1, ids => wireDAt (fld ids 3 0) :: stateWiresD n (ids >>> 3)
+  | n + 1, ids => wireDAt (fld ids 4 0) :: stateWiresD n (ids >>> 4)
 def stateWiresS : Nat → Nat → List Nat
   | 0, _ => []
-  | n + 1, ids => wireSAt (fld ids 3 0) :: stateWiresS n (ids >>> 3)
-def SD (s j : Nat) : List (Nat × Nat × Nat) :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWiresD (packed &&& 15) (packed >>> 4)
-def SS (s j : Nat) : List Nat :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWiresS (packed &&& 15) (packed >>> 4)
-theorem stateWiresD_eq (n ids : Nat) :
-    stateWiresD n ids = (stateWiresS n ids).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := by
-  induction n generalizing ids with
-  | zero => rfl
-  | succ n ih => simp [stateWiresD, stateWiresS, wireSAt, wireDAt_eq, ih]
-theorem SD_eq (s j : Nat) :
-    SD s j = (SS s j).map (fun w => (w, projBit r1sG w, projBit r2sG w)) :=
-  stateWiresD_eq _ _
-
+  | n + 1, ids => wireSAt (fld ids 4 0) :: stateWiresS n (ids >>> 4)
+def SD (s j : Nat) : List (Nat × Nat × Nat) := let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16); stateWiresD (packed &&& 15) (packed >>> 4)
+def SS (s j : Nat) : List Nat := let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16); stateWiresS (packed &&& 15) (packed >>> 4)
+theorem stateWiresD_eq (n ids : Nat) : stateWiresD n ids = (stateWiresS n ids).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := by
+  induction n generalizing ids with | zero => rfl | succ n ih => simp [stateWiresD, stateWiresS, wireSAt, wireDAt_eq, ih]
+theorem SD_eq (s j : Nat) : SD s j = (SS s j).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := stateWiresD_eq _ _
 def htAt (s i : Nat) : Nat := fld (HT s (i / 64)) 32 (i % 64)
-def idxH (s h : Nat) : Nat := bsr (htAt s) h 3 0 (NN s)
+def idxH (s h : Nat) : Nat := bsr (htAt s) h 4 0 (NN s)
 def idx (s : Nat) (zs : List Nat) : Nat := idxH s (hk 0 zs)
 def CN : Nat → Nat
-  | 5 => 6
+  | 3 => 1
+  | 4 => 10
+  | 5 => 27
   | _ => 0
 def CH : Nat → Nat → Nat
-  | 5, 0 => 0xb41bdfa392b4184b3385d7e81f16380d14e17f6b0ab33ff3
+  | 3, 0 => 0xd53985cd
+  | 4, 0 => 0xd20dd439bb0e122fb62449fa963c9a35906efd643f4fef2c25f416d7247f68861f16380d076b0f11
+  | 5, 0 => 0xe39fa026e269044ad5d7a2cec3e14ac6b98e8086b762f0afb41bdfa3aacb8ff0a78f08149dcd98c6974979bd92b4184b8fd54a877f5dffb962f7203634b0cb8f3385d7e82c356191258c480e21a8620b202fbf561f16380d1e29e5df14e17f6b0d59fc0a0ab33ff309e2bbbd
   | _, _ => 0
 def CV : Nat → Nat → Nat
-  | 5, 0 => 0x200000000000010000000000001000000000000100000000000000000000000000
+  | 3, 0 => 0x1
+  | 4, 0 => 0x100000000000010000000000001000000000000000000000000010000000000000000000000000100000000000000000000000001
+  | 5, 0 => 0x1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000001000000000000000000000000010000000000000000000000000000000000000000000000000001000000000000000000000000010000000000001
   | _, _ => 0
 def chAt (s i : Nat) : Nat := fld (CH s (i / 64)) 32 (i % 64)
-def cidxH (s h : Nat) : Nat := bsr (chAt s) h 4 0 (CN s)
+def cidxH (s h : Nat) : Nat := bsr (chAt s) h 5 0 (CN s)
 def cidx (s : Nat) (zs : List Nat) : Nat := cidxH s (hk 0 zs)
 def checkCutByIdx (s : Nat) (ws : List Nat) (hint : Nat) : Bool :=
   match hint &&& 255 with
-  | 0 => checkCutEntry dom_28 roots_28 4 s ws hint
-  | 1 => checkCutEntry dom_29 roots_29 5 s ws hint
-  | 2 => checkCutEntry dom_15 roots_15 5 s ws hint
+  | 0 => checkCutEntry dom_13 roots_13 4 s ws hint
+  | 1 => checkCutEntry dom_28 roots_28 4 s ws hint
   | _ => false
-def cutHitH (s h : Nat) (ws : List Nat) : Bool :=
-  let i := cidxH s h
-  decide (i < CN s) && (chAt s i == h) && checkCutByIdx s ws (fld (CV s (i / 32)) 52 (i % 32))
-
+def cutHitH (s h : Nat) (ws : List Nat) : Bool := let i := cidxH s h; decide (i < CN s) && (chAt s i == h) && checkCutByIdx s ws (fld (CV s (i / 32)) 52 (i % 32))
 def cutHit (s : Nat) (ws : List Nat) : Bool := cutHitH s (hk 0 ws) ws
-
 theorem cutHitH_sound {u ys} (h : cutHitH u (hk 0 ys) ys = true) : ¬ RunD dom_31 goalM u ys := by
-  unfold cutHitH at h
-  simp only [Bool.and_eq_true] at h
-  have hc := h.2
-  unfold checkCutByIdx at hc
-  split at hc
+  unfold cutHitH at h; simp only [Bool.and_eq_true] at h; have hc := h.2; unfold checkCutByIdx at hc; split at hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_13 _ hc
   · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_28 _ hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_29 _ hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_15 _ hc
   · contradiction
 theorem cutHit_sound {u ys} (h : cutHit u ys = true) : ¬ RunD dom_31 goalM u ys := cutHitH_sound h
-
-def symsG : List (List (Nat × Nat)) := [[(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4)]]
-theorem symsG_ok : symsG.all (fun ms => ms.all moveOK256 && (applyMoves ms dom_31 == dom_31) && (applyMoves ms goalM == goalM)) = true := by decide +kernel
+def symsG : List (List (Nat × Nat)) := []
+theorem symsG_ok : symsG.all (fun ms => ms.all moveOK256 && (applyMoves ms dom_31 == dom_31) && (applyMoves ms goalM == goalM)) = true := by decide
 def ori (zs : List Nat) : List Nat := pickMin 0 zs symsG zs (hk 0 zs)
-theorem ori_ok {u ys} (h : RunD dom_31 goalM u ys) : RunD dom_31 goalM u (ori ys) :=
-  pickMin_runD 0 ys h symsG ys (hk 0 ys) symsG_ok h
-
+theorem ori_ok {u ys} (h : RunD dom_31 goalM u ys) : RunD dom_31 goalM u (ori ys) := pickMin_runD 0 ys h symsG ys (hk 0 ys) symsG_ok h
 def Z (s : Nat) := bar dom_31 goalM pairsG r1sG r2sG mpG SD SS NN htAt idxH ori 0 pool6G cutHitH s
 private theorem z0 : ∀ i, 0 ≤ i → i < 0 → Z 0 i = true := by omega
 private theorem z1 : ∀ i, 0 ≤ i → i < 0 → Z 1 i = true := by omega
 private theorem z2 : ∀ i, 0 ≤ i → i < 0 → Z 2 i = true := by omega
-private theorem z3 : ∀ i, 0 ≤ i → i < 0 → Z 3 i = true := by omega
-private theorem z4 : ∀ i, 0 ≤ i → i < 0 → Z 4 i = true := by omega
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
-private theorem z5 : ∀ i, 0 ≤ i → i < 3 → Z 5 i = true := span_ok (by decide +kernel : span (Z 5) 3 0 = true)
+private theorem z3 : ∀ i, 0 ≤ i → i < 2 → Z 3 i = true := span_ok (by decide +kernel : span (Z 3) 2 0 = true)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z4 : ∀ i, 0 ≤ i → i < 5 → Z 4 i = true := span_ok (by decide +kernel : span (Z 4) 5 0 = true)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z5 : ∀ i, 0 ≤ i → i < 8 → Z 5 i = true := span_ok (by decide +kernel : span (Z 5) 8 0 = true)
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
 private theorem z6 : ∀ i, 0 ≤ i → i < 1 → Z 6 i = true := span_ok (by decide +kernel : span (Z 6) 1 0 = true)
@@ -2468,18 +2543,13 @@ theorem checked (s : Nat) (hs : s ≤ 6) : ∀ i < NN s, Z s i = true := by
   · exact fun i hi => z4 i (Nat.zero_le i) hi
   · exact fun i hi => z5 i (Nat.zero_le i) hi
   · exact fun i hi => z6 i (Nat.zero_le i) hi
-def RootG (s : Nat) : Bool :=
-  scr dom_31 goalM s pool6G xsM || cutHit s (ori xsM) || found SS NN idx s (ori xsM)
-
+def RootG (s : Nat) : Bool := scr dom_31 goalM s pool6G xsM || cutHit s (ori xsM) || found SS NN idx s (ori xsM)
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
 theorem rootChecked : span RootG 3 4 = true := by decide +kernel
-
 theorem proper_failG : ∀ zs ∈ xsM.sublists, zs ≠ xsM → unorientedCov pairsG zs = false := by decide +kernel
-
 theorem noRunFull (s : Nat) (hs : s ≤ 6) (h : RunD dom_31 goalM s xsM) : False := by
-  have hmin : 4 ≤ s := by
-    have hl := run_len h; change 5 ≤ s + 1 at hl; omega
+  have hmin : 4 ≤ s := by have hl := run_len h; change 5 ≤ s + 1 at hl; omega
   have hr := span_ok rootChecked s hmin (by omega)
   unfold RootG at hr
   rw [scr_no pool6G h, Bool.false_or, Bool.or_eq_true] at hr
@@ -2487,19 +2557,19 @@ theorem noRunFull (s : Nat) (hs : s ≤ 6) (h : RunD dom_31 goalM s xsM) : False
   · exact cutHit_sound hcut (ori_ok h)
   · rw [found, Bool.and_eq_true, decide_eq_true_eq, List.isPerm_iff] at hf
     exact bar_all (by decide +kernel) rfl rfl (by decide +kernel) SD_eq (by decide +kernel) ori_ok cutHitH_sound checked s hs _ hf.1 (Run.perm hf.2 (ori_ok h))
-
 theorem noCircuit : Lower dom_31 roots_31 goal_31 7 := by
   intro p bank hr ha
   by_contra! hsmall
   have hnc : ¬ IsConst dom_31 goal_31 := by
     have h0 : isConstB dom_31 goal_31 = false := by decide +kernel
-    intro h; rw [(isConstB_iff _ _).2 h] at h0; contradiction
+    intro h
+    rw [(isConstB_iff _ _).2 h] at h0
+    contradiction
   obtain ⟨s, ws, hs_le, hnd, hws_sub, hrun⟩ := reach_to_run (by decide +kernel) hnc hr ha
   have hperm_sub : ∃ zs, zs.Sublist xsM ∧ ws.Perm zs := by
     refine ⟨xsM.filter (fun x => decide (x ∈ ws)), List.filter_sublist, ?_⟩
     refine (List.perm_ext_iff_of_nodup hnd (List.Nodup.filter _ (by decide +kernel : xsM.Nodup))).2 ?_
-    intro x; simp only [List.mem_filter, decide_eq_true_eq]
-    exact ⟨fun hx => ⟨hws_sub x hx, hx⟩, fun h => h.2⟩
+    intro x; simp only [List.mem_filter, decide_eq_true_eq]; exact ⟨fun hx => ⟨hws_sub x hx, hx⟩, fun h => h.2⟩
   obtain ⟨zs, hsub, hpz⟩ := hperm_sub
   have hrun' := Run.perm hpz hrun
   by_cases heq : zs = xsM
@@ -2507,154 +2577,114 @@ theorem noCircuit : Lower dom_31 roots_31 goal_31 7 := by
   · have hcov := unorientedCov_ok (by decide +kernel) pairsG (by decide +kernel) hrun'
     have hbad := proper_failG zs (List.mem_sublists.2 hsub) heq
     rw [hcov] at hbad; contradiction
-
 end S_31
-
 theorem low_31 : Lower dom_31 roots_31 goal_31 7 := S_31.noCircuit
-
-namespace S_47
-def pairsG : List (Nat × Nat) := [(1, 3), (1, 5), (1, 9), (1, 33), (2, 3), (2, 34), (4, 5), (4, 12), (6, 7), (6, 14), (6, 38), (8, 9), (8, 12), (10, 11), (10, 14), (10, 42), (32, 33), (32, 34), (36, 37), (36, 38), (36, 44), (40, 41), (40, 42), (40, 44)]
-def r1sG : List Nat := [1, 1, 1, 1, 2, 2, 4, 4, 6, 6, 6, 8, 8, 10, 10, 10, 32, 32, 36, 36, 36, 40, 40, 40]
-def r2sG : List Nat := [3, 5, 9, 33, 3, 34, 5, 12, 7, 14, 38, 9, 12, 11, 14, 42, 33, 34, 37, 38, 44, 41, 42, 44]
-def mpG : Nat := 0xffffff
-def pool6G : List Nat := [1143134626051, 1271915087113, 1125887640835, 1125449992453, 1143134619907, 1271480320801]
-def xsM : List Nat := roots_47.map (· &&& dom_47)
-def goalM : Nat := goal_47 &&& dom_47
+def isoMv_61 : List (Nat × Nat) := [(0xcccccccc00000000cccccccc00000000cccccccc00000000cccccccc, 30)]
+theorem low_61 : Lower dom_61 roots_61 goal_61 7 :=
+  lower_iso isoMv_61 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_31
+namespace S_55
+def pairsG : List (Nat × Nat) := [(1, 3), (1, 5), (1, 33), (2, 3), (2, 34), (4, 5), (4, 20), (6, 7), (6, 22), (6, 38), (16, 20), (17, 19), (17, 21), (17, 49), (18, 19), (18, 22), (18, 50), (32, 33), (32, 34), (36, 37), (36, 38), (36, 52), (48, 49), (48, 50), (48, 52)]
+def r1sG : List Nat := [1, 1, 1, 2, 2, 4, 4, 6, 6, 6, 16, 17, 17, 17, 18, 18, 18, 32, 32, 36, 36, 36, 48, 48, 48]
+def r2sG : List Nat := [3, 5, 33, 3, 34, 5, 20, 7, 22, 38, 20, 19, 21, 49, 19, 22, 50, 33, 34, 37, 38, 52, 49, 50, 52]
+def mpG : Nat := 0x1ffffff
+def pool6G : List Nat := []
+def xsM : List Nat := roots_55.map (· &&& dom_55)
+def goalM : Nat := goal_55 &&& dom_55
 def NN : Nat → Nat
-  | 5 => 3
-  | 6 => 6
-  | 7 => 1
+  | 5 => 8
+  | 6 => 1
   | _ => 0
 def HT : Nat → Nat → Nat
-  | 5, 0 => 0x4617139e0f49110e058fe465
-  | 6, 0 => 0xd0d157b67bde9db267219c703b576e79058fe46505616d1d
-  | 7, 0 => 0x3b576e79
+  | 5, 0 => 0xfc6186b5fab4a6aef7570b67d8f9f269a3f876e627b801ee11927a6111454111
+  | 6, 0 => 0xa5e2e6eb
   | _, _ => 0
 def dictB : Nat → Nat → Nat
-  | 0, 0 => 0xaaaa0000aaaa000000000000000000000000000000000000000000000000000033330000333300000000000000000000000000000000000000000000000000000f0f00000f0f0000000000000000000000000000000000000000000000000000ffff000000000000000000000000000000000000000000000000000000000000ff000000ff000000000000000000000000000000000000000000000000000000f0f00000f0f00000000000000000000000000000000000000000000000000000cccc0000cccc0000000000000000000000000000000000000000000000000000555500005555
-  | 0, 1 => 0xffaa0000ffaa0000000000000000000000000000000000000000000000000000ffff0000f0f0
+  | 0, 0 => 0xff00ff00000000000000000000000000000000000000000000000000ff000000ff0000000000000000000000000000000000000000000000000000003300330033003300000000000000000000000000000000000000000000000000ff00ff0000000000000000000000000000000000000000000000000000000000ff00aa00ff00aa00000000000000000000000000000000000000000000000000f000f000f000f000000000000000000000000000000000000000000000000000cc00cc00cc00cc00000000000000000000000000000000000000000000000000aa00aa00aa00aa
+  | 0, 1 => 0x5500550055005500000000000000000000000000000000000000000000000000ff00ff00aa00aa00000000000000000000000000000000000000000000000000ff00ff00cc00cc00000000000000000000000000000000000000000000000000ee00ee00ee00ee
   | _, _ => 0
-def stateB : Nat → Nat → Nat → Nat
-  | 5, 0, 0 => 0x432065437655432105
-  | 6, 0, 0 => 0x432170604327654932176043217504321058432176
-  | 7, 0, 0 => 0x432175
-  | _, _, _ => 0
-def stateW : Nat → Nat
-  | 5 => 24
-  | 6 => 28
-  | 7 => 24
-  | _ => 0
-def wireAt (i : Nat) : Nat := fld (dictB (i / 128) (i / 8 % 16)) 256 (i % 8)
-def stateWires : Nat → Nat → List Nat
-  | 0, _ => []
-  | n + 1, ids => wireAt (fld ids 4 0) :: stateWires n (ids >>> 4)
-def S (s j : Nat) : List Nat :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWires (packed &&& 15) (packed >>> 4)
-
 def dictP1B : Nat → Nat → Nat
-  | 0, 0 => 0xf0000000000000000000000000000000000000000000000000000000000ff18cf0000000000000000000000000000000000000000000000000000000000e3f83f0000000000000000000000000000000000000000000000000000000000ff00000000000000000000000000000000000000000000000000000000000000e0f80000000000000000000000000000000000000000000000000000000000001c07c0000000000000000000000000000000000000000000000000000000000000e7300000000000000000000000000000000000000000000000000000000000fffff0
-  | 0, 1 => 0xe0f80f0000000000000000000000000000000000000000000000000000000000ff07c0
+  | 0, 0 => 0x1ffff0000000000000000000000000000000000000000000000000000000001c1fc000000000000000000000000000000000000000000000000000000000001fe3c670000000000000000000000000000000000000000000000000000000001fe00000000000000000000000000000000000000000000000000000000000001c1fc0700000000000000000000000000000000000000000000000000000000003803e0000000000000000000000000000000000000000000000000000000000001c3980000000000000000000000000000000000000000000000000000000000003807
+  | 0, 1 => 0x1ffc7f80000000000000000000000000000000000000000000000000000000001fe38070000000000000000000000000000000000000000000000000000000001ffc398000000000000000000000000000000000000000000000000000000000001fb9f
   | _, _ => 0
 def dictP2B : Nat → Nat → Nat
-  | 0, 0 => 0x25295f0000000000000000000000000000000000000000000000000000000000b518ce000000000000000000000000000000000000000000000000000000000063a83d0000000000000000000000000000000000000000000000000000000000ff84280000000000000000000000000000000000000000000000000000000000f0fa8400000000000000000000000000000000000000000000000000000000009c57c200000000000000000000000000000000000000000000000000000000004ae7310000000000000000000000000000000000000000000000000000000000dad6a0
-  | 0, 1 => 0xf5fbdf0000000000000000000000000000000000000000000000000000000000ffd7ea
+  | 0, 0 => 0xddeb0000000000000000000000000000000000000000000000000000000001e1fd4000000000000000000000000000000000000000000000000000000000016a34660000000000000000000000000000000000000000000000000000000001ff22140000000000000000000000000000000000000000000000000000000001ebfdef00000000000000000000000000000000000000000000000000000000013897e2000000000000000000000000000000000000000000000000000000000095cb9900000000000000000000000000000000000000000000000000000000004a78af
+  | 0, 1 => 0x1b587500000000000000000000000000000000000000000000000000000000001ff7abf0000000000000000000000000000000000000000000000000000000001ffeb9d0000000000000000000000000000000000000000000000000000000000dffbbf
   | _, _ => 0
+def stateB : Nat → Nat → Nat → Nat
+  | 5, 0, 0 => 0x4621b546210b6a46210694621064628106062107504620550432105
+  | 6, 0, 0 => 0x462105
+  | _, _, _ => 0
+def stateW : Nat → Nat
+  | 5 => 28
+  | 6 => 24
+  | _ => 0
+def wireAt (i : Nat) : Nat := fld (dictB (i / 128) (i / 8 % 16)) 256 (i % 8)
 def p1At (i : Nat) : Nat := fld (dictP1B (i / 128) (i / 8 % 16)) 256 (i % 8)
 def p2At (i : Nat) : Nat := fld (dictP2B (i / 128) (i / 8 % 16)) 256 (i % 8)
-def wireDAt (i : Nat) : Nat × Nat × Nat :=
-  if i < 10 then (wireAt i, p1At i, p2At i) else (0, 0, 0)
-def wireDOK (i : Nat) : Bool :=
-  (p1At i == projBit r1sG (wireAt i)) && (p2At i == projBit r2sG (wireAt i))
+def wireDAt (i : Nat) : Nat × Nat × Nat := if i < 12 then (wireAt i, p1At i, p2At i) else (0, 0, 0)
+def wireDOK (i : Nat) : Bool := (p1At i == projBit r1sG (wireAt i)) && (p2At i == projBit r2sG (wireAt i))
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
-theorem wireD_ok_all : span wireDOK 10 0 = true := by decide +kernel
+theorem wireD_ok_all : span wireDOK 12 0 = true := by decide +kernel
 theorem projBit_zero (rs : List Nat) : projBit rs 0 = 0 := by
   induction rs with
   | nil => rfl
   | cons r rs ih => simp only [projBit, List.foldr_cons, Nat.zero_testBit, Bool.false_eq_true, ite_false] at ih ⊢; rw [ih]; rfl
 theorem wireDAt_eq (i : Nat) :
-    wireDAt i = (let w := if i < 10 then wireAt i else 0; (w, projBit r1sG w, projBit r2sG w)) := by
-  unfold wireDAt
-  split
-  · next hi =>
-    have h := span_ok wireD_ok_all i (Nat.zero_le i) (by omega)
-    simp only [wireDOK, Bool.and_eq_true, beq_iff_eq] at h
-    simp [h.1, h.2]
+    wireDAt i = (let w := if i < 12 then wireAt i else 0; (w, projBit r1sG w, projBit r2sG w)) := by
+  unfold wireDAt; split
+  · next hi => have h := span_ok wireD_ok_all i (Nat.zero_le i) (by omega); simp only [wireDOK, Bool.and_eq_true, beq_iff_eq] at h; simp [h.1, h.2]
   · simp [projBit_zero]
-def wireSAt (i : Nat) : Nat := if i < 10 then wireAt i else 0
+def wireSAt (i : Nat) : Nat := if i < 12 then wireAt i else 0
 def stateWiresD : Nat → Nat → List (Nat × Nat × Nat)
   | 0, _ => []
   | n + 1, ids => wireDAt (fld ids 4 0) :: stateWiresD n (ids >>> 4)
 def stateWiresS : Nat → Nat → List Nat
   | 0, _ => []
   | n + 1, ids => wireSAt (fld ids 4 0) :: stateWiresS n (ids >>> 4)
-def SD (s j : Nat) : List (Nat × Nat × Nat) :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWiresD (packed &&& 15) (packed >>> 4)
-def SS (s j : Nat) : List Nat :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWiresS (packed &&& 15) (packed >>> 4)
-theorem stateWiresD_eq (n ids : Nat) :
-    stateWiresD n ids = (stateWiresS n ids).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := by
-  induction n generalizing ids with
-  | zero => rfl
-  | succ n ih => simp [stateWiresD, stateWiresS, wireSAt, wireDAt_eq, ih]
-theorem SD_eq (s j : Nat) :
-    SD s j = (SS s j).map (fun w => (w, projBit r1sG w, projBit r2sG w)) :=
-  stateWiresD_eq _ _
-
+def SD (s j : Nat) : List (Nat × Nat × Nat) := let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16); stateWiresD (packed &&& 15) (packed >>> 4)
+def SS (s j : Nat) : List Nat := let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16); stateWiresS (packed &&& 15) (packed >>> 4)
+theorem stateWiresD_eq (n ids : Nat) : stateWiresD n ids = (stateWiresS n ids).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := by
+  induction n generalizing ids with | zero => rfl | succ n ih => simp [stateWiresD, stateWiresS, wireSAt, wireDAt_eq, ih]
+theorem SD_eq (s j : Nat) : SD s j = (SS s j).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := stateWiresD_eq _ _
 def htAt (s i : Nat) : Nat := fld (HT s (i / 64)) 32 (i % 64)
 def idxH (s h : Nat) : Nat := bsr (htAt s) h 4 0 (NN s)
 def idx (s : Nat) (zs : List Nat) : Nat := idxH s (hk 0 zs)
 def CN : Nat → Nat
-  | 5 => 6
-  | 6 => 5
+  | 4 => 11
+  | 5 => 25
   | _ => 0
 def CH : Nat → Nat → Nat
-  | 5, 0 => 0x7bde9db23b576e792f9f757d19fcdcbd137fdc2e0af1ee9b
-  | 6, 0 => 0x3c6da0a32c66de4114de6d040bf0396e058847cc
+  | 4, 0 => 0xf8ede3f4a5e2e6eb9e94babc917273a581b750a6801dcf9763f25c0d56438df531d366d811897e1403459afe
+  | 5, 0 => 0xf150752eede69525d1cd36f1bf98b147bef1a836ba2e0454a5e2e6eb9661eed3963660d182092a6e6e21827567d0cec255bbd1f444608fe23ed527902932dee32659db28236d2b7b2352f7d6199d11721249c6e80ed4e76f0893e0840322b61c003c1023
   | _, _ => 0
 def CV : Nat → Nat → Nat
-  | 5, 0 => 0x300000000000030000000000000000000000000100000000000000000000000002
-  | 6, 0 => 0x10000000000000000000000000300000000000000000000000000
+  | 4, 0 => 0x10000000000002000000000000000000000000020000000000001000000000000100000000000000000000000000
+  | 5, 0 => 0x100000000000000000000000002000000000000100000000000020000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   | _, _ => 0
 def chAt (s i : Nat) : Nat := fld (CH s (i / 64)) 32 (i % 64)
-def cidxH (s h : Nat) : Nat := bsr (chAt s) h 4 0 (CN s)
+def cidxH (s h : Nat) : Nat := bsr (chAt s) h 5 0 (CN s)
 def cidx (s : Nat) (zs : List Nat) : Nat := cidxH s (hk 0 zs)
 def checkCutByIdx (s : Nat) (ws : List Nat) (hint : Nat) : Bool :=
   match hint &&& 255 with
-  | 0 => checkCutEntry dom_43 roots_43 5 s ws hint
-  | 1 => checkCutEntry dom_13 roots_13 4 s ws hint
-  | 2 => checkCutEntry dom_15 roots_15 5 s ws hint
-  | 3 => checkCutEntry dom_45 roots_45 5 s ws hint
+  | 0 => checkCutEntry dom_35 roots_35 4 s ws hint
+  | 1 => checkCutEntry dom_53 roots_53 4 s ws hint
+  | 2 => checkCutEntry dom_23 roots_23 4 s ws hint
   | _ => false
-def cutHitH (s h : Nat) (ws : List Nat) : Bool :=
-  let i := cidxH s h
-  decide (i < CN s) && (chAt s i == h) && checkCutByIdx s ws (fld (CV s (i / 32)) 52 (i % 32))
-
+def cutHitH (s h : Nat) (ws : List Nat) : Bool := let i := cidxH s h; decide (i < CN s) && (chAt s i == h) && checkCutByIdx s ws (fld (CV s (i / 32)) 52 (i % 32))
 def cutHit (s : Nat) (ws : List Nat) : Bool := cutHitH s (hk 0 ws) ws
-
-theorem cutHitH_sound {u ys} (h : cutHitH u (hk 0 ys) ys = true) : ¬ RunD dom_47 goalM u ys := by
-  unfold cutHitH at h
-  simp only [Bool.and_eq_true] at h
-  have hc := h.2
-  unfold checkCutByIdx at hc
-  split at hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_43 _ hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_13 _ hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_15 _ hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_45 _ hc
+theorem cutHitH_sound {u ys} (h : cutHitH u (hk 0 ys) ys = true) : ¬ RunD dom_55 goalM u ys := by
+  unfold cutHitH at h; simp only [Bool.and_eq_true] at h; have hc := h.2; unfold checkCutByIdx at hc; split at hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_35 _ hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_53 _ hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_23 _ hc
   · contradiction
-theorem cutHit_sound {u ys} (h : cutHit u ys = true) : ¬ RunD dom_47 goalM u ys := cutHitH_sound h
-
-def symsG : List (List (Nat × Nat)) := [[(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4)], [(0xcccccccc00000000cccccccc00000000cccccccc00000000cccccccc, 30)], [(0xff00ff0000000000ff00ff0000000000ff00ff0000000000ff00ff00, 24), (0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c, 2)], [(0xf0f0f0f000000000f0f0f0f000000000f0f0f0f000000000f0f0f0f0, 28), (0xcc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc, 6)], [(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4), (0xcccccccc00000000cccccccc00000000cccccccc00000000cccccccc, 30)]]
-theorem symsG_ok : symsG.all (fun ms => ms.all moveOK256 && (applyMoves ms dom_47 == dom_47) && (applyMoves ms goalM == goalM)) = true := by decide +kernel
+theorem cutHit_sound {u ys} (h : cutHit u ys = true) : ¬ RunD dom_55 goalM u ys := cutHitH_sound h
+def symsG : List (List (Nat × Nat)) := []
+theorem symsG_ok : symsG.all (fun ms => ms.all moveOK256 && (applyMoves ms dom_55 == dom_55) && (applyMoves ms goalM == goalM)) = true := by decide
 def ori (zs : List Nat) : List Nat := pickMin 0 zs symsG zs (hk 0 zs)
-theorem ori_ok {u ys} (h : RunD dom_47 goalM u ys) : RunD dom_47 goalM u (ori ys) :=
-  pickMin_runD 0 ys h symsG ys (hk 0 ys) symsG_ok h
-
-def Z (s : Nat) := bar dom_47 goalM pairsG r1sG r2sG mpG SD SS NN htAt idxH ori 0 pool6G cutHitH s
+theorem ori_ok {u ys} (h : RunD dom_55 goalM u ys) : RunD dom_55 goalM u (ori ys) := pickMin_runD 0 ys h symsG ys (hk 0 ys) symsG_ok h
+def Z (s : Nat) := bar dom_55 goalM pairsG r1sG r2sG mpG SD SS NN htAt idxH ori 0 pool6G cutHitH s
 private theorem z0 : ∀ i, 0 ≤ i → i < 0 → Z 0 i = true := by omega
 private theorem z1 : ∀ i, 0 ≤ i → i < 0 → Z 1 i = true := by omega
 private theorem z2 : ∀ i, 0 ≤ i → i < 0 → Z 2 i = true := by omega
@@ -2662,10 +2692,196 @@ private theorem z3 : ∀ i, 0 ≤ i → i < 0 → Z 3 i = true := by omega
 private theorem z4 : ∀ i, 0 ≤ i → i < 0 → Z 4 i = true := by omega
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
-private theorem z5 : ∀ i, 0 ≤ i → i < 3 → Z 5 i = true := span_ok (by decide +kernel : span (Z 5) 3 0 = true)
+private theorem z5 : ∀ i, 0 ≤ i → i < 8 → Z 5 i = true := span_ok (by decide +kernel : span (Z 5) 8 0 = true)
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
-private theorem z6 : ∀ i, 0 ≤ i → i < 6 → Z 6 i = true := span_ok (by decide +kernel : span (Z 6) 6 0 = true)
+private theorem z6 : ∀ i, 0 ≤ i → i < 1 → Z 6 i = true := span_ok (by decide +kernel : span (Z 6) 1 0 = true)
+theorem checked (s : Nat) (hs : s ≤ 6) : ∀ i < NN s, Z s i = true := by
+  interval_cases s
+  · exact fun i hi => z0 i (Nat.zero_le i) hi
+  · exact fun i hi => z1 i (Nat.zero_le i) hi
+  · exact fun i hi => z2 i (Nat.zero_le i) hi
+  · exact fun i hi => z3 i (Nat.zero_le i) hi
+  · exact fun i hi => z4 i (Nat.zero_le i) hi
+  · exact fun i hi => z5 i (Nat.zero_le i) hi
+  · exact fun i hi => z6 i (Nat.zero_le i) hi
+def RootG (s : Nat) : Bool := scr dom_55 goalM s pool6G xsM || cutHit s (ori xsM) || found SS NN idx s (ori xsM)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+theorem rootChecked : span RootG 3 4 = true := by decide +kernel
+theorem proper_failG : ∀ zs ∈ xsM.sublists, zs ≠ xsM → unorientedCov pairsG zs = false := by decide +kernel
+theorem noRunFull (s : Nat) (hs : s ≤ 6) (h : RunD dom_55 goalM s xsM) : False := by
+  have hmin : 4 ≤ s := by have hl := run_len h; change 5 ≤ s + 1 at hl; omega
+  have hr := span_ok rootChecked s hmin (by omega)
+  unfold RootG at hr
+  rw [scr_no pool6G h, Bool.false_or, Bool.or_eq_true] at hr
+  rcases hr with hcut | hf
+  · exact cutHit_sound hcut (ori_ok h)
+  · rw [found, Bool.and_eq_true, decide_eq_true_eq, List.isPerm_iff] at hf
+    exact bar_all (by decide +kernel) rfl rfl (by decide +kernel) SD_eq (by decide +kernel) ori_ok cutHitH_sound checked s hs _ hf.1 (Run.perm hf.2 (ori_ok h))
+theorem noCircuit : Lower dom_55 roots_55 goal_55 7 := by
+  intro p bank hr ha
+  by_contra! hsmall
+  have hnc : ¬ IsConst dom_55 goal_55 := by
+    have h0 : isConstB dom_55 goal_55 = false := by decide +kernel
+    intro h
+    rw [(isConstB_iff _ _).2 h] at h0
+    contradiction
+  obtain ⟨s, ws, hs_le, hnd, hws_sub, hrun⟩ := reach_to_run (by decide +kernel) hnc hr ha
+  have hperm_sub : ∃ zs, zs.Sublist xsM ∧ ws.Perm zs := by
+    refine ⟨xsM.filter (fun x => decide (x ∈ ws)), List.filter_sublist, ?_⟩
+    refine (List.perm_ext_iff_of_nodup hnd (List.Nodup.filter _ (by decide +kernel : xsM.Nodup))).2 ?_
+    intro x; simp only [List.mem_filter, decide_eq_true_eq]; exact ⟨fun hx => ⟨hws_sub x hx, hx⟩, fun h => h.2⟩
+  obtain ⟨zs, hsub, hpz⟩ := hperm_sub
+  have hrun' := Run.perm hpz hrun
+  by_cases heq : zs = xsM
+  · subst heq; exact noRunFull s (by omega) hrun'
+  · have hcov := unorientedCov_ok (by decide +kernel) pairsG (by decide +kernel) hrun'
+    have hbad := proper_failG zs (List.mem_sublists.2 hsub) heq
+    rw [hcov] at hbad; contradiction
+end S_55
+theorem low_55 : Lower dom_55 roots_55 goal_55 7 := S_55.noCircuit
+def isoMv_59 : List (Nat × Nat) := [(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4)]
+theorem low_59 : Lower dom_59 roots_59 goal_59 7 :=
+  lower_iso isoMv_59 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_55
+namespace S_47
+def pairsG : List (Nat × Nat) := [(1, 3), (1, 5), (1, 9), (1, 33), (2, 3), (2, 34), (4, 5), (4, 12), (6, 7), (6, 14), (6, 38), (8, 9), (8, 12), (10, 11), (10, 14), (10, 42), (32, 33), (32, 34), (36, 37), (36, 38), (36, 44), (40, 41), (40, 42), (40, 44)]
+def r1sG : List Nat := [1, 1, 1, 1, 2, 2, 4, 4, 6, 6, 6, 8, 8, 10, 10, 10, 32, 32, 36, 36, 36, 40, 40, 40]
+def r2sG : List Nat := [3, 5, 9, 33, 3, 34, 5, 12, 7, 14, 38, 9, 12, 11, 14, 42, 33, 34, 37, 38, 44, 41, 42, 44]
+def mpG : Nat := 0xffffff
+def pool6G : List Nat := []
+def xsM : List Nat := roots_47.map (· &&& dom_47)
+def goalM : Nat := goal_47 &&& dom_47
+def NN : Nat → Nat
+  | 3 => 2
+  | 4 => 6
+  | 5 => 14
+  | 6 => 8
+  | 7 => 1
+  | _ => 0
+def HT : Nat → Nat → Nat
+  | 3, 0 => 0x5362c71a2a5c6f3a
+  | 4, 0 => 0x9c0dc3005477eafa3fb0a486145aa1f00cefb46706f6f792
+  | 5, 0 => 0xd0d157b6b56b988098fa57c14f36a8fa4ded6c714d81105f4617139e2a8e38012512194c23941d5b0f49110e0d8a7863058fe4650352024a
+  | 6, 0 => 0xd0d157b6cec1e1d57bde9db26bca2ef067219c703b576e79058fe46505616d1d
+  | 7, 0 => 0x3b576e79
+  | _, _ => 0
+def dictB : Nat → Nat → Nat
+  | 0, 0 => 0xffff0000aa880000000000000000000000000000000000000000000000000000ff000000ff000000000000000000000000000000000000000000000000000000f0f00000f0f00000000000000000000000000000000000000000000000000000eeee0000eeee0000000000000000000000000000000000000000000000000000ffff000000000000000000000000000000000000000000000000000000000000ffa80000ffa80000000000000000000000000000000000000000000000000000fafa0000fafa0000000000000000000000000000000000000000000000000000cccc0000cccc
+  | 0, 1 => 0xfefe0000fefe0000000000000000000000000000000000000000000000000000fafa0000faf00000000000000000000000000000000000000000000000000000ffff000011110000000000000000000000000000000000000000000000000000aaaa0000a0a00000000000000000000000000000000000000000000000000000ffff0000aaaa0000000000000000000000000000000000000000000000000000aaaa0000aa000000000000000000000000000000000000000000000000000000ff050000ff050000000000000000000000000000000000000000000000000000aaaa0000aaaa
+  | 0, 2 => 0xfcfc0000fcfc00000000000000000000000000000000000000000000000000000033000000330000000000000000000000000000000000000000000000000000ffff0000f0f00000000000000000000000000000000000000000000000000000000000005555000000000000000000000000000000000000000000000000000033330000333300000000000000000000000000000000000000000000000000000f0f00000f0f0000000000000000000000000000000000000000000000000000ff550000ff550000000000000000000000000000000000000000000000000000555500005555
+  | 0, 3 => 0xffaa0000ffaa0000000000000000000000000000000000000000000000000000ffff000055550000000000000000000000000000000000000000000000000000005500000055
+  | _, _ => 0
+def dictP1B : Nat → Nat → Nat
+  | 0, 0 => 0xff00000000000000000000000000000000000000000000000000000000000000e0f80000000000000000000000000000000000000000000000000000000000001c07c0000000000000000000000000000000000000000000000000000000000000e73f0000000000000000000000000000000000000000000000000000000000ff00000000000000000000000000000000000000000000000000000000000000e0f80000000000000000000000000000000000000000000000000000000000001c07cf000000000000000000000000000000000000000000000000000000000000e730
+  | 0, 1 => 0x1ce7ff00000000000000000000000000000000000000000000000000000000001c07c00000000000000000000000000000000000000000000000000000000000ff18c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ff000f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e3f830000000000000000000000000000000000000000000000000000000000000000f
+  | 0, 2 => 0x1ce7f000000000000000000000000000000000000000000000000000000000001f00cf0000000000000000000000000000000000000000000000000000000000ff07c0000000000000000000000000000000000000000000000000000000000000fff00000000000000000000000000000000000000000000000000000000000ff18cf0000000000000000000000000000000000000000000000000000000000e3f83f0000000000000000000000000000000000000000000000000000000000fffff00000000000000000000000000000000000000000000000000000000000fffff0
+  | 0, 3 => 0xe0f80f0000000000000000000000000000000000000000000000000000000000fffff000000000000000000000000000000000000000000000000000000000001f07f0
+  | _, _ => 0
+def dictP2B : Nat → Nat → Nat
+  | 0, 0 => 0xffad3d0000000000000000000000000000000000000000000000000000000000f0fa8400000000000000000000000000000000000000000000000000000000009c57c200000000000000000000000000000000000000000000000000000000006fef7f0000000000000000000000000000000000000000000000000000000000ff84280000000000000000000000000000000000000000000000000000000000f4fbd70000000000000000000000000000000000000000000000000000000000bd7fdf00000000000000000000000000000000000000000000000000000000004ae731
+  | 0, 1 => 0xffffff0000000000000000000000000000000000000000000000000000000000bd7fce0000000000000000000000000000000000000000000000000000000000ff94a8000000000000000000000000000000000000000000000000000000000025014a0000000000000000000000000000000000000000000000000000000000ffad7f000000000000000000000000000000000000000000000000000000000025280c0000000000000000000000000000000000000000000000000000000000f2faa4000000000000000000000000000000000000000000000000000000000025295f
+  | 0, 2 => 0xdef7f3000000000000000000000000000000000000000000000000000000000005004a0000000000000000000000000000000000000000000000000000000000ffd7ea00000000000000000000000000000000000000000000000000000000000052800000000000000000000000000000000000000000000000000000000000b518ce000000000000000000000000000000000000000000000000000000000063a83d0000000000000000000000000000000000000000000000000000000000fafea40000000000000000000000000000000000000000000000000000000000dad6a0
+  | 0, 3 => 0xf5fbdf0000000000000000000000000000000000000000000000000000000000ffd6a800000000000000000000000000000000000000000000000000000000000a0420
+  | _, _ => 0
+def stateB : Nat → Nat → Nat → Nat
+  | 3, 0, 0 => 0x398a44188204
+  | 4, 0, 0 => 0xe62810a3338085698a0428cc10315662814a3494085
+  | 5, 0, 0 => 0x198a0441b2331408600cc084946628118619ae52218662810a600cc584d466281166a8cc102186628114600cc89c947131408600cc5041466794086
+  | 6, 0, 0 => 0x198a044180330112500cc544d5633140861e8c502180331408500cc50416a3314086
+  | 7, 0, 0 => 0x3314085
+  | _, _, _ => 0
+def stateW : Nat → Nat
+  | 3 => 24
+  | 4 => 29
+  | 5 => 34
+  | 6 => 34
+  | 7 => 29
+  | _ => 0
+def wireAt (i : Nat) : Nat := fld (dictB (i / 128) (i / 8 % 16)) 256 (i % 8)
+def p1At (i : Nat) : Nat := fld (dictP1B (i / 128) (i / 8 % 16)) 256 (i % 8)
+def p2At (i : Nat) : Nat := fld (dictP2B (i / 128) (i / 8 % 16)) 256 (i % 8)
+def wireDAt (i : Nat) : Nat × Nat × Nat := if i < 27 then (wireAt i, p1At i, p2At i) else (0, 0, 0)
+def wireDOK (i : Nat) : Bool := (p1At i == projBit r1sG (wireAt i)) && (p2At i == projBit r2sG (wireAt i))
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+theorem wireD_ok_all : span wireDOK 27 0 = true := by decide +kernel
+theorem projBit_zero (rs : List Nat) : projBit rs 0 = 0 := by
+  induction rs with
+  | nil => rfl
+  | cons r rs ih => simp only [projBit, List.foldr_cons, Nat.zero_testBit, Bool.false_eq_true, ite_false] at ih ⊢; rw [ih]; rfl
+theorem wireDAt_eq (i : Nat) :
+    wireDAt i = (let w := if i < 27 then wireAt i else 0; (w, projBit r1sG w, projBit r2sG w)) := by
+  unfold wireDAt; split
+  · next hi => have h := span_ok wireD_ok_all i (Nat.zero_le i) (by omega); simp only [wireDOK, Bool.and_eq_true, beq_iff_eq] at h; simp [h.1, h.2]
+  · simp [projBit_zero]
+def wireSAt (i : Nat) : Nat := if i < 27 then wireAt i else 0
+def stateWiresD : Nat → Nat → List (Nat × Nat × Nat)
+  | 0, _ => []
+  | n + 1, ids => wireDAt (fld ids 5 0) :: stateWiresD n (ids >>> 5)
+def stateWiresS : Nat → Nat → List Nat
+  | 0, _ => []
+  | n + 1, ids => wireSAt (fld ids 5 0) :: stateWiresS n (ids >>> 5)
+def SD (s j : Nat) : List (Nat × Nat × Nat) := let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16); stateWiresD (packed &&& 15) (packed >>> 4)
+def SS (s j : Nat) : List Nat := let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16); stateWiresS (packed &&& 15) (packed >>> 4)
+theorem stateWiresD_eq (n ids : Nat) : stateWiresD n ids = (stateWiresS n ids).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := by
+  induction n generalizing ids with | zero => rfl | succ n ih => simp [stateWiresD, stateWiresS, wireSAt, wireDAt_eq, ih]
+theorem SD_eq (s j : Nat) : SD s j = (SS s j).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := stateWiresD_eq _ _
+def htAt (s i : Nat) : Nat := fld (HT s (i / 64)) 32 (i % 64)
+def idxH (s h : Nat) : Nat := bsr (htAt s) h 4 0 (NN s)
+def idx (s : Nat) (zs : List Nat) : Nat := idxH s (hk 0 zs)
+def CN : Nat → Nat
+  | 4 => 9
+  | 5 => 50
+  | 6 => 9
+  | _ => 0
+def CH : Nat → Nat → Nat
+  | 4, 0 => 0x9185cfda483f416b3b576e79187d70ea165fe77311fb318c11d711301187e5fe023cffdf
+  | 5, 0 => 0xf8bf2ce7e68341e4de5a4849db303c9fd37ae575cec1e1d5cc33711ebf04180ebcaa8a54a617fd359dfb7ec59774e46f8f6d2d8d89bd03a77bde9db27a2ae7427167d63b6bca2ef067cd6ed167219c7053e31fd350ec74e050ae33c7443e8d7142be05b73f84ea353f42ac8c3eeadb903c78bddf3c6da0a33b576e7935ad773a2f9f757d2d532f8b2c66de41228b45be2037d4601eb3ccb419fcdcbd14de6d04137fdc2e10c838450ffda3820bf0396e0af1ee9b08a447d60628cfec058847cc05616d1d0514ee4f
+  | 6, 0 => 0xdb303c9fd37ae575bcaa8a543f42ac8c3c6da0a32c66de4114de6d040bf0396e058847cc
+  | _, _ => 0
+def CV : Nat → Nat → Nat
+  | 4, 0 => 0x100000000000000000000000000000000000000100000000000010000000000000000000000000000000000000000000000000001
+  | 5, 0 => 0x1000000000000100000000000000000000000000000000000000100000000000010000000000000000000000000000000000000000000000000001000000000000000000000000000000000000001000000000000100000000000000000000000000000000000000100000000000000000000000001000000000000000000000000000000000000000000000000000000000000000010000000000001000000000000000000000000010000000000000000000000000100000000000000000000000000
+  | 5, 1 => 0x100000000000000000000000001000000000000100000000000000000000000001000000000000000000000000000000000000001000000000000100000000000000000000000000000000000000100000000000010000000000000000000000000000000000000010000000000000
+  | 6, 0 => 0x100000000000000000000000001000000000000000000000000000000000000000000000000000000000000000010000000000001
+  | _, _ => 0
+def chAt (s i : Nat) : Nat := fld (CH s (i / 64)) 32 (i % 64)
+def cidxH (s h : Nat) : Nat := bsr (chAt s) h 6 0 (CN s)
+def cidx (s : Nat) (zs : List Nat) : Nat := cidxH s (hk 0 zs)
+def checkCutByIdx (s : Nat) (ws : List Nat) (hint : Nat) : Bool :=
+  match hint &&& 255 with
+  | 0 => checkCutEntry dom_13 roots_13 4 s ws hint
+  | 1 => checkCutEntry dom_35 roots_35 4 s ws hint
+  | _ => false
+def cutHitH (s h : Nat) (ws : List Nat) : Bool := let i := cidxH s h; decide (i < CN s) && (chAt s i == h) && checkCutByIdx s ws (fld (CV s (i / 32)) 52 (i % 32))
+def cutHit (s : Nat) (ws : List Nat) : Bool := cutHitH s (hk 0 ws) ws
+theorem cutHitH_sound {u ys} (h : cutHitH u (hk 0 ys) ys = true) : ¬ RunD dom_47 goalM u ys := by
+  unfold cutHitH at h; simp only [Bool.and_eq_true] at h; have hc := h.2; unfold checkCutByIdx at hc; split at hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_13 _ hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_35 _ hc
+  · contradiction
+theorem cutHit_sound {u ys} (h : cutHit u ys = true) : ¬ RunD dom_47 goalM u ys := cutHitH_sound h
+def symsG : List (List (Nat × Nat)) := [[(0xcccccccc, 30)], [(0xf000f000f000f0, 4)], [(0xcccccccc, 30), (0xf000f000f000f0, 4)]]
+theorem symsG_ok : symsG.all (fun ms => ms.all moveOK256 && (applyMoves ms dom_47 == dom_47) && (applyMoves ms goalM == goalM)) = true := by decide +kernel
+def ori (zs : List Nat) : List Nat := pickMin 0 zs symsG zs (hk 0 zs)
+theorem ori_ok {u ys} (h : RunD dom_47 goalM u ys) : RunD dom_47 goalM u (ori ys) := pickMin_runD 0 ys h symsG ys (hk 0 ys) symsG_ok h
+def Z (s : Nat) := bar dom_47 goalM pairsG r1sG r2sG mpG SD SS NN htAt idxH ori 0 pool6G cutHitH s
+private theorem z0 : ∀ i, 0 ≤ i → i < 0 → Z 0 i = true := by omega
+private theorem z1 : ∀ i, 0 ≤ i → i < 0 → Z 1 i = true := by omega
+private theorem z2 : ∀ i, 0 ≤ i → i < 0 → Z 2 i = true := by omega
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z3 : ∀ i, 0 ≤ i → i < 2 → Z 3 i = true := span_ok (by decide +kernel : span (Z 3) 2 0 = true)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z4 : ∀ i, 0 ≤ i → i < 6 → Z 4 i = true := span_ok (by decide +kernel : span (Z 4) 6 0 = true)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z5 : ∀ i, 0 ≤ i → i < 14 → Z 5 i = true := span_ok (by decide +kernel : span (Z 5) 14 0 = true)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z6 : ∀ i, 0 ≤ i → i < 8 → Z 6 i = true := span_ok (by decide +kernel : span (Z 6) 8 0 = true)
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
 private theorem z7 : ∀ i, 0 ≤ i → i < 1 → Z 7 i = true := span_ok (by decide +kernel : span (Z 7) 1 0 = true)
@@ -2679,18 +2895,13 @@ theorem checked (s : Nat) (hs : s ≤ 7) : ∀ i < NN s, Z s i = true := by
   · exact fun i hi => z5 i (Nat.zero_le i) hi
   · exact fun i hi => z6 i (Nat.zero_le i) hi
   · exact fun i hi => z7 i (Nat.zero_le i) hi
-def RootG (s : Nat) : Bool :=
-  scr dom_47 goalM s pool6G xsM || cutHit s (ori xsM) || found SS NN idx s (ori xsM)
-
+def RootG (s : Nat) : Bool := scr dom_47 goalM s pool6G xsM || cutHit s (ori xsM) || found SS NN idx s (ori xsM)
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
 theorem rootChecked : span RootG 4 4 = true := by decide +kernel
-
 theorem proper_failG : ∀ zs ∈ xsM.sublists, zs ≠ xsM → unorientedCov pairsG zs = false := by decide +kernel
-
 theorem noRunFull (s : Nat) (hs : s ≤ 7) (h : RunD dom_47 goalM s xsM) : False := by
-  have hmin : 4 ≤ s := by
-    have hl := run_len h; change 5 ≤ s + 1 at hl; omega
+  have hmin : 4 ≤ s := by have hl := run_len h; change 5 ≤ s + 1 at hl; omega
   have hr := span_ok rootChecked s hmin (by omega)
   unfold RootG at hr
   rw [scr_no pool6G h, Bool.false_or, Bool.or_eq_true] at hr
@@ -2698,19 +2909,19 @@ theorem noRunFull (s : Nat) (hs : s ≤ 7) (h : RunD dom_47 goalM s xsM) : False
   · exact cutHit_sound hcut (ori_ok h)
   · rw [found, Bool.and_eq_true, decide_eq_true_eq, List.isPerm_iff] at hf
     exact bar_all (by decide +kernel) rfl rfl (by decide +kernel) SD_eq (by decide +kernel) ori_ok cutHitH_sound checked s hs _ hf.1 (Run.perm hf.2 (ori_ok h))
-
 theorem noCircuit : Lower dom_47 roots_47 goal_47 8 := by
   intro p bank hr ha
   by_contra! hsmall
   have hnc : ¬ IsConst dom_47 goal_47 := by
     have h0 : isConstB dom_47 goal_47 = false := by decide +kernel
-    intro h; rw [(isConstB_iff _ _).2 h] at h0; contradiction
+    intro h
+    rw [(isConstB_iff _ _).2 h] at h0
+    contradiction
   obtain ⟨s, ws, hs_le, hnd, hws_sub, hrun⟩ := reach_to_run (by decide +kernel) hnc hr ha
   have hperm_sub : ∃ zs, zs.Sublist xsM ∧ ws.Perm zs := by
     refine ⟨xsM.filter (fun x => decide (x ∈ ws)), List.filter_sublist, ?_⟩
     refine (List.perm_ext_iff_of_nodup hnd (List.Nodup.filter _ (by decide +kernel : xsM.Nodup))).2 ?_
-    intro x; simp only [List.mem_filter, decide_eq_true_eq]
-    exact ⟨fun hx => ⟨hws_sub x hx, hx⟩, fun h => h.2⟩
+    intro x; simp only [List.mem_filter, decide_eq_true_eq]; exact ⟨fun hx => ⟨hws_sub x hx, hx⟩, fun h => h.2⟩
   obtain ⟨zs, hsub, hpz⟩ := hperm_sub
   have hrun' := Run.perm hpz hrun
   by_cases heq : zs = xsM
@@ -2718,417 +2929,238 @@ theorem noCircuit : Lower dom_47 roots_47 goal_47 8 := by
   · have hcov := unorientedCov_ok (by decide +kernel) pairsG (by decide +kernel) hrun'
     have hbad := proper_failG zs (List.mem_sublists.2 hsub) heq
     rw [hcov] at hbad; contradiction
-
 end S_47
-
 theorem low_47 : Lower dom_47 roots_47 goal_47 8 := S_47.noCircuit
-
-namespace S_55
-def pairsG : List (Nat × Nat) := [(1, 3), (1, 5), (1, 33), (2, 3), (2, 34), (4, 5), (4, 20), (6, 7), (6, 22), (6, 38), (16, 20), (17, 19), (17, 21), (17, 49), (18, 19), (18, 22), (18, 50), (32, 33), (32, 34), (36, 37), (36, 38), (36, 52), (48, 49), (48, 50), (48, 52)]
-def r1sG : List Nat := [1, 1, 1, 2, 2, 4, 4, 6, 6, 6, 16, 17, 17, 17, 18, 18, 18, 32, 32, 36, 36, 36, 48, 48, 48]
-def r2sG : List Nat := [3, 5, 33, 3, 34, 5, 20, 7, 22, 38, 20, 19, 21, 49, 19, 22, 50, 33, 34, 37, 38, 52, 49, 50, 52]
-def mpG : Nat := 0x1ffffff
-def pool6G : List Nat := [19865031287043, 18717770777349, 1125887640835, 39656240518149, 39655535936289]
-def xsM : List Nat := roots_55.map (· &&& dom_55)
-def goalM : Nat := goal_55 &&& dom_55
-def NN : Nat → Nat
-  | 5 => 3
-  | 6 => 1
-  | _ => 0
-def HT : Nat → Nat → Nat
-  | 5, 0 => 0xfc6186b511927a6111454111
-  | 6, 0 => 0xa5e2e6eb
-  | _, _ => 0
-def dictB : Nat → Nat → Nat
-  | 0, 0 => 0x5500550055005500000000000000000000000000000000000000000000000000ff000000ff0000000000000000000000000000000000000000000000000000003300330033003300000000000000000000000000000000000000000000000000ff00ff0000000000000000000000000000000000000000000000000000000000ff00aa00ff00aa00000000000000000000000000000000000000000000000000f000f000f000f000000000000000000000000000000000000000000000000000cc00cc00cc00cc00000000000000000000000000000000000000000000000000aa00aa00aa00aa
-  | _, _ => 0
-def stateB : Nat → Nat → Nat → Nat
-  | 5, 0, 0 => 0x1323d6642ac6885
-  | 6, 0, 0 => 0x4c885
-  | _, _, _ => 0
-def stateW : Nat → Nat
-  | 5 => 19
-  | 6 => 19
-  | _ => 0
-def wireAt (i : Nat) : Nat := fld (dictB (i / 128) (i / 8 % 16)) 256 (i % 8)
-def stateWires : Nat → Nat → List Nat
-  | 0, _ => []
-  | n + 1, ids => wireAt (fld ids 3 0) :: stateWires n (ids >>> 3)
-def S (s j : Nat) : List Nat :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWires (packed &&& 15) (packed >>> 4)
-
-def dictP1B : Nat → Nat → Nat
-  | 0, 0 => 0x1ffc7f80000000000000000000000000000000000000000000000000000000001c1fc000000000000000000000000000000000000000000000000000000000001fe3c670000000000000000000000000000000000000000000000000000000001fe00000000000000000000000000000000000000000000000000000000000001c1fc0700000000000000000000000000000000000000000000000000000000003803e0000000000000000000000000000000000000000000000000000000000001c3980000000000000000000000000000000000000000000000000000000000003807
-  | _, _ => 0
-def dictP2B : Nat → Nat → Nat
-  | 0, 0 => 0x1b587500000000000000000000000000000000000000000000000000000000001e1fd4000000000000000000000000000000000000000000000000000000000016a34660000000000000000000000000000000000000000000000000000000001ff22140000000000000000000000000000000000000000000000000000000001ebfdef00000000000000000000000000000000000000000000000000000000013897e2000000000000000000000000000000000000000000000000000000000095cb9900000000000000000000000000000000000000000000000000000000004a78af
-  | _, _ => 0
-def p1At (i : Nat) : Nat := fld (dictP1B (i / 128) (i / 8 % 16)) 256 (i % 8)
-def p2At (i : Nat) : Nat := fld (dictP2B (i / 128) (i / 8 % 16)) 256 (i % 8)
-def wireDAt (i : Nat) : Nat × Nat × Nat :=
-  if i < 8 then (wireAt i, p1At i, p2At i) else (0, 0, 0)
-def wireDOK (i : Nat) : Bool :=
-  (p1At i == projBit r1sG (wireAt i)) && (p2At i == projBit r2sG (wireAt i))
-set_option maxRecDepth 40000 in
-set_option maxHeartbeats 0 in
-theorem wireD_ok_all : span wireDOK 8 0 = true := by decide +kernel
-theorem projBit_zero (rs : List Nat) : projBit rs 0 = 0 := by
-  induction rs with
-  | nil => rfl
-  | cons r rs ih => simp only [projBit, List.foldr_cons, Nat.zero_testBit, Bool.false_eq_true, ite_false] at ih ⊢; rw [ih]; rfl
-theorem wireDAt_eq (i : Nat) :
-    wireDAt i = (let w := if i < 8 then wireAt i else 0; (w, projBit r1sG w, projBit r2sG w)) := by
-  unfold wireDAt
-  split
-  · next hi =>
-    have h := span_ok wireD_ok_all i (Nat.zero_le i) (by omega)
-    simp only [wireDOK, Bool.and_eq_true, beq_iff_eq] at h
-    simp [h.1, h.2]
-  · simp [projBit_zero]
-def wireSAt (i : Nat) : Nat := if i < 8 then wireAt i else 0
-def stateWiresD : Nat → Nat → List (Nat × Nat × Nat)
-  | 0, _ => []
-  | n + 1, ids => wireDAt (fld ids 3 0) :: stateWiresD n (ids >>> 3)
-def stateWiresS : Nat → Nat → List Nat
-  | 0, _ => []
-  | n + 1, ids => wireSAt (fld ids 3 0) :: stateWiresS n (ids >>> 3)
-def SD (s j : Nat) : List (Nat × Nat × Nat) :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWiresD (packed &&& 15) (packed >>> 4)
-def SS (s j : Nat) : List Nat :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWiresS (packed &&& 15) (packed >>> 4)
-theorem stateWiresD_eq (n ids : Nat) :
-    stateWiresD n ids = (stateWiresS n ids).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := by
-  induction n generalizing ids with
-  | zero => rfl
-  | succ n ih => simp [stateWiresD, stateWiresS, wireSAt, wireDAt_eq, ih]
-theorem SD_eq (s j : Nat) :
-    SD s j = (SS s j).map (fun w => (w, projBit r1sG w, projBit r2sG w)) :=
-  stateWiresD_eq _ _
-
-def htAt (s i : Nat) : Nat := fld (HT s (i / 64)) 32 (i % 64)
-def idxH (s h : Nat) : Nat := bsr (htAt s) h 3 0 (NN s)
-def idx (s : Nat) (zs : List Nat) : Nat := idxH s (hk 0 zs)
-def CN : Nat → Nat
-  | 4 => 1
-  | 5 => 4
-  | _ => 0
-def CH : Nat → Nat → Nat
-  | 4, 0 => 0x9e94babc
-  | 5, 0 => 0xa5e2e6eb236d2b7b2352f7d6199d1172
-  | _, _ => 0
-def CV : Nat → Nat → Nat
-  | 4, 0 => 0x0
-  | 5, 0 => 0x1000000000000000000000000010000000000001
-  | _, _ => 0
-def chAt (s i : Nat) : Nat := fld (CH s (i / 64)) 32 (i % 64)
-def cidxH (s h : Nat) : Nat := bsr (chAt s) h 4 0 (CN s)
-def cidx (s : Nat) (zs : List Nat) : Nat := cidxH s (hk 0 zs)
-def checkCutByIdx (s : Nat) (ws : List Nat) (hint : Nat) : Bool :=
-  match hint &&& 255 with
-  | 0 => checkCutEntry dom_35 roots_35 4 s ws hint
-  | 1 => checkCutEntry dom_39 roots_39 5 s ws hint
-  | _ => false
-def cutHitH (s h : Nat) (ws : List Nat) : Bool :=
-  let i := cidxH s h
-  decide (i < CN s) && (chAt s i == h) && checkCutByIdx s ws (fld (CV s (i / 32)) 52 (i % 32))
-
-def cutHit (s : Nat) (ws : List Nat) : Bool := cutHitH s (hk 0 ws) ws
-
-theorem cutHitH_sound {u ys} (h : cutHitH u (hk 0 ys) ys = true) : ¬ RunD dom_55 goalM u ys := by
-  unfold cutHitH at h
-  simp only [Bool.and_eq_true] at h
-  have hc := h.2
-  unfold checkCutByIdx at hc
-  split at hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_35 _ hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_39 _ hc
-  · contradiction
-theorem cutHit_sound {u ys} (h : cutHit u ys = true) : ¬ RunD dom_55 goalM u ys := cutHitH_sound h
-
-def symsG : List (List (Nat × Nat)) := [[(0xcccccccc00000000cccccccc00000000cccccccc00000000cccccccc, 30)]]
-theorem symsG_ok : symsG.all (fun ms => ms.all moveOK256 && (applyMoves ms dom_55 == dom_55) && (applyMoves ms goalM == goalM)) = true := by decide +kernel
-def ori (zs : List Nat) : List Nat := pickMin 0 zs symsG zs (hk 0 zs)
-theorem ori_ok {u ys} (h : RunD dom_55 goalM u ys) : RunD dom_55 goalM u (ori ys) :=
-  pickMin_runD 0 ys h symsG ys (hk 0 ys) symsG_ok h
-
-def Z (s : Nat) := bar dom_55 goalM pairsG r1sG r2sG mpG SD SS NN htAt idxH ori 0 pool6G cutHitH s
-private theorem z0 : ∀ i, 0 ≤ i → i < 0 → Z 0 i = true := by omega
-private theorem z1 : ∀ i, 0 ≤ i → i < 0 → Z 1 i = true := by omega
-private theorem z2 : ∀ i, 0 ≤ i → i < 0 → Z 2 i = true := by omega
-private theorem z3 : ∀ i, 0 ≤ i → i < 0 → Z 3 i = true := by omega
-private theorem z4 : ∀ i, 0 ≤ i → i < 0 → Z 4 i = true := by omega
-set_option maxRecDepth 40000 in
-set_option maxHeartbeats 0 in
-private theorem z5 : ∀ i, 0 ≤ i → i < 3 → Z 5 i = true := span_ok (by decide +kernel : span (Z 5) 3 0 = true)
-set_option maxRecDepth 40000 in
-set_option maxHeartbeats 0 in
-private theorem z6 : ∀ i, 0 ≤ i → i < 1 → Z 6 i = true := span_ok (by decide +kernel : span (Z 6) 1 0 = true)
-theorem checked (s : Nat) (hs : s ≤ 6) : ∀ i < NN s, Z s i = true := by
-  interval_cases s
-  · exact fun i hi => z0 i (Nat.zero_le i) hi
-  · exact fun i hi => z1 i (Nat.zero_le i) hi
-  · exact fun i hi => z2 i (Nat.zero_le i) hi
-  · exact fun i hi => z3 i (Nat.zero_le i) hi
-  · exact fun i hi => z4 i (Nat.zero_le i) hi
-  · exact fun i hi => z5 i (Nat.zero_le i) hi
-  · exact fun i hi => z6 i (Nat.zero_le i) hi
-def RootG (s : Nat) : Bool :=
-  scr dom_55 goalM s pool6G xsM || cutHit s (ori xsM) || found SS NN idx s (ori xsM)
-
-set_option maxRecDepth 40000 in
-set_option maxHeartbeats 0 in
-theorem rootChecked : span RootG 3 4 = true := by decide +kernel
-
-theorem proper_failG : ∀ zs ∈ xsM.sublists, zs ≠ xsM → unorientedCov pairsG zs = false := by decide +kernel
-
-theorem noRunFull (s : Nat) (hs : s ≤ 6) (h : RunD dom_55 goalM s xsM) : False := by
-  have hmin : 4 ≤ s := by
-    have hl := run_len h; change 5 ≤ s + 1 at hl; omega
-  have hr := span_ok rootChecked s hmin (by omega)
-  unfold RootG at hr
-  rw [scr_no pool6G h, Bool.false_or, Bool.or_eq_true] at hr
-  rcases hr with hcut | hf
-  · exact cutHit_sound hcut (ori_ok h)
-  · rw [found, Bool.and_eq_true, decide_eq_true_eq, List.isPerm_iff] at hf
-    exact bar_all (by decide +kernel) rfl rfl (by decide +kernel) SD_eq (by decide +kernel) ori_ok cutHitH_sound checked s hs _ hf.1 (Run.perm hf.2 (ori_ok h))
-
-theorem noCircuit : Lower dom_55 roots_55 goal_55 7 := by
-  intro p bank hr ha
-  by_contra! hsmall
-  have hnc : ¬ IsConst dom_55 goal_55 := by
-    have h0 : isConstB dom_55 goal_55 = false := by decide +kernel
-    intro h; rw [(isConstB_iff _ _).2 h] at h0; contradiction
-  obtain ⟨s, ws, hs_le, hnd, hws_sub, hrun⟩ := reach_to_run (by decide +kernel) hnc hr ha
-  have hperm_sub : ∃ zs, zs.Sublist xsM ∧ ws.Perm zs := by
-    refine ⟨xsM.filter (fun x => decide (x ∈ ws)), List.filter_sublist, ?_⟩
-    refine (List.perm_ext_iff_of_nodup hnd (List.Nodup.filter _ (by decide +kernel : xsM.Nodup))).2 ?_
-    intro x; simp only [List.mem_filter, decide_eq_true_eq]
-    exact ⟨fun hx => ⟨hws_sub x hx, hx⟩, fun h => h.2⟩
-  obtain ⟨zs, hsub, hpz⟩ := hperm_sub
-  have hrun' := Run.perm hpz hrun
-  by_cases heq : zs = xsM
-  · subst heq; exact noRunFull s (by omega) hrun'
-  · have hcov := unorientedCov_ok (by decide +kernel) pairsG (by decide +kernel) hrun'
-    have hbad := proper_failG zs (List.mem_sublists.2 hsub) heq
-    rw [hcov] at hbad; contradiction
-
-end S_55
-
-theorem low_55 : Lower dom_55 roots_55 goal_55 7 := S_55.noCircuit
-
 theorem low_62 : Lower dom_62 roots_62 goal_62 6 :=
   lower_slice (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel)
     (by decide +kernel) (by decide +kernel) (by decide +kernel)
     [(0x4444444444444444, 32, 34), (0x5555555500000000, 2, 34)] (by decide +kernel) (by decide +kernel) low_28
-
-def isoMv_59 : List (Nat × Nat) := [(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4)]
-theorem low_59 : Lower dom_59 roots_59 goal_59 7 :=
-  lower_iso isoMv_59 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_55
-
-def isoMv_61 : List (Nat × Nat) := [(0xcccccccc00000000cccccccc00000000cccccccc00000000cccccccc, 30)]
-theorem low_61 : Lower dom_61 roots_61 goal_61 7 :=
-  lower_iso isoMv_61 (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_31
-
 namespace S_63
 def pairsG : List (Nat × Nat) := [(1, 3), (1, 5), (1, 9), (1, 33), (2, 3), (2, 34), (4, 5), (4, 12), (4, 20), (6, 7), (6, 14), (6, 22), (6, 38), (8, 9), (8, 12), (8, 24), (10, 11), (10, 14), (10, 26), (10, 42), (16, 20), (16, 24), (17, 19), (17, 21), (17, 25), (17, 49), (18, 19), (18, 22), (18, 26), (18, 50), (32, 33), (32, 34), (36, 37), (36, 38), (36, 44), (36, 52), (40, 41), (40, 42), (40, 44), (40, 56), (48, 49), (48, 50), (48, 52), (48, 56)]
 def r1sG : List Nat := [1, 1, 1, 1, 2, 2, 4, 4, 4, 6, 6, 6, 6, 8, 8, 8, 10, 10, 10, 10, 16, 16, 17, 17, 17, 17, 18, 18, 18, 18, 32, 32, 36, 36, 36, 36, 40, 40, 40, 40, 48, 48, 48, 48]
 def r2sG : List Nat := [3, 5, 9, 33, 3, 34, 5, 12, 20, 7, 14, 22, 38, 9, 12, 24, 11, 14, 26, 42, 20, 24, 19, 21, 25, 49, 19, 22, 26, 50, 33, 34, 37, 38, 44, 52, 41, 42, 44, 56, 49, 50, 52, 56]
 def mpG : Nat := 0xfffffffffff
-def pool6G : List Nat := [19817148451860, 39608475779874, 19865031287043, 44054085700617, 1125887640835, 39655535936801, 11021692965900, 39656240518149, 18734749322264, 18735320664323, 4471229645573, 11021189382924, 18717770777349]
+def pool6G : List Nat := []
 def xsM : List Nat := roots_63.map (· &&& dom_63)
 def goalM : Nat := goal_63 &&& dom_63
 def NN : Nat → Nat
-  | 6 => 21
-  | 7 => 41
+  | 4 => 2
+  | 5 => 18
+  | 6 => 57
+  | 7 => 51
   | 8 => 10
   | 9 => 1
   | _ => 0
 def HT : Nat → Nat → Nat
-  | 6, 0 => 0xd456bdf5b5170810ae7a07f8a67683648fc3745b8103242c764a933970b39b04638fa9754364a1c537a16c613582312924946f0f1f8de90b1f2e7fac1d490ecc1c5f717a18917f9407dcd0c00370d01e029d3776
-  | 7, 0 => 0xcef2f817cc2257dbc7abb727c58557c3b7794bf6a8fc361198c6984895546bd092a884948ffad9b98c0b847c88c8f860868841c184135e957162e77e6b3d020a60c081b75b1760205360be5f4c8d80f443cb07283bcc4b8e34f9221f28910cf8273fec7024f1d90e21f40ce01eb180c41c1160c61ac2a53e196939d216ed244d140ddc32106602d20cc27f900ba05b630a4a180908cac383085dcf4701c0cf2f0185e19d
+  | 4, 0 => 0x6484db434942a59a
+  | 5, 0 => 0xc7dac199c50a215d8fc2e3c28e3c35528a1600f5826eb32a6e619e26528b1cd4525fc68244232a2041ab194d383ef5c92c4244a1298c2afd25864fba25656b0e18f5aae1055fa689
+  | 6, 0 => 0xe9aaf229e1d5d790dadec81ad456bdf5b5170810b1022d5caf6de679ae7a07f8a6768364a66ac28ca62384049feaa7b29bf2ef0f8fc3745b8c2048b4894fa878764a933970b39b04685fc3915e278f0e53a0e14f5281bc6d4c1ac3744bcac3884b59e9114a5d9a7248f220d54646e00c43ec44e64136cd1a3faa646c37a16c613722863a3582312934de44863146257427b49de523497e701f8de90b1f2e7fac1df5c4f81d490ecc1c6ef0421c5f717a1948027b18917f9416d0a3ef15bcd8b812b894e50a35b3bc09b570f8088d0f520868b13b07dcd0c00370d01e029d3776009978f5
+  | 7, 0 => 0xcef2f817cc2257dbc7abb727c58557c3b7794bf6a8fc361198c6984895546bd092a884948ffad9b98c0b847c88c8f86086ac8c48868841c184135e957162e77e6b3d020a619f6a4560c081b75b1760205360be5f4c8d80f443cb072843a4cbbe3ce83b323bcc4b8e34f9221f2d2b64b728910cf827a4a978273fec7024f1d90e22b3913a21f40ce01eb180c41d3ebfa81c1160c61ac2a53e196939d216ed244d140ddc3211b6e00f10af5719106602d20cc27f900ba05b630a4a180908cac383085dcf4701c0cf2f0185e19d
   | 8, 0 => 0xd43a869fbde6d522b749d50ab40748ee77cbd1825d017f513e51fe3b3ba45360358f846f196926bf
   | 9, 0 => 0x69904ec9
   | _, _ => 0
 def dictB : Nat → Nat → Nat
-  | 0, 0 => 0xf0f0f0f0f0f0f0f0000000000000000000000000000000000000000000000000000555500005555000000000000000000000000000000000000000000000000ffffffff00000000000000000000000000000000000000000000000000000000ffffaaaaffffaaaa000000000000000000000000000000000000000000000000ffaaffaaffaaffaa000000000000000000000000000000000000000000000000ff00ff00ff00ff00000000000000000000000000000000000000000000000000f0f0f0f0f0f0f0f00000000000000000000000000000000000000000000000003333333333333333
-  | 0, 1 => 0xfffffffff0f0f0f0000000000000000000000000000000000000000000000000fafafafafafafafa000000000000000000000000000000000000000000000000ffff0000ffff0000000000000000000000000000000000000000000000000000555555555555555500000000000000000000000000000000000000000000000000ff00ff00ff00ff000000000000000000000000000000000000000000000000fff0fff0fff0fff0000000000000000000000000000000000000000000000000cccccccccccccccc000000000000000000000000000000000000000000000000aaaaaaaaaaaaaaaa
-  | 0, 2 => 0xffccffccffccffcc000000000000000000000000000000000000000000000000fffafffafffafffa000000000000000000000000000000000000000000000000f0f0f0a0f0f0f0a0000000000000000000000000000000000000000000000000ffffffffff00ff00000000000000000000000000000000000000000000000000cccccccc888888880000000000000000000000000000000000000000000000000055005500550055000000000000000000000000000000000000000000000000eeeeeeee0000000000000000000000000000000000000000000000000000000000000000ffffffff
-  | 0, 3 => 0xffffffffcccccccc000000000000000000000000000000000000000000000000ffffffffaaaaaaaa000000000000000000000000000000000000000000000000eeeeeeeeeeeeeeee000000000000000000000000000000000000000000000000ffffeeeeffffeeee0000000000000000000000000000000000000000000000000000000000ff00ff0000000000000000000000000000000000000000000000000505050505050505000000000000000000000000000000000000000000000000fcfcfcfcfcfcfcfc000000000000000000000000000000000000000000000000fffffffffafafafa
-  | 0, 4 => 0xfffffffffcfcfcfc000000000000000000000000000000000000000000000000fffffffffff0fff0000000000000000000000000000000000000000000000000fffffafafffffafa
+  | 0, 0 => 0xfcfcfcfcfcfcfcfc000000000000000000000000000000000000000000000000ffffaaaafff0aaa0000000000000000000000000000000000000000000000000cccccccccccccccc000000000000000000000000000000000000000000000000ffffffff00000000000000000000000000000000000000000000000000000000ffffeeeeffffeeee000000000000000000000000000000000000000000000000ff00ff00ff00ff00000000000000000000000000000000000000000000000000fcfca8a8fcfca8a8000000000000000000000000000000000000000000000000fafafafafafafafa
+  | 0, 1 => 0xffaaffaaffaaffaa000000000000000000000000000000000000000000000000f0f0f0f0f0f0f0f0000000000000000000000000000000000000000000000000ffffffffff00ff00000000000000000000000000000000000000000000000000fffffffff0f0f0f0000000000000000000000000000000000000000000000000ffff0000ffff0000000000000000000000000000000000000000000000000000aaaaaaaaaaaaaaaa000000000000000000000000000000000000000000000000ffffaaaaffffaaaa000000000000000000000000000000000000000000000000ffccffccffccffcc
+  | 0, 2 => 0xfff0fff0fff0fff0000000000000000000000000000000000000000000000000ff00ff55ff00ff55000000000000000000000000000000000000000000000000ffffffffffffaaaa000000000000000000000000000000000000000000000000ffffaaaaff00aa00000000000000000000000000000000000000000000000000ffffffff00110011000000000000000000000000000000000000000000000000ffff0005ffff0005000000000000000000000000000000000000000000000000ffffffff00001111000000000000000000000000000000000000000000000000fffffffffff0fff0
+  | 0, 3 => 0xf0f0f0f0f0f0f0f000000000000000000000000000000000000000000000000000055550000555500000000000000000000000000000000000000000000000033333333333333330000000000000000000000000000000000000000000000000101010101010101000000000000000000000000000000000000000000000000f0f0f0f5f0f0f0f5000000000000000000000000000000000000000000000000ffffffaaffffffaa000000000000000000000000000000000000000000000000ffff0003ffff0003000000000000000000000000000000000000000000000000fffffafafffffafa
+  | 0, 4 => 0xfffffffffffcfffc00000000000000000000000000000000000000000000000000000000ffffffff000000000000000000000000000000000000000000000000ffffffff05050505000000000000000000000000000000000000000000000000fffffffafffffffa000000000000000000000000000000000000000000000000555555555555555500000000000000000000000000000000000000000000000000ff00ff00ff00ff0000000000000000000000000000000000000000000000000055005500550055000000000000000000000000000000000000000000000000ffffffffaaaaaaaa
+  | 0, 5 => 0x3000300030003000000000000000000000000000000000000000000000000ff05ff05ff05ff05000000000000000000000000000000000000000000000000ffffffeeffffffee0000000000000000000000000000000000000000000000000033003300330033000000000000000000000000000000000000000000000000fffffffffffafffa0000000000000000000000000000000000000000000000000000050500000505000000000000000000000000000000000000000000000000ffeeffeeffeeffee000000000000000000000000000000000000000000000000ff00fa00ff00fa00
+  | 0, 6 => 0xff00ff0000000000000000000000000000000000000000000000000505050505050505000000000000000000000000000000000000000000000000fffffffffafafafa0000000000000000000000000000000000000000000000000005000500050005000000000000000000000000000000000000000000000000fffafffafffafffa0000000000000000000000000000000000000000000000000000000000005555000000000000000000000000000000000000000000000000ffffffff000055550000000000000000000000000000000000000000000000000000000000330033
+  | 0, 7 => 0xfffffffffcfcfcfc000000000000000000000000000000000000000000000000ffffffffcccccccc000000000000000000000000000000000000000000000000eeeeeeeeeeeeeeee000000000000000000000000000000000000000000000000ffffffffffccffcc
+  | _, _ => 0
+def dictP1B : Nat → Nat → Nat
+  | 0, 0 => 0xf3c0f1ff000000000000000000000000000000000000000000000000000000f0000000000000000000000000000000000000000000000000000000000000000003c0f1e3000000000000000000000000000000000000000000000000000000fffc000000000000000000000000000000000000000000000000000000000000f003fff1e3f000000000000000000000000000000000000000000000000000000f0000fe000000000000000000000000000000000000000000000000000000000003c0000000000000000000000000000000000000000000000000000000000000f03c01fcf
+  | 0, 1 => 0xf003cfe00f0000000000000000000000000000000000000000000000000000000f00001fc000000000000000000000000000000000000000000000000000000fffc00fe00000000000000000000000000000000000000000000000000000000fffc0001fc000000000000000000000000000000000000000000000000000000f003ff000000000000000000000000000000000000000000000000000000000000003c0000f00000000000000000000000000000000000000000000000000000f003ff0000f000000000000000000000000000000000000000000000000000000f03c0ffe30
+  | 0, 2 => 0xff000fffc0000000000000000000000000000000000000000000000000000000ffc00ffff000000000000000000000000000000000000000000000000000000ffffff0000f00000000000000000000000000000000000000000000000000000f000000000000000000000000000000000000000000000000000000000000000fffc03001c000000000000000000000000000000000000000000000000000000f00fff0003000000000000000000000000000000000000000000000000000000fffc000e1c000000000000000000000000000000000000000000000000000000fffc00fffc0
+  | 0, 3 => 0xff0ffffe03f000000000000000000000000000000000000000000000000000000ffc00ffff000000000000000000000000000000000000000000000000000000fffc3f0e1cf00000000000000000000000000000000000000000000000000000ff0c030e0000000000000000000000000000000000000000000000000000000000fc0001ff000000000000000000000000000000000000000000000000000000ff03fffe00f00000000000000000000000000000000000000000000000000000f00fff0000f00000000000000000000000000000000000000000000000000000f0f3ff01fcf
+  | 0, 4 => 0xffffc0ffff0000000000000000000000000000000000000000000000000000000003fffffff00000000000000000000000000000000000000000000000000000ffffc3fe03000000000000000000000000000000000000000000000000000000fff3fffffcf00000000000000000000000000000000000000000000000000000ffffc3ffff000000000000000000000000000000000000000000000000000000f0ffff01fff00000000000000000000000000000000000000000000000000000f0ffc301ff000000000000000000000000000000000000000000000000000000fffc3c0000f
+  | 0, 5 => 0xf00c3f0000f00000000000000000000000000000000000000000000000000000ff0fc3fe03000000000000000000000000000000000000000000000000000000ff03ffffe3f00000000000000000000000000000000000000000000000000000f0fc3f001cf00000000000000000000000000000000000000000000000000000fffc3cfffcf000000000000000000000000000000000000000000000000000000f0c00fe030000000000000000000000000000000000000000000000000000000f03fcffe3f0000000000000000000000000000000000000000000000000000000000000000
+  | 0, 6 => 0x3ff01fff00000000000000000000000000000000000000000000000000000ff0fc3fe03000000000000000000000000000000000000000000000000000000fffc3c01fcf00000000000000000000000000000000000000000000000000000f00fc300030000000000000000000000000000000000000000000000000000000ff03cfffcf00000000000000000000000000000000000000000000000000000000000ffff000000000000000000000000000000000000000000000000000000fffc00ffff00000000000000000000000000000000000000000000000000000000003f001cf
+  | 0, 7 => 0xffffc0f1ff000000000000000000000000000000000000000000000000000000ffffc0f1e30000000000000000000000000000000000000000000000000000000003fcf1e3f00000000000000000000000000000000000000000000000000000ffffc0ffe30
+  | _, _ => 0
+def dictP2B : Nat → Nat → Nat
+  | 0, 0 => 0x66fbcdf5ff300000000000000000000000000000000000000000000000000000f997bb5ab4e00000000000000000000000000000000000000000000000000000222bc4f1e3100000000000000000000000000000000000000000000000000000fffe208102800000000000000000000000000000000000000000000000000000fbbffffbf7f000000000000000000000000000000000000000000000000000008f4112fe484000000000000000000000000000000000000000000000000000006093cd50b530000000000000000000000000000000000000000000000000000055f4fd37fdf
+  | 0, 1 => 0x9f557efe6df0000000000000000000000000000000000000000000000000000044f08925fc200000000000000000000000000000000000000000000000000000ffff32ff4ac00000000000000000000000000000000000000000000000000000fffea9a5fea00000000000000000000000000000000000000000000000000000f883ff489000000000000000000000000000000000000000000000000000000011147c1225f00000000000000000000000000000000000000000000000000000f997ff5ab5f00000000000000000000000000000000000000000000000000000af6bd6ffeb5
+  | 0, 2 => 0xcff19bfffc6000000000000000000000000000000000000000000000000000008f6912ff4a400000000000000000000000000000000000000000000000000000ffffffdbb7f00000000000000000000000000000000000000000000000000000f997325a00c00000000000000000000000000000000000000000000000000000fffe218112800000000000000000000000000000000000000000000000000000f88bff4892000000000000000000000000000000000000000000000000000000fffe20850a800000000000000000000000000000000000000000000000000000ffffbbfffee
+  | 0, 3 => 0xbb0f76da03d00000000000000000000000000000000000000000000000000000066800a54a000000000000000000000000000000000000000000000000000000ddd43b0e1ce00000000000000000000000000000000000000000000000000000880002080000000000000000000000000000000000000000000000000000000044f88925fe200000000000000000000000000000000000000000000000000000ffd7fffefdf00000000000000000000000000000000000000000000000000000f887ff4890800000000000000000000000000000000000000000000000000000fdf7ff7ffdf
+  | 0, 4 => 0xfffffffffff000000000000000000000000000000000000000000000000000000001df7efd700000000000000000000000000000000000000000000000000000ffff22c902800000000000000000000000000000000000000000000000000000fff7fffffdf00000000000000000000000000000000000000000000000000000eeeb83edda00000000000000000000000000000000000000000000000000000070beed01b7b0000000000000000000000000000000000000000000000000000060aa810192000000000000000000000000000000000000000000000000000000fffe7c9327f
+  | 0, 5 => 0x1004200000800000000000000000000000000000000000000000000000000000af4b12fe4a400000000000000000000000000000000000000000000000000000fffffffffff000000000000000000000000000000000000000000000000000005094290014a00000000000000000000000000000000000000000000000000000fffffffffff000000000000000000000000000000000000000000000000000000208008002000000000000000000000000000000000000000000000000000000bf7ffeffeff000000000000000000000000000000000000000000000000000008d41127e484
+  | 0, 6 => 0xcd00b5300000000000000000000000000000000000000000000000000000aa0b02c802000000000000000000000000000000000000000000000000000000fffefdb7fff00000000000000000000000000000000000000000000000000000200a000002000000000000000000000000000000000000000000000000000000dff5fffffdf000000000000000000000000000000000000000000000000000000000002448000000000000000000000000000000000000000000000000000000fffe20a54a80000000000000000000000000000000000000000000000000000000000900142
+  | 0, 7 => 0xffffedf5ffb00000000000000000000000000000000000000000000000000000ffffe4f1e3900000000000000000000000000000000000000000000000000000333ffcf3e7f00000000000000000000000000000000000000000000000000000fffff6ffebd
   | _, _ => 0
 def stateB : Nat → Nat → Nat → Nat
-  | 6, 0, 0 => 0xd0912481d80144088007600534a0ce25801440952486014342053218014408125260053493072d8d28205124870051030891d8014404930b600204920641803c510238960053413002d80144283049600508920719801440c20406
-  | 6, 0, 1 => 0x14458204960051092072d8014d2001cb600d08800741801430812466
-  | 7, 0, 0 => 0x5342749207700014d088007601414d089207700534e04920b7005704081248700534204921b700534204921a700d08e049210700534308124c700f14d0992487000144081200601814d081248700014408e0496014144081248701414d08120070053570c12487
-  | 7, 0, 1 => 0x5103081248700014d081300601414d08124c700534308e0497005342248307700580408124877c534a081248800014d2481cb60053560812487005102049206700534a08124c778534a0812488000342048010600534a08e2487000144089207601478d0812487
-  | 7, 0, 2 => 0x5357099048700510a081248701f14d089207700534a081200702214d081248700014d0893076000142049206602114d081248700014408124c6
-  | 8, 0, 0 => 0x53422481d801440812486005342048019414d081248714d28204921df14d08124870053420493185343081248778534204921c534204920c7
-  | 9, 0, 0 => 0x14d0812486
+  | 4, 0, 0 => 0x10608015440c20405
+  | 5, 0, 0 => 0x10909b14a64042cf005611a61714a610608e14a611908e14a61182573c5610908100561093d6385655408e14a64cb08e14a61032483ce611208e14a644908e14a640424f385634c2c81ca61092021c06
+  | 5, 0, 1 => 0x10b20f1c061095cf0056
+  | 6, 0, 0 => 0x238529e99a510b08e14a700c109080158490908e14a70042ce8dd89846095c214a73442cf00e15c42423852a1754424200e15c424f08e16174202c238529c425608e14a70042573ce158010214a7de600424f08e75842c238529c7
+  | 6, 0, 1 => 0x1093c238579c42c23852af710bb8238529c4b4908e14a710908e14ab1eb10b08e14a700424238585842423852aa70042c58df89842e908738a730424f08e15c4609a0e14a71092021ce29c01093c215f600424e16389a710b08e14a7
+  | 6, 0, 2 => 0x109ccf08e15c42423852b2711a60238529c42693c238570043c238579842c808700a71095c200529c010908a75f60042d73c015846093c238573442c81ce29c425408e14a74042c200529f110908e14a710b5cf00529c42c23852b07
+  | 6, 0, 3 => 0x1010908e14a710b08e14ad1c424f080385700427308e158010914a7e2654d24238529c427308e14a70042ca75f89802c229d7e66
+  | 7, 0, 0 => 0xe0d10b08e14a80042c03852a270040c908e14a70042c23852b770042c23852b6700b0803852a6740c10b08e14a810b20200e14a80042cf08e163700c10b08714a700010908e29d603510b08e14a7000109080385600d10908e14a700d10b08e29d70042c83ce14a7
+  | 7, 0, 1 => 0x42f308e14a700424238529e70042d708e16378042d708e14a83442c21ce14a810b0803852b680002c238a76660042d708014a710bccf08e14a800010908529f610b5c23852a3800d80b08e14a70042c2e4529f710ba4f08e14a800010b08a75f600d10b08529f7
+  | 7, 0, 2 => 0x42d708e29d703b10b08e14a700010b0858df600010238529e601010b08e14a700010908e163600424f08e14a700010b08e8dd600d10b08e1637d4c10b08e14a80042cf08038570042c214a8df700460908e14a7e842d708e14a810b3c200e14a800010b14a7e26
+  | 7, 0, 3 => 0x42c808738a700425708e14a703a10b08529f7
+  | 8, 0, 0 => 0x42c214a7d8010908e14a60042c238a758d10b08e14a710b5c238529fa10b08e14a70042c23858d842cf08e14a78042c238529c42c23852a37
+  | 9, 0, 0 => 0x10b08e14a6
   | _, _, _ => 0
 def stateW : Nat → Nat
+  | 4 => 34
+  | 5 => 40
   | 6 => 46
   | 7 => 52
   | 8 => 46
   | 9 => 40
   | _ => 0
 def wireAt (i : Nat) : Nat := fld (dictB (i / 128) (i / 8 % 16)) 256 (i % 8)
-def stateWires : Nat → Nat → List Nat
-  | 0, _ => []
-  | n + 1, ids => wireAt (fld ids 6 0) :: stateWires n (ids >>> 6)
-def S (s j : Nat) : List Nat :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWires (packed &&& 15) (packed >>> 4)
-
-def dictP1B : Nat → Nat → Nat
-  | 0, 0 => 0xff0ffffe03f000000000000000000000000000000000000000000000000000000ffc00ffff000000000000000000000000000000000000000000000000000000fffc000000000000000000000000000000000000000000000000000000000000f003ff0000f000000000000000000000000000000000000000000000000000000f003cfe00f000000000000000000000000000000000000000000000000000000f0000fe0000000000000000000000000000000000000000000000000000000000f00001fc000000000000000000000000000000000000000000000000000000fffc3f0e1cf
-  | 0, 1 => 0xfffc0001fc00000000000000000000000000000000000000000000000000000000f03c01fcf00000000000000000000000000000000000000000000000000000f003ff0000000000000000000000000000000000000000000000000000000000ffffc3ffff000000000000000000000000000000000000000000000000000000f0ffff01fff000000000000000000000000000000000000000000000000000000ff000fffc0000000000000000000000000000000000000000000000000000000003c0f1e300000000000000000000000000000000000000000000000000000000003c0000f
-  | 0, 2 => 0xf03c0ffe30000000000000000000000000000000000000000000000000000000ff03cfffcf000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000fffc00fe000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f0ffc301ff00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003fffffff
-  | 0, 3 => 0xffffc0f1e3000000000000000000000000000000000000000000000000000000fffc3c0000f000000000000000000000000000000000000000000000000000000003fcf1e3f00000000000000000000000000000000000000000000000000000f003fff1e3f000000000000000000000000000000000000000000000000000000003ff01fff00000000000000000000000000000000000000000000000000000ff0fc3fe0300000000000000000000000000000000000000000000000000000000f3c0f1ff000000000000000000000000000000000000000000000000000000fffc3c01fcf
-  | 0, 4 => 0xffffc0f1ff000000000000000000000000000000000000000000000000000000fffc00fffc000000000000000000000000000000000000000000000000000000f0f3ff01fcf
-  | _, _ => 0
-def dictP2B : Nat → Nat → Nat
-  | 0, 0 => 0xbb0f76da03d00000000000000000000000000000000000000000000000000000066800a54a000000000000000000000000000000000000000000000000000000fffe208102800000000000000000000000000000000000000000000000000000f997ff5ab5f000000000000000000000000000000000000000000000000000009f557efe6df000000000000000000000000000000000000000000000000000008f4112fe4840000000000000000000000000000000000000000000000000000044f08925fc200000000000000000000000000000000000000000000000000000ddd43b0e1ce
-  | 0, 1 => 0xfffea9a5fea0000000000000000000000000000000000000000000000000000055f4fd37fdf00000000000000000000000000000000000000000000000000000f883ff4890000000000000000000000000000000000000000000000000000000eeeb83edda00000000000000000000000000000000000000000000000000000070beed01b7b00000000000000000000000000000000000000000000000000000cff19bfffc600000000000000000000000000000000000000000000000000000222bc4f1e310000000000000000000000000000000000000000000000000000011147c1225f
-  | 0, 2 => 0xaf6bd6ffeb500000000000000000000000000000000000000000000000000000dff5fffffdf0000000000000000000000000000000000000000000000000000044d08924fc200000000000000000000000000000000000000000000000000000ffff32ff4ac00000000000000000000000000000000000000000000000000000222a44912310000000000000000000000000000000000000000000000000000060aa810192000000000000000000000000000000000000000000000000000000333e2081028000000000000000000000000000000000000000000000000000000001df7efd7
-  | 0, 3 => 0xffffe4f1e3900000000000000000000000000000000000000000000000000000fffe7c9327f00000000000000000000000000000000000000000000000000000333ffcf3e7f00000000000000000000000000000000000000000000000000000fbbffffbf7f000000000000000000000000000000000000000000000000000000000cd00b5300000000000000000000000000000000000000000000000000000aa0b02c80200000000000000000000000000000000000000000000000000000066fbcdf5ff300000000000000000000000000000000000000000000000000000fffefdb7fff
-  | 0, 4 => 0xffffedf5ffb00000000000000000000000000000000000000000000000000000ffffbbfffee00000000000000000000000000000000000000000000000000000fdf7ff7ffdf
-  | _, _ => 0
 def p1At (i : Nat) : Nat := fld (dictP1B (i / 128) (i / 8 % 16)) 256 (i % 8)
 def p2At (i : Nat) : Nat := fld (dictP2B (i / 128) (i / 8 % 16)) 256 (i % 8)
-def wireDAt (i : Nat) : Nat × Nat × Nat :=
-  if i < 35 then (wireAt i, p1At i, p2At i) else (0, 0, 0)
-def wireDOK (i : Nat) : Bool :=
-  (p1At i == projBit r1sG (wireAt i)) && (p2At i == projBit r2sG (wireAt i))
+def wireDAt (i : Nat) : Nat × Nat × Nat := if i < 60 then (wireAt i, p1At i, p2At i) else (0, 0, 0)
+def wireDOK (i : Nat) : Bool := (p1At i == projBit r1sG (wireAt i)) && (p2At i == projBit r2sG (wireAt i))
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
-theorem wireD_ok_all : span wireDOK 35 0 = true := by decide +kernel
+theorem wireD_ok_all : span wireDOK 60 0 = true := by decide +kernel
 theorem projBit_zero (rs : List Nat) : projBit rs 0 = 0 := by
   induction rs with
   | nil => rfl
   | cons r rs ih => simp only [projBit, List.foldr_cons, Nat.zero_testBit, Bool.false_eq_true, ite_false] at ih ⊢; rw [ih]; rfl
 theorem wireDAt_eq (i : Nat) :
-    wireDAt i = (let w := if i < 35 then wireAt i else 0; (w, projBit r1sG w, projBit r2sG w)) := by
-  unfold wireDAt
-  split
-  · next hi =>
-    have h := span_ok wireD_ok_all i (Nat.zero_le i) (by omega)
-    simp only [wireDOK, Bool.and_eq_true, beq_iff_eq] at h
-    simp [h.1, h.2]
+    wireDAt i = (let w := if i < 60 then wireAt i else 0; (w, projBit r1sG w, projBit r2sG w)) := by
+  unfold wireDAt; split
+  · next hi => have h := span_ok wireD_ok_all i (Nat.zero_le i) (by omega); simp only [wireDOK, Bool.and_eq_true, beq_iff_eq] at h; simp [h.1, h.2]
   · simp [projBit_zero]
-def wireSAt (i : Nat) : Nat := if i < 35 then wireAt i else 0
+def wireSAt (i : Nat) : Nat := if i < 60 then wireAt i else 0
 def stateWiresD : Nat → Nat → List (Nat × Nat × Nat)
   | 0, _ => []
   | n + 1, ids => wireDAt (fld ids 6 0) :: stateWiresD n (ids >>> 6)
 def stateWiresS : Nat → Nat → List Nat
   | 0, _ => []
   | n + 1, ids => wireSAt (fld ids 6 0) :: stateWiresS n (ids >>> 6)
-def SD (s j : Nat) : List (Nat × Nat × Nat) :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWiresD (packed &&& 15) (packed >>> 4)
-def SS (s j : Nat) : List Nat :=
-  let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16)
-  stateWiresS (packed &&& 15) (packed >>> 4)
-theorem stateWiresD_eq (n ids : Nat) :
-    stateWiresD n ids = (stateWiresS n ids).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := by
-  induction n generalizing ids with
-  | zero => rfl
-  | succ n ih => simp [stateWiresD, stateWiresS, wireSAt, wireDAt_eq, ih]
-theorem SD_eq (s j : Nat) :
-    SD s j = (SS s j).map (fun w => (w, projBit r1sG w, projBit r2sG w)) :=
-  stateWiresD_eq _ _
-
+def SD (s j : Nat) : List (Nat × Nat × Nat) := let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16); stateWiresD (packed &&& 15) (packed >>> 4)
+def SS (s j : Nat) : List Nat := let packed := fld (stateB s (j / 256) (j / 16 % 16)) (stateW s) (j % 16); stateWiresS (packed &&& 15) (packed >>> 4)
+theorem stateWiresD_eq (n ids : Nat) : stateWiresD n ids = (stateWiresS n ids).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := by
+  induction n generalizing ids with | zero => rfl | succ n ih => simp [stateWiresD, stateWiresS, wireSAt, wireDAt_eq, ih]
+theorem SD_eq (s j : Nat) : SD s j = (SS s j).map (fun w => (w, projBit r1sG w, projBit r2sG w)) := stateWiresD_eq _ _
 def htAt (s i : Nat) : Nat := fld (HT s (i / 64)) 32 (i % 64)
-def idxH (s h : Nat) : Nat := bsr (htAt s) h 7 0 (NN s)
+def idxH (s h : Nat) : Nat := bsr (htAt s) h 6 0 (NN s)
 def idx (s : Nat) (zs : List Nat) : Nat := idxH s (hk 0 zs)
 def CN : Nat → Nat
-  | 5 => 5
-  | 6 => 68
-  | 7 => 155
+  | 4 => 15
+  | 5 => 80
+  | 6 => 273
+  | 7 => 312
   | 8 => 16
   | _ => 0
 def CH : Nat → Nat → Nat
-  | 5, 0 => 0xd751a5e39dd647ab5ffabf8f4642fd49120feeaa
-  | 6, 0 => 0xd43a869fcb7a0fdfc61354febde6d522bda5ba88b749d50ab2a179deadcd0e94a7e07051a76b4f4da204a7329e68ddc599357d919022d1e78ef830c38e26e5f78a35f35b8577d885827719247e842bcb7891b1e46d8847ba69904ec9689eda76642cd5305f16df6a5ef7a2cd5d251b8450fcb6f24fcdfcf2492e513d45d63c984206f138417ae7e74169ac4d3fee5b4b3e51fe3b3a75cc833a5ad4a439321f4135389f9733f5467333641e9c308b8d4b27e4956725a1eb18226fc5be1cb35624184d71d4172afb181313b3141182c6e9108dfb000dbbbcde0ce919930c76b2fc097f4255094cec42071ebcc605f3a13e050caf6c0342f9cf02d338cd010c7f3d
-  | 6, 1 => 0xff99db15ff0eb918f44d6af7e2c5f762
-  | 7, 0 => 0x3a9cdd1a3913ae5c386dc6753797b31a375c328c3661bf2535db239334bd92e331c32ec32ee5f83b2c9d909e2b5379482ad82ba32aa9504826c74c062232fccd20bd10b41f8bbb851db36f6a1d0c61251c7f660e1c02e4e51b9b06e31b2750f31ae554351ae1562919b15e681983ef5b196926bf194d07b418bc18ae17c2485d1658ec56161ad833159b56a614ffc7cb14c25be714b7efae147be17a1444561113ec0a3313b478a2122bc8a911f546a611c9fc590ecd7e060eccb7400e9e27910de1f81f0db6ae630d31a8270b8bbf6b0a5133e109d69a710801277907852a5a05af33680544cdf60499b2c10451cc9a025a06d301dd076b00f26ece002f4827
-  | 7, 1 => 0x9bea8a5f9b4c7f429b2fddca98fd6fd798e1de9b9492ddb292427637911bcb61902d5b0c8ed4acb685cf5b4385a3bc0f84fccbd1824f20f68128f3f38077f7197a5ac63379ff8fe978e4f5a276abcfae76a6ae13764d3db575a3370771e3fb216f1f7e7a6dbfad186cb455396afb3f0269904ec9679e3ab8679b211f6722ad0067108e52664a2e4d6608c41365962e4f64bb1a686438425e63ff7f47608a602b6013f4555e4e7aea5a910ab55a0f56b157c4634854bb1162533db7de5164663951529dc44f85907a4f1c75a54cfebf1947e5621746d9577145d1eda14433319842a809fe417604ab408d44063f1911403eca17bc3d084ce73c5cd0913b8c25f9
-  | 7, 2 => 0xfebb539ef8ec2452f5380deef44d6af7eb406b8fdc06615ad7593a2fcf64937bcedaf033ce16f6e3c9d81675c82a4e78c169a7a0c11b76cfbe769f18b9653685b7f96484b1838f47b15805aab0b62913af359018af1d0a4eaf0a244eab2fae5aaabb0592a3ac4ce79cee05e0
+  | 4, 0 => 0x8593f57f7a35e8027422806670b5a2a96a7b29176a117a1b666675035d149eb257054f8e4ab1bea43dde0dd22867ec972360c1ce0d3faa8e00b0d14c
+  | 5, 0 => 0x87c17cb8804fcfd47c3b1bc078ed702f72d48c636b35679c69904ec962d8c4c15f6aa0325e8e304c5da3729b5c7195ba547e80025121a0b34d2a24134806cec94790fd3e4642fd4945da43c841d7788e3f1b238c3e5e79083dcc21b53935688b386ff24b380b058f3528021033677f0331fb77de302efb542e5701362742d9be268291292593237024bd8b8124b1c4a7215a25cd1f0e5d961e9aa9331c9ec72b1bf64b951b4ad6a919a647fa1964d378157f2c9b1376d1eb1263f20b120feeaa116703450f829e5e0ef745bf0a2303e408cac38308aeddb7071381fe06b7ad5104b898f104a2bd2d044c27d404167c59022394ed01e0a1ad01cb040900dd2360
+  | 5, 1 => 0xf7a31d20ed27172ed751a5e3d456bdf5c8d8b73ab268ce67ac11ca64a965aa7aa451e1df9dd647ab9555cd34920c584d91ebcbfa912becaa8d2a1b62881ae44f
+  | 6, 0 => 0x158cf507147c1fb214572b6314093d38138eec7e1313b3141218d9d311de323c1182c6e9111daaa410bfb41810ae3699108dfb000fe3bfab0fb9c5eb0fb172a50f63d76b0df384db0dbbbcde0db8a9780d0fc4000ce919930c76b2fc0bfca3de0bdf8fea0bcfd24f0ba2b5cf0ad79ab60ab1a88f097f4255094cec42094a91aa0931d2630875c2bc074e33b2071ebcc606a471e50688b2d306094b0a05f3a13e05dba0bf05db450a05af3368059b03a40544cdf6050caf6c05050e01049fe583046f34830404861503b6a7900360aaa70342f9cf0335143e02fbbdeb02d338cd02c4fbd3025ebca501e314b1016d7b8201271ba7010c7f3d0104396600aed0e9
+  | 6, 1 => 0x3a75cc833a5ad4a43a4fc2b639321f4138f9c9453607a2a035907712358f846f35389f97347b000a33f5467333718a5633641e9c333fecef32c2068731bdaf9d308b8d4b2f7aeeb72e948f2d2e46958b2dc73e3e2d0e39ee2bf5fe322b8991172ab1ef7827e4956727b43dd425fd7cc625a1eb1824c4815c24946f0f23e1233a23450ca4226fc5be2261afbb223d2890213fe88e213b829920aee6cc20892a781f415ead1ec6fb471e495c2b1de210981dd645d51d0839f91cb356241c166f5f1bb8628c1a28899f1a244824196926bf193bf80a1929eff618d3f00918c367c3184d71d417f4e3e817ec8ed517e17fa417bf419b172afb181706463c1658b727
+  | 6, 2 => 0x6d8847ba6a0f594769904ec9689eda7667d44f0c66824f02650c780064c5e58f64bc892b642cd530638fa97562c46bf961bed9f361936f60611905e960e9aef2608f01095f16df6a5f00935f5ef7a2cd5e38bf355d251b845d017f515caba7035b17602058b5a95e58612ef15360be5f5311d9f750fcb6f2509321c9506a9b634fe54fc54fcdfcf24fa77cfe4e8393474ddfac4c4be15cf549ea7d1e492e513d48b14f3c4861424c45d63c9844b139ef436bb9d54364a1c54320af4b424d90154206f13841eec1fc417ae7e74169ac4d401bfc4f3fee5b4b3f8bd5363e51fe3b3e2548743c7eb0e93c05e1c63ba453603b879d9d3b1fa0fa3a9a5db33a987e5d
+  | 6, 3 => 0xbd012136bc29ef1dbc08914db749d50ab40748eeb2a179deae65dd0aadcd0e94a854e1bda7e07051a76b4f4da5baec92a5ab549fa427599ba33be304a204a732a12a7d829ed2d9529e68ddc59e21a63f9e0d81059e0597809d8e14769b2fddca99357d919022d1e78fdebaae8f533e868f215ec08f1a9f138ef830c38e26e5f78e0d0afe8dd424298a35f35b8a224c288577d88582f798d582a31138827719248209a61281c578128103242c80f4d4d87e842bcb7e687d3c7d1bcfb67c67cfb87b9672c97b8f7e127891b1e47881ab04783fe09f77cbd18276d0a77976954fc474a69c93739d6ef2732cb95173286417726857e97162e77e6dda75b46dbfad18
+  | 6, 4 => 0xff99db15ff0eb918f44d6af7e2c5f762e29240aedc42c1a1dab10399d43a869fce6b659dcb7a0fdfc8bad4eec61354fec4f17c22bfa61ebbbde6d522bddd1fe6bda5ba88
+  | 7, 0 => 0x14c25be714b7efae147be17a144456111439cce413ec0a3313b478a212d88d1712a036a6128177ed122bc8a911f546a611c9fc59117fcfcb116093e1111d5c611106cdc71101c9f510eee49c10dfc44d108a8de80f1c517e0ecd7e060eccb7400eb2ba8a0e9e27910de1f81f0db6ae630d31a8270d2c2e290cf6d6570cda57470cd29d6b0cc838990c5bdf350bedd9ed0b8bbf6b0b203b970b15b6280af1fed60a9f6c030a5133e109efeca509d69a71097037230801277907a389060790ca2a07852a5a07695452075d3abb06940e5505c078cc05af33680544cdf604be9b5d0499b2c10451cc9a0426a541025a06d3020fff7e01dd076b00f26ece002f4827
+  | 7, 1 => 0x35a83339352b3a5934bd92e332db8bcc327c9e7a3265f7993263f9b831c32ec330797d6f3069bd2d2f1583e82ee5f83b2ea7d59d2dbb214e2c9d909e2c8995d12c33b3742b5379482ad82ba32aa950482a9cb8fe2a339e292900b4f726c74c0625e008592547379b24c639ab24ba3ed6249d63ef249231972232fccd20bd10b41f8bbb851f505e561db36f6a1d43fbd41d291e511d0c61251c8d2d2f1c7f660e1c02e4e51b9b06e31b2750f31ae554351ae156291a3039c419b15e681983ef5b196926bf194d07b418ed5c0818bc18ae17c2485d179ba5681773f9151742223f172371541703b38d169f5cd91658ec56161ad833159b56a614ffc7cb14f312d4
+  | 7, 2 => 0x630363cc6131850560f5b6426091d258608a602b6013f4555e4e7aea5bf8a09c5a910ab55a0f56b157c463485516b86d5514da2a54bb116253fc1e2653fb90b3533db7de52c6dafb51bfab725164663951529dc450ba5f8b4f85907a4f1c75a54f01e97c4d2e4be94cfebf194b43cfa04a258bc54a0c99e049dfd61947e5621746d9577145d1eda1449d41de4433319843cc4196436b49e542a809fe41e4c453417604ab408d44063fd242ec3f643da43f1911403eca17bc3d9f9c853d41059b3d0bb5b13d084ce73c79d3023c5cd0913b8c25f93b6b92a33a9cdd1a3a4a87f93913ae5c386dc6753860df7e37fc88ca3797b31a375c328c3661bf2535db2393
+  | 7, 3 => 0x964fc4fc9492ddb29452b81d92427637923c767591505196913e368f911bcb61902d5b0c8f0252678ed4acb6881c49d68646d6de85cf5b4385a3bc0f84fccbd1824f20f68128f3f38077f7197a5ac63379ff8fe97937382478e4f5a276abcfae76a6ae137673e45e7663a7c6764d3db576374ac775a3370774e1c74f7414985b73e927a173be14ec72f58c2c71e3fb21708219686f1f7e7a6ea16f056dbfad186ce0bd3b6cb455396bf5ec266afb3f026a20792e6a0e5a8069904ec96952e2d9684ad96a679e3ab8679b211f67360e8c6722ad0067108e52664b1a33664a2e4d6608c41365962e4f64d6e24c64bb1a686438425e63ff7f4763e020e463ce0236
+  | 7, 4 => 0xfebb539ef8ec2452f5380deef4643038f44d6af7eb406b8fdc06615ad7593a2fd4c65289d4034cd6d277431ecf7791e2cf64937bcedaf033ce16f6e3cddc3d11c9d81675c82a4e78c6579413c634e73dc169a7a0c11b76cfbfd6d0e9be769f18bd4946fdb9fc0058b9653685b7f96484b7acf0edb5f481dbb25ec8e9b1838f47b15805aab0b62913af359018af1d0a4eaf0a244ead1f9a1cab2fae5aaaea7c7eaabb0592a92e1f67a7787976a3ac4ce7a38fee899f574e1a9cee05e09bea8a5f9b4c7f429b2fddca98fd6fd798e1de9b98a7fe43989ed46797de4ccf979476b8
   | 8, 0 => 0xc68acfd0c43bc065b03b1c5fa4234630a0e187958302b3d669904ec946d9577144efaef6448b58423ef2c9303d084ce7242a74e01957081117a485a0167ebc1d
   | _, _ => 0
 def CV : Nat → Nat → Nat
-  | 5, 0 => 0x2000000000000000000520c120000000000000010000000000000
-  | 6, 0 => 0x1802202000000000210300000000c110300000000511070000002802202000000000000600000000c110000000000000050000000012100000000000000700000000000040000000000006000000000000000000001011040000000000003000000000a1070000000000000000000000000500000000c11030000003802202000000000000500000000c110000000000000020000000006103000000480220200000000000030000000006100000000010910700000000c11000000000000002000000000a1000000000000007
-  | 6, 1 => 0x280220200000000000020000000000002000000000000200000000021020000001802202000000000000700000000000030000000000000000000380a202000000000000600000000851070000000000003000000000000500000000c11030000000002100000000080a20200000000021000000004806202000000000000600000018c920200000000021020000000000002000000180a20200000000000010000000006107000000280220200000000c1100000000000a104000000000000400000000000030000000006107
-  | 6, 2 => 0x32402202000000000000200000000021020000000000002
-  | 7, 0 => 0x40000000000002000000000000700000000c1107000000000610300000000c51020000000012102000000000610000000000000060000000002102000000000000000000000061020000000002100000000000a102000000000000700000000000050000000006102000000000a10700000000000070000000006107000000000000500000000061020000000000007000000001210300000000c11030000000000006000000000000700000000000030000000000005000000000000500000000411020000000000007
-  | 7, 1 => 0xd110200000000c91020000000000007000000010110400000000000020000000000007000000001210300000000121020000000000005000000000a1020000000091102000000000610700000000000020000000002104000000000a1020000000000000000000000a100000000000000200000000000050000000081102000000000e102000000000a103000000000210400000000c1102000000000a10200000000c1100000000000210700000000000000000000002102000000000210700000000000070000000000000
-  | 7, 2 => 0x61020000000000006000000000000300000000c910200000000021020000000006102000000000a102000000000000500000000021020000000000002000000000210200000000000010000000002103000000000000000000000c11030000000000000000000000000300000000000060000000002100000000000000400000000000030000000012102000000000a102000000001210200000000000000000000002102000000000000300000000000040000000000005000000000a10200000000000060000000000007
-  | 7, 3 => 0x610400000000021000000000101104000000000210200000000c11070000000006104000000000000700000000000020000000000007000000000a10200000000000020000000000002000000000210200000000c1102000000000a10200000001051020000000000000000000000000300000000021020000000000007000000000000700000000000000000000002107000000000610200000000000040000000000006000000000210200000001011020000000000002000000000000700000000000060000000000005
-  | 7, 4 => 0x6000000000210200000000c110700000000021020000000002102000000000000300000000c11030000000002102000000000a1020000000002102000000000000800000000000030000000000004000000000000000000000c9102000000000000000000000c9102000000000a104000000000000500000000000000000000006107000000008510700000000000030000000000005000000000000700000001051020000000012102
-  | 8, 0 => 0x200000000000020000000000002000000000000700000000000030000000000002000000000000400000000000070000000000007000000000000200000000000000000000000002000000000000200000000000020000000000002
+  | 4, 0 => 0x300000000000000000000000002000000000000200000000000020000000000001000000000000200000000000020000000000002000000000000100000000000010000000000006000000000000200000000000000000000000002
+  | 5, 0 => 0x100000544852080000000000002000000000000000000000000020000000000001000000000000100000000000020000000000002000000000000000000000000010000000000002000000000000000000000000020000000000002000000000000100000000000010000000000003000000000000100000000000000000000000001000000000000100000000000010000000000002000000000000200000000000050000000000001000000000000100000000000020000000000002
+  | 5, 1 => 0x20000000000002000000000000200000000000010000000000000000000000000200000000000000000000000001000000000000200000000000020000000000002000000000000200000000000020000053485207000000000000000000000000020000000000002000000000000200000000000020000000000002000000000000200000000000040000000000001000000000000200000000000020000000000002000000000000100000000000010000000000002000000000000100000000000010000000000001
+  | 5, 2 => 0x1000000000000200000000000000000000000002000000000000200000000000000000000000002000000000000200000000000000000000000001000000000000100000000000020000000000000000000000000100000000000000000000000000
+  | 6, 0 => 0x50000000000000000000000000100000000c51070000000000004000000000000000000000000020000000000001000000000000100000000c1109000000000000000000000000010000000000001000000000000000000000000020000000000002000000000000000000000000010000000000002000000000000200000000000010000000000001000000000000100000000411090000000000001000000000000000000000000000000000000000
+  | 6, 1 => 0x10000000000002000000000000200000000000020000000002109000000000000100000000000000000000000002000000380220b00000000000020000000000002000000000000200000000000010000000000006000000000000000000000000000000000000001000000000000100000000000010000000000001000000000000100000000000000000000000001000000000000100000000000010000000000001000000000000100000000000000000000000001000000480220b00000000000020000000000004
+  | 6, 2 => 0x1000000000000100000000000000000000000001000000000000100000544c120b00000000000000000000000000000000000000100000000000020000000000000000000000000100000058c120b0000000085108000000000e107000000000000100000000000000000000000002000000000000200000000000010000000000000000000000000400000000000010000000000002000000000000200000000000020000000000001000000000000100000000c110a000000000000100000000000020000000000001
+  | 6, 3 => 0x100000000c110a00000000000010000000000001000000000000100000000c11090000000000000000000000000000000000121090000053485207000000000000000000000000010000000000000000000000000200000000000000000000000000000000000000100000000000020000000000001000000000000000000000000020000000000002000000000000200000314c120b00000000000010000000000002000000000000100000000000060000000000001000000000000200000000c91070000000000000
+  | 6, 4 => 0x200000000000000000000000001000000000000200000000000020000000000002000000000000100000000000010000000000002000000000000100000000000020000000000000000000000000000000001091080000000000002000000000000100000000000010000000000001000000000210900000000c1109000000000000100000000851070000000000000000000000000100000000000010000000000000000000000000000000000000010000000000000000000000000100000000000020000000000000
+  | 6, 5 => 0x210b00000000c11090000000000000000000280620b00000000000020000000000000000000000000200000000000010000000000001000000000000200000000c110a00000000000020000000000000000000000000100000000000010000000000002000000000210900000000061080000000000002000000280220b000000000000200000000c110a0000000000000000004350120b000000000000200000000000010000000000002000000000210b0000000000001000000000a10700000000000020000000000005
+  | 6, 6 => 0x10000000000002000000000000000000000021090000000000002000004248120b000000000000000000000000020000000000002000000000a107000000000000100000000000010000000000000000000000000100000000000020000000000001000000000000000000000000000000000000002000000000210b0000000000002000000008510700000000000010000000000001000000000000200000000000000000000000002000000000000200000000c110a00000000000020000000000001
+  | 6, 7 => 0x200000000000020000000000002000000000000000000000000000000000000000000000000000200000000000010000000000001000000000000200000000000020000000000001000000000000200000001051090000000000000000000000000100000000c110a00000000c110900000000c91070000000000002000000000000100000000c11090000000000002000000000000000000000000020000000000001000000000000100000000000010000000000001000000000000200000000c11090000000000001
+  | 6, 8 => 0x210b00000000000000000000000001000000000000000000000000020000000000002000000000210b000000000000200000000000010000000000000000000000000000000000c110a0000000000002000000000000200000000000010000000000000000000000210b
+  | 7, 0 => 0x200000000000000000000000000000000000000a000000000a107000000000000000000000000000000000000000000000000000200000000000010000000000000000000000000000000000000020000000000001000000000000100000000000020000000000001000000000000200000000000000000000000000000000000000100000000c110900000000000010000000000001000000000000000000000000020000000000001000000000000100000000411090000000000001000000004110b0000000000000
+  | 7, 1 => 0xc510b0000000000000000000000610900000000000000000000000000000000000210b00000000000000000000000001000000000000100000000000000000000000000000000000210a00000000000000000000000000000000000000000000000c110b00000000000020000000000000000000004110b000000000000000000000000020000000000002000000000000800000000000000000000000001000000000610b000000000a1080000000000000000000000000100000000000020000000000001
+  | 7, 2 => 0xb0000000000001000000000000100000000000000000000000006000000008110b000000000000100000000000020000000000002000000000000100000000c110b000000000a10b00000000c11090000000000000000000000000100000000000020000000000001000000000000100000000000010000000000000000000000000200000000000000000000000001000000004110900000000000010000000000001000000000000100000000000070000000000000000000000000000000000000010000000000000
+  | 7, 3 => 0x10000000000009000000001210b00000000000010000000000002000000000000200000000000000000000000001000000010510a00000000000070000000000001000000000000200000000000000000000000002000000010910b000000000000100000000000010000000000002000000000000b0000000000001000000000000100000000000010000000000000000000000a10b0000000000002000000000000200000000c110b00000000000020000000000000000000000000100000000000020000000000002
+  | 7, 4 => 0x200000000000020000000000000000000000000000000000000000000000000002000000010910b00000000000010000000000009000000000210a00000000000010000000000000000000000000100000000000020000000000000000000000000000000000000020000000000002000000000000100000000000000000000000001000000010d10b000000000000000000000000020000000000008000000000000000000000000000000000000001000000000000000000000000000000000012109
+  | 7, 5 => 0x20000000002109000000000000000000000000000000000000001000000000210b00000000000000000000000000000000000210b00000000000020000000000001000000000000100000000c91070000000000001000000000210b000000000000000000000c1109000000008510800000000000000000000000001000000000000200000000000010000000000001000000000210a0000000000001000000000000200000000000000000000000002000000008110b000000000000000000000000020000000000002
+  | 7, 6 => 0x10000000000001000000000610b00000000000010000000000000000000010d10b0000000000001000000000000000000000000010000000000001000000010110b000000000000100000000000000000000000007000000000000200000000000020000000000008000000000000100000000000000000000000001000000000000000000000000010000000000001000000000000200000000000020000000000001000000000210a0000000000000000000000000200000000000010000000000000
+  | 7, 7 => 0x1000000000000000000000000000000000000000000000000000200000000000000000000000002000000000000000000000000070000000000000000000000a10b0000000000000000000000000100000000000000000000000000000000000210b00000000c110b00000000000020000000000000000000000000200000000000020000000000002000000000210b000000000000100000000c510700000000000010000000002109000000000000a0000000000002000000000000100000000000010000000000001
+  | 7, 8 => 0x10510900000000000070000000000002000000000000000000000000020000000000002000000000a10700000000000010000000000009000000000610800000000c910700000000000020000000000000000000000000100000000000000000000000000000000000000100000000000000000000000000000000000000200000000000020000000000000000000000000000000000021090000000000001000000000000100000000000010000000000000000000000000200000000000020000000000000
+  | 7, 9 => 0x1000000000210b00000000000010000000000001000000000210b000000000210b000000000000000000000000010000000000002000000000000100000000000020000000000000000000000000100000000000020000000000001000000000000100000000000000000000000009000000000210b00000000000020000000000001000000000000a00000000000000000000000002
+  | 8, 0 => 0x9000000000000b000000000000b000000000000b00000000000070000000000009000000000000b000000000000700000000000080000000000008000000000000b000000000000a000000000000b00000000000070000000000009000000000000b
   | _, _ => 0
 def chAt (s i : Nat) : Nat := fld (CH s (i / 64)) 32 (i % 64)
 def cidxH (s h : Nat) : Nat := bsr (chAt s) h 9 0 (CN s)
 def cidx (s : Nat) (zs : List Nat) : Nat := cidxH s (hk 0 zs)
 def checkCutByIdx (s : Nat) (ws : List Nat) (hint : Nat) : Bool :=
   match hint &&& 255 with
-  | 0 => checkCutEntry dom_59 roots_59 7 s ws hint
-  | 1 => checkCutEntry dom_35 roots_35 4 s ws hint
-  | 2 => checkCutEntry dom_47 roots_47 8 s ws hint
-  | 3 => checkCutEntry dom_55 roots_55 7 s ws hint
-  | 4 => checkCutEntry dom_31 roots_31 7 s ws hint
-  | 5 => checkCutEntry dom_28 roots_28 4 s ws hint
-  | 6 => checkCutEntry dom_62 roots_62 6 s ws hint
-  | 7 => checkCutEntry dom_61 roots_61 7 s ws hint
-  | 8 => checkCutEntry dom_29 roots_29 5 s ws hint
+  | 0 => checkCutEntry dom_13 roots_13 4 s ws hint
+  | 1 => checkCutEntry dom_28 roots_28 4 s ws hint
+  | 2 => checkCutEntry dom_35 roots_35 4 s ws hint
+  | 3 => checkCutEntry dom_53 roots_53 4 s ws hint
+  | 4 => checkCutEntry dom_57 roots_57 4 s ws hint
+  | 5 => checkCutEntry dom_23 roots_23 4 s ws hint
+  | 6 => checkCutEntry dom_27 roots_27 4 s ws hint
+  | 7 => checkCutEntry dom_31 roots_31 7 s ws hint
+  | 8 => checkCutEntry dom_61 roots_61 7 s ws hint
+  | 9 => checkCutEntry dom_55 roots_55 7 s ws hint
+  | 10 => checkCutEntry dom_59 roots_59 7 s ws hint
+  | 11 => checkCutEntry dom_47 roots_47 8 s ws hint
   | _ => false
-def cutHitH (s h : Nat) (ws : List Nat) : Bool :=
-  let i := cidxH s h
-  decide (i < CN s) && (chAt s i == h) && checkCutByIdx s ws (fld (CV s (i / 32)) 52 (i % 32))
-
+def cutHitH (s h : Nat) (ws : List Nat) : Bool := let i := cidxH s h; decide (i < CN s) && (chAt s i == h) && checkCutByIdx s ws (fld (CV s (i / 32)) 52 (i % 32))
 def cutHit (s : Nat) (ws : List Nat) : Bool := cutHitH s (hk 0 ws) ws
-
 theorem cutHitH_sound {u ys} (h : cutHitH u (hk 0 ys) ys = true) : ¬ RunD dom_63 goalM u ys := by
-  unfold cutHitH at h
-  simp only [Bool.and_eq_true] at h
-  have hc := h.2
-  unfold checkCutByIdx at hc
-  split at hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_59 _ hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_35 _ hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_47 _ hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_55 _ hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_31 _ hc
+  unfold cutHitH at h; simp only [Bool.and_eq_true] at h; have hc := h.2; unfold checkCutByIdx at hc; split at hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_13 _ hc
   · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_28 _ hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_62 _ hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_35 _ hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_53 _ hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_57 _ hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_23 _ hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_27 _ hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_31 _ hc
   · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_61 _ hc
-  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_29 _ hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_55 _ hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_59 _ hc
+  · exact checkCutEntry_sound (by decide +kernel) (by decide +kernel) (by decide +kernel) (by decide +kernel) low_47 _ hc
   · contradiction
 theorem cutHit_sound {u ys} (h : cutHit u ys = true) : ¬ RunD dom_63 goalM u ys := cutHitH_sound h
-
-def symsG : List (List (Nat × Nat)) := [[(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4)], [(0xcccccccc00000000cccccccc00000000cccccccc00000000cccccccc, 30)], [(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4), (0xcccccccc00000000cccccccc00000000cccccccc00000000cccccccc, 30)]]
+def symsG : List (List (Nat × Nat)) := [[(0xcccccccc, 30)], [(0xf000f000f000f0, 4)], [(0xcccccccc, 30), (0xf000f000f000f0, 4)]]
 theorem symsG_ok : symsG.all (fun ms => ms.all moveOK256 && (applyMoves ms dom_63 == dom_63) && (applyMoves ms goalM == goalM)) = true := by decide +kernel
 def ori (zs : List Nat) : List Nat := pickMin 0 zs symsG zs (hk 0 zs)
-theorem ori_ok {u ys} (h : RunD dom_63 goalM u ys) : RunD dom_63 goalM u (ori ys) :=
-  pickMin_runD 0 ys h symsG ys (hk 0 ys) symsG_ok h
-
+theorem ori_ok {u ys} (h : RunD dom_63 goalM u ys) : RunD dom_63 goalM u (ori ys) := pickMin_runD 0 ys h symsG ys (hk 0 ys) symsG_ok h
 def Z (s : Nat) := bar dom_63 goalM pairsG r1sG r2sG mpG SD SS NN htAt idxH ori 0 pool6G cutHitH s
 private theorem z0 : ∀ i, 0 ≤ i → i < 0 → Z 0 i = true := by omega
 private theorem z1 : ∀ i, 0 ≤ i → i < 0 → Z 1 i = true := by omega
 private theorem z2 : ∀ i, 0 ≤ i → i < 0 → Z 2 i = true := by omega
 private theorem z3 : ∀ i, 0 ≤ i → i < 0 → Z 3 i = true := by omega
-private theorem z4 : ∀ i, 0 ≤ i → i < 0 → Z 4 i = true := by omega
-private theorem z5 : ∀ i, 0 ≤ i → i < 0 → Z 5 i = true := by omega
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z4 : ∀ i, 0 ≤ i → i < 2 → Z 4 i = true := span_ok (by decide +kernel : span (Z 4) 2 0 = true)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z5_0 : ∀ i, 0 ≤ i → i < 16 → Z 5 i = true := span_ok (by decide +kernel : span (Z 5) 16 0 = true)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z5_16 : ∀ i, 16 ≤ i → i < 18 → Z 5 i = true := span_ok (by decide +kernel : span (Z 5) 2 16 = true)
+private theorem z5 : ∀ i, 0 ≤ i → i < 18 → Z 5 i = true := (range_split z5_0 z5_16)
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
 private theorem z6_0 : ∀ i, 0 ≤ i → i < 16 → Z 6 i = true := span_ok (by decide +kernel : span (Z 6) 16 0 = true)
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
-private theorem z6_16 : ∀ i, 16 ≤ i → i < 21 → Z 6 i = true := span_ok (by decide +kernel : span (Z 6) 5 16 = true)
-private theorem z6 : ∀ i, 0 ≤ i → i < 21 → Z 6 i = true := (range_split z6_0 z6_16)
+private theorem z6_16 : ∀ i, 16 ≤ i → i < 32 → Z 6 i = true := span_ok (by decide +kernel : span (Z 6) 16 16 = true)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z6_32 : ∀ i, 32 ≤ i → i < 48 → Z 6 i = true := span_ok (by decide +kernel : span (Z 6) 16 32 = true)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z6_48 : ∀ i, 48 ≤ i → i < 57 → Z 6 i = true := span_ok (by decide +kernel : span (Z 6) 9 48 = true)
+private theorem z6 : ∀ i, 0 ≤ i → i < 57 → Z 6 i = true := (range_split (range_split z6_0 z6_16) (range_split z6_32 z6_48))
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
 private theorem z7_0 : ∀ i, 0 ≤ i → i < 16 → Z 7 i = true := span_ok (by decide +kernel : span (Z 7) 16 0 = true)
@@ -3137,8 +3169,11 @@ set_option maxHeartbeats 0 in
 private theorem z7_16 : ∀ i, 16 ≤ i → i < 32 → Z 7 i = true := span_ok (by decide +kernel : span (Z 7) 16 16 = true)
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
-private theorem z7_32 : ∀ i, 32 ≤ i → i < 41 → Z 7 i = true := span_ok (by decide +kernel : span (Z 7) 9 32 = true)
-private theorem z7 : ∀ i, 0 ≤ i → i < 41 → Z 7 i = true := (range_split z7_0 (range_split z7_16 z7_32))
+private theorem z7_32 : ∀ i, 32 ≤ i → i < 48 → Z 7 i = true := span_ok (by decide +kernel : span (Z 7) 16 32 = true)
+set_option maxRecDepth 40000 in
+set_option maxHeartbeats 0 in
+private theorem z7_48 : ∀ i, 48 ≤ i → i < 51 → Z 7 i = true := span_ok (by decide +kernel : span (Z 7) 3 48 = true)
+private theorem z7 : ∀ i, 0 ≤ i → i < 51 → Z 7 i = true := (range_split (range_split z7_0 z7_16) (range_split z7_32 z7_48))
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
 private theorem z8 : ∀ i, 0 ≤ i → i < 10 → Z 8 i = true := span_ok (by decide +kernel : span (Z 8) 10 0 = true)
@@ -3157,18 +3192,13 @@ theorem checked (s : Nat) (hs : s ≤ 9) : ∀ i < NN s, Z s i = true := by
   · exact fun i hi => z7 i (Nat.zero_le i) hi
   · exact fun i hi => z8 i (Nat.zero_le i) hi
   · exact fun i hi => z9 i (Nat.zero_le i) hi
-def RootG (s : Nat) : Bool :=
-  scr dom_63 goalM s pool6G xsM || cutHit s (ori xsM) || found SS NN idx s (ori xsM)
-
+def RootG (s : Nat) : Bool := scr dom_63 goalM s pool6G xsM || cutHit s (ori xsM) || found SS NN idx s (ori xsM)
 set_option maxRecDepth 40000 in
 set_option maxHeartbeats 0 in
 theorem rootChecked : span RootG 5 5 = true := by decide +kernel
-
 theorem proper_failG : ∀ zs ∈ xsM.sublists, zs ≠ xsM → unorientedCov pairsG zs = false := by decide +kernel
-
 theorem noRunFull (s : Nat) (hs : s ≤ 9) (h : RunD dom_63 goalM s xsM) : False := by
-  have hmin : 5 ≤ s := by
-    have hl := run_len h; change 6 ≤ s + 1 at hl; omega
+  have hmin : 5 ≤ s := by have hl := run_len h; change 6 ≤ s + 1 at hl; omega
   have hr := span_ok rootChecked s hmin (by omega)
   unfold RootG at hr
   rw [scr_no pool6G h, Bool.false_or, Bool.or_eq_true] at hr
@@ -3176,19 +3206,19 @@ theorem noRunFull (s : Nat) (hs : s ≤ 9) (h : RunD dom_63 goalM s xsM) : False
   · exact cutHit_sound hcut (ori_ok h)
   · rw [found, Bool.and_eq_true, decide_eq_true_eq, List.isPerm_iff] at hf
     exact bar_all (by decide +kernel) rfl rfl (by decide +kernel) SD_eq (by decide +kernel) ori_ok cutHitH_sound checked s hs _ hf.1 (Run.perm hf.2 (ori_ok h))
-
 theorem noCircuit : Lower dom_63 roots_63 goal_63 10 := by
   intro p bank hr ha
   by_contra! hsmall
   have hnc : ¬ IsConst dom_63 goal_63 := by
     have h0 : isConstB dom_63 goal_63 = false := by decide +kernel
-    intro h; rw [(isConstB_iff _ _).2 h] at h0; contradiction
+    intro h
+    rw [(isConstB_iff _ _).2 h] at h0
+    contradiction
   obtain ⟨s, ws, hs_le, hnd, hws_sub, hrun⟩ := reach_to_run (by decide +kernel) hnc hr ha
   have hperm_sub : ∃ zs, zs.Sublist xsM ∧ ws.Perm zs := by
     refine ⟨xsM.filter (fun x => decide (x ∈ ws)), List.filter_sublist, ?_⟩
     refine (List.perm_ext_iff_of_nodup hnd (List.Nodup.filter _ (by decide +kernel : xsM.Nodup))).2 ?_
-    intro x; simp only [List.mem_filter, decide_eq_true_eq]
-    exact ⟨fun hx => ⟨hws_sub x hx, hx⟩, fun h => h.2⟩
+    intro x; simp only [List.mem_filter, decide_eq_true_eq]; exact ⟨fun hx => ⟨hws_sub x hx, hx⟩, fun h => h.2⟩
   obtain ⟨zs, hsub, hpz⟩ := hperm_sub
   have hrun' := Run.perm hpz hrun
   by_cases heq : zs = xsM
@@ -3196,11 +3226,8 @@ theorem noCircuit : Lower dom_63 roots_63 goal_63 10 := by
   · have hcov := unorientedCov_ok (by decide +kernel) pairsG (by decide +kernel) hrun'
     have hbad := proper_failG zs (List.mem_sublists.2 hsub) heq
     rw [hcov] at hbad; contradiction
-
 end S_63
-
 theorem low_63 : Lower dom_63 roots_63 goal_63 10 := S_63.noCircuit
-
 def pt6 (r : Nat) : Fin 6 → Bool := fun i => r.testBit i.val
 theorem roots_63_bits : ∀ r : Fin 64, roots_63.map (·.testBit r.val) = List.ofFn (pt6 r.val) := by decide +kernel
 theorem dom_63_lt : ∀ r : Fin 64, dom_63.testBit r.val = true := by decide +kernel
@@ -3221,8 +3248,7 @@ theorem lower_to_circuit6 (f : (Fin 6 → Bool) → Bool) (T lb : Nat)
       have h1 := execN_bit C.gates roots_63 r (by omega) (fun g hg => (hfan g hg).1)
       have h2 := congrArg (fun l => l.getD C.output false) h1
       rw [roots_63_bits ⟨r, hlt⟩] at h2
-      have hgd : ((execN C.gates roots_63).map (·.testBit r)).getD C.output false =
-          out.testBit r := by
+      have hgd : ((execN C.gates roots_63).map (·.testBit r)).getD C.output false = out.testBit r := by
         simp only [out, List.getD_eq_getElem?_getD, List.getElem?_map]
         cases (execN C.gates roots_63)[C.output]? with | none => simp | some v => rfl
       rw [hgd] at h2
@@ -3238,36 +3264,32 @@ theorem lower_to_circuit6 (f : (Fin 6 → Bool) → Bool) (T lb : Nat)
     · rw [show out = 0 from List.getD_eq_default _ _ (by omega)]; exact Or.inl (Or.inl (by simp))
   have hd63 : dom_63 &&& mask256 = dom_63 := by decide
   have hm256 : mask256 &&& mask256 = mask256 := by decide
-  have houtm : (out &&& mask256) &&& dom_63 = T &&& dom_63 := by
-    rw [Nat.and_assoc, Nat.and_comm mask256 dom_63, hd63, hout]
+  have houtm : (out &&& mask256) &&& dom_63 = T &&& dom_63 := by rw [Nat.and_assoc, Nat.and_comm mask256 dom_63, hd63, hout]
   have hnc_m : ¬ IsConst dom_63 (out &&& mask256) := fun hc => hncT (by rcases hc with h0 | h1; exact Or.inl (houtm.symm.trans h0); exact Or.inr (houtm.symm.trans h1))
-  have hnc_256 : ¬ IsConst mask256 out := fun hc => hnc_m (by
+  have hnc_256 : ¬ IsConst mask256 out := by
+    intro hc
+    apply hnc_m
     rcases hc with h0 | h1
     · exact Or.inl (by rw [h0]; simp)
-    · exact Or.inr (by rw [h1, Nat.and_comm, hd63]))
+    · exact Or.inr (by rw [h1, Nat.and_comm, hd63])
   obtain ⟨s, ws, hs, _, hws, hrun⟩ := reach_to_run hm256 hnc_256 hr hav_out
   have hws63 : ∀ w ∈ ws, Avail dom_63 roots_63 w := fun w hw => by
     obtain ⟨u, hu, rfl⟩ := List.mem_map.1 (hws w hw)
     exact Or.inr ⟨u, hu, by rw [Nat.and_assoc, Nat.and_comm mask256 dom_63, hd63]⟩
   obtain ⟨q, next, hq, hav_q, hqp⟩ := contraction hd63 hd63 hnc_m hrun (show NatReach dom_63 roots_63 0 roots_63 from rfl) hws63
   have hL := hlow q next hq (avail_of_eq houtm hav_q)
-  show lb ≤ t
-  have : C.gates.length ≤ t := hsz
-  omega
+  show lb ≤ t; have : C.gates.length ≤ t := hsz; omega
 
-def wit : PEqualNP.CircuitLowerBounds.Circuit := ⟨[⟨PEqualNP.CircuitLowerBounds.GateOp.or, [2, 3]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [1, 5]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [4, 6]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [1, 6]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [5, 9]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [2, 3]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [7, 8]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [0, 10]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [11, 13]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [12, 14]⟩], 15⟩
-
+def wit : PEqualNP.CircuitLowerBounds.Circuit := ⟨[⟨PEqualNP.CircuitLowerBounds.GateOp.and, [2, 3]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [1, 5]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [6, 7]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [0, 8]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [2, 3]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [1, 5]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [4, 9]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [9, 11]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [10, 13]⟩, ⟨PEqualNP.CircuitLowerBounds.GateOp.and, [12, 14]⟩], 15⟩
 theorem upper : PEqualNP.MetaComplexity.HasCircuitSize 6 (fun x : Fin 6 → Bool => (18446461426206309032 : ℕ).testBit (PEqualNP.MetaComplexity.tableIndex x)) 10 :=
   ⟨wit, by simp [wit, PEqualNP.MetaComplexity.FanInTwo], by decide, by decide +kernel⟩
-
 theorem hT6 : ∀ r : Fin 64, goal_63.testBit r.val = (18446461426206309032 : ℕ).testBit (PEqualNP.MetaComplexity.tableIndex (pt6 r.val)) := by decide +kernel
-
 theorem lower : ∀ t : ℕ, PEqualNP.MetaComplexity.HasCircuitSize 6 (fun x : Fin 6 → Bool => (18446461426206309032 : ℕ).testBit (PEqualNP.MetaComplexity.tableIndex x)) t → 10 ≤ t :=
   lower_to_circuit6 (fun x : Fin 6 → Bool => (18446461426206309032 : ℕ).testBit (PEqualNP.MetaComplexity.tableIndex x)) goal_63 10 hT6 (by unfold IsConst; decide) low_63
 
-end PEqualNP.Outside.V_meta_9953__k10_aux
+end PEqualNP.Outside.V_meta_9953__k10
 
 theorem PEqualNP.Outside.V_meta_9953__k10 :
   PEqualNP.MetaComplexity.HasCircuitSize 6 (fun x : Fin 6 → Bool => (18446461426206309032 : ℕ).testBit (PEqualNP.MetaComplexity.tableIndex x)) 10 ∧
   ∀ t : ℕ, PEqualNP.MetaComplexity.HasCircuitSize 6 (fun x : Fin 6 → Bool => (18446461426206309032 : ℕ).testBit (PEqualNP.MetaComplexity.tableIndex x)) t → 10 ≤ t :=
-  ⟨PEqualNP.Outside.V_meta_9953__k10_aux.upper, PEqualNP.Outside.V_meta_9953__k10_aux.lower⟩
+  ⟨PEqualNP.Outside.V_meta_9953__k10.upper, PEqualNP.Outside.V_meta_9953__k10.lower⟩
