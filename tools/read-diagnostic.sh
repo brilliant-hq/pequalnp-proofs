@@ -9,7 +9,12 @@
 #      LANG only, a root of exactly bin jail lib lib64 proc sbin tmp usr, no /home /opt /etc /var /run, no network,
 #      the jail and /usr read only, no capabilities, no new privileges, the limits;
 #   C. failure: a probe that exits 3, one that runs past the time limit, one that asks for too much memory and one that
-#      prints a forged PLAIN line and then fails: each gives a nonzero status and the fixed HOLD with ERROR.
+#      prints a forged PLAIN line and then fails: each gives a nonzero status and the fixed HOLD with ERROR;
+#   D. the verdict step's accepted tail, taken from the workflow file at this base (its VERDICT line through the RECORD
+#      BLOCK END marker) and run under the step shell's errexit and set -u on team-made inputs: read off, read on, and
+#      read on with GITHUB_OUTPUT unwritable give the same VERDICT line and exit 0, and a record only in the plain
+#      read-on case. (The tail is run outside a job; what a job adds, the runner's own GITHUB_OUTPUT file, is replaced
+#      by a plain file, a folder and a missing path, the nearest honest stand-ins.)
 # Prints one PASS or FAIL line per check, then "DIAGNOSTIC: PASS (<n> checks)" or "DIAGNOSTIC: FAIL (<k> of <n>)"; exit 0 or 1.
 set -u
 B=$(cd "$1" && pwd); T="$B/tools"; WD=$(mktemp -d); n=0; bad=0
@@ -96,6 +101,26 @@ for x in exit slow mem forged; do
   echo "$(receipt plain "$WD/q-$x")" > "$WD/rc-$x.json"
   ok "$(is '[ "$(cat $WD/q-'"$x"'/status)" != 0 ] && jq -e ".decision == \"HOLD\" and .shapes == [[0, \"ERROR\", \"empty\", \"empty\"]]" '"$WD/rc-$x.json")" "C-$x a failing parse gives status $(cat "$WD/q-$x/status") and the ERROR hold"
 done
+
+# D. the verdict step's accepted tail, from the workflow's own text
+WF="$B/.github/workflows/authoritative.yml"
+awk '/echo "VERDICT: \$verdict \(checker exit \$CODE\)"/{on=1} on{print substr($0, 11)} /# RECORD BLOCK END/{if(on) exit}' "$WF" > "$WD/tail.sh"
+tailrun() {   # tailrun <read> <GITHUB_OUTPUT path> <name>: prints the VERDICT line, the exit and the record count
+  local d="$WD/tail-$3"; mkdir -p "$d/in"
+  printf '%s' "$(printf c%.0s $(seq 40))" > "$d/in/pr.head"; printf '%s' "$(printf b%.0s $(seq 40))" > "$d/in/pr.blob"; printf check > "$d/in/gap.kind"
+  printf 'MANIFEST {"lemma":"L-diag-1"}\nACCEPTED (check) fine\n' > "$d/checker.out"
+  out=$(env READ="$1" W="$d" RUNNER_TEMP="$d" PR=1 GAP=L-diag-1 CODE=0 GITHUB_OUTPUT="$2" GITHUB_STEP_SUMMARY="$d/summary" \
+        bash -c 'set -eu; verdict=ACCEPTED; last="ACCEPTED (check) fine"; file=lean/PEqualNP/Outside/L_diag_1.lean; children=0
+                 fsha=$(printf 1%.0s $(seq 64)); ssha=$(printf 2%.0s $(seq 64)); . "$0"; echo NOT-REACHED; exit 9' "$WD/tail.sh" 2>/dev/null); rc=$?
+  if [ -f "$2" ]; then recs=$(grep -c '^record={' "$2" || true); else recs=0; fi
+  echo "$out|$rc|$recs"
+}
+: > "$WD/go-off"; : > "$WD/go-on"; mkdir -p "$WD/go-dir"
+D_OFF=$(tailrun "" "$WD/go-off" off); D_ON=$(tailrun on "$WD/go-on" on); D_DIR=$(tailrun on "$WD/go-dir" dir); D_MISS=$(tailrun on "$WD/none/out" miss)
+ok "$(is '[ -s $WD/tail.sh ] && grep -q "RECORD BLOCK END" $WD/tail.sh')" "D0 the accepted tail was taken from the workflow at this base"
+ok "$(is '[ "$D_OFF" = "VERDICT: ACCEPTED (checker exit 0)|0|0" ]')" "D1 read off: the VERDICT line, exit 0, no record"
+ok "$(is '[ "$D_ON" = "VERDICT: ACCEPTED (checker exit 0)|0|1" ]')" "D2 read on: the same VERDICT line, exit 0, one record"
+ok "$(is '[ "$D_DIR" = "VERDICT: ACCEPTED (checker exit 0)|0|0" ] && [ "$D_MISS" = "VERDICT: ACCEPTED (checker exit 0)|0|0" ]')" "D3 read on, output unwritable: the same VERDICT line, exit 0, no record"
 
 if [ "$bad" = 0 ]; then echo "DIAGNOSTIC: PASS ($n checks)"; exit 0; fi
 echo "DIAGNOSTIC: FAIL ($bad of $n)"; exit 1
