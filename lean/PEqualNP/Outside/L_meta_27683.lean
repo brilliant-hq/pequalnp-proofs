@@ -1,150 +1,139 @@
+import Mathlib
 import PEqualNP.Defs
 
-namespace PEqualNP.Outside.L_meta_27683_aux
-
+namespace PEqualNP.Outside.L_meta_27683
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
 
-private def target (x : Fin 9 → Bool) : Bool :=
-  ((x 0 && x 4 && x 8) || (x 0 && x 5 && x 7) || (x 1 && x 3 && x 8) ||
-    (x 1 && x 5 && x 6) || (x 2 && x 3 && x 7) || (x 2 && x 4 && x 6))
+def first : Gate := ⟨.or, [0, 1]⟩
+def second : Gate := ⟨.or, [2, 5]⟩
 
-private def g0 : Gate := ⟨.or, [0, 1]⟩
-private def g1 : Gate := ⟨.or, [2, 5]⟩
+def matching (x : Fin 9 → Bool) : Bool :=
+  (x 0 && x 4 && x 8) || (x 0 && x 5 && x 7) || (x 1 && x 3 && x 8) ||
+  (x 1 && x 5 && x 6) || (x 2 && x 3 && x 7) || (x 2 && x 4 && x 6)
 
-private def stepW (w : List Bool) (g : Gate) : List Bool :=
+def step (w : List Bool) (g : Gate) : List Bool :=
   w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]
 
-private theorem fold_indep (gs : List Gate) (i : ℕ) (hi : i ∉ gs.flatMap Gate.inputs)
-    (a b : List Bool) (hl : a.length = b.length)
-    (h : ∀ j : ℕ, j ≠ i → a.getD j false = b.getD j false) :
-    ∀ j : ℕ, j ≠ i → (gs.foldl stepW a).getD j false = (gs.foldl stepW b).getD j false := by
-  induction gs generalizing a b with
-  | nil => exact h
+def beforeTail (x : Fin 9 → Bool) : List Bool := step (step (List.ofFn x) first) second
+
+def yes (i j : Fin 9) : Bool :=
+  ([163, 99, 116, 140, 84, 102, 84, 140, 266] : List ℕ).getD i.val 0 |>.testBit j.val
+
+def no (i j : Fin 9) : Bool :=
+  ([162, 97, 112, 132, 68, 70, 20, 12, 10] : List ℕ).getD i.val 0 |>.testBit j.val
+
+theorem separates : ∀ i : Fin 9, matching (yes i) = true ∧ matching (no i) = false := by
+  decide +kernel
+
+theorem prefixAgree : ∀ (i : Fin 9) (j : Fin 11), j.val ≠ i.val →
+    (beforeTail (yes i)).getD j.val false = (beforeTail (no i)).getD j.val false := by
+  decide +kernel
+
+theorem beforeLen (x : Fin 9 → Bool) : (beforeTail x).length = 11 := by
+  simp [beforeTail, step]
+
+theorem agreeAll (i : Fin 9) (j : ℕ) (hne : j ≠ i.val) :
+    (beforeTail (yes i)).getD j false = (beforeTail (no i)).getD j false := by
+  by_cases hj : j < 11
+  · exact prefixAgree i ⟨j, hj⟩ hne
+  · simp [List.getD_eq_getElem?_getD, beforeLen, Nat.le_of_not_gt hj]
+
+theorem agreeRun (gs : List Gate) (i : ℕ) (havoid : i ∉ gs.flatMap Gate.inputs)
+    (u v : List Bool) (hlen : u.length = v.length)
+    (hag : ∀ j, j ≠ i → u.getD j false = v.getD j false) :
+    ∀ j, j ≠ i → (gs.foldl step u).getD j false = (gs.foldl step v).getD j false := by
+  induction gs generalizing u v with
+  | nil => exact hag
   | cons g gs ih =>
-    have hn : i ∉ g.inputs ∧ i ∉ gs.flatMap Gate.inputs := by
-      simpa using hi
-    have hm : g.inputs.map (fun j => a.getD j false) =
-        g.inputs.map (fun j => b.getD j false) := by
-      apply List.map_congr_left
-      intro j hj
-      exact h j (fun he => hn.1 (he ▸ hj))
-    simp only [List.foldl_cons]
-    apply ih hn.2 (stepW a g) (stepW b g)
-    · simp [stepW, hl]
-    · intro j hj
-      by_cases hk : j < a.length
-      · simpa only [stepW, List.getD_append _ _ _ _ hk,
-          List.getD_append _ _ _ _ (hl ▸ hk)] using h j hj
-      · rw [stepW, stepW, List.getD_append_right _ _ _ _ (Nat.le_of_not_gt hk),
-          List.getD_append_right _ _ _ _ (hl ▸ Nat.le_of_not_gt hk), hm, hl]
-
-private def pfx (x : Fin 9 → Bool) : List Bool :=
-  stepW (stepW (List.ofFn x) g0) g1
-
-private def witRow (i : Fin 9) (flip : Bool) (j : Fin 9) : Bool :=
-  (([162, 97, 112, 132, 68, 70, 20, 12, 10] : List ℕ).getD i.val 0).testBit j.val || (flip && (j == i))
-
-private theorem witRows (i : Fin 9) :
-    target (witRow i false) ≠ target (witRow i true) ∧
-      ∀ j : Fin 11, j.val ≠ i.val →
-        (pfx (witRow i false)).getD j.val false = (pfx (witRow i true)).getD j.val false := by
-  fin_cases i <;> decide +kernel
-
-private theorem forceInputs (C : Circuit)
-    (he : ∀ x : Fin 9 → Bool, C.eval (List.ofFn x) = target x)
-    (ho : C.output + 1 = 9 + C.size)
-    (gs : List Gate)
-    (hg : C.gates = g0 :: g1 :: gs) :
-    ∀ i : ℕ, i < 9 → i ∈ gs.flatMap Gate.inputs := by
-  intro i hi
-  by_contra hn
-  let k : Fin 9 := ⟨i, hi⟩
-  have hlen (x : Fin 9 → Bool) : (pfx x).length = 11 := by simp [pfx, stepW]
-  have hrows := witRows k
-  have hagree : ∀ j : ℕ, j ≠ i →
-      (pfx (witRow k false)).getD j false = (pfx (witRow k true)).getD j false := by
+    simp only [List.flatMap_cons, List.mem_append, not_or] at havoid
+    change ∀ j, j ≠ i → (gs.foldl step (step u g)).getD j false =
+      (gs.foldl step (step v g)).getD j false
+    apply ih havoid.2 _ _ (by simp [step, hlen])
+    have hm : (g.inputs.map fun j => u.getD j false) = (g.inputs.map fun j => v.getD j false) :=
+      List.map_congr_left (fun j hj => hag j (fun e => havoid.1 (e ▸ hj)))
     intro j hj
-    by_cases hj' : j < 11
-    · exact hrows.2 ⟨j, hj'⟩ hj
-    · have ha : (pfx (witRow k false)).length ≤ j := by rw [hlen]; omega
-      have hb : (pfx (witRow k true)).length ≤ j := by rw [hlen]; omega
-      simp [ha, hb]
-  have hout : C.output ≠ i := by
-    simp [Circuit.size, hg] at ho
-    omega
-  have hEq := fold_indep gs i hn _ _ (by rw [hlen, hlen]) hagree C.output hout
-  have heval (x : Fin 9 → Bool) : C.eval (List.ofFn x) =
-      (gs.foldl stepW (pfx x)).getD C.output false := by
-    simp only [Circuit.eval, Circuit.wires, hg, List.foldl_cons]
-    rfl
-  rw [← heval, ← heval, he, he] at hEq
-  exact hrows.1 hEq
+    unfold step
+    rw [hm]
+    by_cases hj' : j < u.length
+    · have hv : j < v.length := hlen ▸ hj'
+      simpa only [List.getD_eq_getElem?_getD, List.getElem?_append_left hj',
+        List.getElem?_append_left hv] using hag j hj
+    · have hu : u.length ≤ j := Nat.le_of_not_gt hj'
+      have hv : v.length ≤ j := hlen ▸ hu
+      simp only [List.getD_eq_getElem?_getD, List.getElem?_append_right hu,
+        List.getElem?_append_right hv, hlen]
 
-private theorem refLength (gs : List Gate) (h : ∀ g ∈ gs, g.inputs.length ≤ 2) :
+theorem allInputReads (gs : List Gate) (o : ℕ) (ho : 9 ≤ o)
+    (he : ∀ x, (Circuit.mk (first :: second :: gs) o).eval (List.ofFn x) = matching x)
+    (i : Fin 9) : i.val ∈ gs.flatMap Gate.inputs := by
+  by_contra ha
+  have hs := agreeRun gs i.val ha (beforeTail (yes i)) (beforeTail (no i))
+    (by rw [beforeLen, beforeLen]) (agreeAll i) o (by have := i.isLt; omega)
+  change (Circuit.mk (first :: second :: gs) o).eval (List.ofFn (yes i)) =
+    (Circuit.mk (first :: second :: gs) o).eval (List.ofFn (no i)) at hs
+  rw [he, he, (separates i).1, (separates i).2] at hs
+  contradiction
+
+theorem allGateReads (gs : List Gate)
+    (hlive : ∀ j : Fin (first :: second :: gs).length, j.val + 1 < (first :: second :: gs).length →
+      ∃ k : Fin (first :: second :: gs).length, j.val < k.val ∧
+        9 + j.val ∈ ((first :: second :: gs).get k).inputs)
+    (j : ℕ) (hj : j + 1 < (first :: second :: gs).length) :
+    9 + j ∈ gs.flatMap Gate.inputs := by
+  obtain ⟨⟨k, hk⟩, hjk, hm⟩ := hlive ⟨j, by omega⟩ hj
+  change j < k at hjk
+  change 9 + j ∈ ((first :: second :: gs).get ⟨k, hk⟩).inputs at hm
+  rcases k with _ | _ | k
+  · omega
+  · change 9 + j ∈ [2, 5] at hm
+    simp at hm
+    omega
+  · have klt : k < gs.length := by simp at hk; omega
+    exact List.mem_flatMap.mpr ⟨gs[k], List.getElem_mem klt, hm⟩
+
+theorem sumInputs (gs : List Gate) (hs : ∀ g ∈ gs, g.inputs.length ≤ 2) :
     (gs.flatMap Gate.inputs).length ≤ 2 * gs.length := by
   induction gs with
   | nil => simp
   | cons g gs ih =>
-    have hg := h g (by simp)
-    have hs := ih (fun a ha => h a (by simp [ha]))
+    have hg := hs g (by simp)
+    have ht := ih (fun g hg => hs g (by simp [hg]))
     simp only [List.flatMap_cons, List.length_append, List.length_cons]
     omega
 
-private theorem nodup_card_le (l m : List ℕ) (hnd : l.Nodup) (hsub : ∀ x ∈ l, x ∈ m) :
-    l.length ≤ m.length := by
-  have h1 : l.toFinset ⊆ m.toFinset := fun x hx =>
-    List.mem_toFinset.mpr (hsub x (List.mem_toFinset.mp hx))
-  have h2 := Finset.card_le_card h1
-  rw [List.toFinset_card_of_nodup hnd] at h2
-  exact h2.trans (List.toFinset_card_le m)
-
-private theorem main_contra (C : Circuit) (hfan : FanInTwo C) (hsz : C.size ≤ 11)
-    (he : ∀ x : Fin 9 → Bool, C.eval (List.ofFn x) = target x)
+theorem lower (C : Circuit) (hfan : FanInTwo C)
+    (he : ∀ x, C.eval (List.ofFn x) = matching x)
     (ho : C.output + 1 = 9 + C.size)
     (hlive : ∀ j : Fin C.gates.length, j.val + 1 < C.gates.length →
       ∃ k : Fin C.gates.length, j.val < k.val ∧ 9 + j.val ∈ (C.gates.get k).inputs)
-    (h0 : C.gates.head? = some g0)
-    (h1 : C.gates.tail.head? = some g1) : False := by
-  rcases C with ⟨gates, out⟩
-  cases gates with
-  | nil => simp at h0
-  | cons a rest =>
-    cases rest with
-    | nil => simp at h1
-    | cons b gs =>
-      have ha : a = g0 := Option.some.inj h0
-      have hb : b = g1 := Option.some.inj h1
-      subst a; subst b
-      have hinputs := forceInputs ⟨g0 :: g1 :: gs, out⟩ he ho gs rfl
-      have hsub : ∀ z ∈ List.range (10 + gs.length), z ∈ gs.flatMap Gate.inputs := by
-        intro z hz
-        rw [List.mem_range] at hz
-        by_cases hz9 : z < 9
-        · exact hinputs z hz9
-        · let j : Fin (g0 :: g1 :: gs).length := ⟨z - 9, by simp; omega⟩
-          obtain ⟨k, hjk, hk⟩ := hlive j (by simp [j]; omega)
-          let g := (g0 :: g1 :: gs).get k
-          have hzg : z ∈ g.inputs := by
-            have : 9 + j.val = z := by dsimp [j]; omega
-            rwa [this] at hk
-          have hmem : g ∈ gs := by
-            rcases List.mem_cons.mp (List.get_mem _ k) with e | hrest
-            · have hh : z ∈ g0.inputs := e ▸ hzg
-              simp [g0] at hh; omega
-            · rcases List.mem_cons.mp hrest with e | htail
-              · have hh : z ∈ g1.inputs := e ▸ hzg
-                simp [g1] at hh; omega
-              · exact htail
-          exact List.mem_flatMap.mpr ⟨g, hmem, hzg⟩
-      have hcard := nodup_card_le (List.range (10 + gs.length)) (gs.flatMap Gate.inputs)
-        (List.nodup_range) hsub
-      rw [List.length_range] at hcard
-      have hlen := refLength gs (fun g hg => (hfan g (by simp [hg])).2)
-      change (g0 :: g1 :: gs).length ≤ 11 at hsz
-      simp only [List.length_cons] at hsz
-      omega
+    (hh : C.gates.head? = some first) (ht : C.gates.tail.head? = some second) : 12 ≤ C.size := by
+  rcases C with ⟨_ | ⟨g?, _ | ⟨h?, gs⟩⟩, o⟩
+  · simp at hh
+  · simp at ht
+  · simp only [List.head?_cons, Option.some.injEq] at hh
+    change some h? = some second at ht
+    have ht' := Option.some.inj ht
+    subst g?; subst h?
+    have hout : 9 ≤ o := by change o + 1 = 9 + (first :: second :: gs).length at ho; simp at ho; omega
+    have hcount := sumInputs gs (fun g hg => (hfan g (by simp [hg])).2)
+    have hall : Finset.range (9 + gs.length + 1) ⊆ (gs.flatMap Gate.inputs).toFinset := by
+      intro w hw
+      have hw' := Finset.mem_range.mp hw
+      apply List.mem_toFinset.mpr
+      by_cases h9 : w < 9
+      · exact allInputReads gs o hout he ⟨w, h9⟩
+      · have hj : (w - 9) + 1 < (first :: second :: gs).length := by simp; omega
+        have hv := allGateReads gs hlive (w - 9) hj
+        rwa [show 9 + (w - 9) = w by omega] at hv
+    have hc := Finset.card_le_card hall
+    rw [Finset.card_range] at hc
+    have hlist : (gs.flatMap Gate.inputs).toFinset.card ≤ (gs.flatMap Gate.inputs).length :=
+      List.toFinset_card_le _
+    change 12 ≤ (first :: second :: gs).length
+    simp only [List.length_cons]
+    omega
 
-end PEqualNP.Outside.L_meta_27683_aux
+end PEqualNP.Outside.L_meta_27683
 
 theorem PEqualNP.Outside.L_meta_27683 : ¬ (∃ C : PEqualNP.CircuitLowerBounds.Circuit,
     PEqualNP.MetaComplexity.FanInTwo C ∧ C.size ≤ 11 ∧
@@ -165,5 +154,6 @@ theorem PEqualNP.Outside.L_meta_27683 : ¬ (∃ C : PEqualNP.CircuitLowerBounds.
       ∃ k : Fin C.gates.length, j.val < k.val ∧ 9 + j.val ∈ (C.gates.get k).inputs) ∧
     C.gates.head? = some ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [0, 1]⟩ ∧
     C.gates.tail.head? = some ⟨PEqualNP.CircuitLowerBounds.GateOp.or, [2, 5]⟩) := by
-  rintro ⟨C, hfan, hsz, he, ho, _, _, hlive, h0, h1⟩
-  exact PEqualNP.Outside.L_meta_27683_aux.main_contra C hfan hsz he ho hlive h0 h1
+  rintro ⟨C, hfan, hs, he, ho, _, _, hl, hh, ht⟩
+  have := L_meta_27683.lower C hfan he ho hl hh ht
+  omega
