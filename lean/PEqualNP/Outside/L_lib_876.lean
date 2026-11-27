@@ -1,6 +1,6 @@
 import Mathlib
 
-namespace PEqualNP.Outside.Lib876
+namespace PEqualNP.Outside.L_lib_876
 
 open Module
 
@@ -665,9 +665,9 @@ lemma quad_of_D3 (k : (Fin n → K2) → K2) (hk : ∀ a b c x, D3 k a b c x = 0
 
 end Deriv
 
-end PEqualNP.Outside.Lib876
+end PEqualNP.Outside.L_lib_876
 
-open PEqualNP.Outside.Lib876 in
+open PEqualNP.Outside.L_lib_876 in
 set_option maxHeartbeats 1000000 in
 theorem PEqualNP.Outside.L_lib_876 : ∀ n : ℕ,
   let F := ZMod 2
