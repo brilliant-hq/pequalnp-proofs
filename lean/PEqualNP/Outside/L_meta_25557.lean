@@ -1,4 +1,10 @@
-import Mathlib
+import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Data.Finset.Powerset
+import Mathlib.Tactic.ByContra
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.SplitIfs
 import PEqualNP.Defs
 
 namespace PEqualNP.Outside.L_meta_25557_aux
