@@ -105,7 +105,8 @@ class Receipt(unittest.TestCase):
         os.makedirs(f'{self.d}/in')
         for n, v in (('pr.blob', self.blob), ('pr.head', 'c' * 40), ('pr.file', 'lean/PEqualNP/Outside/L_x_1.lean')): put(f'{self.d}/in/{n}', v)
         self.rec = {'pr': 41, 'gap': 'L-x-1', 'kind': 'check', 'file': 'lean/PEqualNP/Outside/L_x_1.lean', 'head': 'c' * 40, 'blob': self.blob,
-                    'file_sha256': self.sha, 'verdict': 'ACCEPTED'}
+                    'file_sha256': self.sha, 'statement_sha256': 'd' * 64, 'manifest_sha256': 'e' * 64, 'children': 0,
+                    'children_sha256': hashlib.sha256(b'').hexdigest(), 'verdict': 'ACCEPTED'}
         self.env = {**os.environ, 'GITHUB_REPOSITORY': 'open-goat/pequalnp-proofs', 'PR': '41', 'GAP': 'L-x-1', 'GITHUB_RUN_ID': '777',
                     'GITHUB_RUN_ATTEMPT': '2', 'GITHUB_SHA': 'b' * 40, 'CHECK_RECORD': json.dumps(self.rec)}
     def receipt(self, line, env=None, status='0'):
@@ -155,7 +156,8 @@ class Receipt(unittest.TestCase):
     def test_no_receipt_without_a_matching_accepted_check_record(self):
         cases = [('', 'missing (the check job writes it only on ACCEPTED)')]
         for k, v in (('verdict', 'REJECTED'), ('pr', 42), ('gap', 'L-x-2'), ('head', 'e' * 40), ('blob', 'f' * 40), ('file_sha256', '0' * 64),
-                     ('file', 'lean/PEqualNP/Outside/L_x_2.lean'), ('kind', 'value'), ('extra', 1)):
+                     ('file', 'lean/PEqualNP/Outside/L_x_2.lean'), ('kind', 'value'), ('extra', 1), ('statement_sha256', 'x'),
+                     ('manifest_sha256', 'D' * 64), ('children', 2), ('children', 1.5), ('children_sha256', None)):
             cases.append((json.dumps({**self.rec, k: v}), k))
         for rec, why in cases:
             with self.subTest(why=why):
@@ -179,11 +181,19 @@ class Sandbox(unittest.TestCase):
     def test_workflow_wiring(self):
         w = open(os.path.join(BASE, '.github/workflows/authoritative.yml')).read()
         read = w[w.index('\n  read:\n'):]
-        for must in ('needs: check', 'CHECK_RECORD: ${{ needs.check.outputs.record }}', 'bash "$W/base/tools/read-parse.sh" "$W/base/tools" "$W/rd/proof.lean" "$judge" "$W/rd"',
+        for must in ('needs: check', "if: success() && inputs.read == 'on'", 'CHECK_RECORD: ${{ needs.check.outputs.record }}', 'bash "$W/base/tools/read-parse.sh" "$W/base/tools" "$W/rd/proof.lean" "$judge" "$W/rd"',
                      '"$W/rd/status"'):
             self.assertIn(must, read)
         self.assertNotIn('uses:', read); self.assertNotIn('upload-artifact', w)
         self.assertIn('record: ${{ steps.verdict.outputs.record }}', w); self.assertIn('id: verdict', w)
+        self.assertIn('manifest_sha256: $m, children: $n, children_sha256: $c', w)
+    def test_a_reduction_record_needs_two_to_four_children(self):
+        r = Receipt('test_a_good_line_becomes_one_canonical_receipt_line'); r.setUp()
+        for n, ok in ((0, False), (1, False), (2, True), (4, True), (5, False)):
+            with self.subTest(n=n):
+                rec = dict(r.rec, kind='reduce', children=n)
+                p, rc = r.receipt(r.good(), env={**r.env, 'CHECK_RECORD': json.dumps(rec)})
+                self.assertEqual(p.returncode == 0, ok)
 
 if __name__ == '__main__':
     sys.exit(0 if unittest.main(exit=False, verbosity=1).result.wasSuccessful() else 1)

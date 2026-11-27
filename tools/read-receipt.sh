@@ -21,8 +21,11 @@ printf '%s' "$path" | grep -Eqx 'lean/PEqualNP/Outside/[A-Za-z0-9_]{1,200}\.lean
 [ "$(git hash-object "$f")" = "$blob" ] || { echo "READ-JOB: the bytes are not the named blob; no receipt"; exit 1; }
 sha=$(sha256sum "$f" | cut -d' ' -f1)
 [ "${#CHECK_RECORD}" -le 2000 ] && printf '%s' "$CHECK_RECORD" | jq -e --argjson pr "$PR" --arg gap "$GAP" --arg path "$path" --arg head "$head" --arg blob "$blob" --arg sha "$sha" '
-    (keys == ["blob","file","file_sha256","gap","head","kind","pr","verdict"]) and .verdict == "ACCEPTED" and .pr == $pr and .gap == $gap
-    and .file == $path and .head == $head and .blob == $blob and .file_sha256 == $sha and (.kind | IN("check","refute","reduce"))' > /dev/null 2>&1 \
+    def h64: type == "string" and test("^[0-9a-f]{64}$");
+    (keys == ["blob","children","children_sha256","file","file_sha256","gap","head","kind","manifest_sha256","pr","statement_sha256","verdict"])
+    and .verdict == "ACCEPTED" and .pr == $pr and .gap == $gap and .file == $path and .head == $head and .blob == $blob and .file_sha256 == $sha
+    and (.kind | IN("check","refute","reduce")) and (.statement_sha256 | h64) and (.manifest_sha256 | h64) and (.children_sha256 | h64)
+    and (.children | type == "number" and floor == .) and (if .kind == "reduce" then (.children >= 2 and .children <= 4) else .children == 0 end)' > /dev/null 2>&1 \
   || { echo "READ-JOB: the check record is missing, not ACCEPTED, or names other bytes; no receipt"; exit 1; }
 vocab=$(mktemp); trap 'rm -f "$vocab"' EXIT
 python3 -I -S "$base/tools/read-decision.py" --vocab > "$vocab"

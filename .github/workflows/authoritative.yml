@@ -37,6 +37,10 @@ on:
         description: Leave empty (the checker on two cores, as always). "all" runs a proof or a refutation on every core of the runner; only our own hand dispatches send it (rehearsal of the all-cores change).
         required: false
         type: string
+      read:
+        description: 'Leave empty. "on" also runs the read job (the runner reader''s receipt). Off unless the intake''s runner_reader switch or a rehearsal asks for it.'
+        required: false
+        type: string
       open_claims:
         description: 'For a reduction only, from the intake: a JSON list of the open pull requests of the same step inside the stale window, [{number, createdAt, author, files}], author the intake 12-hex hash of the sender or null, never a login (an empty list is no claims). A reduction run without it is a FAULT.'
         required: false
@@ -754,10 +758,16 @@ jobs:
           echo "VERDICT: $verdict (checker exit $CODE)" | tee -a "$GITHUB_STEP_SUMMARY"
           if [ "$verdict" = ACCEPTED ]; then
             # The check record (see the job's outputs): only validated or before-the-outside-step values, built by jq.
-            if printf '%s %s %s' "$fsha" "$(cat "$W/in/pr.head")" "$(cat "$W/in/pr.blob")" | grep -Eqx '[0-9a-f]{64} [0-9a-f]{40} [0-9a-f]{40}'; then
+            if printf '%s %s %s %s' "$fsha" "$ssha" "$(cat "$W/in/pr.head")" "$(cat "$W/in/pr.blob")" | grep -Eqx '[0-9a-f]{64} [0-9a-f]{64} [0-9a-f]{40} [0-9a-f]{40}'; then
+              # What the hub records, as digests of exactly the lines this step prints for it (each without its "  | "):
+              # the MANIFEST line(s), and the CHILD lines and their count.
+              msha=$(grep -a '^MANIFEST {' "$RUNNER_TEMP/checker.out" | cut -c1-200000 | sha256sum | cut -d' ' -f1)
+              csha=$(grep -a '^CHILD ' "$RUNNER_TEMP/checker.out" | tr -d '\000-\010\013-\037\177' | cut -c1-8200 | sha256sum | cut -d' ' -f1)
               echo "record=$(jq -cnS --argjson pr "$PR" --arg gap "$GAP" --arg kind "$(cat "$W/in/gap.kind")" --arg file "$file" \
-                --arg head "$(cat "$W/in/pr.head")" --arg blob "$(cat "$W/in/pr.blob")" --arg f "$fsha" \
-                '{pr: $pr, gap: $gap, kind: $kind, file: $file, head: $head, blob: $blob, file_sha256: $f, verdict: "ACCEPTED"}')" >> "$GITHUB_OUTPUT"
+                --arg head "$(cat "$W/in/pr.head")" --arg blob "$(cat "$W/in/pr.blob")" --arg f "$fsha" --arg s "$ssha" \
+                --arg m "$msha" --argjson n "${children:-0}" --arg c "$csha" \
+                '{pr: $pr, gap: $gap, kind: $kind, file: $file, head: $head, blob: $blob, file_sha256: $f, statement_sha256: $s,
+                  manifest_sha256: $m, children: $n, children_sha256: $c, verdict: "ACCEPTED"}')" >> "$GITHUB_OUTPUT"
             fi
             exit 0
           fi
@@ -777,6 +787,8 @@ jobs:
   # pull request wrote is printed: the guard's words go to a file.
   read:
     needs: check
+    # Only when asked (input read = on): until the rehearsal and the red team clear it, no contributor file is read here.
+    if: success() && inputs.read == 'on'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:

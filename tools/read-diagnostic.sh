@@ -30,7 +30,8 @@ receipt() {   # receipt <name> <out dir>: the read job's last step for a team fi
   local f="$WD/$1.lean" o=$2 blob sha
   blob=$(git hash-object "$f"); sha=$(sha256sum "$f" | cut -d' ' -f1); mkdir -p "$o/in"
   printf '%s' "$blob" > "$o/in/pr.blob"; printf '%s' "$(printf c%.0s $(seq 40))" > "$o/in/pr.head"; printf '%s' "lean/PEqualNP/Outside/L_diag_1.lean" > "$o/in/pr.file"
-  CHECK_RECORD=$(jq -cn --arg b "$blob" --arg s "$sha" --arg h "$(cat "$o/in/pr.head")" '{pr: 1, gap: "L-diag-1", kind: "check", file: "lean/PEqualNP/Outside/L_diag_1.lean", head: $h, blob: $b, file_sha256: $s, verdict: "ACCEPTED"}') \
+  CHECK_RECORD=$(jq -cn --arg b "$blob" --arg s "$sha" --arg h "$(cat "$o/in/pr.head")" '{pr: 1, gap: "L-diag-1", kind: "check", file: "lean/PEqualNP/Outside/L_diag_1.lean", head: $h, blob: $b, file_sha256: $s,
+    statement_sha256: ("d" * 64), manifest_sha256: ("e" * 64), children: 0, children_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", verdict: "ACCEPTED"}') \
   PR=1 GAP=L-diag-1 GITHUB_REPOSITORY=${GITHUB_REPOSITORY:-open-goat/pequalnp-proofs} GITHUB_RUN_ID=${GITHUB_RUN_ID:-1} GITHUB_RUN_ATTEMPT=${GITHUB_RUN_ATTEMPT:-1} \
   GITHUB_SHA=$(git -C "$B" rev-parse HEAD) bash "$T/read-receipt.sh" "$o/decision.json" "$o/status" "$f" "$o/in" "$B" | sed -n 's/^READ-RECEIPT //p'
 }
