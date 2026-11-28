@@ -93,42 +93,42 @@ def HY : Nat := 0x20000820000800021000040001100004200010844244000000000000000000
 end hz3
 noncomputable section hz4
 variable {R : ℕ → ℕ}
-def st (n : Nat) (f : Nat → Bool) : Bool := Nat.rec (motive := fun _ => Bool) (f 0) (fun m _ => f m) (Nat.succ n)
+def st (n : Nat) (f : Nat → Bool) : Bool := Nat.rec (motive:=fun _=> Bool) (f 0) (fun m _ => f m) (Nat.succ n)
 def sp (d : Bool) (l s : Nat) : Nat :=
-  Nat.land (Nat.xor s (Nat.land (Nat.shiftRight s NN) l)) (Bool.rec (motive := fun _ => Nat) (Nat.land s l) l d)
+  Nat.land (Nat.xor s (Nat.land (Nat.shiftRight s NN) l)) (Bool.rec (motive:=fun _=> Nat) (Nat.land s l) l d)
 def cov (d : Bool) (l : Nat) (v : List W) : Nat :=
-  List.rec (motive := fun _ => Nat) 0 (fun w _ ih => Nat.lor (sp d l w.s) ih) v
+  List.rec (motive:=fun _=> Nat) 0 (fun w _ ih => Nat.lor (sp d l w.s) ih) v
 def twice (d : Bool) (l : Nat) (v : List W) : Nat :=
-  List.rec (motive := fun _ => Nat) 0 (fun w t ih => Nat.lor (Nat.land (sp d l w.s) (cov d l t)) ih) v
-def hit (f e : Nat) : Bool := (Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) (true) (false) (Nat.beq (Nat.land (Nat.land f e) HY) 0))) (false) (Nat.beq (Nat.land (Nat.land f e) HX) 0))
-def hits (f : Nat) (m : List Nat) : Bool := (List.rec (motive := fun _ => Bool) (false) (fun e _ ih => (Bool.rec (motive := fun _ => Bool) (ih) (true) (hit f e))) (m))
+  List.rec (motive:=fun _=> Nat) 0 (fun w t ih => Nat.lor (Nat.land (sp d l w.s) (cov d l t)) ih) v
+def hit (f e : Nat) : Bool := (Bool.rec (motive:=fun _=> Bool) ((Bool.rec (motive:=fun _=> Bool) (true) (false) (Nat.beq (Nat.land (Nat.land f e) HY) 0))) (false) (Nat.beq (Nat.land (Nat.land f e) HX) 0))
+def hits (f : Nat) (m : List Nat) : Bool := (List.rec (motive:=fun _=> Bool) (false) (fun e _ ih => (Bool.rec (motive:=fun _=> Bool) (ih) (true) (hit f e))) (m))
 def flag (d : Bool) (l o : Nat) (w : W) : Nat := Nat.add (Nat.land (sp d l w.s) o) AA
 def rect (d : Bool) (l o : Nat) (v : List W) : List Nat → Bool :=
-  List.rec (motive := fun _ => List Nat → Bool) (fun _ => false)
-    (fun w _ ih m => (Bool.rec (motive := fun _ => Bool) (ih (flag d l o w :: m)) (true) (hits (flag d l o w) m))) v
-def app (x y : List Nat) : List Nat := List.rec (motive := fun _ => List Nat) y (fun e _ ih => e :: ih) x
+  List.rec (motive:=fun _=> List Nat → Bool) (fun _ => false)
+    (fun w _ ih m => (Bool.rec (motive:=fun _=> Bool) (ih (flag d l o w :: m)) (true) (hits (flag d l o w) m))) v
+def app (x y : List Nat) : List Nat := List.rec (motive:=fun _=> List Nat) y (fun e _ ih => e :: ih) x
 def join (k : List Cm → Bool) (f : Nat) (cs : List Cm) : List Nat → List Nat → List Cm → Bool :=
-  List.rec (motive := fun _ => List Nat → List Nat → List Cm → Bool) (fun S O R => k (⟨S, O⟩ :: R))
-    (fun c _ ih S O R => Bool.rec (motive := fun _ => Bool)
-      (Bool.rec (motive := fun _ => Bool) (ih S O (c :: R)) (ih (app c.a S) (app c.b O) R) (hits f c.b))
-      (Bool.rec (motive := fun _ => Bool) (ih (app c.b S) (app c.a O) R) true (hits f c.b)) (hits f c.a)) cs
+  List.rec (motive:=fun _=> List Nat → List Nat → List Cm → Bool) (fun S O R => k (⟨S, O⟩ :: R))
+    (fun c _ ih S O R => Bool.rec (motive:=fun _=> Bool)
+      (Bool.rec (motive:=fun _=> Bool) (ih S O (c :: R)) (ih (app c.a S) (app c.b O) R) (hits f c.b))
+      (Bool.rec (motive:=fun _=> Bool) (ih (app c.b S) (app c.a O) R) true (hits f c.b)) (hits f c.a)) cs
 def bip (l o : Nat) (v : List W) : List Cm → Bool :=
-  List.rec (motive := fun _ => List Cm → Bool) (fun _ => false)
+  List.rec (motive:=fun _=> List Cm → Bool) (fun _ => false)
     (fun w _ ih cs => (fun f => join ih f cs [f] [] []) (flag false l o w)) v
-def anyE (m : List Nat) : Bool := List.rec (motive := fun _ => Bool) false (fun f t ih => Bool.rec (motive := fun _ => Bool) ih true (hits f t)) m
+def anyE (m : List Nat) : Bool := List.rec (motive:=fun _=> Bool) false (fun f t ih => Bool.rec (motive:=fun _=> Bool) ih true (hits f t)) m
 def rmF (f : Nat) (m : List Nat) : List Nat :=
-  List.rec (motive := fun _ => List Nat) [] (fun e t ih => Bool.rec (motive := fun _ => List Nat) (e :: ih) t (hit f e)) m
-def star (m : List Nat) : Bool := List.rec (motive := fun _ => Bool) true (fun f t ih => Bool.rec (motive := fun _ => Bool) ih
-  (Bool.rec (motive := fun _ => Bool) true (Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) true false (anyE (rmF f t))) false (hits f (rmF f t))) (anyE t)) (hits f t)) m
+  List.rec (motive:=fun _=> List Nat) [] (fun e t ih => Bool.rec (motive:=fun _=> List Nat) (e :: ih) t (hit f e)) m
+def star (m : List Nat) : Bool := List.rec (motive:=fun _=> Bool) true (fun f t ih => Bool.rec (motive:=fun _=> Bool) ih
+  (Bool.rec (motive:=fun _=> Bool) true (Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) true false (anyE (rmF f t))) false (hits f (rmF f t))) (anyE t)) (hits f t)) m
 def flk (l o : Nat) (v : List W) : (List Nat → Bool) → Bool :=
-  List.rec (motive := fun _ => (List Nat → Bool) → Bool) (fun k => k []) (fun w _ ih k => (fun f => ih (fun r => k (f :: r))) (flag false l o w)) v
+  List.rec (motive:=fun _=> (List Nat → Bool) → Bool) (fun k => k []) (fun w _ ih k => (fun f => ih (fun r => k (f :: r))) (flag false l o w)) v
 def rm (x y : Nat) (v : List W) : (List W → Bool) → Bool :=
-  List.rec (motive := fun _ => (List W → Bool) → Bool) (fun h => h []) (fun w _ ih h => Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) (ih (fun r => h (w :: r))) (ih h) (Nat.beq w.s y)) (ih h) (Nat.beq w.s x)) v
+  List.rec (motive:=fun _=> (List W → Bool) → Bool) (fun h => h []) (fun w _ ih h => Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) (ih (fun r => h (w :: r))) (ih h) (Nat.beq w.s y)) (ih h) (Nat.beq w.s x)) v
 def ins (o : W) (v : List W) : (List W → Bool) → Bool :=
-  List.rec (motive := fun _ => (List W → Bool) → Bool) (fun h => h [o]) (fun w t ih h => Bool.rec (motive := fun _ => Bool) (ih (fun r => h (w :: r))) (Bool.rec (motive := fun _ => Bool) (h (o :: w :: t)) false (Nat.beq o.s w.s)) (Nat.ble w.s o.s)) v
+  List.rec (motive:=fun _=> (List W → Bool) → Bool) (fun h => h [o]) (fun w t ih h => Bool.rec (motive:=fun _=> Bool) (ih (fun r => h (w :: r))) (Bool.rec (motive:=fun _=> Bool) (h (o :: w :: t)) false (Nat.beq o.s w.s)) (Nat.ble w.s o.s)) v
 def child (f : Nat → List W → Bool) (g : Nat) (kb : Bool) (mk : (List W → Bool) → Bool) (z : Nat) : Bool :=
-  Bool.rec (motive := fun _ => Bool) false (Bool.rec (motive := fun _ => Bool) (st z (fun z => mk (f z))) false kb) (Nat.beq (Nat.land z g) g)
-def laneL (w : Nat) (L : List Nat) : Nat := List.rec (motive := fun _ => Nat) 0 (fun d _ ih => Nat.add (Nat.shiftLeft ih w) d) L
+  Bool.rec (motive:=fun _=> Bool) false (Bool.rec (motive:=fun _=> Bool) (st z (fun z => mk (f z))) false kb) (Nat.beq (Nat.land z g) g)
+def laneL (w : Nat) (L : List Nat) : Nat := List.rec (motive:=fun _=> Nat) 0 (fun d _ ih => Nat.add (Nat.shiftLeft ih w) d) L
 def WL (N : Nat) : Nat := Nat.succ (Nat.mul 2 N)
 def FM2 (N : Nat) : Nat := Nat.sub (Nat.pow 2 (Nat.mul 2 N)) 1
 def R16 (N : Nat) : Nat := laneL (WL N) (List.replicate 16 1)
@@ -137,49 +137,61 @@ def GG16 (N : Nat) : Nat := laneL (WL N) (List.replicate 16 (Nat.pow 2 (Nat.mul 
 def MD16 (N : Nat) : Nat := Nat.sub (Nat.pow 2 (WL N)) 32
 def U16 : Nat := laneL 5 (List.replicate 16 1)
 def zflG (N np q nc : Nat) : Nat := Nat.land (Nat.sub U16 (Nat.mod (Nat.shiftRight (Nat.land (Nat.add (Nat.land (Nat.mul (Nat.land q (FM2 N)) (R16 N)) np) (MM16 N)) (GG16 N)) (Nat.mul 2 N)) (MD16 N))) nc
-def zfl (np q nc : Nat) : Nat := zflG NN np q nc
+def repBits (n w : Nat) : Nat := ((1 <<< (n*w))-1) / ((1 <<< w)-1)
+def reps16 : Nat := 0x8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
+def m916 : Nat := (1 <<< 916) - 1
+def rrGG : Nat := reps16 <<< 916
+def rrMM : Nat := reps16 * m916
+def zfl (np q nc : Nat) : Nat :=
+  let lanes := (((q &&& m916) * reps16) &&& np) + rrMM
+  let packed := ((lanes &&& rrGG) >>> 916) % ((1 <<< 917) - 32)
+  (0x8421084210842108421 - packed) &&& nc
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem zflRaw (np q nc : Nat) : zfl np q nc = zflG NN np q nc := by rfl
 def MU (f : Nat) : Nat := Nat.mul 31 f
 def rmk (sa : Nat) (ka : Bool) (da : Nat) (sc : Nat) (kc : Bool) (dc : Nat) (v : List W) : (List W → Bool) → Bool :=
-  List.rec (motive := fun _ => (List W → Bool) → Bool) (fun h => h []) (fun w _ ih h => Bool.rec (motive := fun _ => Bool)
-    (Bool.rec (motive := fun _ => Bool) (ih (fun r => h (w :: r))) (Bool.rec (motive := fun _ => Bool) (ih h) (st dc fun d => W.rec (motive := fun _ => Bool) (fun s a b c r0 _ => ih (fun r => h (⟨s, a, b, c, r0, d⟩ :: r))) w) kc) (Nat.beq w.s sc))
-    (Bool.rec (motive := fun _ => Bool) (ih h) (st da fun d => W.rec (motive := fun _ => Bool) (fun s a b c r0 _ => ih (fun r => h (⟨s, a, b, c, r0, d⟩ :: r))) w) ka) (Nat.beq w.s sa)) v
+  List.rec (motive:=fun _=> (List W → Bool) → Bool) (fun h => h []) (fun w _ ih h => Bool.rec (motive:=fun _=> Bool)
+    (Bool.rec (motive:=fun _=> Bool) (ih (fun r => h (w :: r))) (Bool.rec (motive:=fun _=> Bool) (ih h) (st dc fun d => W.rec (motive:=fun _=> Bool) (fun s a b c r0 _ => ih (fun r => h (⟨s, a, b, c, r0, d⟩ :: r))) w) kc) (Nat.beq w.s sc))
+    (Bool.rec (motive:=fun _=> Bool) (ih h) (st da fun d => W.rec (motive:=fun _=> Bool) (fun s a b c r0 _ => ih (fun r => h (⟨s, a, b, c, r0, d⟩ :: r))) w) ka) (Nat.beq w.s sa)) v
 def rmkB (sa da sc dc d0 : Nat) (v : List W) (h : List W → Bool) : Bool :=
-  Bool.rec (motive := fun _ => Bool) (rmk sa true da sc true dc v h) (h v) (Nat.beq d0 0)
+  Bool.rec (motive:=fun _=> Bool) (rmk sa true da sc true dc v h) (h v) (Nat.beq d0 0)
 def put (m s x y : Nat) (v : List W) (d : Nat) (h : List W → Bool) : Bool :=
-  st s fun s => Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) (st x fun x1 => st y fun y1 => st (Nat.lor x y) fun w => st d fun d => ins ⟨s, x1, y1, w, 0, d⟩ v h) false (Nat.beq s m)) false (Nat.beq s 0)
+  st s fun s => Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) (st x fun x1 => st y fun y1 => st (Nat.lor x y) fun w => st d fun d => ins ⟨s, x1, y1, w, 0, d⟩ v h) false (Nat.beq s m)) false (Nat.beq s 0)
 def kids (c : Bool → ((List W → Bool) → Bool) → Nat → Bool) (e n z u w fA fC : Nat) (a c' : W) (oa oc ka kc kb : Bool) (mk : Nat → (List W → Bool) → Bool) : Bool :=
   (fun fN sA sC =>
-    Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false
+    Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) false
         (c kb (fun h => mk fN (fun r => rmkB a.s (Nat.land sC a.d) c'.s (Nat.land sA c'.d) (Nat.add a.d c'.d) r h)) (Nat.sub (Nat.sub z a.c) c'.c))
         (Nat.ble (Nat.succ (Nat.succ n)) e)) true
-      (Bool.rec (motive := fun _ => Bool) false (Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false
+      (Bool.rec (motive:=fun _=> Bool) false (Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) false
           (c kc (fun h => mk (Nat.add fN (Nat.land (MU (Nat.add fN fA)) a.d)) (fun r => rmk a.s false 0 c'.s true (Nat.land sA c'.d) r h)) (Nat.sub (Nat.sub z (Nat.land sC a.d)) c'.c)) oa) true
-        (Bool.rec (motive := fun _ => Bool) false
+        (Bool.rec (motive:=fun _=> Bool) false
           (c ka (fun h => mk (Nat.add fN (Nat.land (MU (Nat.add fN fC)) c'.d)) (fun r => rmk a.s true (Nat.land sC a.d) c'.s false 0 r h)) (Nat.sub (Nat.sub z a.c) (Nat.land sA c'.d))) oc)) (Nat.ble (Nat.succ n) e))) true
-      (Bool.rec (motive := fun _ => Bool) false (Bool.rec (motive := fun _ => Bool) false
+      (Bool.rec (motive:=fun _=> Bool) false (Bool.rec (motive:=fun _=> Bool) false
         (c false (fun h => mk (Nat.add (Nat.add fN (Nat.land (MU (Nat.add fN fA)) a.d)) (Nat.land (MU (Nat.add fN fC)) c'.d)) (fun r => rmk a.s false 0 c'.s false 0 r h)) (Nat.sub (Nat.sub z (Nat.land sC a.d)) (Nat.land sA c'.d))) oc) oa))
   (Nat.sub (Nat.sub (Nat.sub u w) fA) fC) (MU (Nat.add w fA)) (MU (Nat.add w fC))
 def mid (f : Nat → List W → Bool) (m g np e n z : Nat) (v : List W) (a c : W) (oa oc ka kc kb : Bool) (s x y : Nat) : Bool :=
-  Bool.rec (motive := fun _ => Bool) false
+  Bool.rec (motive:=fun _=> Bool) false
     ((fun u w => (fun nc => st (zfl np (Nat.xor a.s s) nc) fun eA => st (zfl np (Nat.xor c.s s) (Nat.sub nc eA)) fun eC =>
-      Bool.rec (motive := fun _ => Bool) false
+      Bool.rec (motive:=fun _=> Bool) false
         (st (Nat.sub (Nat.sub (Nat.add z (Nat.land a.c c.c)) w) (Nat.add eA eC)) fun z =>
           kids (child f g) e n z u w (Nat.add eA (Nat.sub c.c (Nat.land c.c w))) (Nat.add eC (Nat.sub a.c (Nat.land a.c w))) a c oa oc ka kc kb (put m s x y v))
         (Nat.beq (Nat.land (Nat.sub (Nat.sub (Nat.add z (Nat.land a.c c.c)) w) (Nat.add eA eC)) g) g))
       (Nat.sub u (Nat.lor (Nat.lor a.c c.c) w))) (Nat.shiftRight g 4) (Nat.lor x y))
     (Nat.beq (Nat.land (Nat.sub (Nat.add z (Nat.land a.c c.c)) (Nat.lor x y)) g) g)
 def nots (f : Nat → Nat → List W → Bool) (m g e n z q : Nat) (v r : List W) : Bool :=
-  List.rec (motive := fun _ => Bool) false (fun a _ ih => Bool.rec (motive := fun _ => Bool) ih true (Bool.rec (motive := fun _ => Bool)
+  List.rec (motive:=fun _=> Bool) false (fun a _ ih => Bool.rec (motive:=fun _=> Bool) ih true (Bool.rec (motive:=fun _=> Bool)
     (st (Nat.xor a.s m) fun s => st (Nat.sub z a.c) fun z => (fun u =>
-      Bool.rec (motive := fun _ => Bool)
-        (Bool.rec (motive := fun _ => Bool) false (st u fun d1 => ins ⟨s, a.b, a.a, a.c, 0, d1⟩ v (fun v => child (f s) g false (rmk a.s true 0 a.s true 0 v) (Nat.sub z a.c))) (Nat.ble (Nat.succ n) e)) true
-        (Bool.rec (motive := fun _ => Bool) false (st (Nat.add u a.d) fun d1 => ins ⟨s, a.b, a.a, a.c, 0, d1⟩ v (fun v => child (f s) g false (rmk a.s false 0 a.s false 0 v) z)) (Nat.ble n e)))
+      Bool.rec (motive:=fun _=> Bool)
+        (Bool.rec (motive:=fun _=> Bool) false (st u fun d1 => ins ⟨s, a.b, a.a, a.c, 0, d1⟩ v (fun v => child (f s) g false (rmk a.s true 0 a.s true 0 v) (Nat.sub z a.c))) (Nat.ble (Nat.succ n) e)) true
+        (Bool.rec (motive:=fun _=> Bool) false (st (Nat.add u a.d) fun d1 => ins ⟨s, a.b, a.a, a.c, 0, d1⟩ v (fun v => child (f s) g false (rmk a.s false 0 a.s false 0 v) z)) (Nat.ble n e)))
       (Nat.sub (Nat.shiftRight g 4) a.c)) false (Nat.beq (Nat.succ a.s) q))) r
-def pos (t : Nat) : Bool := Nat.rec (motive := fun _ => Bool) false (fun _ _ => true) t
+def pos (t : Nat) : Bool := Nat.rec (motive:=fun _=> Bool) false (fun _ _ => true) t
 def wst (d : Bool) (l : Nat) (v : List W) : Nat := Nat.xor l (twice d l v)
-def prd (t : Nat) (h : Nat → Bool) : Bool := Nat.rec (motive := fun _ => Bool) false (fun s _ => h s) t
+def prd (t : Nat) (h : Nat → Bool) : Bool := Nat.rec (motive:=fun _=> Bool) false (fun s _ => h s) t
 def cv (d : Bool) (l : Nat) (v : List W) (b : Bool) : Bool :=
-  Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false b (Nat.beq (cov d l v) l)) b d
+  Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) false b (Nat.beq (cov d l v) l)) b d
 end hz4
 section hz5
 variable {R : ℕ → ℕ}
@@ -232,23 +244,23 @@ def notW (m : ℕ) (a : W) : W := ⟨a.s ^^^ m, a.b, a.a, a.c, 0, 0⟩
 end hz5
 noncomputable section hz6
 variable {R : ℕ → ℕ}
-def len (v : List W) : Nat := List.rec (motive := fun _ => Nat) 0 (fun _ _ ih => Nat.succ ih) v
-def geo (w n : Nat) : Nat := Nat.rec (motive := fun _ => Nat) 0 (fun _ ih => Nat.add (Nat.shiftLeft ih w) 1) n
+def len (v : List W) : Nat := List.rec (motive:=fun _=> Nat) 0 (fun _ _ ih => Nat.succ ih) v
+def geo (w n : Nat) : Nat := Nat.rec (motive:=fun _=> Nat) 0 (fun _ ih => Nat.add (Nat.shiftLeft ih w) 1) n
 def LNN : Nat := Nat.mul 12 NN
 def LN2 : Nat := Nat.mul 24 NN
 def LN4 : Nat := Nat.mul 48 NN
 def LM1 : Nat := Nat.mul 13 NN
 def LM2 : Nat := Nat.mul 26 NN
 def LM4 : Nat := Nat.mul 52 NN
-def RL : Nat := geo NN 12
+def RL : Nat := repBits 12 458
 def PLN : Nat := Nat.pow 2 LNN
 def AAR : Nat := Nat.mul AA RL
-def HXR : Nat := Nat.mul HX (geo NN 84)
-def HYR : Nat := Nat.mul HY (geo NN 84)
-def MRR : Nat := Nat.mul (Nat.sub (Nat.pow 2 NN) (Nat.pow 2 64)) (geo NN 84)
-def TOPR : Nat := Nat.shiftLeft (geo NN 72) LM1
+def HXR : Nat := Nat.mul HX (repBits 84 458)
+def HYR : Nat := Nat.mul HY (repBits 84 458)
+def MRR : Nat := Nat.mul (Nat.sub (Nat.pow 2 NN) (Nat.pow 2 64)) (repBits 84 458)
+def TOPR : Nat := Nat.shiftLeft (repBits 72 458) LM1
 def GMD : Nat := Nat.sub (Nat.pow 2 (Nat.sub NN 1)) 1
-def pkd (d : Bool) (l : Nat) (v : List W) : Nat := List.rec (motive := fun _ => Nat) 0 (fun w t ih => Nat.lor (Nat.shiftLeft (sp d l w.s) (Nat.mul NN (len t))) ih) v
+def pkd (d : Bool) (l : Nat) (v : List W) : Nat := List.rec (motive:=fun _=> Nat) 0 (fun w t ih => Nat.lor (Nat.shiftLeft (sp d l w.s) (Nat.mul NN (len t))) ih) v
 def dbl (m x : Nat) : Nat := Nat.lor x (Nat.shiftLeft x m)
 def eg2 (G : Nat) : Nat := Nat.shiftRight (Nat.mod (Nat.land (Nat.land (Nat.add (Nat.land G HXR) MRR) (Nat.add (Nat.land G HYR) MRR)) TOPR) GMD) 1
 def eg1 (F : Nat) : Nat := eg2 (Nat.land (dbl LN4 (dbl LN2 (dbl LNN F))) (dbl LM4 (dbl LM2 (dbl LM1 F))))
@@ -260,37 +272,37 @@ def f13c (b : Nat) : Nat := Nat.land (Nat.lor b (Nat.shiftRight b 13)) 4095
 def f13b (a : Nat) : Nat := f13c (Nat.lor a (Nat.shiftRight a 26))
 def f13 (w : Nat) : Nat := f13b (Nat.lor w (Nat.shiftRight w 52))
 def nbr (e S : Nat) : Nat := Nat.lor (f12 (Nat.land e (Nat.mul S 302268352895954163081217))) (f13 (Nat.land e (Nat.mul S 4723519685917965029377)))
-def bfs (e : Nat) (fuel : Nat) : Nat → Nat → (Nat → Bool) → Bool := Nat.rec (motive := fun _ => Nat → Nat → (Nat → Bool) → Bool) (fun _ _ _ => false)
-  (fun _ ih A B k => st (Nat.lor A (nbr e B)) (fun a => st (Nat.lor B (nbr e a)) (fun b => Bool.rec (motive := fun _ => Bool) true
-    (Bool.rec (motive := fun _ => Bool) (ih a b k) (k (Nat.lor a b)) (Nat.beq (Nat.lor A B) (Nat.lor a b))) (Nat.beq (Nat.land a b) 0)))) fuel
-def nonb (e : Nat) (fuel : Nat) : Nat → Bool := Nat.rec (motive := fun _ => Nat → Bool) (fun _ => false)
-  (fun _ ih r => Bool.rec (motive := fun _ => Bool) (bfs e 12 (Nat.gcd r 2048) 0 (fun c => ih (Nat.sub r (Nat.land r c)))) false (Nat.beq r 0)) fuel
+def bfs (e : Nat) (fuel : Nat) : Nat → Nat → (Nat → Bool) → Bool := Nat.rec (motive:=fun _=> Nat → Nat → (Nat → Bool) → Bool) (fun _ _ _ => false)
+  (fun _ ih A B k => st (Nat.lor A (nbr e B)) (fun a => st (Nat.lor B (nbr e a)) (fun b => Bool.rec (motive:=fun _=> Bool) true
+    (Bool.rec (motive:=fun _=> Bool) (ih a b k) (k (Nat.lor a b)) (Nat.beq (Nat.lor A B) (Nat.lor a b))) (Nat.beq (Nat.land a b) 0)))) fuel
+def nonb (e : Nat) (fuel : Nat) : Nat → Bool := Nat.rec (motive:=fun _=> Nat → Bool) (fun _ => false)
+  (fun _ ih r => Bool.rec (motive:=fun _=> Bool) (bfs e 12 (Nat.gcd r 2048) 0 (fun c => ih (Nat.sub r (Nat.land r c)))) false (Nat.beq r 0)) fuel
 def nonbip (e : Nat) : Bool := nonb e 12 (Nat.lor (f12 e) (f13 e))
 def tch (i : Nat) : Nat := Nat.lor (Nat.mul i 302268352895954163081217) (Nat.mul i 4723519685917965029377)
 def del (e i : Nat) : Nat := Nat.xor (Nat.lor e (tch i)) (tch i)
-def ne0 (e : Nat) : Bool := Bool.rec (motive := fun _ => Bool) true false (Nat.beq e 0)
+def ne0 (e : Nat) : Bool := Bool.rec (motive:=fun _=> Bool) true false (Nat.beq e 0)
 def kF (_ : Nat) : Bool := false
 def kF2 (_ _ : Nat) : Bool := false
 def kT2 (_ _ : Nat) : Bool := true
 def tst1 (h : Nat) (F : (Nat → Bool) → (Nat → Nat → Bool) → Bool) : Bool :=
-  Bool.rec (motive := fun _ => Bool) (F (fun i => ne0 (del h i)) kT2) false (nonbip h)
-def tri5 (a L r : Nat) : Nat := Bool.rec (motive := fun _ => Nat) (Nat.lor a (Nat.gcd L 4096)) r (Nat.beq L 0)
+  Bool.rec (motive:=fun _=> Bool) (F (fun i => ne0 (del h i)) kT2) false (nonbip h)
+def tri5 (a L r : Nat) : Nat := Bool.rec (motive:=fun _=> Nat) (Nat.lor a (Nat.gcd L 4096)) r (Nat.beq L 0)
 def tri4 (h i N k r : Nat) : Nat := tri5 (Nat.lor i k) (Nat.land (nbr h k) N) r
-def tri3 (h i N M r : Nat) : Nat := Bool.rec (motive := fun _ => Nat) (tri4 h i N (Nat.gcd M 4096) r) r (Nat.beq M 0)
+def tri3 (h i N M r : Nat) : Nat := Bool.rec (motive:=fun _=> Nat) (tri4 h i N (Nat.gcd M 4096) r) r (Nat.beq M 0)
 def tri2 (h i N r : Nat) : Nat := tri3 h i N (Nat.land (nbr h N) N) r
 def tri1 (h i r : Nat) : Nat := tri2 h i (nbr h i) r
-def tri (h : Nat) (fuel : Nat) : Nat → Nat := Nat.rec (motive := fun _ => Nat → Nat) (fun _ => 0)
-  (fun _ ih r => Bool.rec (motive := fun _ => Nat) (tri1 h (Nat.gcd r 2048) (ih (Nat.sub r (Nat.gcd r 2048)))) 0 (Nat.beq r 0)) fuel
+def tri (h : Nat) (fuel : Nat) : Nat → Nat := Nat.rec (motive:=fun _=> Nat → Nat) (fun _ => 0)
+  (fun _ ih r => Bool.rec (motive:=fun _=> Nat) (tri1 h (Nat.gcd r 2048) (ih (Nat.sub r (Nat.gcd r 2048)))) 0 (Nat.beq r 0)) fuel
 def k1 (h i : Nat) : Bool := nonbip (del h i)
 def k2 (h i j : Nat) : Bool := ne0 (del (del h i) j)
-def k3 (h T i : Nat) : Bool := Bool.rec (motive := fun _ => Bool) (nonbip (del h i)) true (Nat.beq (Nat.land i T) 0)
-def k4 (h T i j : Nat) : Bool := Bool.rec (motive := fun _ => Bool) true (ne0 (del (del h i) j)) (Nat.beq (Nat.land (Nat.lor i j) T) (Nat.lor i j))
-def tst2 (h : Nat) (F : (Nat → Bool) → (Nat → Nat → Bool) → Bool) : Bool := st (tri h 12 (f12 h)) (fun T => Bool.rec (motive := fun _ => Bool) (F (k3 h T) (k4 h T)) (F (k1 h) (k2 h)) (Nat.beq T 0))
+def k3 (h T i : Nat) : Bool := Bool.rec (motive:=fun _=> Bool) (nonbip (del h i)) true (Nat.beq (Nat.land i T) 0)
+def k4 (h T i j : Nat) : Bool := Bool.rec (motive:=fun _=> Bool) true (ne0 (del (del h i) j)) (Nat.beq (Nat.land (Nat.lor i j) T) (Nat.lor i j))
+def tst2 (h : Nat) (F : (Nat → Bool) → (Nat → Nat → Bool) → Bool) : Bool := st (tri h 12 (f12 h)) (fun T => Bool.rec (motive:=fun _=> Bool) (F (k3 h T) (k4 h T)) (F (k1 h) (k2 h)) (Nat.beq T 0))
 def tsn (d : Bool) (l e : Nat) (v : List W) (F : (Nat → Bool) → (Nat → Nat → Bool) → Bool) : Bool :=
-  (fun n => (fun o => Bool.rec (motive := fun _ => Bool)
-    (Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) (F kF kF2) (st (edg false l o v) (fun h => tst2 h F)) (Nat.beq (Nat.succ (Nat.succ n)) e))
+  (fun n => (fun o => Bool.rec (motive:=fun _=> Bool)
+    (Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) (F kF kF2) (st (edg false l o v) (fun h => tst2 h F)) (Nat.beq (Nat.succ (Nat.succ n)) e))
       (st (edg false l o v) (fun h => tst1 h F)) (Nat.beq (Nat.succ n) e))
-    (Bool.rec (motive := fun _ => Bool) false (F kF kF2) (Nat.beq (edg d l o v) 0)) (Nat.beq n e)) (wst d l v)) (len v)
+    (Bool.rec (motive:=fun _=> Bool) false (F kF kF2) (Nat.beq (edg d l o v) 0)) (Nat.beq n e)) (wst d l v)) (len v)
 end hz6
 section hz7
 variable {R : ℕ → ℕ}
@@ -304,60 +316,60 @@ end hz7
 noncomputable section hz8
 variable {R : ℕ → ℕ}
 def mkX (d : Bool) (l o : Nat) (v : List W) : List X :=
-  List.rec (motive := fun _ => List X) [] (fun w t ih => ⟨w, w.s, Nat.shiftRight w.s NN, Nat.land (sp d l w.s) o, Nat.shiftLeft 1 (len t)⟩ :: ih) v
+  List.rec (motive:=fun _=> List X) [] (fun w t ih => ⟨w, w.s, Nat.shiftRight w.s NN, Nat.land (sp d l w.s) o, Nat.shiftLeft 1 (len t)⟩ :: ih) v
 def f0 (h : W → W → Bool → Bool → Bool → Bool → Bool → Nat → Nat → Nat → Bool) (a c : W) (ia ic da dc s x y : Nat) : Bool :=
-  Bool.rec (motive := fun _ => Bool) false (h a c true true true true true s x y) (Nat.beq (Nat.lor da dc) 0)
+  Bool.rec (motive:=fun _=> Bool) false (h a c true true true true true s x y) (Nat.beq (Nat.lor da dc) 0)
 def f1 (κ : Nat → Bool) (κ2 : Nat → Nat → Bool) (h : W → W → Bool → Bool → Bool → Bool → Bool → Nat → Nat → Nat → Bool) (a c : W) (ia ic da dc s x y : Nat) : Bool :=
-  Bool.rec (motive := fun _ => Bool)
-    (Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) (h a c false false true true false s x y) false (κ2 ia ic))
-      (Bool.rec (motive := fun _ => Bool) (h a c false true false true (κ2 ia ic) s x y) (Bool.rec (motive := fun _ => Bool) (h a c false false true true false s x y) false (κ2 ia ic)) (κ ia)) (Nat.beq dc 0))
-    (Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) (h a c true false true false (κ2 ia ic) s x y) (Bool.rec (motive := fun _ => Bool) (h a c false false true true false s x y) false (κ2 ia ic)) (κ ic))
+  Bool.rec (motive:=fun _=> Bool)
+    (Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) (h a c false false true true false s x y) false (κ2 ia ic))
+      (Bool.rec (motive:=fun _=> Bool) (h a c false true false true (κ2 ia ic) s x y) (Bool.rec (motive:=fun _=> Bool) (h a c false false true true false s x y) false (κ2 ia ic)) (κ ia)) (Nat.beq dc 0))
+    (Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) (h a c true false true false (κ2 ia ic) s x y) (Bool.rec (motive:=fun _=> Bool) (h a c false false true true false s x y) false (κ2 ia ic)) (κ ic))
       (h a c true true (κ ia) (κ ic) (κ2 ia ic) s x y) (Nat.beq dc 0))
     (Nat.beq da 0)
 def f2 (h : W → W → Bool → Bool → Bool → Bool → Bool → Nat → Nat → Nat → Bool) (a c : W) (ia ic da dc s x y : Nat) : Bool :=
   h a c (Nat.beq da 0) (Nat.beq dc 0) false false false s x y
 def pair (h : W → W → Nat → Nat → Nat → Nat → Nat → Nat → Nat → Bool) (a c : X) : Bool :=
-  X.rec (motive := fun _ => Bool) (fun a s q u i => X.rec (motive := fun _ => Bool) (fun c s' q' u' j => Bool.rec (motive := fun _ => Bool)
+  X.rec (motive:=fun _=> Bool) (fun a s q u i => X.rec (motive:=fun _=> Bool) (fun c s' q' u' j => Bool.rec (motive:=fun _=> Bool)
     (h a c i j (Nat.land u q') (Nat.land u' q) (Nat.lor s s') (Nat.land a.a c.a) (Nat.lor a.b c.b)) true
     (h a c i j (Nat.xor (Nat.land u s') u) (Nat.xor (Nat.land u' s) u') (Nat.land s s') (Nat.lor a.a c.a) (Nat.land a.b c.b))) c) a
-def scan (p : X → Bool) (xs : List X) : Bool := (List.rec (motive := fun _ => Bool) (false) (fun c _ jh => (Bool.rec (motive := fun _ => Bool) (jh) (true) (p c))) (xs))
+def scan (p : X → Bool) (xs : List X) : Bool := (List.rec (motive:=fun _=> Bool) (false) (fun c _ jh => (Bool.rec (motive:=fun _=> Bool) (jh) (true) (p c))) (xs))
 def pairs (h : X → X → Bool) (xs : List X) : Bool :=
-  (List.rec (motive := fun _ => Bool) (false) (fun a r ih => (Bool.rec (motive := fun _ => Bool) (ih) (true) (scan (h a) r))) (xs))
+  (List.rec (motive:=fun _=> Bool) (false) (fun a r ih => (Bool.rec (motive:=fun _=> Bool) (ih) (true) (scan (h a) r))) (xs))
 def pairsP (q : Nat) (h : X → X → Bool) (xs : List X) : Bool :=
-  scan (fun a => (Bool.rec (motive := fun _ => Bool) (false) (scan (fun c => (Bool.rec (motive := fun _ => Bool) (h a c) (false) (Nat.beq c.s q))) xs) (Nat.beq a.s q))) xs
+  scan (fun a => (Bool.rec (motive:=fun _=> Bool) (false) (scan (fun c => (Bool.rec (motive:=fun _=> Bool) (h a c) (false) (Nat.beq c.s q))) xs) (Nat.beq a.s q))) xs
 def pairsQ (q q' : Nat) (h : X → X → Bool) (xs : List X) : Bool :=
-  scan (fun a => (Bool.rec (motive := fun _ => Bool) (false) (scan (fun c => (Bool.rec (motive := fun _ => Bool) (false) (h a c) (Nat.beq c.s q'))) xs) (Nat.beq a.s q))) xs
-def fr (xs : List X) : List X := List.rec (motive := fun _ => List X) [] (fun a _ ih => Bool.rec (motive := fun _ => List X) ih (a :: ih) (Nat.beq a.w.r 0)) xs
-def fs (xs : List X) : List X := List.rec (motive := fun _ => List X) [] (fun a _ ih => Bool.rec (motive := fun _ => List X) (a :: ih) ih (Nat.beq a.w.r 0)) xs
+  scan (fun a => (Bool.rec (motive:=fun _=> Bool) (false) (scan (fun c => (Bool.rec (motive:=fun _=> Bool) (false) (h a c) (Nat.beq c.s q'))) xs) (Nat.beq a.s q))) xs
+def fr (xs : List X) : List X := List.rec (motive:=fun _=> List X) [] (fun a _ ih => Bool.rec (motive:=fun _=> List X) ih (a :: ih) (Nat.beq a.w.r 0)) xs
+def fs (xs : List X) : List X := List.rec (motive:=fun _=> List X) [] (fun a _ ih => Bool.rec (motive:=fun _=> List X) (a :: ih) ih (Nat.beq a.w.r 0)) xs
 def pairsN (h : X → X → Bool) (xs : List X) : Bool :=
-  Bool.rec (motive := fun _ => Bool) (scan (fun a => scan (h a) (fs xs)) (fr xs)) true (pairs h (fr xs))
+  Bool.rec (motive:=fun _=> Bool) (scan (fun a => scan (h a) (fs xs)) (fr xs)) true (pairs h (fr xs))
 def pairsS (h : X → X → Bool) (xs : List X) : Bool := pairs h (fs xs)
 def nodeH (h : W → W → Bool → Bool → Bool → Bool → Bool → Nat → Nat → Nat → Bool) (d : Bool) (l e n : Nat) (v : List W) (κ : Nat → Bool) (κ2 : Nat → Nat → Bool) (go : (X → X → Bool) → List X → Bool) : Bool :=
-  (fun xs => Bool.rec (motive := fun _ => Bool) (go (pair (f0 h)) xs)
-    (Bool.rec (motive := fun _ => Bool) (go (pair (f1 κ κ2 h)) xs) (go (pair (f2 h)) xs) (Nat.ble (Nat.succ (Nat.succ n)) e)) (Nat.ble n e))
+  (fun xs => Bool.rec (motive:=fun _=> Bool) (go (pair (f0 h)) xs)
+    (Bool.rec (motive:=fun _=> Bool) (go (pair (f1 κ κ2 h)) xs) (go (pair (f2 h)) xs) (Nat.ble (Nat.succ (Nat.succ n)) e)) (Nat.ble n e))
     (mkX d l (wst d l v) v)
 def node (f : Nat → List W → Bool) (d : Bool) (l m g np e n z : Nat) (v : List W) (κ : Nat → Bool) (κ2 : Nat → Nat → Bool) (go : (X → X → Bool) → List X → Bool) : Bool :=
   nodeH (mid f m g np e (Nat.pred n) z v) d l e n v κ κ2 go
 def forb (fm fh s : Nat) : Bool := Nat.beq (Nat.land (Nat.shiftRight fh (Nat.mod s fm)) 1) 1
 def mid1 (fm fh : Nat) (h : W → W → Bool → Bool → Bool → Bool → Bool → Nat → Nat → Nat → Bool) (a c : W) (oa oc ka kc kb : Bool) (s x y : Nat) : Bool :=
-  Bool.rec (motive := fun _ => Bool) (h a c oa oc ka kc kb s x y) false (forb fm fh s)
+  Bool.rec (motive:=fun _=> Bool) (h a c oa oc ka kc kb s x y) false (forb fm fh s)
 def node1 (f : Nat → List W → Bool) (d : Bool) (l m g np fm fh e n z : Nat) (v : List W) (κ : Nat → Bool) (κ2 : Nat → Nat → Bool) (go : (X → X → Bool) → List X → Bool) : Bool :=
   nodeH (mid1 fm fh (mid f m g np e (Nat.pred n) z v)) d l e n v κ κ2 go
 def mv (F : Nat → Nat → Nat → List W → Bool) (l m g np k t z : Nat) (v : List W) (κ : Nat → Bool) (κ2 : Nat → Nat → Bool) : Bool :=
-  (fun n => Bool.rec (motive := fun _ => Bool) (prd t (fun s => nots (fun q z v => cv (pos s) l v (tsn (pos s) l (Nat.sub k s) v (fun κ κ2 =>
-      Bool.rec (motive := fun _ => Bool) (prd s (fun s => nots (fun q' z v => cv (pos s) l v (tsn (pos s) l (Nat.sub (Nat.sub k 1) s) v (fun κ κ2 =>
+  (fun n => Bool.rec (motive:=fun _=> Bool) (prd t (fun s => nots (fun q z v => cv (pos s) l v (tsn (pos s) l (Nat.sub k s) v (fun κ κ2 =>
+      Bool.rec (motive:=fun _=> Bool) (prd s (fun s => nots (fun q' z v => cv (pos s) l v (tsn (pos s) l (Nat.sub (Nat.sub k 1) s) v (fun κ κ2 =>
           st (Nat.sub k 3) fun k3 => node (F k3 s) (pos s) l m g np (Nat.sub (Nat.sub k 2) s) (len v) z v κ κ2 (pairsQ q q'))))
           m g (Nat.sub (Nat.sub k 1) s) (len v) z (Nat.succ q) v v)) true
         (st (Nat.sub k 2) fun k2 => node (F k2 s) (pos s) l m g np (Nat.sub (Nat.sub k 1) s) (len v) z v κ κ2 (pairsP q)))))
       m g (Nat.sub k s) n z 0 v v)) true
     (st (Nat.sub k 1) fun k1 => node (F k1 t) (pos t) l m g np (Nat.sub k t) n z v κ κ2 pairsN)) (len v)
 def look (l m g np : Nat) (fuel : Nat) : Nat → Nat → Nat → List W → Bool :=
-  Nat.rec (motive := fun _ => Nat → Nat → Nat → List W → Bool) (fun _ _ _ _ => true)
-    (fun _ ih k t z v => Bool.rec (motive := fun _ => Bool) (tsn (pos t) l (Nat.sub (Nat.succ k) t) v (fun κ κ2 => mv ih l m g np k t z v κ κ2)) true (Nat.ble (len v) 1)) fuel
+  Nat.rec (motive:=fun _=> Nat → Nat → Nat → List W → Bool) (fun _ _ _ _ => true)
+    (fun _ ih k t z v => Bool.rec (motive:=fun _=> Bool) (tsn (pos t) l (Nat.sub (Nat.succ k) t) v (fun κ κ2 => mv ih l m g np k t z v κ κ2)) true (Nat.ble (len v) 1)) fuel
 def look1 (l m g np fm fh K : Nat) (fuel : Nat) : Nat → Nat → Nat → List W → Bool :=
-  Nat.rec (motive := fun _ => Nat → Nat → Nat → List W → Bool) (fun _ _ _ _ => true)
-    (fun _ ih k t z v => Bool.rec (motive := fun _ => Bool) (tsn (pos t) l (Nat.sub (Nat.succ k) t) v (fun κ κ2 =>
-      Bool.rec (motive := fun _ => Bool) (mv (look l m g np k) l m g np k t z v κ κ2) true
+  Nat.rec (motive:=fun _=> Nat → Nat → Nat → List W → Bool) (fun _ _ _ _ => true)
+    (fun _ ih k t z v => Bool.rec (motive:=fun _=> Bool) (tsn (pos t) l (Nat.sub (Nat.succ k) t) v (fun κ κ2 =>
+      Bool.rec (motive:=fun _=> Bool) (mv (look l m g np k) l m g np k t z v κ κ2) true
         (st (Nat.sub k 1) fun k1 => node1 (ih k1 t) (pos t) l m g np fm fh (Nat.sub k t) (len v) z v κ κ2 pairsS))) true (Nat.ble (len v) 1)) fuel
 end hz8
 section hz9
@@ -412,7 +424,7 @@ def npOf (P : List ℕ) : ℕ := laneL (WL NN) ((List.range 16).map (fun j => P.
 end hz9
 noncomputable section hz10
 variable {R : ℕ → ℕ}
-def pL (L : List ℕ) : ℕ := List.rec (motive := fun _ => ℕ) 0 (fun d _ ih => Nat.add (Nat.shiftLeft ih 5) d) L
+def pL (L : List ℕ) : ℕ := List.rec (motive:=fun _=> ℕ) 0 (fun d _ ih => Nat.add (Nat.shiftLeft ih 5) d) L
 end hz10
 section hz11
 variable {R : ℕ → ℕ}
@@ -420,26 +432,26 @@ def bit01 (b : Bool) : ℕ := bif b then 1 else 0
 end hz11
 noncomputable section hz12
 variable {R : ℕ → ℕ}
-def fl0 (s : ℕ) (P : List ℕ) : ℕ := List.rec (motive := fun _ => ℕ) 0 (fun n _ ih => Nat.add (Nat.shiftLeft ih 5) (bit01 (Nat.beq (Nat.land s n) 0))) P
-def fl1 (s : ℕ) (P : List ℕ) : ℕ := List.rec (motive := fun _ => ℕ) 0 (fun n _ ih => Nat.add (Nat.shiftLeft ih 5) (bit01 (Nat.beq (Nat.land s n) n))) P
+def fl0 (s : ℕ) (P : List ℕ) : ℕ := List.rec (motive:=fun _=> ℕ) 0 (fun n _ ih => Nat.add (Nat.shiftLeft ih 5) (bit01 (Nat.beq (Nat.land s n) 0))) P
+def fl1 (s : ℕ) (P : List ℕ) : ℕ := List.rec (motive:=fun _=> ℕ) 0 (fun n _ ih => Nat.add (Nat.shiftLeft ih 5) (bit01 (Nat.beq (Nat.land s n) n))) P
 def mkW (P : List ℕ) (s : ℕ) : W := ⟨s, fl0 s P, fl1 s P, Nat.lor (fl0 s P) (fl1 s P), 3, 0⟩
-def addN (o : ℕ) (v : List ℕ) : List ℕ := List.rec (motive := fun _ => List ℕ) [o]
-  (fun w t ih => Bool.rec (motive := fun _ => List ℕ) (w :: ih) (Bool.rec (motive := fun _ => List ℕ) (o :: w :: t) (w :: t) (Nat.beq o w)) (Nat.ble w o)) v
-def avl (m : ℕ) (L : List ℕ) : List ℕ := List.rec (motive := fun _ => List ℕ) []
-  (fun w _ ih => Bool.rec (motive := fun _ => List ℕ) (Bool.rec (motive := fun _ => List ℕ) (addN (Nat.land w m) ih) ih (Nat.beq (Nat.land w m) m)) ih (Nat.beq (Nat.land w m) 0)) L
-def mkA (P : List ℕ) (L : List ℕ) : (List W → Bool) → Bool := List.rec (motive := fun _ => (List W → Bool) → Bool) (fun h => h [])
+def addN (o : ℕ) (v : List ℕ) : List ℕ := List.rec (motive:=fun _=> List ℕ) [o]
+  (fun w t ih => Bool.rec (motive:=fun _=> List ℕ) (w :: ih) (Bool.rec (motive:=fun _=> List ℕ) (o :: w :: t) (w :: t) (Nat.beq o w)) (Nat.ble w o)) v
+def avl (m : ℕ) (L : List ℕ) : List ℕ := List.rec (motive:=fun _=> List ℕ) []
+  (fun w _ ih => Bool.rec (motive:=fun _=> List ℕ) (Bool.rec (motive:=fun _=> List ℕ) (addN (Nat.land w m) ih) ih (Nat.beq (Nat.land w m) m)) ih (Nat.beq (Nat.land w m) 0)) L
+def mkA (P : List ℕ) (L : List ℕ) : (List W → Bool) → Bool := List.rec (motive:=fun _=> (List W → Bool) → Bool) (fun h => h [])
   (fun s _ ih h => st s fun s => st (fl0 s P) fun a => st (fl1 s P) fun b => st (Nat.lor a b) fun c => ih fun r => h (⟨s, a, b, c, 3, 0⟩ :: r)) L
-def frcP (L : List ℕ) : (List ℕ → Bool) → Bool := List.rec (motive := fun _ => (List ℕ → Bool) → Bool) (fun h => h [])
+def frcP (L : List ℕ) : (List ℕ → Bool) → Bool := List.rec (motive:=fun _=> (List ℕ → Bool) → Bool) (fun h => h [])
   (fun s _ ih h => st s fun s => ih fun r => h (s :: r)) L
-def anySub (d : Bool) (l : ℕ) (v : List W) : ℕ → (List W → Bool) → Bool := List.rec (motive := fun _ => ℕ → (List W → Bool) → Bool) (fun _ h => h [])
-  (fun w t ih c h => Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (ih c h) (Nat.beq (Nat.lor c (cov d l t)) l)) true
+def anySub (d : Bool) (l : ℕ) (v : List W) : ℕ → (List W → Bool) → Bool := List.rec (motive:=fun _=> ℕ → (List W → Bool) → Bool) (fun _ h => h [])
+  (fun w t ih c h => Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) false (ih c h) (Nat.beq (Nat.lor c (cov d l t)) l)) true
     (st (Nat.lor c (sp d l w.s)) fun c => ih c fun r => h (w :: r))) v
-def sumc (v : List W) : ℕ := List.rec (motive := fun _ => ℕ) 0 (fun w _ ih => Nat.add w.c ih) v
+def sumc (v : List W) : ℕ := List.rec (motive:=fun _=> ℕ) 0 (fun w _ ih => Nat.add w.c ih) v
 def MM : ℕ := 214
 def hb (H x : ℕ) : Bool := Nat.beq (Nat.land (Nat.shiftRight H (Nat.mod x MM)) 1) 1
 def fbit (fm fh s : ℕ) : Bool := Nat.beq (Nat.land (Nat.shiftRight fh (Nat.mod s fm)) 1) 1
-def hasP (p : ℕ) (v : List W) : Bool := Bool.rec (motive := fun _ => Bool)
-  (List.rec (motive := fun _ => Bool) false (fun w _ ih => Bool.rec (motive := fun _ => Bool) ih true (Nat.beq w.s p)) v) true (Nat.beq p 0)
+def hasP (p : ℕ) (v : List W) : Bool := Bool.rec (motive:=fun _=> Bool)
+  (List.rec (motive:=fun _=> Bool) false (fun w _ ih => Bool.rec (motive:=fun _=> Bool) ih true (Nat.beq w.s p)) v) true (Nat.beq p 0)
 end hz12
 section hz13
 variable {R : ℕ → ℕ}
@@ -456,15 +468,15 @@ noncomputable def RZ (E : List (Bool × ℕ × ℕ)) (Z : ℕ) : ℕ → ℕ := 
 end hz13
 noncomputable section hz14
 variable {R : ℕ → ℕ}
-def frcQ (Q : List (ℕ × ℕ)) : (List (ℕ × ℕ) → Bool) → Bool := List.rec (motive := fun _ => (List (ℕ × ℕ) → Bool) → Bool) (fun h => h [])
+def frcQ (Q : List (ℕ × ℕ)) : (List (ℕ × ℕ) → Bool) → Bool := List.rec (motive:=fun _=> (List (ℕ × ℕ) → Bool) → Bool) (fun h => h [])
   (fun x _ ih h => st x.1 fun c => st x.2 fun L => ih fun r => h ((c, L) :: r)) Q
-def lnW (v : List W) : ℕ := List.rec (motive := fun _ => ℕ) 0 (fun _ _ ih => Nat.succ ih) v
-def anyN (h : ℕ → Bool) (L : List ℕ) : Bool := List.rec (motive := fun _ => Bool) false (fun a _ ih => Bool.rec (motive := fun _ => Bool) ih true (h a)) L
+def lnW (v : List W) : ℕ := List.rec (motive:=fun _=> ℕ) 0 (fun _ _ ih => Nat.succ ih) v
+def anyN (h : ℕ → Bool) (L : List ℕ) : Bool := List.rec (motive:=fun _=> Bool) false (fun a _ ih => Bool.rec (motive:=fun _=> Bool) ih true (h a)) L
 def pre (E : List (Bool × ℕ × ℕ)) (Q : List (ℕ × ℕ)) (Z K : ℕ) (h : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → List W → Bool) : Bool :=
   frcQ Q fun Q => frcP (PZ Q) fun P => st (lz Z) fun l => st (mz Z) fun m => st (npOf P) fun np => st (pL (Q.map fun _ => 16)) fun g => st (pL (Q.map fun e => 16 + (K - e.2))) fun B =>
     st (pwr E Z) fun p => frcP (avl m (rawL E)) fun sg => mkA P sg fun v => h l m np g B p v
 def startG (f : ℕ → List W → Bool) (g B K t p : ℕ) (v : List W) : Bool :=
-  Bool.rec (motive := fun _ => Bool) false (Bool.rec (motive := fun _ => Bool) false
+  Bool.rec (motive:=fun _=> Bool) false (Bool.rec (motive:=fun _=> Bool) false
     (child f g false (fun h => h v) (Nat.sub B (sumc v)))
     (Nat.ble (lnW v) (Nat.sub (Nat.succ K) t))) (hasP p v)
 def chkG (top : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → List W → Bool) (E : List (Bool × ℕ × ℕ)) (Q : List (ℕ × ℕ)) (fb : ℕ × ℕ) (Z K t H ph : ℕ) : Bool :=
@@ -481,23 +493,30 @@ def TopOk (top : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ →
       (∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit fm fh (op d x y) = true → op d x y ∈ Fs) →
       (∀ s ∈ Fs, ∀ q < k', ¬ Sol Z0 m T q (C m (insert s ({x | R x ≠ 0} ∪ (S : Set ℕ))))) → False
 def MW (R : ℕ → ℕ) (m T k : ℕ) (S : Finset ℕ) : Prop := ∀ q < k, ¬ Sol Z0 m T q (C m ({x | R x ≠ 0} ∪ (S : Set ℕ)))
-def MF (R : ℕ → ℕ) (m T k : ℕ) (Fs : Set ℕ) (S : Finset ℕ) : Prop := ∀ s ∈ Fs, ∀ q < k, ¬ Sol Z0 m T q (C m (insert s ({x | R x ≠ 0} ∪ (S : Set ℕ))))
+def Bound (m T t k : ℕ) (A : Set ℕ) : Prop :=
+  ∀ q < k, ∀ V : Finset ℕ, (V : Set ℕ) ⊆ A → ¬Live Z0 m T q t V
+
+
+def MF (R : ℕ → ℕ) (m T k t : ℕ) (Fs : Set ℕ) (S : Finset ℕ) : Prop :=
+  ∀ z ∈ Fs, Bound m T t k (C m (insert z ({x | R x ≠ 0} ∪ (S : Set ℕ))))
+
+
 end hz15
 noncomputable section hz16
 variable {R : ℕ → ℕ}
 def pairsC (H : ℕ) (h : X → X → Bool) (xs : List X) : Bool :=
-  List.rec (motive := fun _ => Bool) false (fun a r ih => Bool.rec (motive := fun _ => Bool) ih true
-    (scan (fun x => Bool.rec (motive := fun _ => Bool) false (h a x) (hb H (Nat.add a.s x.s))) r)) xs
+  List.rec (motive:=fun _=> Bool) false (fun a r ih => Bool.rec (motive:=fun _=> Bool) ih true
+    (scan (fun x => Bool.rec (motive:=fun _=> Bool) false (h a x) (hb H (Nat.add a.s x.s))) r)) xs
 def topC (l m g np fm fh K H ph k t z : ℕ) (v : List W) : Bool :=
-  Bool.rec (motive := fun _ => Bool) (tsn (pos t) l (Nat.sub (Nat.succ k) t) v (fun κ κ2 =>
-    Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq ph 1)) true
+  Bool.rec (motive:=fun _=> Bool) (tsn (pos t) l (Nat.sub (Nat.succ k) t) v (fun κ κ2 =>
+    Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq ph 1)) true
       (st (Nat.sub k 1) fun k1 => node1 (look1 l m g np fm fh K K k1 t) (pos t) l m g np fm fh (Nat.sub k t) (len v) z v κ κ2 (fun h xs => pairsC H h (fs xs))))) true (Nat.ble (len v) 1)
 end hz16
 section hz17
 variable {R : ℕ → ℕ}
 def P1 (R : ℕ → ℕ) (P : List ℕ) (l m T : ℕ) (Fs : Set ℕ) (f : ℕ → ℕ → ℕ → List W → Bool) : Prop :=
   ∀ (k t z : ℕ) (v : List W) (S : Finset ℕ), f k t z v = false → StOk P T l k z v S → (∀ w ∈ v, w.r = R w.s) →
-    ∀ k' ≤ k, Live Z0 m T k' t S → MW R m T k' S → MF R m T k' Fs S → False
+    ∀ k' ≤ k, Live Z0 m T k' t S → MW R m T k' S → MF R m T k' t Fs S → False
 abbrev TopT := ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → List W → Bool
 noncomputable def okR (top : TopT) (E : List (Bool × ℕ × ℕ)) (Q : List (ℕ × ℕ)) (x : ℕ × ℕ) : Bool :=
   pOk x.1 Q && Nat.ble x.2 15 && (Q.any (fun y => Nat.ble x.2 y.2) || !chkT top E Q (1, 0) x.1 (x.2 - 1) (List.range x.2) FF 1)
@@ -2145,7 +2164,7 @@ lemma un_sum_le {m a e : ℕ} {D D' : ℕ → ℕ} {S S' : Finset ℕ} (hb : Un 
   omega
 noncomputable section core
 end core
-lemma bR (c e t : Bool) : (Bool.rec (motive := fun _ => Bool) e t c : Bool) = bif c then t else e := by cases c <;> rfl
+lemma bR (c e t : Bool) : (Bool.rec (motive:=fun _=> Bool) e t c : Bool) = bif c then t else e := by cases c <;> rfl
 lemma st_eq (n : ℕ) (f : ℕ → Bool) : st n f = f n := by cases n <;> rfl
 lemma nl (a b : ℕ) : Nat.land a b = a &&& b := rfl
 lemma no (a b : ℕ) : Nat.lor a b = a ||| b := rfl
@@ -2258,7 +2277,7 @@ lemma hits_false {f : ℕ} {m : List ℕ} (h : ∀ e ∈ m, hit f e = false) : h
   induction m with
   | nil => rfl
   | cons e m ih =>
-    change (Bool.rec (motive := fun _ => Bool) (hits f m) true (hit f e) : Bool) = false
+    change (Bool.rec (motive:=fun _=> Bool) (hits f m) true (hit f e) : Bool) = false
     rw [bR, h e (by simp), ih (fun x hx => h x (by simp [hx]))]; rfl
 lemma rect_false {d : Bool} {l o : ℕ} {v : List W} : ∀ {m : List ℕ}, v.Pairwise (fun a b => hit (flag d l o b) (flag d l o a) = false) →
     (∀ w ∈ v, ∀ e ∈ m, hit (flag d l o w) e = false) → rect d l o v m = false := by
@@ -2266,7 +2285,7 @@ lemma rect_false {d : Bool} {l o : ℕ} {v : List W} : ∀ {m : List ℕ}, v.Pai
   | nil => intros; rfl
   | cons w v ih =>
     intro m hp hm
-    change (Bool.rec (motive := fun _ => Bool) (rect d l o v (flag d l o w :: m)) true (hits (flag d l o w) m) : Bool) = false
+    change (Bool.rec (motive:=fun _=> Bool) (rect d l o v (flag d l o w :: m)) true (hits (flag d l o w) m) : Bool) = false
     rw [List.pairwise_cons] at hp
     rw [bR, hits_false (hm w (by simp)), ih hp.2]; · rfl
     intro w' hw' e he
@@ -2585,8 +2604,10 @@ lemma zflG_spec {N np q nc : ℕ} {f : ℕ → ℕ} (hf : ∀ j < 16, f j < 2 ^ 
   have := h.1.2
   by_contra hne
   simp [b, hne] at this
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
 lemma zfl_spec {np q nc : ℕ} {f : ℕ → ℕ} (hf : ∀ j < 16, f j < 2 ^ (2 * NN)) (hnp : np = lane (WL NN) 16 f) (hw : 86 ≤ 2 * NN + 1) {j : ℕ}
-    (h : (zfl np q nc).testBit (5 * j) = true) : j < 16 ∧ q &&& f j = 0 ∧ nc.testBit (5 * j) = true := zflG_spec hf hnp hw h
+    (h : (zfl np q nc).testBit (5 * j) = true) : j < 16 ∧ q &&& f j = 0 ∧ nc.testBit (5 * j) = true := zflG_spec hf hnp hw (by rwa [← zflRaw])
 lemma cnt_card {P : List ℕ} {v : List W} {S : Finset ℕ} (hr : Rep v S) (hw : ∀ w ∈ v, WOk P w) {j : ℕ} (hj : j < P.length) :
     cnt v j ≤ (S.filter (Cst (P.getD j 0))).card := by
   have e : cnt v j = (v.filter (fun w => w.c.testBit (5 * j))).length := by
@@ -2635,7 +2656,7 @@ lemma rm_eq (x y : ℕ) (v : List W) : ∀ h, rm x y v h = h (v.filter (fun w =>
   | nil => intro h; rfl
   | cons w v ih =>
     intro h
-    change (Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) (rm x y v (fun r => h (w :: r)))
+    change (Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) (rm x y v (fun r => h (w :: r)))
       (rm x y v h) (Nat.beq w.s y)) (rm x y v h) (Nat.beq w.s x) : Bool) = _
     rw [bR, bR, ih, ih, List.filter_cons]
     cases Nat.beq w.s x <;> cases Nat.beq w.s y <;> simp
@@ -2646,8 +2667,8 @@ lemma ins_spec (o : W) (v : List W) (hv : ∀ w ∈ v, w.s ≠ o.s) : ∃ r : Li
     obtain ⟨r, hp, hr⟩ := ih fun w' hw' => hv w' (by simp [hw'])
     have e : ∀ h, ins o (w :: v) h = bif Nat.ble w.s o.s then (bif Nat.beq o.s w.s then false else h (o :: w :: v)) else ins o v (fun r => h (w :: r)) := by
       intro h
-      change (Bool.rec (motive := fun _ => Bool) (ins o v (fun r => h (w :: r)))
-        (Bool.rec (motive := fun _ => Bool) (h (o :: w :: v)) false (Nat.beq o.s w.s)) (Nat.ble w.s o.s) : Bool) = _
+      change (Bool.rec (motive:=fun _=> Bool) (ins o v (fun r => h (w :: r)))
+        (Bool.rec (motive:=fun _=> Bool) (h (o :: w :: v)) false (Nat.beq o.s w.s)) (Nat.ble w.s o.s) : Bool) = _
       rw [bR, bR]
     cases hb : Nat.ble w.s o.s with
     | true =>
@@ -2890,10 +2911,10 @@ lemma rmk_eq (sa : ℕ) (ka : Bool) (da sc : ℕ) (kc : Bool) (dc : ℕ) (v : Li
   | cons w v ih =>
     intro h
     obtain ⟨ws, wa, wb, wc, wr, wd'⟩ := w
-    change (Bool.rec (motive := fun _ => Bool)
-      (Bool.rec (motive := fun _ => Bool) (rmk sa ka da sc kc dc v (fun r => h (⟨ws, wa, wb, wc, wr, wd'⟩ :: r))) (Bool.rec (motive := fun _ => Bool) (rmk sa ka da sc kc dc v h)
+    change (Bool.rec (motive:=fun _=> Bool)
+      (Bool.rec (motive:=fun _=> Bool) (rmk sa ka da sc kc dc v (fun r => h (⟨ws, wa, wb, wc, wr, wd'⟩ :: r))) (Bool.rec (motive:=fun _=> Bool) (rmk sa ka da sc kc dc v h)
         (st dc fun d => rmk sa ka da sc kc dc v (fun r => h (⟨ws, wa, wb, wc, wr, d⟩ :: r))) kc) (Nat.beq ws sc))
-      (Bool.rec (motive := fun _ => Bool) (rmk sa ka da sc kc dc v h) (st da fun d => rmk sa ka da sc kc dc v (fun r => h (⟨ws, wa, wb, wc, wr, d⟩ :: r))) ka) (Nat.beq ws sa) : Bool) = _
+      (Bool.rec (motive:=fun _=> Bool) (rmk sa ka da sc kc dc v h) (st da fun d => rmk sa ka da sc kc dc v (fun r => h (⟨ws, wa, wb, wc, wr, d⟩ :: r))) ka) (Nat.beq ws sa) : Bool) = _
     simp only [bR, st_eq, ih]
     rw [List.filter_cons]
     unfold kp
@@ -3315,7 +3336,7 @@ lemma nc_spec {P : List ℕ} {a c o : W} {g w : ℕ} (hg : g = pk P.length (fun 
   intro j _
   have := fl_le a j; have := fl_le c j; have := fl_le o j; omega
 lemma zfl_isPk {n np q nc : ℕ} (h : isPk n nc) : isPk n (zfl np q nc) := by
-  unfold zfl zflG
+  unfold zfl
   change isPk n (_ &&& nc)
   rw [Nat.and_comm]; exact isPk_and h
 section sound
@@ -3362,7 +3383,7 @@ lemma gate_sound {f : ℕ → List W → Bool} {e n z t k k' : ℕ} {v : List W}
   have hEA : isPk P.length eA := by rw [heA]; exact zfl_isPk hncP
   have zle : ∀ {q x j : ℕ}, fb (zfl np q x) j ≤ fb x j := by
     intro q x j
-    unfold fb zfl zflG
+    unfold fb zfl
     change ((_ &&& x).testBit (5 * j)).toNat ≤ _
     rw [Nat.testBit_and]
     cases x.testBit (5 * j) <;> simp
@@ -3675,11 +3696,11 @@ lemma nots_false {f : ℕ → ℕ → List W → Bool} {m g e n z q : ℕ} {v r 
   induction r with
   | nil => simp at ha
   | cons w r ih =>
-    change (Bool.rec (motive := fun _ => Bool) (nots f m g e n z q v r) true (Bool.rec (motive := fun _ => Bool)
+    change (Bool.rec (motive:=fun _=> Bool) (nots f m g e n z q v r) true (Bool.rec (motive:=fun _=> Bool)
       (st (Nat.xor w.s m) fun s => st (Nat.sub z w.c) fun z => (fun u =>
-      Bool.rec (motive := fun _ => Bool)
-        (Bool.rec (motive := fun _ => Bool) false (st u fun d1 => ins ⟨s, w.b, w.a, w.c, 0, d1⟩ v (fun v => child (f s) g false (rmk w.s true 0 w.s true 0 v) (Nat.sub z w.c))) (Nat.ble (Nat.succ n) e)) true
-        (Bool.rec (motive := fun _ => Bool) false (st (Nat.add u w.d) fun d1 => ins ⟨s, w.b, w.a, w.c, 0, d1⟩ v (fun v => child (f s) g false (rmk w.s false 0 w.s false 0 v) z)) (Nat.ble n e)))
+      Bool.rec (motive:=fun _=> Bool)
+        (Bool.rec (motive:=fun _=> Bool) false (st u fun d1 => ins ⟨s, w.b, w.a, w.c, 0, d1⟩ v (fun v => child (f s) g false (rmk w.s true 0 w.s true 0 v) (Nat.sub z w.c))) (Nat.ble (Nat.succ n) e)) true
+        (Bool.rec (motive:=fun _=> Bool) false (st (Nat.add u w.d) fun d1 => ins ⟨s, w.b, w.a, w.c, 0, d1⟩ v (fun v => child (f s) g false (rmk w.s false 0 w.s false 0 v) z)) (Nat.ble n e)))
       (Nat.sub (Nat.shiftRight g 4) w.c)) false (Nat.beq (Nat.succ w.s) q)) : Bool) = false at h
     simp only [bR, st_eq] at h
     have key : ∀ {p q : Bool}, (bif p then true else q) = false → p = false ∧ q = false := fun {p q} h => by cases p <;> simp_all
@@ -3863,6 +3884,8 @@ include hl
 lemma o_lt (ho : ∀ i, o.testBit i = true → l.testBit i = true) : o < 2 ^ NN :=
   lt_of_bits fun i hi => bit_lt AA_lt1 (hl i (ho i hi))
 include ho
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
 lemma U_bit {d : Bool} {v : List W} {i b : ℕ} (hb : b < NN) (h : (Nat.land (pkd d l v) (Nat.mul o RL)).testBit (NN * i + b) = true) :
     i < 12 ∧ ∃ w, Pos v w i ∧ (Nat.land (sp d l w.s) o).testBit b = true := by
   simp only [nl, Nat.testBit_and, Bool.and_eq_true] at h
@@ -4148,8 +4171,8 @@ lemma bfs_ok {e : ℕ} (he : Eb e) {c : ℕ → Bool} (hc : Pc e c) {κ : Bool} 
   | zero => intros; rfl
   | succ fuel ih =>
     intro A B hA hB cA cB
-    change (st (Nat.lor A (nbr e B)) fun a => st (Nat.lor B (nbr e a)) fun b => Bool.rec (motive := fun _ => Bool) true
-      (Bool.rec (motive := fun _ => Bool) (bfs e fuel a b k) (k (Nat.lor a b)) (Nat.beq (Nat.lor A B) (Nat.lor a b))) (Nat.beq (Nat.land a b) 0)) = false
+    change (st (Nat.lor A (nbr e B)) fun a => st (Nat.lor B (nbr e a)) fun b => Bool.rec (motive:=fun _=> Bool) true
+      (Bool.rec (motive:=fun _=> Bool) (bfs e fuel a b k) (k (Nat.lor a b)) (Nat.beq (Nat.lor A B) (Nat.lor a b))) (Nat.beq (Nat.land a b) 0)) = false
     rw [st_eq, st_eq, bR, bR]
     set a := Nat.lor A (nbr e B) with ha
     set b := Nat.lor B (nbr e a) with hb
@@ -4188,7 +4211,7 @@ lemma nonb_ok {e : ℕ} (he : Eb e) {c : ℕ → Bool} (hc : Pc e c) : ∀ fuel 
   | zero => intros; rfl
   | succ fuel ih =>
     intro r
-    change (Bool.rec (motive := fun _ => Bool) (bfs e 12 (Nat.gcd r 2048) 0 (fun c => nonb e fuel (Nat.sub r (Nat.land r c)))) false (Nat.beq r 0)) = false
+    change (Bool.rec (motive:=fun _=> Bool) (bfs e 12 (Nat.gcd r 2048) 0 (fun c => nonb e fuel (Nat.sub r (Nat.land r c)))) false (Nat.beq r 0)) = false
     rw [bR]
     have : bfs e 12 (Nat.gcd r 2048) 0 (fun c => nonb e fuel (Nat.sub r (Nat.land r c))) = false := by
       obtain ⟨j, hj, hg⟩ := (Nat.dvd_prime_pow Nat.prime_two).1 (show Nat.gcd r 2048 ∣ 2 ^ 11 from Nat.gcd_dvd_right r 2048)
@@ -4263,7 +4286,7 @@ lemma gcd_bit {M : ℕ} (h0 : M ≠ 0) (h1 : M < 2 ^ 12) : ∃ k, k < 12 ∧ Nat
   rw [pow_succ] at this
   have : 0 < 2 ^ k := by positivity
   omega
-lemma bRn (c : Bool) (e t : ℕ) : (Bool.rec (motive := fun _ => ℕ) e t c : ℕ) = bif c then t else e := by cases c <;> rfl
+lemma bRn (c : Bool) (e t : ℕ) : (Bool.rec (motive:=fun _=> ℕ) e t c : ℕ) = bif c then t else e := by cases c <;> rfl
 lemma tri_ok {e : ℕ} (he : Eb e) : ∀ fuel r, tri e fuel r = 0 ∨ ∃ x y z, Adj e x y ∧ Adj e x z ∧ Adj e y z ∧ tri e fuel r = 2 ^ x ||| 2 ^ y ||| 2 ^ z := by
   intro fuel
   induction fuel with
@@ -4271,7 +4294,7 @@ lemma tri_ok {e : ℕ} (he : Eb e) : ∀ fuel r, tri e fuel r = 0 ∨ ∃ x y z,
   | succ fuel ih =>
     intro r
     have e0 : tri e (fuel + 1) r = bif Nat.beq r 0 then 0 else tri1 e (Nat.gcd r 2048) (tri e fuel (Nat.sub r (Nat.gcd r 2048))) := by
-      change Bool.rec (motive := fun _ => Nat) (tri1 e (Nat.gcd r 2048) (tri e fuel (Nat.sub r (Nat.gcd r 2048)))) 0 (Nat.beq r 0) = _
+      change Bool.rec (motive:=fun _=> Nat) (tri1 e (Nat.gcd r 2048) (tri e fuel (Nat.sub r (Nat.gcd r 2048)))) 0 (Nat.beq r 0) = _
       rw [bRn]
     rw [e0]
     cases hr : Nat.beq r 0 with
@@ -4701,7 +4724,7 @@ lemma scan_false {p : X → Bool} {xs : List X} (h : scan p xs = false) : ∀ c 
   induction xs with
   | nil => simp
   | cons a r ih =>
-    change (Bool.rec (motive := fun _ => Bool) (scan p r) true (p a) : Bool) = false at h
+    change (Bool.rec (motive:=fun _=> Bool) (scan p r) true (p a) : Bool) = false at h
     rw [bR] at h
     intro c hc
     simp only [List.mem_cons] at hc
@@ -4713,7 +4736,7 @@ lemma pairs_false {h : X → X → Bool} {xs : List X} (hp : pairs h xs = false)
   induction xs with
   | nil => simp
   | cons a r ih =>
-    change (Bool.rec (motive := fun _ => Bool) (pairs h r) true (scan (h a) r) : Bool) = false at hp
+    change (Bool.rec (motive:=fun _=> Bool) (pairs h r) true (scan (h a) r) : Bool) = false at hp
     rw [bR] at hp
     rw [List.pairwise_cons]
     constructor
@@ -4740,7 +4763,7 @@ lemma fr_mem {xs : List X} {a : X} (ha : a ∈ xs) (h : a.w.r = 0) : a ∈ fr xs
   induction xs with
   | nil => simp at ha
   | cons x xs ih =>
-    change a ∈ Bool.rec (motive := fun _ => List X) (fr xs) (x :: fr xs) (Nat.beq x.w.r 0)
+    change a ∈ Bool.rec (motive:=fun _=> List X) (fr xs) (x :: fr xs) (Nat.beq x.w.r 0)
     simp only [List.mem_cons] at ha
     rcases ha with rfl | ha
     · rw [h]; simp
@@ -4751,7 +4774,7 @@ lemma fs_mem {xs : List X} {a : X} (ha : a ∈ xs) (h : a.w.r ≠ 0) : a ∈ fs 
   induction xs with
   | nil => simp at ha
   | cons x xs ih =>
-    change a ∈ Bool.rec (motive := fun _ => List X) (x :: fs xs) (fs xs) (Nat.beq x.w.r 0)
+    change a ∈ Bool.rec (motive:=fun _=> List X) (x :: fs xs) (fs xs) (Nat.beq x.w.r 0)
     simp only [List.mem_cons] at ha
     rcases ha with rfl | ha
     · rw [beq_f h]; simp
@@ -5067,7 +5090,7 @@ theorem look_sound (hR : RR R) : ∀ (fuel k t z : ℕ) (v : List W) (S : Finset
   | zero => intro k t z v S h; simp [look] at h
   | succ fuel ih =>
     intro k t z v S h hs hcod k' hk hm
-    change (Bool.rec (motive := fun _ => Bool) (tsn (pos t) l (k + 1 - t) v (fun κ κ2 => mv (look l m g np fuel) l m g np k t z v κ κ2)) true (Nat.ble (len v) 1) : Bool) = false at h
+    change (Bool.rec (motive:=fun _=> Bool) (tsn (pos t) l (k + 1 - t) v (fun κ κ2 => mv (look l m g np fuel) l m g np k t z v κ κ2)) true (Nat.ble (len v) 1) : Bool) = false at h
     rw [bR, pos_eq, len_eq] at h
     cases h0 : Nat.ble v.length 1 with
     | true => rw [h0] at h; simp at h
@@ -5321,7 +5344,7 @@ lemma anySub_false {d : Bool} {l : ℕ} {v : List W} : ∀ {c : ℕ} {h : List W
   | nil => intro c h _ hh r hr _; rw [List.sublist_nil.1 hr]; exact hh
   | cons w v ih =>
     intro c h hcl hh r hr hcov
-    change (Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (anySub d l v c h) (Nat.beq (Nat.lor c (cov d l v)) l)) true
+    change (Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) false (anySub d l v c h) (Nat.beq (Nat.lor c (cov d l v)) l)) true
       (st (Nat.lor c (sp d l w.s)) fun c => anySub d l v c fun r => h (w :: r)) : Bool) = false at hh
     rw [bR, bR, st_eq] at hh
     cases h1 : anySub d l v (Nat.lor c (sp d l w.s)) (fun r => h (w :: r)) with
@@ -5370,7 +5393,7 @@ lemma anySub_false {d : Bool} {l : ℕ} {v : List W} : ∀ {c : ℕ} {h : List W
             · exact Or.inl (Or.inr h)
             · exact Or.inr h
 lemma addN_cons (o w : ℕ) (t : List ℕ) : addN o (w :: t) = bif Nat.ble w o then (bif Nat.beq o w then w :: t else o :: w :: t) else w :: addN o t := by
-  change Bool.rec (motive := fun _ => List ℕ) (w :: addN o t) (Bool.rec (motive := fun _ => List ℕ) (o :: w :: t) (w :: t) (Nat.beq o w)) (Nat.ble w o) = _
+  change Bool.rec (motive:=fun _=> List ℕ) (w :: addN o t) (Bool.rec (motive:=fun _=> List ℕ) (o :: w :: t) (w :: t) (Nat.beq o w)) (Nat.ble w o) = _
   cases Nat.ble w o <;> cases Nat.beq o w <;> rfl
 lemma addN_spec {o : ℕ} {v : List ℕ} (hv : Srt v) : Srt (addN o v) ∧ ∀ w, w ∈ addN o v ↔ w = o ∨ w ∈ v := by
   induction v with
@@ -5412,7 +5435,7 @@ lemma avl_spec (m : ℕ) (L : List ℕ) : Srt (avl m L) ∧ ∀ w, w ∈ avl m L
   | cons y L ih =>
     obtain ⟨i1, i2⟩ := ih
     have e : avl m (y :: L) = bif Nat.beq (Nat.land y m) 0 then avl m L else bif Nat.beq (Nat.land y m) m then avl m L else addN (Nat.land y m) (avl m L) := by
-      change Bool.rec (motive := fun _ => List ℕ) (Bool.rec (motive := fun _ => List ℕ) (addN (Nat.land y m) (avl m L)) (avl m L) (Nat.beq (Nat.land y m) m)) (avl m L) (Nat.beq (Nat.land y m) 0) = _
+      change Bool.rec (motive:=fun _=> List ℕ) (Bool.rec (motive:=fun _=> List ℕ) (addN (Nat.land y m) (avl m L)) (avl m L) (Nat.beq (Nat.land y m) m)) (avl m L) (Nat.beq (Nat.land y m) 0) = _
       cases Nat.beq (Nat.land y m) 0 <;> cases Nat.beq (Nat.land y m) m <;> rfl
     rw [e]
     cases h1 : Nat.beq (Nat.land y m) 0 with
@@ -5506,11 +5529,11 @@ lemma hasP_ok {p : ℕ} {v : List W} (h : p = 0 ∨ ∃ w ∈ v, w.s = p) : hasP
   rw [bR]
   rcases h with rfl | ⟨w, hw, rfl⟩
   · rfl
-  · have : (List.rec (motive := fun _ => Bool) false (fun w' _ ih => Bool.rec (motive := fun _ => Bool) ih true (Nat.beq w'.s w.s)) v : Bool) = true := by
+  · have : (List.rec (motive:=fun _=> Bool) false (fun w' _ ih => Bool.rec (motive:=fun _=> Bool) ih true (Nat.beq w'.s w.s)) v : Bool) = true := by
       induction v with
       | nil => simp at hw
       | cons x v ih =>
-        change (Bool.rec (motive := fun _ => Bool) (List.rec (motive := fun _ => Bool) false (fun w' _ ih => Bool.rec (motive := fun _ => Bool) ih true (Nat.beq w'.s w.s)) v : Bool) true (Nat.beq x.s w.s) : Bool) = true
+        change (Bool.rec (motive:=fun _=> Bool) (List.rec (motive:=fun _=> Bool) false (fun w' _ ih => Bool.rec (motive:=fun _=> Bool) ih true (Nat.beq w'.s w.s)) v : Bool) true (Nat.beq x.s w.s) : Bool) = true
         rw [bR]
         simp only [List.mem_cons] at hw
         rcases hw with rfl | hw
@@ -5534,7 +5557,7 @@ lemma anyN_false {h : ℕ → Bool} {L : List ℕ} (hh : anyN h L = false) : ∀
   induction L with
   | nil => simp
   | cons a L ih =>
-    change (Bool.rec (motive := fun _ => Bool) (anyN h L) true (h a) : Bool) = false at hh
+    change (Bool.rec (motive:=fun _=> Bool) (anyN h L) true (h a) : Bool) = false at hh
     rw [bR] at hh
     intro t ht
     cases ha : h a with
@@ -5849,27 +5872,56 @@ lemma step_sub {m : ℕ} {A : Set ℕ} {S S1 : Finset ℕ} {g : ℕ} (h : S1 ⊆
 lemma MW.bi {m T k a b : ℕ} {d : Bool} {S S1 : Finset ℕ} (h : MW R m T (k + 1) S) (hb : Bi Z0 d a b S S1) : MW R m T k S1 := by
   intro q hq hs
   exact h (q + 1) (by omega) (.bi (d := d) (a := a) (b := b) (Or.inl (Or.inr hb.sub.1)) (Or.inl (Or.inr hb.sub.2.1)) (al0 _ _ _) (hs.mono le_rfl (step_sub hb.sub.2.2)))
-lemma MF.bi {m T k a b : ℕ} {Fs : Set ℕ} {d : Bool} {S S1 : Finset ℕ} (h : MF R m T (k + 1) Fs S) (hb : Bi Z0 d a b S S1) : MF R m T k Fs S1 := by
-  intro s hsF q hq hs
-  refine h s hsF (q + 1) (by omega) (.bi (d := d) (a := a) (b := b) (Or.inl (Or.inr (Or.inr hb.sub.1))) (Or.inl (Or.inr (Or.inr hb.sub.2.1))) (al0 _ _ _) (hs.mono le_rfl ?_))
-  rw [← Set.insert_union, ← Set.insert_union]
-  exact step_sub hb.sub.2.2
-lemma MF.gate {m T k t a b : ℕ} {Fs : Set ℕ} {d : Bool} {S S1 : Finset ℕ} (h : MF R m T (k + 1) Fs S) (hb : Bi Z0 d a b S S1) (hl : Live Z0 m T k t S1)
+theorem Bound.push {m T t k a b : ℕ} {d : Bool} {A : Set ℕ}
+    (h : Bound m T t (k+1) A) (ha : a ∈ A) (hb : b ∈ A) :
+    Bound m T t k (insert (op d a b) A) := by
+  intro q hq V sub hl
+  by_cases used : op d a b ∈ V
+  · by_cases eq : a=b
+    · subst b
+      rw [op_self,Set.insert_eq_of_mem ha] at sub
+      exact h q (by omega) V sub hl
+    · refine h (q+1) (by omega) (insert a (insert b (V.erase (op d a b)))) ?_ (.bi (d:=d) eq (al0 _ _ _) ?_)
+      · intro x hx
+        simp only [Finset.mem_coe, Finset.mem_insert, Finset.mem_erase] at hx
+        rcases hx with rfl|rfl|⟨hne, hx⟩
+        · exact ha
+        · exact hb
+        · exact (sub hx).resolve_left hne
+      · rwa [Finset.insert_erase used]
+  · apply h q (by omega) V _ hl
+    intro x hx
+    exact (sub hx).resolve_left (fun e => used (e ▸ hx))
+
+
+theorem MF.bi {R : ℕ → ℕ} {m T k t a b : ℕ} {Fs : Set ℕ} {d : Bool} {S S1 : Finset ℕ}
+    (h : MF R m T (k+1) t Fs S) (hb : Bi Z0 d a b S S1) : MF R m T k t Fs S1 := by
+  intro z hz q hq V hv hl
+  apply (h z hz).push (d:=d) (a:=a) (b:=b) (Or.inl (Or.inr (Or.inr hb.sub.1)))
+    (Or.inl (Or.inr (Or.inr hb.sub.2.1))) q hq V _ hl
+  have sub : C m (insert z ({x | R x ≠ 0} ∪ (S1 : Set ℕ))) ⊆
+      insert (op d a b) (C m (insert z ({x | R x ≠ 0} ∪ (S : Set ℕ)))) := by
+    rw [← Set.insert_union, ← Set.insert_union]
+    exact step_sub hb.sub.2.2
+  exact hv.trans sub
+
+theorem MF.gate {R : ℕ → ℕ} {m T k t a b : ℕ} {Fs : Set ℕ} {d : Bool} {S S1 : Finset ℕ}
+    (h : MF R m T (k+1) t Fs S) (hb : Bi Z0 d a b S S1) (hl : Live Z0 m T k t S1)
     (hg : op d a b ∈ Fs) : False := by
-  refine h _ hg k (by omega) (hl.sol.mono le_rfl fun x hx => ?_)
-  have hx' := hb.sub.2.2 hx
-  simp only [Finset.mem_insert] at hx'
-  rcases hx' with rfl | hx'
+  refine h _ hg k (by omega) S1 ?_ hl
+  intro x hx
+  rcases Finset.mem_insert.mp (hb.sub.2.2 hx) with rfl|old
   · exact Or.inl (Or.inl rfl)
-  · exact Or.inl (Or.inr (Or.inr hx'))
+  · exact Or.inl (Or.inr (Or.inr old))
+
 theorem phase_step (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {P : List ℕ} {m T l k k' t : ℕ} {f : ℕ → List W → Bool} {v : List W} {S : Finset ℕ} {fm fh : ℕ} {Fs : Set ℕ}
-    (hrep : Rep v S) (hcod : ∀ w ∈ v, w.r = R w.s) (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' S) (hFb : MF R m T k' Fs S)
+    (hrep : Rep v S) (hcod : ∀ w ∈ v, w.r = R w.s) (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' S) (hFb : MF R m T k' t Fs S)
     (hfb : ∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit fm fh (op d x y) = true → op d x y ∈ Fs)
     (hA : ¬ Min R m T k' t S)
     (hB : ∀ (d : Bool) (a c : W) (S1 : Finset ℕ) (k0 : ℕ), a ∈ v → c ∈ v → a.s ≠ c.s → a.r ≠ 0 → c.r ≠ 0 → k' = k0 + 1 → Bi Z0 d a.s c.s S S1 → Live Z0 m T k0 t S1 →
       fbit fm fh (op d a.s c.s) = false → ∃ z' r, f z' r = false ∧ StOk P T l (k - 1) z' r S1 ∧ ∀ w ∈ r, (w.s = op d a.s c.s ∧ w.r = 0) ∨ ∃ w' ∈ v, w'.s = w.s ∧ w'.r = w.r)
     (hF : ∀ (z' : ℕ) (r : List W) (S1 : Finset ℕ), f z' r = false → StOk P T l (k - 1) z' r S1 → (∀ w ∈ r, w.r = R w.s) → ∀ k0 ≤ k - 1, Live Z0 m T k0 t S1 →
-      MW R m T k0 S1 → MF R m T k0 Fs S1 → False) : False := by
+      MW R m T k0 S1 → MF R m T k0 t Fs S1 → False) : False := by
   rcases front hR2 hl hmW with hlR | ⟨k0, d, a, b, S1, rfl, ha, hb', hb, hl1⟩
   · exact hA ⟨hlR, (hmW.min hl).2⟩
   · obtain ⟨wa, hwa, rfl⟩ := hrep.mem.1 hb.sub.1
@@ -5898,15 +5950,15 @@ lemma pairsC_false {H : ℕ} {h : X → X → Bool} {xs : List X} (hp : pairsC H
   induction xs with
   | nil => simp
   | cons a r ih =>
-    change (Bool.rec (motive := fun _ => Bool) (pairsC H h r) true
-      (scan (fun x => Bool.rec (motive := fun _ => Bool) false (h a x) (hb H (Nat.add a.s x.s))) r) : Bool) = false at hp
+    change (Bool.rec (motive:=fun _=> Bool) (pairsC H h r) true
+      (scan (fun x => Bool.rec (motive:=fun _=> Bool) false (h a x) (hb H (Nat.add a.s x.s))) r) : Bool) = false at hp
     rw [bR] at hp
     rw [List.pairwise_cons]
     constructor
     · intro b hbm hi
-      have h1 : scan (fun x => Bool.rec (motive := fun _ => Bool) false (h a x) (hb H (Nat.add a.s x.s))) r = false := by
+      have h1 : scan (fun x => Bool.rec (motive:=fun _=> Bool) false (h a x) (hb H (Nat.add a.s x.s))) r = false := by
         revert hp
-        cases scan (fun x => Bool.rec (motive := fun _ => Bool) false (h a x) (hb H (Nat.add a.s x.s))) r <;> simp
+        cases scan (fun x => Bool.rec (motive:=fun _=> Bool) false (h a x) (hb H (Nat.add a.s x.s))) r <;> simp
       have h2 := scan_false h1 b hbm
       beta_reduce at h2
       rw [bR] at h2
@@ -5918,7 +5970,7 @@ lemma pairsC_any {H : ℕ} {h : X → X → Bool} {xs : List X} (hp : pairsC H h
   have : Std.Symm (fun a b : X => hb H (a.s + b.s) = true → (h a b = false ∨ h b a = false)) :=
     ⟨fun a b h e => (h (by rw [Nat.add_comm]; exact e)).symm⟩
   exact ((pairsC_false hp).imp (S := fun a b => hb H (a.s + b.s) = true → (h a b = false ∨ h b a = false)) fun h e => Or.inl (h e)).forall ha hc hne hb'
-lemma or_f {a b : Bool} (h : (Bool.rec (motive := fun _ => Bool) b true a : Bool) = false) : a = false ∧ b = false := by
+lemma or_f {a b : Bool} (h : (Bool.rec (motive:=fun _=> Bool) b true a : Bool) = false) : a = false ∧ b = false := by
   cases a <;> simp_all
 lemma KP.toR {m T k' t : ℕ} {S : Finset ℕ} {v : List W} {κ : ℕ → Bool} {κ2 : ℕ → ℕ → Bool} (h : KP Z0 m T k' t S v κ κ2) : KP R m T k' t S v κ κ2 :=
   ⟨fun e hb hl ha hb' => h.g1 e (hb.rel fun d a b _ => al0 d a b) (hl.rel fun d a b _ => al0 d a b) ha hb',
@@ -5934,7 +5986,7 @@ include X
 lemma one_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {fm fh fu : ℕ} {Fs : Set ℕ} {f : ℕ → ℕ → ℕ → List W → Bool}
     (hfb : ∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit fm fh (op d x y) = true → op d x y ∈ Fs)
     (hF : P1 R P l m T Fs f) {k t z : ℕ} {v : List W} {S : Finset ℕ} {κ : ℕ → Bool} {κ2 : ℕ → ℕ → Bool} (hs : StOk P T l k z v S) (hcod : ∀ w ∈ v, w.r = R w.s) (hlen : 2 ≤ v.length)
-    {k' : ℕ} (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' S) (hFb : MF R m T k' Fs S) (hKP : KP Z0 m T k' t S v κ κ2)
+    {k' : ℕ} (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' S) (hFb : MF R m T k' t Fs S) (hKP : KP Z0 m T k' t S v κ κ2)
     (h2 : mv (look l m g np fu) l m g np k t z v κ κ2 = false)
     (h1 : ∀ x y, x ∈ S → y ∈ S → x ≠ y → R x ≠ 0 → R y ≠ 0 → ∃ go : (PEqualNP.Outside.L_meta_32273_aux.Source7.X → PEqualNP.Outside.L_meta_32273_aux.Source7.X → Bool) → List PEqualNP.Outside.L_meta_32273_aux.Source7.X → Bool,
       node1 (f (k - 1) t) (pos' t) l m g np fm fh (k - t) v.length z v κ κ2 go = false ∧
@@ -5967,7 +6019,7 @@ theorem look1_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R
   | zero => intro k t z v S h; simp [look1] at h
   | succ fuel ih =>
     intro k t z v S h hs hcod k' hk hl hmW hFb
-    change (Bool.rec (motive := fun _ => Bool) (tsn (pos t) l (k + 1 - t) v (fun κ κ2 => Bool.rec (motive := fun _ => Bool) (mv (look l m g np k) l m g np k t z v κ κ2) true
+    change (Bool.rec (motive:=fun _=> Bool) (tsn (pos t) l (k + 1 - t) v (fun κ κ2 => Bool.rec (motive:=fun _=> Bool) (mv (look l m g np k) l m g np k t z v κ κ2) true
         (st (k - 1) fun k1 => node1 (look1 l m g np fm fh K fuel k1 t) (pos t) l m g np fm fh (k - t) (len v) z v κ κ2 pairsS))) true (Nat.ble (len v) 1) : Bool) = false at h
     rw [bR, pos_eq, len_eq] at h
     cases h0 : Nat.ble v.length 1 with
@@ -5988,17 +6040,17 @@ theorem look1_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R
 theorem topC_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {fm fh K k t z : ℕ} {v : List W} {S : Finset ℕ} {M : List (ℕ × ℕ)} {Fs : Set ℕ}
     (hM : mFull M = true) (h : ∀ p ∈ M, topC l m g np fm fh K p.1 p.2 k t z v = false) (hs : StOk P T l k z v S) (hcod : ∀ w ∈ v, w.r = R w.s)
     {k' : ℕ} (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' S)
-    (hfb : ∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit fm fh (op d x y) = true → op d x y ∈ Fs) (hFb : MF R m T k' Fs S) : False := by
+    (hfb : ∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit fm fh (op d x y) = true → op d x y ∈ Fs) (hFb : MF R m T k' t Fs S) : False := by
   simp only [mFull, Bool.and_eq_true, List.all_eq_true, List.mem_range, List.any_eq_true] at hM
   obtain ⟨hM1, p0, hp0, hp1⟩ := hM
   have hmin := hmW.min hl
   obtain ⟨κ, κ2, hFy, hKP⟩ := tsn_sound X hs hmin hk
-  have un : ∀ p ∈ M, 2 ≤ v.length ∧ (Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq p.2 1)) true
+  have un : ∀ p ∈ M, 2 ≤ v.length ∧ (Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq p.2 1)) true
       (st (k - 1) fun k1 => node1 (look1 l m g np fm fh K K k1 t) (pos' t) l m g np fm fh (k - t) v.length z v κ κ2 (fun h xs => pairsC p.1 h (fs xs))) : Bool) = false := by
     intro p hp
     have h := h p hp
-    change (Bool.rec (motive := fun _ => Bool) (tsn (pos t) l (k + 1 - t) v (fun κ κ2 =>
-      Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq p.2 1)) true
+    change (Bool.rec (motive:=fun _=> Bool) (tsn (pos t) l (k + 1 - t) v (fun κ κ2 =>
+      Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq p.2 1)) true
       (st (k - 1) fun k1 => node1 (look1 l m g np fm fh K K k1 t) (pos t) l m g np fm fh (k - t) (len v) z v κ κ2 (fun h xs => pairsC p.1 h (fs xs))))) true (Nat.ble (len v) 1) : Bool) = false at h
     rw [bR, pos_eq, len_eq] at h
     cases h0 : Nat.ble v.length 1 with
@@ -6021,7 +6073,7 @@ theorem topC_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R 
 end sound
 theorem topC_ok : TopOk topC := by
   intro P l m g np T X R hR hR2 fm fh K k t z v S M Fs hM h hs hcod k' hk hl hmW hfb hFb
-  exact topC_sound X hR hR2 hM h hs hcod hk hl hmW hfb hFb
+  exact topC_sound X hR hR2 hM h hs hcod hk hl hmW hfb (fun z hZ q hq V hv hlV => hFb z hZ q hq (hlV.W hv))
 lemma pick_sub {T : List (ℕ × ℕ)} {cs : List ℕ} : ∀ x ∈ pick T cs, x ∈ T := by
   intro x hx
   simp only [pick, List.mem_filterMap] at hx
@@ -7500,8 +7552,8 @@ private theorem unaryPhaseOnly {R : ℕ → ℕ} {P : List ℕ} {l m g np T : �
     (hs : StOk P T l k z v S) (hc : ∀ w ∈ v, w.r = R w.s)
     {actual : ℕ} (hk : actual ≤ k) (hm : Min R m T actual t S) : False := by
   obtain ⟨κ, κ2, law, kp⟩ := tsn_sound X hs hm hk
-  change (Bool.rec (motive := fun _ => Bool) (tsn (pos t) l (k + 1 - t) v (fun κ κ2 =>
-    Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq 1 1)) true
+  change (Bool.rec (motive:=fun _=> Bool) (tsn (pos t) l (k + 1 - t) v (fun κ κ2 =>
+    Bool.rec (motive:=fun _=> Bool) (Bool.rec (motive:=fun _=> Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq 1 1)) true
       (st (k - 1) fun k1 => node1 (look1 l m g np fm fh K K k1 t) (pos t) l m g np fm fh (k - t) (len v) z v κ κ2 (fun h xs => pairsC 0 h (fs xs))))) true (Nat.ble (len v) 1) : Bool) = false at val
   rw [bR,pos_eq,len_eq] at val
   cases hlen : Nat.ble v.length 1 with
@@ -7773,26 +7825,20 @@ theorem excludeBySwap {e f : Gt} (prior : noLiveGate f) {d : Bool} {a b : ℕ} {
 
 end PEqualNP.Outside.L_meta_32273_aux.Source7
 namespace PEqualNP.Outside.L_meta_32273_aux.Source7
-noncomputable def topFirstFilter (l m g np fm fh K H ph k t z : ℕ) (v : List W) : Bool :=
-  Bool.rec (motive := fun _ => Bool) (tsn (pos t) l (Nat.sub (Nat.succ k) t) v (fun κ κ2 =>
-    Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq ph 1)) true
-      (st (Nat.sub k 1) fun k1 => node1 (look1 l m g np 1 0 K K k1 t) (pos t) l m g np fm fh (Nat.sub k t) (len v) z v κ κ2 (fun h xs => pairsC H h (fs xs))))) true (Nat.ble (len v) 1)
-
 section
 variable {R : ℕ → ℕ} {P : List ℕ} {l m g np T : ℕ} (X : Ctx P l m g np T)
 include X
-
 private theorem oneFilter (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {fm fh fu H : ℕ} {Fs : Set ℕ} {f : ℕ → ℕ → ℕ → List W → Bool}
-    (hfb : ∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit 1 0 (op d x y) = true → op d x y ∈ Fs)
+    (hfb : ∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit fm fh (op d x y) = true → op d x y ∈ Fs)
     (hF : P1 R P l m T Fs f) {k t z : ℕ} {v : List W} {S : Finset ℕ} {κ : ℕ → Bool} {κ2 : ℕ → ℕ → Bool} (hs : StOk P T l k z v S) (hcod : ∀ w ∈ v, w.r = R w.s) (hlen : 2 ≤ v.length)
-    {k' : ℕ} (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' S) (hFb : MF R m T k' Fs S) (hKP : KP Z0 m T k' t S v κ κ2)
+    {k' : ℕ} (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' S) (hFb : MF R m T k' t Fs S) (hKP : KP Z0 m T k' t S v κ κ2)
     (h2 : mv (look l m g np fu) l m g np k t z v κ κ2 = false)
     (hcut : ∀ {x y V d actual}, k' = actual+1 → R x ≠ 0 → R y ≠ 0 →
       Bi Z0 d x y S V → Live Z0 m T actual t V → (hb H (x+y)=false ∨ fbit fm fh (op d x y)=true) → False)
     (h1 : ∀ x y, hb H (x+y)=true → x ∈ S → y ∈ S → x ≠ y → R x ≠ 0 → R y ≠ 0 → ∃ go : (PEqualNP.Outside.L_meta_32273_aux.Source7.X → PEqualNP.Outside.L_meta_32273_aux.Source7.X → Bool) → List PEqualNP.Outside.L_meta_32273_aux.Source7.X → Bool,
       node1 (f (k - 1) t) (pos' t) l m g np fm fh (k - t) v.length z v κ κ2 go = false ∧
       ∀ h xs, go h xs = false → ∀ a c : PEqualNP.Outside.L_meta_32273_aux.Source7.X, a ∈ xs → c ∈ xs → a.w.r ≠ 0 → c.w.r ≠ 0 → a.s = x → c.s = y → h a c = false ∨ h c a = false) : False := by
-  refine phase_step hR2 (P := P) (l := l) (f := f (k - 1) t) (fm := 1) (fh := 0) (Fs := Fs) hs.rep hcod hk hl hmW hFb hfb ?_ ?_ ?_
+  refine phase_step hR2 (P := P) (l := l) (f := f (k - 1) t) (fm := fm) (fh := fh) (Fs := Fs) hs.rep hcod hk hl hmW hFb hfb ?_ ?_ ?_
   · intro hm
     exact mv_sound X hR (look_sound X hR fu) hs (fun w hw => Or.inr (hcod w hw)) hlen h2 k' hk hm hKP.toR
   · intro d a c S1 k0 ha hc hne har hcr e hb hl1 hnf
@@ -7822,35 +7868,46 @@ private theorem oneFilter (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) �
         rw [this]; exact hcr
   · intro z' r S1 hf hst hcod' k0 hk0 hl1 hmW1 hFb1
     exact hF _ _ _ _ _ hf hst hcod' k0 hk0 hl1 hmW1 hFb1
-private theorem topFilter (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {fm fh K k t z : ℕ} {v : List W} {S : Finset ℕ} {H : ℕ} {Fs : Set ℕ}
-    (h : topFirstFilter l m g np fm fh K H 1 k t z v = false) (hs : StOk P T l k z v S) (hcod : ∀ w ∈ v, w.r = R w.s)
+def coversPhase (H : ℕ) (M : List (ℕ × ℕ)) : Bool :=
+  ((List.range MM).all fun i => ! hb H i || M.any (fun p => hb p.1 i)) &&
+    M.any (fun p => p.2 == 1)
+theorem topParts (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {fm fh K k t z : ℕ} {v : List W} {S : Finset ℕ} {H : ℕ} {M : List (ℕ × ℕ)} {Fs : Set ℕ}
+    (hM : coversPhase H M = true) (h : ∀ p ∈ M, topC l m g np fm fh K p.1 p.2 k t z v = false) (hs : StOk P T l k z v S) (hcod : ∀ w ∈ v, w.r = R w.s)
     {k' : ℕ} (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' S)
-    (hfb : ∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit 1 0 (op d x y) = true → op d x y ∈ Fs) (hFb : MF R m T k' Fs S)
-    (hcut : ∀ {x y V d actual}, k' = actual+1 → R x ≠ 0 → R y ≠ 0 →
+    (hfb : ∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit fm fh (op d x y) = true → op d x y ∈ Fs) (hFb : MF R m T k' t Fs S) (hcut : ∀ {x y V d actual}, k' = actual+1 → R x ≠ 0 → R y ≠ 0 →
       Bi Z0 d x y S V → Live Z0 m T actual t V → (hb H (x+y)=false ∨ fbit fm fh (op d x y)=true) → False) : False := by
+  simp only [coversPhase, Bool.and_eq_true, Bool.or_eq_true, Bool.not_eq_true', List.all_eq_true, List.mem_range, List.any_eq_true, beq_iff_eq] at hM
+  obtain ⟨hM1, p0, hp0, hp1⟩ := hM
   have hmin := hmW.min hl
   obtain ⟨κ, κ2, hFy, hKP⟩ := tsn_sound X hs hmin hk
-  have un : 2 ≤ v.length ∧ (Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq (1:ℕ) 1)) true
-      (st (k - 1) fun k1 => node1 (look1 l m g np 1 0 K K k1 t) (pos' t) l m g np fm fh (k - t) v.length z v κ κ2 (fun h xs => pairsC H h (fs xs))) : Bool) = false := by
+  have un : ∀ p ∈ M, 2 ≤ v.length ∧ (Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq p.2 1)) true
+      (st (k - 1) fun k1 => node1 (look1 l m g np fm fh K K k1 t) (pos' t) l m g np fm fh (k - t) v.length z v κ κ2 (fun h xs => pairsC p.1 h (fs xs))) : Bool) = false := by
+    intro p hp
+    have h := h p hp
     change (Bool.rec (motive := fun _ => Bool) (tsn (pos t) l (k + 1 - t) v (fun κ κ2 =>
-      Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq (1:ℕ) 1)) true
-      (st (k - 1) fun k1 => node1 (look1 l m g np 1 0 K K k1 t) (pos t) l m g np fm fh (k - t) (len v) z v κ κ2 (fun h xs => pairsC H h (fs xs))))) true (Nat.ble (len v) 1) : Bool) = false at h
+      Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (mv (look l m g np k) l m g np k t z v κ κ2) (Nat.beq p.2 1)) true
+      (st (k - 1) fun k1 => node1 (look1 l m g np fm fh K K k1 t) (pos t) l m g np fm fh (k - t) (len v) z v κ κ2 (fun h xs => pairsC p.1 h (fs xs))))) true (Nat.ble (len v) 1) : Bool) = false at h
     rw [bR, pos_eq, len_eq] at h
     cases h0 : Nat.ble v.length 1 with
     | true => rw [h0] at h; simp at h
     | false =>
-      rw [h0,Bool.cond_false] at h
+      rw [h0, cond_false] at h
       refine ⟨?_, (hFy _).symm.trans h⟩
       by_contra hc
       rw [Nat.ble_eq_true_of_le (by omega)] at h0; simp at h0
-  refine oneFilter X hR hR2 hfb (look1_sound X hR hR2 (K := K) hfb K) hs hcod un.1 hk hl hmW hFb hKP (fu := k) ?_ hcut ?_
-  · have := (or_f un.2).2
-    exact this
-  · intro x y hpb hx hy hne hxr hyr
-    have hv := (or_f un.2).1
-    rw [st_eq] at hv
-    refine ⟨_, hv, fun h xs hp a c ha hc har hcr ea ec => ?_⟩
+  refine oneFilter X hR hR2 hfb (look1_sound X hR hR2 (K := K) hfb K) hs hcod (un p0 hp0).1 hk hl hmW hFb hKP (fu := k) ?_ hcut ?_
+  · have := (or_f (un p0 hp0).2).2
+    rw [bR, hp1] at this; exact this
+  · intro x y covered hx hy hne hxr hyr
+    have both := hM1 ((x+y)%MM) (Nat.mod_lt _ (by decide))
+    rw [← hb_mod] at both
+    obtain ⟨p,hpM,hpb⟩ := both.resolve_left (by rw [covered]; decide)
+    rw [← hb_mod] at hpb
+    have h3 := (or_f (un p hpM).2).1
+    rw [st_eq] at h3
+    refine ⟨_, h3, fun h xs hp a c ha hc har hcr ea ec => ?_⟩
     exact pairsC_any hp (fs_mem ha har) (fs_mem hc hcr) (fun e => hne (by rw [← ea, ← ec, e])) (by rw [ea, ec]; exact hpb)
+
 
 end
 
@@ -7885,17 +7942,17 @@ private theorem coveredFiltered_hit {e : Gt} {done : List Gt} {H fm fh a b : ℕ
   · exact Or.inl (Or.inl ⟨r,hr,hr'.symm⟩)
   · exact Or.inr f
 
-theorem afterFiltered (n : ℕ) (e : Gt) (cs : List ℕ) (H fm fh : ℕ) (done : List Gt)
+theorem afterParts (n : ℕ) (e : Gt) (cs : List ℕ) (H fm fh : ℕ) (done : List Gt) (M : List (ℕ × ℕ)) (hmasks : coversPhase H M=true)
     (hown : ∀ x ∈ rawT, x.1 ∈ qualOwn n → Imp [e] x.1 x.2)
     (prior : ∀ f ∈ done, noLiveGate f)
     (cover : coveredFiltered e done H fm fh = true)
-    (hchk : chkG topFirstFilter [e] (tabE e (qualOwn n) (pick rawT cs)) (fm,fh) 0 12 1 H 1=false) : noLiveGate e := by
+    (hchk : ∀ part ∈ M, chkG topC [e] (tabE e (qualOwn n) (pick rawT cs)) (fm,fh) 0 12 1 part.1 part.2=false) : noLiveGate e := by
   intro S hS hl
   let Q := tabE e (qualOwn n) (pick rawT cs)
   have hp : pOk 0 Q=true := qGateOk _ _ _
   have hI : ∀ x ∈ Q,Imp [e] x.1 x.2 := rootQ ai3 hown
   have hmin : Imp [e] 0 12 := impB iroot
-  have numeric : chkG topFirstFilter [e] Q (fm,fh) 0 12 1 H 1 = false := hchk
+  have numeric : ∀ part ∈ M, chkG topC [e] Q (fm,fh) 0 12 1 part.1 part.2 = false := hchk
   simp only [pOk, Bool.and_eq_true, Bool.not_eq_true', List.all_eq_true] at hp
   obtain ⟨⟨hp0, hp1⟩, hp2⟩ := hp
   have nb : ∀ {x y : ℕ}, Nat.beq x y = false → x ≠ y := fun h e => by rw [e, Nat.beq_refl] at h; simp at h
@@ -8014,18 +8071,48 @@ theorem afterFiltered (n : ℕ) (e : Gt) (cs : List ℕ) (H fm fh : ℕ) (done :
   have hble : Nat.ble (lnW v) (Nat.sub (Nat.succ 12) 1) = true := Nat.ble_eq_true_of_le (by
     rw [lnW_eq]; change v.length ≤ 12 + 1 - 1; omega)
   have hhas : hasP (pwr [e] 0) v = true := hasP_ok (hpw.imp id fun h => hrep.mem.1 h)
-  have val : topFirstFilter (lz 0) (mz 0) (pL (Q.map fun _ => 16)) (npOf (PZ Q)) fm fh 12 H 1 12 1 (pL (Q.map fun e => 16 + (12 - e.2)) - sumc v) v = false := by
-    simp only [chkG, st_eq, pre_eq] at numeric
-    have h3 := anySub_false (by simp) numeric v hsub hcov
+  have val : ∀ part ∈ M, topC (lz 0) (mz 0) (pL (Q.map fun _ => 16)) (npOf (PZ Q)) fm fh 12 part.1 part.2 12 1 (pL (Q.map fun e => 16 + (12 - e.2)) - sumc v) v = false := by
+    intro part hpart
+    have hpart := numeric part hpart
+    simp only [chkG, st_eq, pre_eq] at hpart
+    have h3 := anySub_false (by simp) hpart v hsub hcov
     simp only [startG,hhas,hble] at h3
-    exact child_sound X (f := fun z r => topFirstFilter (lz 0) (mz 0) _ (npOf (PZ Q)) fm fh 12 H 1 12 1 z r) (fun h => rfl) rfl hst hm (by decide) h3
+    exact child_sound X (f := fun z r => topC (lz 0) (mz 0) _ (npOf (PZ Q)) fm fh 12 part.1 part.2 12 1 z r) (fun h => rfl) rfl hst hm (by decide) h3
   have hW : {x | RZ [e] 0 x ≠ 0} ∪ (S : Set ℕ) = WZ [e] 0 := by rw [RZ_set]; exact Set.union_eq_self_of_subset_right hSW
-  refine topFilter X (RZ_RR [e] 0) (RZ_R2 [e] 0) (Fs:=∅) val hst hcod (by decide) hl ?_ ?_ (by intro v hv; exact False.elim hv) ?_
+  refine topParts X (RZ_RR [e] 0) (RZ_R2 [e] 0) (Fs:=C (mz 0) (WZ [e] 0) ∪ {z | ∃ f ∈ done, z = tw f &&& mz 0}) hmasks val hst hcod (by decide) hl ?_ ?_ ?_ ?_
   · intro q hq sol
     rw [hW] at sol
     exact hmin q hq sol
-  · intro entry x y _ _ _ bad
-    simp [fbit_triv] at bad
+  · intro d x y hxy hx hy bad
+    exact coveredFiltered_hit cover (RZ_mem hx) (RZ_mem hy) hxy (Or.inr bad)
+  · intro z hz q hq V hv hlV
+    rw [hW] at hv
+    rcases hz with existing | ⟨f,hf,rfl⟩
+    · apply hmin q hq (hlV.W ?_)
+      intro y hy
+      rcases hv hy with (rfl | orig) | c
+      · exact existing
+      · exact Or.inl orig
+      · exact Or.inr c
+    · let bank := C (mz 0) (WZ [f] 0)
+      have strong : Bound (mz 0) (tz 0) 1 13 bank := by
+        intro a ha U hs hU
+        by_cases eq : a=12
+        · subst a
+          exact prior f hf hs hU
+        · exact (show Imp [f] 0 12 from impB iroot) a (by omega) (hU.W hs)
+      let a := rawP.getD e.2.1 0 &&& mz 0
+      let b := rawP.getD e.2.2 0 &&& mz 0
+      apply strong.push (d:=e.1) (a:=a) (b:=b) (raw_avail [f] _ _) (raw_avail [f] _ _) q hq V _ hlV
+      have gateEq : op e.1 a b = tw e &&& mz 0 := (and_op _ _ _ _).symm
+      intro y hy
+      rcases hv hy with (rfl | ⟨v,hw,rfl⟩) | c
+      · exact Or.inr (Or.inl ⟨tw f,by simp [rawL],rfl⟩)
+      · simp only [rawL,List.mem_append,List.map_cons,List.map_nil,List.mem_singleton] at hw
+        rcases hw with src|rfl
+        · exact Or.inr (Or.inl ⟨v,by simp [rawL,src],rfl⟩)
+        · exact Or.inl gateEq.symm
+      · exact Or.inr (Or.inr c)
   · intro x y V d a ka hx hy gate tail miss
     have is11 : a=11 := by omega
     subst a
@@ -8036,6 +8123,7 @@ theorem afterFiltered (n : ℕ) (e : Gt) (cs : List ℕ) (H fm fh : ℕ) (done :
       · exact existing
       · exact hS hold
     · exact excludeBySwap (prior f hf) hS gate out tail
+
 
 end PEqualNP.Outside.L_meta_32273_aux.Source7
 namespace PEqualNP.Outside.L_meta_32273_aux.Source7
@@ -8074,6 +8162,18 @@ private structure GatePhase where
   fh : ℕ
 
 private def gatePhase : ℕ → GatePhase
+  | 0 => ⟨(false,0,1),0x10000a80000000022a00200015540000200004000000822a040005,0x53,0x40100400000000100⟩
+  | 7 => ⟨(false,0,5),0x10000a80800000002e40200001540000200004800000902a040005,0x53,0x40510402004000100⟩
+  | 19 => ⟨(true,1,4),0x10000a80000000002a2a200001540000200004040000002a040405,0x72,0x1100401000402400000001004400⟩
+  | 20 => ⟨(false,3,4),0x10000a80080000012a00280001540000200004000050002a040005,0x7e,0x4400020004010400000014000047⟩
+  | 17 => ⟨(true,1,3),0x10000a80000000002a20200001540020200004000080002a040141,0x3f,0x500880014000846⟩
+  | 22 => ⟨(false,3,6),0x10002a8000000000aa00200001540000200004000000002a040010,0x3f,0x500891004020846⟩
+  | 25 => ⟨(true,0,4),0x10000e80000080002a00200001540000200004a80000002a040000,0x66,0x406004004230500060500010⟩
+  | 2 => ⟨(false,0,2),0x10020a80004000002a002000015c0000200054000000002a040000,0x8d,0x80010120120000210010208004000022204⟩
+  | 3 => ⟨(false,0,3),0x12000a80000500002a00200001540002200004400000002a040000,0x3f,0x500898014c218c6⟩
+  | 5 => ⟨(false,0,4),0x10004a80000800002a0020000154000020000e800000002a000000,0x5b,0x2120da00010000810484604⟩
+  | 9 => ⟨(false,0,6),0x10000a801000000028a8200001540000200004000000022a000000,0x5b,0x21205a00010000810684605⟩
+  | 15 => ⟨(true,0,1),0x10000a8000000000280020004154000002a004000000002a000000,0x5b,0x21605a40090001810284705⟩
   | 33 => ⟨(true,0,6),0xa8200000000280020004054000002a004000000002a000000,0x69,0x32200002071d1100cb0069⟩
   | 24 => ⟨(false,4,6),0xa802a00000028002000005400000000840004000028000000,0x41,0x7510442110684e04⟩
   | 32 => ⟨(true,4,6),0xa800a800000000028002000005420000100000000000028000000,0x5a,0x105c00924c41a500054⟩
@@ -8086,9 +8186,16 @@ private def gatePhase : ℕ → GatePhase
   | 39 => ⟨(true,3,5),0x200000000000800000002040000000000000000000800000100000,0xd,0xc1a⟩
   | 38 => ⟨(true,1,6),0x4000000002a00000000000000000000000000000004000,0xe,0x106d⟩
   | _ => ⟨(false,0,1),0,0,0⟩
-private def phaseNum (n : ℕ) : Prop :=
+private def sliceMask (i : ℕ) : ℕ :=
+  (((1 <<< (16*14))-1)/65535) <<< i
+private def partPick (H i : ℕ) : ℕ × ℕ :=
+  if i=0 then (0,1) else (H &&& sliceMask (i-1),0)
+private def split (H : ℕ) : List (ℕ × ℕ) := (List.range 17).map (partPick H)
+private def partCheck (n i : ℕ) : Prop :=
   let r := gatePhase n
-  chkG topFirstFilter [r.e] (tabE r.e (qualOwn n) (pick rawT (finalCuts n))) (r.fm,r.fh) 0 12 1 r.H 1 = false
+  let m := partPick r.H i
+  chkG topC [r.e] (tabE r.e (qualOwn n) (pick rawT (finalCuts n))) (r.fm,r.fh) 0 12 1 m.1 m.2 = false
+private def phaseNum (n : ℕ) : Prop := ∀ i : Fin 17, partCheck n i
 
 private def knownGates (done : List Gt) : Prop := ∀ e ∈ done, noLiveGate e
 
@@ -8103,27 +8210,30 @@ private theorem applyPhase (n : ℕ) (done : List Gt)
     (own : ∀ x ∈ rawT, x.1 ∈ qualOwn n → Imp [(gatePhase n).e] x.1 x.2)
     (previous : knownGates done)
     (cover : coveredFiltered (gatePhase n).e done (gatePhase n).H (gatePhase n).fm (gatePhase n).fh = true)
-    (num : phaseNum n) : noLiveGate (gatePhase n).e :=
-  afterFiltered n _ _ _ _ _ done own previous cover num
-
+    (buckets : coversPhase (gatePhase n).H (split (gatePhase n).H)=true)
+    (num : phaseNum n) : noLiveGate (gatePhase n).e := by
+  apply afterParts n _ _ _ _ _ done _ buckets own previous cover
+  intro a ha
+  rcases List.mem_map.mp ha with ⟨j,hj,rfl⟩
+  exact num ⟨j, List.mem_range.mp hj⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 private theorem orderedGates
-    (num0 : qualFact 0 (false,0,1) (finalCuts 0))
-    (num2 : qualFact 2 (false,0,2) (finalCuts 2))
-    (num3 : qualFact 3 (false,0,3) (finalCuts 3))
-    (num5 : qualFact 5 (false,0,4) (finalCuts 5))
-    (num7 : qualFact 7 (false,0,5) (finalCuts 7))
-    (num9 : qualFact 9 (false,0,6) (finalCuts 9))
     (num11 : qualFact 11 (false,1,3) (finalCuts 11))
     (num13 : qualFact 13 (false,1,4) (finalCuts 13))
     (num14 : qualFact 14 (false,1,6) (finalCuts 14))
-    (num15 : qualFact 15 (true,0,1) (finalCuts 15))
-    (num17 : qualFact 17 (true,1,3) (finalCuts 17))
-    (num19 : qualFact 19 (true,1,4) (finalCuts 19))
-    (num20 : qualFact 20 (false,3,4) (finalCuts 20))
-    (num22 : qualFact 22 (false,3,6) (finalCuts 22))
-    (num25 : qualFact 25 (true,0,4) (finalCuts 25))
+    (num0 : phaseNum 0)
+    (num7 : phaseNum 7)
+    (num19 : phaseNum 19)
+    (num20 : phaseNum 20)
+    (num17 : phaseNum 17)
+    (num22 : phaseNum 22)
+    (num25 : phaseNum 25)
+    (num2 : phaseNum 2)
+    (num3 : phaseNum 3)
+    (num5 : phaseNum 5)
+    (num9 : phaseNum 9)
+    (num15 : phaseNum 15)
     (num33 : phaseNum 33)
     (num24 : phaseNum 24)
     (num32 : phaseNum 32)
@@ -8136,109 +8246,93 @@ private theorem orderedGates
     (num39 : phaseNum 39)
     (num38 : phaseNum 38)
     : ∀ e ∈ gtypes, noLiveGate e := by
-  have h0 : noLiveGate (false,0,1) := fun hS hl => excludeAfter _ (qualOwn 0) (finalCuts 0) (by decide) own0 (qGateOk _ _ _) num0 hS hl
-  have h2 : noLiveGate (false,0,2) := fun hS hl => excludeAfter _ (qualOwn 2) (finalCuts 2) (by decide) own0 (qGateOk _ _ _) num2 hS hl
-  have h3 : noLiveGate (false,0,3) := fun hS hl => excludeAfter _ (qualOwn 3) (finalCuts 3) (by decide) own0 (qGateOk _ _ _) num3 hS hl
-  have h5 : noLiveGate (false,0,4) := fun hS hl => excludeAfter _ (qualOwn 5) (finalCuts 5) (by decide) own0 (qGateOk _ _ _) num5 hS hl
-  have h7 : noLiveGate (false,0,5) := fun hS hl => excludeAfter _ (qualOwn 7) (finalCuts 7) (by decide) own0 (qGateOk _ _ _) num7 hS hl
-  have h9 : noLiveGate (false,0,6) := fun hS hl => excludeAfter _ (qualOwn 9) (finalCuts 9) (by decide) own0 (qGateOk _ _ _) num9 hS hl
   have h11 : noLiveGate (false,1,3) := fun hS hl => excludeAfter _ (qualOwn 11) (finalCuts 11) (by decide) own0 (qGateOk _ _ _) num11 hS hl
   have h13 : noLiveGate (false,1,4) := fun hS hl => excludeAfter _ (qualOwn 13) (finalCuts 13) (by decide) own0 (qGateOk _ _ _) num13 hS hl
   have h14 : noLiveGate (false,1,6) := fun hS hl => excludeAfter _ (qualOwn 14) (finalCuts 14) (by decide) own0 (qGateOk _ _ _) num14 hS hl
-  have h15 : noLiveGate (true,0,1) := fun hS hl => excludeAfter _ (qualOwn 15) (finalCuts 15) (by decide) own0 (qGateOk _ _ _) num15 hS hl
-  have h17 : noLiveGate (true,1,3) := fun hS hl => excludeAfter _ (qualOwn 17) (finalCuts 17) (by decide) own0 (qGateOk _ _ _) num17 hS hl
-  have h19 : noLiveGate (true,1,4) := fun hS hl => excludeAfter _ (qualOwn 19) (finalCuts 19) (by decide) own0 (qGateOk _ _ _) num19 hS hl
-  have h20 : noLiveGate (false,3,4) := fun hS hl => excludeAfter _ (qualOwn 20) (finalCuts 20) (by decide) w20_1_h (qGateOk _ _ _) num20 hS hl
-  have h22 : noLiveGate (false,3,6) := fun hS hl => excludeAfter _ (qualOwn 22) (finalCuts 22) (by decide) w22_1_h (qGateOk _ _ _) num22 hS hl
-  have h25 : noLiveGate (true,0,4) := fun hS hl => excludeAfter _ (qualOwn 25) (finalCuts 25) (by decide) w25_1_h (qGateOk _ _ _) num25 hS hl
-  let initial : List Gt := [(false,0,1),(false,1,2),(false,0,2),(false,0,3),(false,2,5),(false,0,4),(false,2,4),(false,0,5),(false,2,3),(false,0,6),(false,2,6),(false,1,3),(false,1,5),(false,1,4),(false,1,6),(true,0,1),(true,1,2),(true,1,3),(true,1,5),(true,1,4),(false,3,4),(false,4,5),(false,3,6),(false,5,6),(true,0,4),(true,2,4)]
+  let initial : List Gt := [(false,1,3),(false,1,5),(false,1,4),(false,1,6)]
   have last0 : knownGates initial := by
     intro f hf
     simp only [initial,List.mem_cons,List.not_mem_nil,or_false] at hf
-    rcases hf with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-    · exact h0
-    · exact noLive_symGate (by decide) tw1 h0
-    · exact h2
-    · exact h3
-    · exact noLive_symGate (by decide) tw4 h3
-    · exact h5
-    · exact noLive_symGate (by decide) tw6 h5
-    · exact h7
-    · exact noLive_symGate (by decide) tw8 h7
-    · exact h9
-    · exact noLive_symGate (by decide) tw10 h9
+    rcases hf with rfl | rfl | rfl | rfl
     · exact h11
     · exact noLive_symGate (by decide) tw12 h11
     · exact h13
     · exact h14
-    · exact h15
-    · exact noLive_symGate (by decide) tw16 h15
-    · exact h17
-    · exact noLive_symGate (by decide) tw18 h17
-    · exact h19
-    · exact h20
-    · exact noLive_symGate (by decide) tw21 h20
-    · exact h22
-    · exact noLive_symGate (by decide) tw23 h22
-    · exact h25
-    · exact noLive_symGate (by decide) tw26 h25
-  have h33 : noLiveGate (true,0,6) := applyPhase 33 initial w33_1_h last0 (by decide +kernel) num33
-  let after33 : List Gt := (true,0,6) :: (true,2,6) :: initial
-  have last1 : knownGates after33 := (knownCons (h33) (knownCons (noLive_symGate (by decide) tw34 h33) last0))
-  have h24 : noLiveGate (false,4,6) := applyPhase 24 after33 w24_1_h last1 (by decide +kernel) num24
+  have h0 : noLiveGate (false,0,1) := applyPhase 0 initial own0 last0 (by decide +kernel) (by decide +kernel) num0
+  let after0 : List Gt := (false,0,1) :: (false,1,2) :: initial
+  have last1 : knownGates after0 := (knownCons (h0) (knownCons (noLive_symGate (by decide) tw1 h0) last0))
+  have h7 : noLiveGate (false,0,5) := applyPhase 7 after0 own0 last1 (by decide +kernel) (by decide +kernel) num7
+  let after7 : List Gt := (false,0,5) :: (false,2,3) :: after0
+  have last2 : knownGates after7 := (knownCons (h7) (knownCons (noLive_symGate (by decide) tw8 h7) last1))
+  have h19 : noLiveGate (true,1,4) := applyPhase 19 after7 own0 last2 (by decide +kernel) (by decide +kernel) num19
+  let after19 : List Gt := (true,1,4) :: after7
+  have last3 : knownGates after19 := (knownCons (h19) last2)
+  have h20 : noLiveGate (false,3,4) := applyPhase 20 after19 w20_1_h last3 (by decide +kernel) (by decide +kernel) num20
+  let after20 : List Gt := (false,3,4) :: (false,4,5) :: after19
+  have last4 : knownGates after20 := (knownCons (h20) (knownCons (noLive_symGate (by decide) tw21 h20) last3))
+  have h17 : noLiveGate (true,1,3) := applyPhase 17 after20 own0 last4 (by decide +kernel) (by decide +kernel) num17
+  let after17 : List Gt := (true,1,3) :: (true,1,5) :: after20
+  have last5 : knownGates after17 := (knownCons (h17) (knownCons (noLive_symGate (by decide) tw18 h17) last4))
+  have h22 : noLiveGate (false,3,6) := applyPhase 22 after17 w22_1_h last5 (by decide +kernel) (by decide +kernel) num22
+  let after22 : List Gt := (false,3,6) :: (false,5,6) :: after17
+  have last6 : knownGates after22 := (knownCons (h22) (knownCons (noLive_symGate (by decide) tw23 h22) last5))
+  have h25 : noLiveGate (true,0,4) := applyPhase 25 after22 w25_1_h last6 (by decide +kernel) (by decide +kernel) num25
+  let after25 : List Gt := (true,0,4) :: (true,2,4) :: after22
+  have last7 : knownGates after25 := (knownCons (h25) (knownCons (noLive_symGate (by decide) tw26 h25) last6))
+  have h2 : noLiveGate (false,0,2) := applyPhase 2 after25 own0 last7 (by decide +kernel) (by decide +kernel) num2
+  let after2 : List Gt := (false,0,2) :: after25
+  have last8 : knownGates after2 := (knownCons (h2) last7)
+  have h3 : noLiveGate (false,0,3) := applyPhase 3 after2 own0 last8 (by decide +kernel) (by decide +kernel) num3
+  let after3 : List Gt := (false,0,3) :: (false,2,5) :: after2
+  have last9 : knownGates after3 := (knownCons (h3) (knownCons (noLive_symGate (by decide) tw4 h3) last8))
+  have h5 : noLiveGate (false,0,4) := applyPhase 5 after3 own0 last9 (by decide +kernel) (by decide +kernel) num5
+  let after5 : List Gt := (false,0,4) :: (false,2,4) :: after3
+  have last10 : knownGates after5 := (knownCons (h5) (knownCons (noLive_symGate (by decide) tw6 h5) last9))
+  have h9 : noLiveGate (false,0,6) := applyPhase 9 after5 own0 last10 (by decide +kernel) (by decide +kernel) num9
+  let after9 : List Gt := (false,0,6) :: (false,2,6) :: after5
+  have last11 : knownGates after9 := (knownCons (h9) (knownCons (noLive_symGate (by decide) tw10 h9) last10))
+  have h15 : noLiveGate (true,0,1) := applyPhase 15 after9 own0 last11 (by decide +kernel) (by decide +kernel) num15
+  let after15 : List Gt := (true,0,1) :: (true,1,2) :: after9
+  have last12 : knownGates after15 := (knownCons (h15) (knownCons (noLive_symGate (by decide) tw16 h15) last11))
+  have h33 : noLiveGate (true,0,6) := applyPhase 33 after15 w33_1_h last12 (by decide +kernel) (by decide +kernel) num33
+  let after33 : List Gt := (true,0,6) :: (true,2,6) :: after15
+  have last13 : knownGates after33 := (knownCons (h33) (knownCons (noLive_symGate (by decide) tw34 h33) last12))
+  have h24 : noLiveGate (false,4,6) := applyPhase 24 after33 w24_1_h last13 (by decide +kernel) (by decide +kernel) num24
   let after24 : List Gt := (false,4,6) :: after33
-  have last2 : knownGates after24 := (knownCons (h24) last1)
-  have h32 : noLiveGate (true,4,6) := applyPhase 32 after24 w32_1_h last2 (by decide +kernel) num32
+  have last14 : knownGates after24 := (knownCons (h24) last13)
+  have h32 : noLiveGate (true,4,6) := applyPhase 32 after24 w32_1_h last14 (by decide +kernel) (by decide +kernel) num32
   let after32 : List Gt := (true,4,6) :: after24
-  have last3 : knownGates after32 := (knownCons (h32) last2)
-  have h28 : noLiveGate (true,0,3) := applyPhase 28 after32 w28_1_h last3 (by decide +kernel) num28
+  have last15 : knownGates after32 := (knownCons (h32) last14)
+  have h28 : noLiveGate (true,0,3) := applyPhase 28 after32 w28_1_h last15 (by decide +kernel) (by decide +kernel) num28
   let after28 : List Gt := (true,0,3) :: (true,2,5) :: after32
-  have last4 : knownGates after28 := (knownCons (h28) (knownCons (noLive_symGate (by decide) tw29 h28) last3))
-  have h30 : noLiveGate (true,3,4) := applyPhase 30 after28 w30_1_h last4 (by decide +kernel) num30
+  have last16 : knownGates after28 := (knownCons (h28) (knownCons (noLive_symGate (by decide) tw29 h28) last15))
+  have h30 : noLiveGate (true,3,4) := applyPhase 30 after28 w30_1_h last16 (by decide +kernel) (by decide +kernel) num30
   let after30 : List Gt := (true,3,4) :: (true,4,5) :: after28
-  have last5 : knownGates after30 := (knownCons (h30) (knownCons (noLive_symGate (by decide) tw31 h30) last4))
-  have h35 : noLiveGate (true,0,5) := applyPhase 35 after30 w35_1_h last5 (by decide +kernel) num35
+  have last17 : knownGates after30 := (knownCons (h30) (knownCons (noLive_symGate (by decide) tw31 h30) last16))
+  have h35 : noLiveGate (true,0,5) := applyPhase 35 after30 w35_1_h last17 (by decide +kernel) (by decide +kernel) num35
   let after35 : List Gt := (true,0,5) :: (true,2,3) :: after30
-  have last6 : knownGates after35 := (knownCons (h35) (knownCons (noLive_symGate (by decide) tw36 h35) last5))
-  have h37 : noLiveGate (true,0,2) := applyPhase 37 after35 w37_1_h last6 (by decide +kernel) num37
+  have last18 : knownGates after35 := (knownCons (h35) (knownCons (noLive_symGate (by decide) tw36 h35) last17))
+  have h37 : noLiveGate (true,0,2) := applyPhase 37 after35 w37_1_h last18 (by decide +kernel) (by decide +kernel) num37
   let after37 : List Gt := (true,0,2) :: after35
-  have last7 : knownGates after37 := (knownCons (h37) last6)
-  have h27 : noLiveGate (false,3,5) := applyPhase 27 after37 w27_1_h last7 (by decide +kernel) num27
+  have last19 : knownGates after37 := (knownCons (h37) last18)
+  have h27 : noLiveGate (false,3,5) := applyPhase 27 after37 w27_1_h last19 (by decide +kernel) (by decide +kernel) num27
   let after27 : List Gt := (false,3,5) :: after37
-  have last8 : knownGates after27 := (knownCons (h27) last7)
-  have h40 : noLiveGate (true,3,6) := applyPhase 40 after27 w40_1_h last8 (by decide +kernel) num40
+  have last20 : knownGates after27 := (knownCons (h27) last19)
+  have h40 : noLiveGate (true,3,6) := applyPhase 40 after27 w40_1_h last20 (by decide +kernel) (by decide +kernel) num40
   let after40 : List Gt := (true,3,6) :: (true,5,6) :: after27
-  have last9 : knownGates after40 := (knownCons (h40) (knownCons (noLive_symGate (by decide) tw41 h40) last8))
-  have h39 : noLiveGate (true,3,5) := applyPhase 39 after40 own0 last9 (by decide +kernel) num39
+  have last21 : knownGates after40 := (knownCons (h40) (knownCons (noLive_symGate (by decide) tw41 h40) last20))
+  have h39 : noLiveGate (true,3,5) := applyPhase 39 after40 own0 last21 (by decide +kernel) (by decide +kernel) num39
   let after39 : List Gt := (true,3,5) :: after40
-  have last10 : knownGates after39 := (knownCons (h39) last9)
-  have h38 : noLiveGate (true,1,6) := applyPhase 38 after39 own0 last10 (by decide +kernel) num38
+  have last22 : knownGates after39 := (knownCons (h39) last21)
+  have h38 : noLiveGate (true,1,6) := applyPhase 38 after39 own0 last22 (by decide +kernel) (by decide +kernel) num38
   let after38 : List Gt := (true,1,6) :: after39
-  have last11 : knownGates after38 := (knownCons (h38) last10)
+  have last23 : knownGates after38 := (knownCons (h38) last22)
   have included : gtypes.all (fun f => decide (f ∈ after38)) = true := by decide +kernel
   intro e he
-  exact last11 e (of_decide_eq_true (List.all_eq_true.mp included e he))
+  exact last23 e (of_decide_eq_true (List.all_eq_true.mp included e he))
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem unaryNumeric : chkG topC [] qT13 (1,0) 0 13 1 0 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase0 : qualFact 0 (false,0,1) (finalCuts 0) := by unfold qualFact; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase2 : qualFact 2 (false,0,2) (finalCuts 2) := by unfold qualFact; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase3 : qualFact 3 (false,0,3) (finalCuts 3) := by unfold qualFact; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase5 : qualFact 5 (false,0,4) (finalCuts 5) := by unfold qualFact; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase7 : qualFact 7 (false,0,5) (finalCuts 7) := by unfold qualFact; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase9 : qualFact 9 (false,0,6) (finalCuts 9) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 private theorem checkedPhase11 : qualFact 11 (false,1,3) (finalCuts 11) := by unfold qualFact; decide +kernel
@@ -8248,57 +8342,60 @@ private theorem checkedPhase13 : qualFact 13 (false,1,4) (finalCuts 13) := by un
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 private theorem checkedPhase14 : qualFact 14 (false,1,6) (finalCuts 14) := by unfold qualFact; decide +kernel
+private def selectedRow : ℕ → ℕ
+  | 0 => 0
+  | 1 => 7
+  | 2 => 19
+  | 3 => 20
+  | 4 => 17
+  | 5 => 22
+  | 6 => 25
+  | 7 => 2
+  | 8 => 3
+  | 9 => 5
+  | 10 => 9
+  | 11 => 15
+  | 12 => 33
+  | 13 => 24
+  | 14 => 32
+  | 15 => 28
+  | 16 => 30
+  | 17 => 35
+  | 18 => 37
+  | 19 => 27
+  | 20 => 40
+  | 21 => 39
+  | 22 => 38
+  | _ => 0
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-private theorem checkedPhase15 : qualFact 15 (true,0,1) (finalCuts 15) := by unfold qualFact; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase17 : qualFact 17 (true,1,3) (finalCuts 17) := by unfold qualFact; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase19 : qualFact 19 (true,1,4) (finalCuts 19) := by unfold qualFact; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase20 : qualFact 20 (false,3,4) (finalCuts 20) := by unfold qualFact; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase22 : qualFact 22 (false,3,6) (finalCuts 22) := by unfold qualFact; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase25 : qualFact 25 (true,0,4) (finalCuts 25) := by unfold qualFact; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase33 : phaseNum 33 := by unfold phaseNum; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase24 : phaseNum 24 := by unfold phaseNum; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase32 : phaseNum 32 := by unfold phaseNum; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase28 : phaseNum 28 := by unfold phaseNum; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase30 : phaseNum 30 := by unfold phaseNum; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase35 : phaseNum 35 := by unfold phaseNum; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase37 : phaseNum 37 := by unfold phaseNum; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase27 : phaseNum 27 := by unfold phaseNum; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase40 : phaseNum 40 := by unfold phaseNum; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase39 : phaseNum 39 := by unfold phaseNum; decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-private theorem checkedPhase38 : phaseNum 38 := by unfold phaseNum; decide +kernel
-theorem excludeAllGates : ∀ e ∈ gtypes, noLiveGate e := orderedGates checkedPhase0 checkedPhase2 checkedPhase3 checkedPhase5 checkedPhase7 checkedPhase9 checkedPhase11 checkedPhase13 checkedPhase14 checkedPhase15 checkedPhase17 checkedPhase19 checkedPhase20 checkedPhase22 checkedPhase25 checkedPhase33 checkedPhase24 checkedPhase32 checkedPhase28 checkedPhase30 checkedPhase35 checkedPhase37 checkedPhase27 checkedPhase40 checkedPhase39 checkedPhase38
+private theorem allParts (j : Fin 23) : phaseNum (selectedRow j) := by
+  intro i
+  fin_cases j <;> fin_cases i <;> unfold partCheck <;> decide +kernel
+private theorem allPartsOf (j : Fin 23) (n : ℕ) (h : selectedRow j=n) : phaseNum n := h ▸ allParts j
+private theorem checkedPhase0 : phaseNum 0  := allPartsOf ⟨0,by decide⟩ _ rfl
+private theorem checkedPhase7 : phaseNum 7  := allPartsOf ⟨1,by decide⟩ _ rfl
+private theorem checkedPhase19 : phaseNum 19  := allPartsOf ⟨2,by decide⟩ _ rfl
+private theorem checkedPhase20 : phaseNum 20  := allPartsOf ⟨3,by decide⟩ _ rfl
+private theorem checkedPhase17 : phaseNum 17  := allPartsOf ⟨4,by decide⟩ _ rfl
+private theorem checkedPhase22 : phaseNum 22  := allPartsOf ⟨5,by decide⟩ _ rfl
+private theorem checkedPhase25 : phaseNum 25  := allPartsOf ⟨6,by decide⟩ _ rfl
+private theorem checkedPhase2 : phaseNum 2  := allPartsOf ⟨7,by decide⟩ _ rfl
+private theorem checkedPhase3 : phaseNum 3  := allPartsOf ⟨8,by decide⟩ _ rfl
+private theorem checkedPhase5 : phaseNum 5  := allPartsOf ⟨9,by decide⟩ _ rfl
+private theorem checkedPhase9 : phaseNum 9  := allPartsOf ⟨10,by decide⟩ _ rfl
+private theorem checkedPhase15 : phaseNum 15  := allPartsOf ⟨11,by decide⟩ _ rfl
+private theorem checkedPhase33 : phaseNum 33  := allPartsOf ⟨12,by decide⟩ _ rfl
+private theorem checkedPhase24 : phaseNum 24  := allPartsOf ⟨13,by decide⟩ _ rfl
+private theorem checkedPhase32 : phaseNum 32  := allPartsOf ⟨14,by decide⟩ _ rfl
+private theorem checkedPhase28 : phaseNum 28  := allPartsOf ⟨15,by decide⟩ _ rfl
+private theorem checkedPhase30 : phaseNum 30  := allPartsOf ⟨16,by decide⟩ _ rfl
+private theorem checkedPhase35 : phaseNum 35  := allPartsOf ⟨17,by decide⟩ _ rfl
+private theorem checkedPhase37 : phaseNum 37  := allPartsOf ⟨18,by decide⟩ _ rfl
+private theorem checkedPhase27 : phaseNum 27  := allPartsOf ⟨19,by decide⟩ _ rfl
+private theorem checkedPhase40 : phaseNum 40  := allPartsOf ⟨20,by decide⟩ _ rfl
+private theorem checkedPhase39 : phaseNum 39  := allPartsOf ⟨21,by decide⟩ _ rfl
+private theorem checkedPhase38 : phaseNum 38  := allPartsOf ⟨22,by decide⟩ _ rfl
+theorem excludeAllGates : ∀ e ∈ gtypes, noLiveGate e := orderedGates checkedPhase11 checkedPhase13 checkedPhase14 checkedPhase0 checkedPhase7 checkedPhase19 checkedPhase20 checkedPhase17 checkedPhase22 checkedPhase25 checkedPhase2 checkedPhase3 checkedPhase5 checkedPhase9 checkedPhase15 checkedPhase33 checkedPhase24 checkedPhase32 checkedPhase28 checkedPhase30 checkedPhase35 checkedPhase37 checkedPhase27 checkedPhase40 checkedPhase39 checkedPhase38
 end PEqualNP.Outside.L_meta_32273_aux.Source7
 theorem PEqualNP.Outside.L_meta_32273 : (∀ (gates : List PEqualNP.CircuitLowerBounds.Gate) (o : ℕ), (∀ g ∈ gates, (g.op = PEqualNP.CircuitLowerBounds.GateOp.and ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.or ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.not) ∧ g.inputs.length ≤ 2) → (∀ i j : Fin gates.length, (gates.get i).op = PEqualNP.CircuitLowerBounds.GateOp.not → (gates.get j).op = PEqualNP.CircuitLowerBounds.GateOp.not → i = j) → (∀ x : Fin 8 → Bool, PEqualNP.CircuitLowerBounds.Circuit.eval ⟨gates, o⟩ (List.ofFn x) = decide (∃ i < ([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 4, 6, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7] : List ℕ).length / 2, (List.ofFn x).getD (([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 4, 6, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7] : List ℕ).getD (2 * i) 0) false = true ∧ (List.ofFn x).getD (([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 4, 6, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7] : List ℕ).getD (2 * i + 1) 0) false = true)) → ∃ (gates' : List PEqualNP.CircuitLowerBounds.Gate) (o' : ℕ), (∀ g ∈ gates', (g.op = PEqualNP.CircuitLowerBounds.GateOp.and ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.or) ∧ g.inputs.length ≤ 2) ∧ gates'.length ≤ gates.length ∧ ∀ x : Fin 8 → Bool, PEqualNP.CircuitLowerBounds.Circuit.eval ⟨gates', o'⟩ (List.ofFn x) = decide (∃ i < ([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 4, 6, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7] : List ℕ).length / 2, (List.ofFn x).getD (([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 4, 6, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7] : List ℕ).getD (2 * i) 0) false = true ∧ (List.ofFn x).getD (([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 4, 6, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7] : List ℕ).getD (2 * i + 1) 0) false = true)) := PEqualNP.Outside.L_meta_32273_aux.finishFront PEqualNP.Outside.L_meta_32273_aux.Source7.unaryNumeric PEqualNP.Outside.L_meta_32273_aux.Source7.excludeAllGates
