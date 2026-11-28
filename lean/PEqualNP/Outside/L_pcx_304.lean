@@ -3771,9 +3771,11 @@ abbrev AuxMatrix (k r h' : ℕ) :=
 abbrev AuxAll (k r h' R : ℕ) :=
   AuxConst ⊕ AuxBase k r ⊕ (Bool × Bool × Fin R × AuxMatrix k r h')
 abbrev VarAll (k r h' R : ℕ) := Sum (V5 k) (AuxAll k r h' R)
-set_option synthInstance.maxSize 4096
+set_option synthInstance.maxSize 4096 in
 def decEqAuxLeaf (k r : ℕ) : DecidableEq (AuxLeaf k r) := inferInstance
+set_option synthInstance.maxSize 4096 in
 def decEqAuxSynCore (k h' : ℕ) : DecidableEq (z155 k h') := inferInstance
+set_option synthInstance.maxSize 4096 in
 def decEqAuxSynAgg (k r : ℕ) : DecidableEq (AuxSynAgg k r) := inferInstance
 def decEqAuxSyn (k r h' : ℕ) : DecidableEq (AuxSyn k r h') :=
   @instDecidableEqSum _ _ (decEqAuxSynCore k h')
@@ -3781,6 +3783,7 @@ def decEqAuxSyn (k r h' : ℕ) : DecidableEq (AuxSyn k r h') :=
       (@instDecidableEqProd _ _ inferInstance
         (@instDecidableEqProd _ _ inferInstance (decEqAuxLeaf k r)))
       (decEqAuxSynAgg k r))
+set_option synthInstance.maxSize 4096 in
 def decEqAuxMatAgg (k h' : ℕ) : DecidableEq (AuxMatAgg k h') := inferInstance
 def decEqAuxMatrix (k r h' : ℕ) : DecidableEq (AuxMatrix k r h') :=
   @instDecidableEqSum _ _ inferInstance
