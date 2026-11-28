@@ -1036,7 +1036,6 @@ structure InstOk (I : Inst) : Prop where
   raw_good : I.rawP.all (fun w => I.segsX.all (segGood w 0) && I.segsY.all (segGood w I.NN)) = true
   rawP_len : I.rawP.length = 8
 
-
 noncomputable section coreC
 def st (n : Nat) (f : Nat → Bool) : Bool := Nat.rec (motive := fun _ => Bool) (f 0) (fun m _ => f m) (Nat.succ n)
 def spC (NN : Nat) (d : Bool) (l s : Nat) : Nat :=
@@ -3603,7 +3602,6 @@ lemma chkFast_eq (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) :
     inactiveStart h nn aa hx hy l m g B K p)]
   rfl
 
-
 lemma tz_sub {Z Z' : ℕ} (h : mz Z' &&& mz Z = mz Z') : tz Z &&& mz Z' = tz Z' := by
   simp only [tz, nl, Nat.and_assoc]; rw [Nat.and_comm (mz Z), h]
 lemma Im_WZ {E : List (ℕ × ℕ)} {Z Z' : ℕ} (h : mz Z' &&& mz Z = mz Z') {S : Finset ℕ} (hS : (S : Set ℕ) ⊆ WZ E Z) : Im (mz Z') S ⊆ WZ E Z' := by
@@ -4185,7 +4183,6 @@ lemma ex_liveCount {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (S 
         · refine ⟨k,t,?_,?_,S0,fun x hx => (hS hx).resolve_left (fun e => hz (e ▸ hx)),hl⟩ <;>
             simp [notCount] <;> omega
 
-
 def picked {X : Type} (F : X → Bool) (G : Fin 8 → X → Bool) : Prop :=
   ∀ x, F x = true → ∃ b, G b x = true
 
@@ -4403,7 +4400,6 @@ noncomputable def chkPairPicked (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (ki
       anySubC nn (pos t) l v 0 (fun r => startPairPicked nn aa hx hy l m g B K t p H ph r kind)))
     (pwr E Z)) (pL (Q.map fun e => 16 + (K - e.2)))) (pL (Q.map fun _ => 16))) (PZ Q)) (mz Z)) (lz Z)
 
-
 lemma noNodePicked {v : List W} {H : ℕ} (h : possibleInputPair H v = false)
     (nn : ℕ) (d kind : Bool) (l m g e n z : ℕ) (f : ℕ → List W → Bool) :
     nodePicked nn f d l m g e n z v H kind = false := by
@@ -4434,7 +4430,6 @@ lemma chkPairFast_eq (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (kind : Bool) 
     inactiveStartPicked h nn aa hx hy l m g B K p kind)]
   rfl
 
-
 lemma chkPair_picked (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ)
     (h : ∀ b : Bool, chkPairPicked E Q Z K t H ph b = false) : chk E Q Z K t H ph = false := by
   suffices chk E Q Z K t H ph = true → False by
@@ -4446,9 +4441,7 @@ lemma chkPair_picked (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ)
   obtain ⟨b,hb⟩ := anySub_picked _ _ _ _ _ _ (startPair_picked _ _ _ _ _ _ _ _ _ _ _ _ _) _ hex
   exact Bool.noConfusion ((h (cvOp b)).symm.trans hb)
 
-
 end BinaryPartition
-
 
 section
 variable {P : List ℕ} {l m g T : ℕ} (X : Ctx P l m g T)
@@ -4736,7 +4729,6 @@ theorem f_graph (x : Fin 8 → Bool) : f x = decide (∃ i < ([0, 3, 1, 4, 0, 5,
     have hi' : i < 12 := hi
     interval_cases i <;> simp_all
 
-
 def EF : ℕ := ((((((((((((rawP0.getD 0 0 &&& rawP0.getD 3 0) ||| (rawP0.getD 1 0 &&& rawP0.getD 4 0)) ||| (rawP0.getD 0 0 &&& rawP0.getD 5 0)) ||| (rawP0.getD 2 0 &&& rawP0.getD 5 0)) ||| (rawP0.getD 2 0 &&& rawP0.getD 6 0)) ||| (rawP0.getD 3 0 &&& rawP0.getD 6 0)) ||| (rawP0.getD 0 0 &&& rawP0.getD 7 0)) ||| (rawP0.getD 1 0 &&& rawP0.getD 7 0)) ||| (rawP0.getD 2 0 &&& rawP0.getD 7 0)) ||| (rawP0.getD 3 0 &&& rawP0.getD 7 0)) ||| (rawP0.getD 4 0 &&& rawP0.getD 7 0)) ||| (rawP0.getD 5 0 &&& rawP0.getD 7 0))
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
@@ -4858,8 +4850,6 @@ theorem Sol.mapSignals {m T m' T' k : ℕ} {S : Set ℕ} (hl : Sol Z0 m T k S)
     rcases hw with rfl | hw
     · exact Or.inl (hbin d a b)
     · exact Or.inr ⟨w,hw,rfl⟩
-
-
 
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
 
@@ -5034,10 +5024,7 @@ lemma pull_initial (a : Fin 4) :
     · rw [pull_mask]
       exact Or.inr (Set.mem_insert_of_mem _ rfl)
 
-
-
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
-
 
 /-- The witness table specifies one source sample position for each of the 256 assignments. -/
 def cofactorPosition (a : Fin 4) (table k : ℕ) : ℕ :=
@@ -5168,7 +5155,6 @@ lemma imp_by_cofactor_symmetry {known other L table : ℕ} {a : Fin 4}
         exact Or.inr (Set.mem_insert_of_mem _ rfl)
   intro q hq sol
   exact lower q hq ((sol.mapSignals map target neg bin).mono le_rfl initial)
-
 
 def q1 : List (ℕ × ℕ) := pr rt 1
 lemma co1_p : pOk 1 q1 = true := by decide +kernel
@@ -6579,8 +6565,6 @@ lemma iroot : Imp [] 0 14 := imp_ts (Or.inl rfl) rootBounds_p (by norm_num) root
   · exact root12
   · exact root13)
 
-
-
 def sampleWire (i : ℕ) : ℕ := rawP0.getD i 0 &&& mz 0
 
 lemma sampleWire_ok (i : Fin 8) : sampleWire i.val ∈ WZ [] 0 := by
@@ -6730,9 +6714,6 @@ theorem fullExclusion {Q : List (ℕ × ℕ)} (pQ : pOk 0 Q = true)
     · rw [← hi, ← hj]
       exact tail
 
-
-
-
 def unaryBounds (Q : List (ℕ × ℕ)) (i : ℕ) : List (ℕ × ℕ) :=
   Q.filter fun e =>
     let signal := xw (i,0) &&& mz e.1
@@ -6778,21 +6759,17 @@ lemma unary_ready {i : Fin 8}
     exact Or.inl ⟨w,List.mem_append_left _ hw,rfl⟩
   · exact Or.inr hr
 
-
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
 
 def unaryConstant (i z : ℕ) : Bool :=
   let signal := xw (i,0) &&& mz z
   signal == 0 || signal == mz z
 
-def unaryCutoff (i : ℕ) : ℕ :=
-  if i == 7 then 7 else if i == 0 || i == 2 then 8 else 15
-
 def unaryCharge (i : ℕ) (e : ℕ × ℕ) : ℕ × ℕ :=
   if unaryConstant i e.1 then e else (e.1,e.2 - 1)
 
 def unaryBoundsStrong (Q : List (ℕ × ℕ)) (i : ℕ) : List (ℕ × ℕ) :=
-  (Q.filter fun e => unaryConstant i e.1 || decide (unaryCutoff i < e.2)).map (unaryCharge i)
+  Q.map (unaryCharge i)
 
 lemma unaryCharge_fst (i : ℕ) (e : ℕ × ℕ) : (unaryCharge i e).1 = e.1 := by
   by_cases h : unaryConstant i e.1 = true <;> simp [unaryCharge,h]
@@ -6804,7 +6781,7 @@ lemma unary_pos_strong (Q : List (ℕ × ℕ)) (hp : pOk 0 Q = true) (i : ℕ) :
   intro e he
   obtain ⟨original, hOriginal, rfl⟩ := List.mem_map.mp he
   simp only [unaryCharge_fst]
-  exact hp.2 original (List.mem_of_mem_filter hOriginal)
+  exact hp.2 original hOriginal
 
 lemma unary_augmented_at {i : Fin 8} (z : ℕ)
     (heq : xw (i.val,0) &&& mz z = (rawP0.getD i.val 0 &&& mz z) ^^^ mz z) :
@@ -6824,8 +6801,7 @@ lemma unary_restriction_strong {Q : List (ℕ × ℕ)} (hQ : ∀ e ∈ Q, Imp []
     (hEq : ∀ e ∈ Q, xw (i.val,0) &&& mz e.1 = (rawP0.getD i.val 0 &&& mz e.1) ^^^ mz e.1) :
     ∀ e ∈ unaryBoundsStrong Q i.val, Imp [(i.val,0)] e.1 e.2 := by
   intro e he
-  obtain ⟨original, hFiltered, rfl⟩ := List.mem_map.mp he
-  have ho := List.mem_of_mem_filter hFiltered
+  obtain ⟨original, ho, rfl⟩ := List.mem_map.mp he
   by_cases hc : unaryConstant i.val original.1 = true
   · simp only [unaryCharge,hc,ite_true]
     apply unary_restriction hQ i.val original
@@ -6860,8 +6836,6 @@ theorem build_unary_strong_certificates {Q : List (ℕ × ℕ)}
   intro q hq hSol
   exact lower (q+1) (by omega) (.un raw (hSol.mono le_rfl (unary_augmented (hEq i))))
 
-
-
 lemma ins_distribute (o : W) (v : List W) {f : List W → Bool} {g : Fin 8 → List W → Bool}
     (h : picked f g) : ins o v f = true → ∃ b, ins o v (g b) = true := by
   induction v generalizing f g with
@@ -6881,7 +6855,6 @@ lemma ins_distribute (o : W) (v : List W) {f : List W → Bool} {g : Fin 8 → L
     · cases he : Nat.beq o.s a.s
       · simpa only [he,hle,Bool.cond_true,Bool.cond_false] using h (o :: a :: r)
       · simp [he,hle]
-
 
 lemma put_distribute (m s x y : ℕ) (v : List W) {f : List W → Bool} {g : Fin 8 → List W → Bool}
     (h : picked f g) : put m s x y v f = true → ∃ b, put m s x y v (g b) = true := by
@@ -6973,7 +6946,6 @@ lemma pairs_distribute (f : XW → XW → Bool) (g : Fin 8 → XW → XW → Boo
       intro _
       obtain ⟨b,hb⟩ := scan_picked _ _ r (h a) hb
       exact ⟨b,by rw [hb]; rfl⟩
-
 
 lemma mode_distribute {f : ℕ → List W → Bool} {g : Fin 8 → ℕ → List W → Bool}
     (m free e n z : ℕ) (v : List W) (a c : W) (da dc s x y : ℕ)
@@ -7078,7 +7050,6 @@ lemma nots_some_bin (f : Nat → Nat → List W → Bool) (m g e n z q : Nat) (v
   refine ⟨⟨a.s % 8, Nat.mod_lt _ (by decide)⟩,
     (nots_true_iff _ _ _ _ _ _ _ _ _).mpr ⟨a, ?_, hit⟩⟩
   simp [ha]
-
 
 def nextPairPred (b : ℕ) (p : XW → XW → Bool) (a c : XW) : Bool :=
   Bool.rec (motive := fun _ => Bool) false (p a c) (Nat.beq (((a.s + c.s) % MM) % 8) b)
@@ -7258,7 +7229,6 @@ lemma chkPair_next (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (kind : Bool)
     (guardStart_picked t H ph (startPairNext_picked _ _ _ _ _ _ _ _ _ _ _ _ _ kind)) _ h
   exact Bool.noConfusion ((checked b).symm.trans hb)
 
-
 lemma pair_distribute {f : W → W → ℕ → ℕ → ℕ → ℕ → ℕ → Bool}
     {g : Fin 8 → W → W → ℕ → ℕ → ℕ → ℕ → ℕ → Bool}
     (h : ∀ a c da dc s x y, f a c da dc s x y = true → ∃ b, g b a c da dc s x y = true)
@@ -7277,7 +7247,6 @@ lemma pair_distribute {f : W → W → ℕ → ℕ → ℕ → ℕ → ℕ → B
   · intro _
     obtain ⟨b,hb⟩ := h _ _ _ _ _ _ _ hb
     exact ⟨b,by rw [hb]; rfl⟩
-
 
 def allInputsNeeded (nn : ℕ) (d : Bool) (l : ℕ) (v : List W) : ℕ → Bool :=
   List.rec (motive := fun _ => ℕ → Bool) (fun _ => true)
@@ -7301,7 +7270,6 @@ lemma anySub_allInputs {nn : ℕ} {d : Bool} {l : ℕ} {v : List W} {bits : ℕ}
       true (st included (fun c => anySubC nn d l ws c (fun r => test (w :: r)))) = _
     rw [st_eq, ih needed.2, mustKeep]
     cases test (w :: ws) <;> rfl
-
 
 def rootPreparedWords : List W := [
   ⟨0x7fffefc0000000000000000000000000000000000000000000000000000000000000000000000000084a2400300000180000c00006000300060000000000000000040000040000000000008000200000000200000200000000000000000007ff80fdfc007f0010fe0021fc004203f80087f0010847f0010fe002109fc004211fc004211091f80ad6ab6aabfff555fffaafffd57ffebfff7ffe00000000000000000000000000000000000000000000000000000000fc000185278004b9, 0x42000000004010000008000000000042000000000000000000000000000800000000, 0x0, 0x42000000004010000008000000000042000000000000000000000000000800000000, 3⟩,
@@ -7351,8 +7319,6 @@ lemma searchInputs_atRoot (t H ph : ℕ)
   change anySubC I.NN (pos t) I.AA rootPreparedWords 0 _ = _
   rw [anySub_allInputs (allRootInputsNeeded (pos t))]
   rfl
-
-
 
 noncomputable def initialBinary (H : ℕ) (kind : Bool) (f : ℕ → List W → Bool) : Bool :=
   nodePicked I.NN f true I.AA rootPreparedMask rootPreparedSlots 13 8
@@ -7574,8 +7540,6 @@ set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem opening_13_or_complete : initialBinary 0x80000 true (frontierMissing opening_13_or) = false := by decide +kernel
 
-
-
 abbrev SearchState := ℕ × List W
 
 noncomputable def pureAt (e : ℕ) (state : SearchState) (f : ℕ → List W → Bool) : Bool :=
@@ -7686,7 +7650,6 @@ def secondCount : ℕ := 443
 
 def encodedSecond : List ℕ := [0x90228e22cc228c22882286228422d00290028e020e02cc028c028802860284020402c2028202eea18c818c6188618c41884186418c01880186018401c20190e010e090c08ec0aea090608e60cc608c60904010408e400e408c40ca40864090208e208c2086208420900010008e000e00cc008c00ca00860084000400c2008200, 0x820590e490848e8490648e648c64886490441044ce448e448c44884486449024cc2488248624842490041004ce048e04cc048c048804860484040404c2048204aec3eca38e838e6388638e43884386438e038803860384030403c203d0e290e28ec22ec290828e8290628e628c628862d04290428e420e42cc428c4288428642, 0x8ea790878e878c878a8790678e678a678867ae47a64790078e078c078a07880786070607c40790e610e690a68ea690868e868c868a869066ae668e668a66886690268e268c268a2688268626900610068e060e06cc068c068a068806c6068606c20682068ec58e858c858e658c658865ea45882586258e058c0588058605c205, 0x8e0a880a860a060ac40a90e910e990a98ea990898e89cc898c898a89906910698e690e698a69886990498e498a498849864990291029ae298e290e298a298829a62986290629c42984298ec88e888c888e688c6888688e480e488c48884886488e288828862884288e080e088c08ea08ca088808860884080408c208820890a7, 0x864d902d102d8e2d0e2da82d882d862d062dc42d842d90ec10ec904c104c8e4c0e4c902c8e2c842c900c100c8e0c0e0cca0cc80c840c040cc20c820c90ebd06b906b8e6b8c6b904b8e4b0e4bca4b864b902b8e2b862b842bd00b900b8e0b0e0bca0b860b840b040bc20b820bb0aaaeaa908a8e8a8c8a906a8e6a886aa84a900a, 0x8c5188518651ee11ce118c1186118411c2118eb090908e908c908e708a708870a65090108e1088108610c4108e8f906f8e6f8a6f904f504fce4f8e4f884f864fd02fce2fd00f900fce0f8e0f860f840f040fc20feece8a6e884e864e860e840ec20e90ed10edaead908d8e8d8c8d906d106d8e6d0e6dca6d886d904d8e4d884d, 0x8c948e748c748a748e540e548c540c5488548654ac348c340c348634843404348eb390938e938c9390738e738a738873ae53a853a653ae338e338833863306338eb2d09290928e928c92d07290728e720e728a7288728e52885286528e320e328832a63286320632e432a432c43284328c918c718a71]
 
-
 noncomputable def transitionFromCode (width : ℕ) (parentAt : ℕ → SearchState) (entry : ℕ) : SearchState :=
   let before := parentAt (entry % 2 ^ width)
   let left := (entry >>> width) % 16
@@ -7705,7 +7668,6 @@ noncomputable def secondSlice (n : ℕ) : List SearchState :=
 
 noncomputable def secondGroups : List (List SearchState) :=
   (List.range ((secondCount + 3) / 4)).map secondSlice
-
 
 def successors0 : List ℕ := [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
 
@@ -9420,36 +9382,47 @@ theorem binaryCertificates : BinaryCertificates rootBounds := by
   · exact ⟨0x40000000000000000000000000000000, by decide +kernel,caseBinary_12⟩
   · exact ⟨0x80000, by decide +kernel,caseBinary_13⟩
 
+def unaryProofBounds : List (ℕ × ℕ) :=
+  ((rt1 ++ rt) ++ pinsAll).filter (fun e => e.2 ≥ 5)
+
+lemma unaryProofBounds_I : ∀ e ∈ unaryProofBounds, Imp [] e.1 e.2 := by
+  intro e he
+  exact apI (apI i1 ir) pinsAll_I e (List.mem_of_mem_filter he)
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_and : chkPairPicked [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 false = false := by
+lemma unaryProofBounds_p : pOk 0 unaryProofBounds = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseUnary_0_and : chkPairPicked [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 false = false := by
   rw [← chkPairFast_eq]
   decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move0 : chkPairNext [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 true 0 = false := by decide +kernel
+theorem caseUnary_0_or_move0 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move1 : chkPairNext [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 true 1 = false := by decide +kernel
+theorem caseUnary_0_or_move1 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move2 : chkPairNext [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 true 2 = false := by decide +kernel
+theorem caseUnary_0_or_move2 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 2 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move3 : chkPairNext [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 true 3 = false := by decide +kernel
+theorem caseUnary_0_or_move3 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 3 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move4 : chkPairNext [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 true 4 = false := by decide +kernel
+theorem caseUnary_0_or_move4 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 4 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move5 : chkPairNext [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 true 5 = false := by decide +kernel
+theorem caseUnary_0_or_move5 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 5 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move6 : chkPairNext [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 true 6 = false := by decide +kernel
+theorem caseUnary_0_or_move6 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 6 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move7 : chkPairNext [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 true 7 = false := by decide +kernel
-theorem caseUnary_0_or : chkPairPicked [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 true = false := by
+theorem caseUnary_0_or_move7 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 7 = false := by decide +kernel
+theorem caseUnary_0_or : chkPairPicked [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true = false := by
   apply chkPair_next
   intro b
   fin_cases b
@@ -9461,7 +9434,7 @@ theorem caseUnary_0_or : chkPairPicked [(0,0)] (unaryBoundsStrong rootBounds 0) 
   · exact caseUnary_0_or_move5
   · exact caseUnary_0_or_move6
   · exact caseUnary_0_or_move7
-theorem caseUnary_0 : chk [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 = false := by
+theorem caseUnary_0 : chk [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 = false := by
   apply chkPair_picked
   intro kind
   cases kind
@@ -9469,20 +9442,20 @@ theorem caseUnary_0 : chk [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 =
   · exact caseUnary_0_or
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_1 : chk [(1,0)] (unaryBoundsStrong rootBounds 1) 0 13 0 FF 1 = false := by
+theorem caseUnary_1 : chk [(1,0)] (unaryBoundsStrong unaryProofBounds 1) 0 13 0 FF 1 = false := by
   rw [← chkFast_eq]
   decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_2_and : chkPairPicked [(2,0)] (unaryBoundsStrong rootBounds 2) 0 13 0 FF 1 false = false := by
+theorem caseUnary_2_and : chkPairPicked [(2,0)] (unaryBoundsStrong unaryProofBounds 2) 0 13 0 FF 1 false = false := by
   rw [← chkPairFast_eq]
   decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_2_or : chkPairPicked [(2,0)] (unaryBoundsStrong rootBounds 2) 0 13 0 FF 1 true = false := by
+theorem caseUnary_2_or : chkPairPicked [(2,0)] (unaryBoundsStrong unaryProofBounds 2) 0 13 0 FF 1 true = false := by
   rw [← chkPairFast_eq]
   decide +kernel
-theorem caseUnary_2 : chk [(2,0)] (unaryBoundsStrong rootBounds 2) 0 13 0 FF 1 = false := by
+theorem caseUnary_2 : chk [(2,0)] (unaryBoundsStrong unaryProofBounds 2) 0 13 0 FF 1 = false := by
   apply chkPair_picked
   intro kind
   cases kind
@@ -9490,34 +9463,34 @@ theorem caseUnary_2 : chk [(2,0)] (unaryBoundsStrong rootBounds 2) 0 13 0 FF 1 =
   · exact caseUnary_2_or
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_6 : chk [(6,0)] (unaryBoundsStrong rootBounds 6) 0 13 0 FF 1 = false := by
+theorem caseUnary_6 : chk [(6,0)] (unaryBoundsStrong unaryProofBounds 6) 0 13 0 FF 1 = false := by
   rw [← chkFast_eq]
   decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move0 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 false 0 = false := by decide +kernel
+theorem caseUnary_7_and_move0 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move1 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 false 1 = false := by decide +kernel
+theorem caseUnary_7_and_move1 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move2 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 false 2 = false := by decide +kernel
+theorem caseUnary_7_and_move2 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 2 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move3 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 false 3 = false := by decide +kernel
+theorem caseUnary_7_and_move3 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 3 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move4 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 false 4 = false := by decide +kernel
+theorem caseUnary_7_and_move4 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 4 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move5 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 false 5 = false := by decide +kernel
+theorem caseUnary_7_and_move5 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 5 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move6 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 false 6 = false := by decide +kernel
+theorem caseUnary_7_and_move6 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 6 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move7 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 false 7 = false := by decide +kernel
-theorem caseUnary_7_and : chkPairPicked [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 false = false := by
+theorem caseUnary_7_and_move7 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 7 = false := by decide +kernel
+theorem caseUnary_7_and : chkPairPicked [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false = false := by
   apply chkPair_next
   intro b
   fin_cases b
@@ -9531,29 +9504,29 @@ theorem caseUnary_7_and : chkPairPicked [(7,0)] (unaryBoundsStrong rootBounds 7)
   · exact caseUnary_7_and_move7
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move0 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 true 0 = false := by decide +kernel
+theorem caseUnary_7_or_move0 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move1 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 true 1 = false := by decide +kernel
+theorem caseUnary_7_or_move1 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move2 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 true 2 = false := by decide +kernel
+theorem caseUnary_7_or_move2 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 2 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move3 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 true 3 = false := by decide +kernel
+theorem caseUnary_7_or_move3 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 3 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move4 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 true 4 = false := by decide +kernel
+theorem caseUnary_7_or_move4 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 4 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move5 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 true 5 = false := by decide +kernel
+theorem caseUnary_7_or_move5 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 5 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move6 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 true 6 = false := by decide +kernel
+theorem caseUnary_7_or_move6 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 6 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move7 : chkPairNext [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 true 7 = false := by decide +kernel
-theorem caseUnary_7_or : chkPairPicked [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 true = false := by
+theorem caseUnary_7_or_move7 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 7 = false := by decide +kernel
+theorem caseUnary_7_or : chkPairPicked [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true = false := by
   apply chkPair_next
   intro b
   fin_cases b
@@ -9565,7 +9538,7 @@ theorem caseUnary_7_or : chkPairPicked [(7,0)] (unaryBoundsStrong rootBounds 7) 
   · exact caseUnary_7_or_move5
   · exact caseUnary_7_or_move6
   · exact caseUnary_7_or_move7
-theorem caseUnary_7 : chk [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 = false := by
+theorem caseUnary_7 : chk [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 = false := by
   apply chkPair_picked
   intro kind
   cases kind
@@ -9574,7 +9547,7 @@ theorem caseUnary_7 : chk [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 =
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem unaryCertificates : UnaryCertificates :=
-  build_unary_strong_certificates rootBounds_p rootBounds_I iroot
+  build_unary_strong_certificates unaryProofBounds_p unaryProofBounds_I iroot
     (by decide +kernel) (by decide +kernel) (by decide +kernel)
     (by
       intro i hi
