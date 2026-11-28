@@ -1,4 +1,6 @@
 import PEqualNP.Defs
+
+namespace PEqualNP.Outside.L_meta_48478
 -- The five-input lower bound is from V_meta_9980__k13, PR #20915 by alexandersato0830.
 -- Its lower-bound method and data derive from #16362 by tungsten-wolf, Apache-2.0.
 namespace RescueK5
@@ -2721,7 +2723,6 @@ theorem s7_I9 : LevelN true s7_T 9 s7_D9 := levelStep s7_B s7_W s7_I8 (chunks 16
 theorem s7_L : LowN true s7_R s7_T 10 := lowSearch s7_B s7_I9 (by decide +kernel)
 end RescueK5
 
-namespace PEqualNP.Outside.L_meta_48478
 open PEqualNP.CircuitLowerBounds
 abbrev Row := Fin 128
 abbrev Wire := Row → Bool
@@ -5079,36 +5080,42 @@ lemma P_0_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_0 G_0 c) P_0 :=
 def bk_0_init : BT (List (List Nat)) := BT.empty
 lemma bk_0_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 (0 - 1) xs.toFinset) bk_0_init := trivial
 def nodes_0_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_0_0 : checkNodesBT W_0 G_0 fmask_0 P_0 autos_0 bk_0_init 0 nodes_0_0 = true := by decide +kernel
 def bk_0_0 : BT (List (List Nat)) := buildBucketsBT W_0 nodes_0_0
 set_option maxRecDepth 500000 in
 lemma bk_0_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 0 xs.toFinset) bk_0_0 :=
   buildBucketsBT_sound (by decide) gp_0 W_0_ok P_0_ok autos_0_ok bk_0_init_ok chk_0_0
 def nodes_0_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_0_1 : checkNodesBT W_0 G_0 fmask_0 P_0 autos_0 bk_0_0 1 nodes_0_1 = true := by decide +kernel
 def bk_0_1 : BT (List (List Nat)) := buildBucketsBT W_0 nodes_0_1
 set_option maxRecDepth 500000 in
 lemma bk_0_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 1 xs.toFinset) bk_0_1 :=
   buildBucketsBT_sound (by decide) gp_0 W_0_ok P_0_ok autos_0_ok bk_0_0_ok chk_0_1
 def nodes_0_2 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_0_2 : checkNodesBT W_0 G_0 fmask_0 P_0 autos_0 bk_0_1 2 nodes_0_2 = true := by decide +kernel
 def bk_0_2 : BT (List (List Nat)) := buildBucketsBT W_0 nodes_0_2
 set_option maxRecDepth 500000 in
 lemma bk_0_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 2 xs.toFinset) bk_0_2 :=
   buildBucketsBT_sound (by decide) gp_0 W_0_ok P_0_ok autos_0_ok bk_0_1_ok chk_0_2
 def nodes_0_3 : List NodeSpec := [([0,1,2],[],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_0_3 : checkNodesBT W_0 G_0 fmask_0 P_0 autos_0 bk_0_2 3 nodes_0_3 = true := by decide +kernel
 def bk_0_3 : BT (List (List Nat)) := buildBucketsBT W_0 nodes_0_3
 set_option maxRecDepth 500000 in
 lemma bk_0_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 3 xs.toFinset) bk_0_3 :=
   buildBucketsBT_sound (by decide) gp_0 W_0_ok P_0_ok autos_0_ok bk_0_2_ok chk_0_3
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_0_ok : forestRootCheck R_0 G_0 [(VAR 2,20,16),(VAR 4,20,4),(VAR 5,36,4)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_0_in : bucketContainsBT bk_0_3 R_0 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_0 : Lower R_0 G_0 4 := lower_of_forestBT root_0_ok bk_0_3_ok root_0_in
@@ -5179,57 +5186,66 @@ lemma P_18_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_18 G_18 c) P_1
 def bk_18_init : BT (List (List Nat)) := BT.empty
 lemma bk_18_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_18 (0 - 1) xs.toFinset) bk_18_init := trivial
 def nodes_18_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_18_0 : checkNodesBT W_18 G_18 fmask_18 P_18 autos_18 bk_18_init 0 nodes_18_0 = true := by decide +kernel
 def bk_18_0 : BT (List (List Nat)) := buildBucketsBT W_18 nodes_18_0
 set_option maxRecDepth 500000 in
 lemma bk_18_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_18 0 xs.toFinset) bk_18_0 :=
   buildBucketsBT_sound (by decide) gp_18 W_18_ok P_18_ok autos_18_ok bk_18_init_ok chk_18_0
 def nodes_18_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_18_1 : checkNodesBT W_18 G_18 fmask_18 P_18 autos_18 bk_18_0 1 nodes_18_1 = true := by decide +kernel
 def bk_18_1 : BT (List (List Nat)) := buildBucketsBT W_18 nodes_18_1
 set_option maxRecDepth 500000 in
 lemma bk_18_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_18 1 xs.toFinset) bk_18_1 :=
   buildBucketsBT_sound (by decide) gp_18 W_18_ok P_18_ok autos_18_ok bk_18_0_ok chk_18_1
 def nodes_18_2 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_18_2 : checkNodesBT W_18 G_18 fmask_18 P_18 autos_18 bk_18_1 2 nodes_18_2 = true := by decide +kernel
 def bk_18_2 : BT (List (List Nat)) := buildBucketsBT W_18 nodes_18_2
 set_option maxRecDepth 500000 in
 lemma bk_18_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_18 2 xs.toFinset) bk_18_2 :=
   buildBucketsBT_sound (by decide) gp_18 W_18_ok P_18_ok autos_18_ok bk_18_1_ok chk_18_2
 def nodes_18_3 : List NodeSpec := [([4,6,8,3],[0,1],[]),([9,0,1,2],[],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_18_3 : checkNodesBT W_18 G_18 fmask_18 P_18 autos_18 bk_18_2 3 nodes_18_3 = true := by decide +kernel
 def bk_18_3 : BT (List (List Nat)) := buildBucketsBT W_18 nodes_18_3
 set_option maxRecDepth 500000 in
 lemma bk_18_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_18 3 xs.toFinset) bk_18_3 :=
   buildBucketsBT_sound (by decide) gp_18 W_18_ok P_18_ok autos_18_ok bk_18_2_ok chk_18_3
 def nodes_18_4 : List NodeSpec := [([5,0,1,2,3],[],[]),([4,6,1,2,3],[0,2],[0]),([7,0,1,2,3],[3],[0])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_18_4 : checkNodesBT W_18 G_18 fmask_18 P_18 autos_18 bk_18_3 4 nodes_18_4 = true := by decide +kernel
 def bk_18_4 : BT (List (List Nat)) := buildBucketsBT W_18 nodes_18_4
 set_option maxRecDepth 500000 in
 lemma bk_18_4_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_18 4 xs.toFinset) bk_18_4 :=
   buildBucketsBT_sound (by decide) gp_18 W_18_ok P_18_ok autos_18_ok bk_18_3_ok chk_18_4
 def nodes_18_5 : List NodeSpec := [([4,0,1,2,3],[2,1,0,3],[0,1,2,3])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_18_5 : checkNodesBT W_18 G_18 fmask_18 P_18 autos_18 bk_18_4 5 nodes_18_5 = true := by decide +kernel
 def bk_18_5 : BT (List (List Nat)) := buildBucketsBT W_18 nodes_18_5
 set_option maxRecDepth 500000 in
 lemma bk_18_5_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_18 5 xs.toFinset) bk_18_5 :=
   buildBucketsBT_sound (by decide) gp_18 W_18_ok P_18_ok autos_18_ok bk_18_4_ok chk_18_5
 def nodes_18_6 : List NodeSpec := [([0,1,2,3],[1,2,0,3],[0,4,5,6,7,8])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_18_6 : checkNodesBT W_18 G_18 fmask_18 P_18 autos_18 bk_18_5 6 nodes_18_6 = true := by decide +kernel
 def bk_18_6 : BT (List (List Nat)) := buildBucketsBT W_18 nodes_18_6
 set_option maxRecDepth 500000 in
 lemma bk_18_6_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_18 6 xs.toFinset) bk_18_6 :=
   buildBucketsBT_sound (by decide) gp_18 W_18_ok P_18_ok autos_18_ok bk_18_5_ok chk_18_6
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_18_ok : forestRootCheck R_18 G_18 [(VAR 1,22,20),(VAR 2,22,18),(VAR 4,22,6),(VAR 5,38,6)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_18_in : bucketContainsBT bk_18_6 R_18 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_18 : Lower R_18 G_18 7 := lower_of_forestBT root_18_ok bk_18_6_ok root_18_in
@@ -5262,50 +5278,58 @@ lemma P_19_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_19 G_19 c) P_1
 def bk_19_init : BT (List (List Nat)) := BT.empty
 lemma bk_19_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_19 (0 - 1) xs.toFinset) bk_19_init := trivial
 def nodes_19_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_19_0 : checkNodesBT W_19 G_19 fmask_19 P_19 autos_19 bk_19_init 0 nodes_19_0 = true := by decide +kernel
 def bk_19_0 : BT (List (List Nat)) := buildBucketsBT W_19 nodes_19_0
 set_option maxRecDepth 500000 in
 lemma bk_19_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_19 0 xs.toFinset) bk_19_0 :=
   buildBucketsBT_sound (by decide) gp_19 W_19_ok P_19_ok autos_19_ok bk_19_init_ok chk_19_0
 def nodes_19_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_19_1 : checkNodesBT W_19 G_19 fmask_19 P_19 autos_19 bk_19_0 1 nodes_19_1 = true := by decide +kernel
 def bk_19_1 : BT (List (List Nat)) := buildBucketsBT W_19 nodes_19_1
 set_option maxRecDepth 500000 in
 lemma bk_19_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_19 1 xs.toFinset) bk_19_1 :=
   buildBucketsBT_sound (by decide) gp_19 W_19_ok P_19_ok autos_19_ok bk_19_0_ok chk_19_1
 def nodes_19_2 : List NodeSpec := [([18,2,3],[],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_19_2 : checkNodesBT W_19 G_19 fmask_19 P_19 autos_19 bk_19_1 2 nodes_19_2 = true := by decide +kernel
 def bk_19_2 : BT (List (List Nat)) := buildBucketsBT W_19 nodes_19_2
 set_option maxRecDepth 500000 in
 lemma bk_19_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_19 2 xs.toFinset) bk_19_2 :=
   buildBucketsBT_sound (by decide) gp_19 W_19_ok P_19_ok autos_19_ok bk_19_1_ok chk_19_2
 def nodes_19_3 : List NodeSpec := [([6,4,1,2],[],[]),([11,0,2,3],[],[]),([12,0,2,3],[],[]),([0,13,2,3],[],[]),([8,14,2,3],[],[0]),([0,1,15,3],[],[]),([0,16,2,3],[],[]),([0,1,17,3],[],[]),([10,9,2,3],[],[0])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_19_3 : checkNodesBT W_19 G_19 fmask_19 P_19 autos_19 bk_19_2 3 nodes_19_3 = true := by decide +kernel
 def bk_19_3 : BT (List (List Nat)) := buildBucketsBT W_19 nodes_19_3
 set_option maxRecDepth 500000 in
 lemma bk_19_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_19 3 xs.toFinset) bk_19_3 :=
   buildBucketsBT_sound (by decide) gp_19 W_19_ok P_19_ok autos_19_ok bk_19_2_ok chk_19_3
 def nodes_19_4 : List NodeSpec := [([4,0,1,2,3],[],[0]),([0,1,2,3,5],[],[0,1]),([6,0,1,2,3],[],[0]),([7,0,1,2,3],[],[0,1]),([8,0,1,2,3],[],[0]),([0,1,9,2,3],[],[0]),([10,0,1,2,3],[],[0])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_19_4 : checkNodesBT W_19 G_19 fmask_19 P_19 autos_19 bk_19_3 4 nodes_19_4 = true := by decide +kernel
 def bk_19_4 : BT (List (List Nat)) := buildBucketsBT W_19 nodes_19_4
 set_option maxRecDepth 500000 in
 lemma bk_19_4_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_19 4 xs.toFinset) bk_19_4 :=
   buildBucketsBT_sound (by decide) gp_19 W_19_ok P_19_ok autos_19_ok bk_19_3_ok chk_19_4
 def nodes_19_5 : List NodeSpec := [([0,1,2,3],[],[0,2,1,3,4,5])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_19_5 : checkNodesBT W_19 G_19 fmask_19 P_19 autos_19 bk_19_4 5 nodes_19_5 = true := by decide +kernel
 def bk_19_5 : BT (List (List Nat)) := buildBucketsBT W_19 nodes_19_5
 set_option maxRecDepth 500000 in
 lemma bk_19_5_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_19 5 xs.toFinset) bk_19_5 :=
   buildBucketsBT_sound (by decide) gp_19 W_19_ok P_19_ok autos_19_ok bk_19_4_ok chk_19_5
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_19_ok : forestRootCheck R_19 G_19 [(VAR 0,7,6),(VAR 1,7,5),(VAR 2,7,3),(VAR 3,9,1)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_19_in : bucketContainsBT bk_19_5 R_19 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_19 : Lower R_19 G_19 6 := lower_of_forestBT root_19_ok bk_19_5_ok root_19_in
@@ -5356,57 +5380,66 @@ lemma P_23_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_23 G_23 c) P_2
 def bk_23_init : BT (List (List Nat)) := BT.empty
 lemma bk_23_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_23 (0 - 1) xs.toFinset) bk_23_init := trivial
 def nodes_23_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_23_0 : checkNodesBT W_23 G_23 fmask_23 P_23 autos_23 bk_23_init 0 nodes_23_0 = true := by decide +kernel
 def bk_23_0 : BT (List (List Nat)) := buildBucketsBT W_23 nodes_23_0
 set_option maxRecDepth 500000 in
 lemma bk_23_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_23 0 xs.toFinset) bk_23_0 :=
   buildBucketsBT_sound (by decide) gp_23 W_23_ok P_23_ok autos_23_ok bk_23_init_ok chk_23_0
 def nodes_23_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_23_1 : checkNodesBT W_23 G_23 fmask_23 P_23 autos_23 bk_23_0 1 nodes_23_1 = true := by decide +kernel
 def bk_23_1 : BT (List (List Nat)) := buildBucketsBT W_23 nodes_23_1
 set_option maxRecDepth 500000 in
 lemma bk_23_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_23 1 xs.toFinset) bk_23_1 :=
   buildBucketsBT_sound (by decide) gp_23 W_23_ok P_23_ok autos_23_ok bk_23_0_ok chk_23_1
 def nodes_23_2 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_23_2 : checkNodesBT W_23 G_23 fmask_23 P_23 autos_23 bk_23_1 2 nodes_23_2 = true := by decide +kernel
 def bk_23_2 : BT (List (List Nat)) := buildBucketsBT W_23 nodes_23_2
 set_option maxRecDepth 500000 in
 lemma bk_23_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_23 2 xs.toFinset) bk_23_2 :=
   buildBucketsBT_sound (by decide) gp_23 W_23_ok P_23_ok autos_23_ok bk_23_1_ok chk_23_2
 def nodes_23_3 : List NodeSpec := [([8,0,1,2],[],[]),([4,7,9,3],[0,1],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_23_3 : checkNodesBT W_23 G_23 fmask_23 P_23 autos_23 bk_23_2 3 nodes_23_3 = true := by decide +kernel
 def bk_23_3 : BT (List (List Nat)) := buildBucketsBT W_23 nodes_23_3
 set_option maxRecDepth 500000 in
 lemma bk_23_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_23 3 xs.toFinset) bk_23_3 :=
   buildBucketsBT_sound (by decide) gp_23 W_23_ok P_23_ok autos_23_ok bk_23_2_ok chk_23_3
 def nodes_23_4 : List NodeSpec := [([5,0,1,2,3],[],[]),([0,1,2,6,3],[2],[0]),([1,4,2,7,3],[0,3],[0])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_23_4 : checkNodesBT W_23 G_23 fmask_23 P_23 autos_23 bk_23_3 4 nodes_23_4 = true := by decide +kernel
 def bk_23_4 : BT (List (List Nat)) := buildBucketsBT W_23 nodes_23_4
 set_option maxRecDepth 500000 in
 lemma bk_23_4_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_23 4 xs.toFinset) bk_23_4 :=
   buildBucketsBT_sound (by decide) gp_23 W_23_ok P_23_ok autos_23_ok bk_23_3_ok chk_23_4
 def nodes_23_5 : List NodeSpec := [([0,1,4,2,3],[0,1,3,2],[0,1,2,3])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_23_5 : checkNodesBT W_23 G_23 fmask_23 P_23 autos_23 bk_23_4 5 nodes_23_5 = true := by decide +kernel
 def bk_23_5 : BT (List (List Nat)) := buildBucketsBT W_23 nodes_23_5
 set_option maxRecDepth 500000 in
 lemma bk_23_5_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_23 5 xs.toFinset) bk_23_5 :=
   buildBucketsBT_sound (by decide) gp_23 W_23_ok P_23_ok autos_23_ok bk_23_4_ok chk_23_5
 def nodes_23_6 : List NodeSpec := [([0,1,2,3],[0,1,3,2],[0,4,5,6,7,8])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_23_6 : checkNodesBT W_23 G_23 fmask_23 P_23 autos_23 bk_23_5 6 nodes_23_6 = true := by decide +kernel
 def bk_23_6 : BT (List (List Nat)) := buildBucketsBT W_23 nodes_23_6
 set_option maxRecDepth 500000 in
 lemma bk_23_6_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_23 6 xs.toFinset) bk_23_6 :=
   buildBucketsBT_sound (by decide) gp_23 W_23_ok P_23_ok autos_23_ok bk_23_5_ok chk_23_6
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_23_ok : forestRootCheck R_23 G_23 [(VAR 1,6,4),(VAR 2,6,2),(VAR 4,18,2),(VAR 5,34,2)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_23_in : bucketContainsBT bk_23_6 R_23 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_23 : Lower R_23 G_23 7 := lower_of_forestBT root_23_ok bk_23_6_ok root_23_in
@@ -5498,71 +5531,82 @@ lemma P_53_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_53 G_53 c) P_5
 def bk_53_init : BT (List (List Nat)) := BT.empty
 lemma bk_53_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_53 (0 - 1) xs.toFinset) bk_53_init := trivial
 def nodes_53_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_53_0 : checkNodesBT W_53 G_53 fmask_53 P_53 autos_53 bk_53_init 0 nodes_53_0 = true := by decide +kernel
 def bk_53_0 : BT (List (List Nat)) := buildBucketsBT W_53 nodes_53_0
 set_option maxRecDepth 500000 in
 lemma bk_53_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_53 0 xs.toFinset) bk_53_0 :=
   buildBucketsBT_sound (by decide) gp_53 W_53_ok P_53_ok autos_53_ok bk_53_init_ok chk_53_0
 def nodes_53_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_53_1 : checkNodesBT W_53 G_53 fmask_53 P_53 autos_53 bk_53_0 1 nodes_53_1 = true := by decide +kernel
 def bk_53_1 : BT (List (List Nat)) := buildBucketsBT W_53 nodes_53_1
 set_option maxRecDepth 500000 in
 lemma bk_53_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_53 1 xs.toFinset) bk_53_1 :=
   buildBucketsBT_sound (by decide) gp_53 W_53_ok P_53_ok autos_53_ok bk_53_0_ok chk_53_1
 def nodes_53_2 : List NodeSpec := [([14,3,4],[],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_53_2 : checkNodesBT W_53 G_53 fmask_53 P_53 autos_53 bk_53_1 2 nodes_53_2 = true := by decide +kernel
 def bk_53_2 : BT (List (List Nat)) := buildBucketsBT W_53 nodes_53_2
 set_option maxRecDepth 500000 in
 lemma bk_53_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_53 2 xs.toFinset) bk_53_2 :=
   buildBucketsBT_sound (by decide) gp_53 W_53_ok P_53_ok autos_53_ok bk_53_1_ok chk_53_2
 def nodes_53_3 : List NodeSpec := nodesWithIdentity [([11,10,3,4],[]),([13,12,3,4],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_53_3 : checkNodesBT W_53 G_53 fmask_53 P_53 autos_53 bk_53_2 3 nodes_53_3 = true := by decide +kernel
 def bk_53_3 : BT (List (List Nat)) := buildBucketsBT W_53 nodes_53_3
 set_option maxRecDepth 500000 in
 lemma bk_53_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_53 3 xs.toFinset) bk_53_3 :=
   buildBucketsBT_sound (by decide) gp_53 W_53_ok P_53_ok autos_53_ok bk_53_2_ok chk_53_3
 def nodes_53_4 : List NodeSpec := nodesWithIdentity [([9,10,2,3,4],[]),([11,9,2,3,4],[]),([9,2,12,3,4],[]),([13,9,2,3,4],[0,1])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_53_4 : checkNodesBT W_53 G_53 fmask_53 P_53 autos_53 bk_53_3 4 nodes_53_4 = true := by decide +kernel
 def bk_53_4 : BT (List (List Nat)) := buildBucketsBT W_53 nodes_53_4
 set_option maxRecDepth 500000 in
 lemma bk_53_4_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_53 4 xs.toFinset) bk_53_4 :=
   buildBucketsBT_sound (by decide) gp_53 W_53_ok P_53_ok autos_53_ok bk_53_3_ok chk_53_4
 def nodes_53_5 : List NodeSpec := nodesWithIdentity [([9,2,3,4],[2,1])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_53_5 : checkNodesBT W_53 G_53 fmask_53 P_53 autos_53 bk_53_4 5 nodes_53_5 = true := by decide +kernel
 def bk_53_5 : BT (List (List Nat)) := buildBucketsBT W_53 nodes_53_5
 set_option maxRecDepth 500000 in
 lemma bk_53_5_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_53 5 xs.toFinset) bk_53_5 :=
   buildBucketsBT_sound (by decide) gp_53 W_53_ok P_53_ok autos_53_ok bk_53_4_ok chk_53_5
 def nodes_53_6 : List NodeSpec := nodesWithIdentity [([5,8,2,3,4],[3,4,2,1]),([7,6,2,3,4],[5,4,2,1])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_53_6 : checkNodesBT W_53 G_53 fmask_53 P_53 autos_53 bk_53_5 6 nodes_53_6 = true := by decide +kernel
 def bk_53_6 : BT (List (List Nat)) := buildBucketsBT W_53 nodes_53_6
 set_option maxRecDepth 500000 in
 lemma bk_53_6_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_53 6 xs.toFinset) bk_53_6 :=
   buildBucketsBT_sound (by decide) gp_53 W_53_ok P_53_ok autos_53_ok bk_53_5_ok chk_53_6
 def nodes_53_7 : List NodeSpec := nodesWithIdentity [([5,0,1,2,3,4],[5,4,3,6,7,8,9,10,11,1]),([0,1,6,2,3,4],[4,5,3,7,6,12,11,10,1]),([7,0,1,2,3,4],[5,3,6,7,8,2,10,11,4,13,1,14])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_53_7 : checkNodesBT W_53 G_53 fmask_53 P_53 autos_53 bk_53_6 7 nodes_53_7 = true := by decide +kernel
 def bk_53_7 : BT (List (List Nat)) := buildBucketsBT W_53 nodes_53_7
 set_option maxRecDepth 500000 in
 lemma bk_53_7_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_53 7 xs.toFinset) bk_53_7 :=
   buildBucketsBT_sound (by decide) gp_53 W_53_ok P_53_ok autos_53_ok bk_53_6_ok chk_53_7
 def nodes_53_8 : List NodeSpec := [([0,1,2,3,4],[8,11],[0,1,2,3,4,5])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_53_8 : checkNodesBT W_53 G_53 fmask_53 P_53 autos_53 bk_53_7 8 nodes_53_8 = true := by decide +kernel
 def bk_53_8 : BT (List (List Nat)) := buildBucketsBT W_53 nodes_53_8
 set_option maxRecDepth 500000 in
 lemma bk_53_8_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_53 8 xs.toFinset) bk_53_8 :=
   buildBucketsBT_sound (by decide) gp_53 W_53_ok P_53_ok autos_53_ok bk_53_7_ok chk_53_8
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_53_ok : forestRootCheck R_53 G_53 [(VAR 0,7,6),(VAR 1,7,5),(VAR 2,7,3),(VAR 3,11,3),(VAR 5,41,9)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_53_in : bucketContainsBT bk_53_8 R_53 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_53 : Lower R_53 G_53 9 := lower_of_forestBT root_53_ok bk_53_8_ok root_53_in
@@ -5607,36 +5651,42 @@ lemma P_0_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_0 G_0 c) P_0 :=
 def bk_0_init : BT (List (List Nat)) := BT.empty
 lemma bk_0_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 (0 - 1) xs.toFinset) bk_0_init := trivial
 def nodes_0_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_0_0 : checkNodesBT W_0 G_0 fmask_0 P_0 autos_0 bk_0_init 0 nodes_0_0 = true := by decide +kernel
 def bk_0_0 : BT (List (List Nat)) := buildBucketsBT W_0 nodes_0_0
 set_option maxRecDepth 500000 in
 lemma bk_0_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 0 xs.toFinset) bk_0_0 :=
   buildBucketsBT_sound (by decide) gp_0 W_0_ok P_0_ok autos_0_ok bk_0_init_ok chk_0_0
 def nodes_0_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_0_1 : checkNodesBT W_0 G_0 fmask_0 P_0 autos_0 bk_0_0 1 nodes_0_1 = true := by decide +kernel
 def bk_0_1 : BT (List (List Nat)) := buildBucketsBT W_0 nodes_0_1
 set_option maxRecDepth 500000 in
 lemma bk_0_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 1 xs.toFinset) bk_0_1 :=
   buildBucketsBT_sound (by decide) gp_0 W_0_ok P_0_ok autos_0_ok bk_0_0_ok chk_0_1
 def nodes_0_2 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_0_2 : checkNodesBT W_0 G_0 fmask_0 P_0 autos_0 bk_0_1 2 nodes_0_2 = true := by decide +kernel
 def bk_0_2 : BT (List (List Nat)) := buildBucketsBT W_0 nodes_0_2
 set_option maxRecDepth 500000 in
 lemma bk_0_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 2 xs.toFinset) bk_0_2 :=
   buildBucketsBT_sound (by decide) gp_0 W_0_ok P_0_ok autos_0_ok bk_0_1_ok chk_0_2
 def nodes_0_3 : List NodeSpec := [([0,1,2],[],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_0_3 : checkNodesBT W_0 G_0 fmask_0 P_0 autos_0 bk_0_2 3 nodes_0_3 = true := by decide +kernel
 def bk_0_3 : BT (List (List Nat)) := buildBucketsBT W_0 nodes_0_3
 set_option maxRecDepth 500000 in
 lemma bk_0_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 3 xs.toFinset) bk_0_3 :=
   buildBucketsBT_sound (by decide) gp_0 W_0_ok P_0_ok autos_0_ok bk_0_2_ok chk_0_3
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_0_ok : forestRootCheck R_0 G_0 [(VAR 2,20,16),(VAR 4,20,4),(VAR 5,36,4)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_0_in : bucketContainsBT bk_0_3 R_0 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_0 : Lower R_0 G_0 4 := lower_of_forestBT root_0_ok bk_0_3_ok root_0_in
@@ -5689,50 +5739,58 @@ lemma P_12_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_12 G_12 c) P_1
 def bk_12_init : BT (List (List Nat)) := BT.empty
 lemma bk_12_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_12 (0 - 1) xs.toFinset) bk_12_init := trivial
 def nodes_12_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_12_0 : checkNodesBT W_12 G_12 fmask_12 P_12 autos_12 bk_12_init 0 nodes_12_0 = true := by decide +kernel
 def bk_12_0 : BT (List (List Nat)) := buildBucketsBT W_12 nodes_12_0
 set_option maxRecDepth 500000 in
 lemma bk_12_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_12 0 xs.toFinset) bk_12_0 :=
   buildBucketsBT_sound (by decide) gp_12 W_12_ok P_12_ok autos_12_ok bk_12_init_ok chk_12_0
 def nodes_12_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_12_1 : checkNodesBT W_12 G_12 fmask_12 P_12 autos_12 bk_12_0 1 nodes_12_1 = true := by decide +kernel
 def bk_12_1 : BT (List (List Nat)) := buildBucketsBT W_12 nodes_12_1
 set_option maxRecDepth 500000 in
 lemma bk_12_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_12 1 xs.toFinset) bk_12_1 :=
   buildBucketsBT_sound (by decide) gp_12 W_12_ok P_12_ok autos_12_ok bk_12_0_ok chk_12_1
 def nodes_12_2 : List NodeSpec := [([18,1,3],[],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_12_2 : checkNodesBT W_12 G_12 fmask_12 P_12 autos_12 bk_12_1 2 nodes_12_2 = true := by decide +kernel
 def bk_12_2 : BT (List (List Nat)) := buildBucketsBT W_12 nodes_12_2
 set_option maxRecDepth 500000 in
 lemma bk_12_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_12 2 xs.toFinset) bk_12_2 :=
   buildBucketsBT_sound (by decide) gp_12 W_12_ok P_12_ok autos_12_ok bk_12_1_ok chk_12_2
 def nodes_12_3 : List NodeSpec := [([4,11,1,3],[],[0]),([0,1,2,12],[],[]),([7,1,5,3],[],[0]),([13,0,1,3],[],[]),([0,1,14,3],[],[]),([6,8,2,3],[],[]),([0,1,2,15],[],[]),([16,0,1,3],[],[]),([0,1,17,3],[],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_12_3 : checkNodesBT W_12 G_12 fmask_12 P_12 autos_12 bk_12_2 3 nodes_12_3 = true := by decide +kernel
 def bk_12_3 : BT (List (List Nat)) := buildBucketsBT W_12 nodes_12_3
 set_option maxRecDepth 500000 in
 lemma bk_12_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_12 3 xs.toFinset) bk_12_3 :=
   buildBucketsBT_sound (by decide) gp_12 W_12_ok P_12_ok autos_12_ok bk_12_2_ok chk_12_3
 def nodes_12_4 : List NodeSpec := [([4,0,1,2,3],[],[0]),([0,1,2,5,3],[],[0]),([6,0,1,2,3],[],[0]),([7,0,1,2,3],[],[0]),([8,0,1,2,3],[],[0]),([0,1,9,2,3],[],[0,1]),([10,0,1,2,3],[],[0,1])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_12_4 : checkNodesBT W_12 G_12 fmask_12 P_12 autos_12 bk_12_3 4 nodes_12_4 = true := by decide +kernel
 def bk_12_4 : BT (List (List Nat)) := buildBucketsBT W_12 nodes_12_4
 set_option maxRecDepth 500000 in
 lemma bk_12_4_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_12 4 xs.toFinset) bk_12_4 :=
   buildBucketsBT_sound (by decide) gp_12 W_12_ok P_12_ok autos_12_ok bk_12_3_ok chk_12_4
 def nodes_12_5 : List NodeSpec := [([0,1,2,3],[],[0,2,1,3,4,5])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_12_5 : checkNodesBT W_12 G_12 fmask_12 P_12 autos_12 bk_12_4 5 nodes_12_5 = true := by decide +kernel
 def bk_12_5 : BT (List (List Nat)) := buildBucketsBT W_12 nodes_12_5
 set_option maxRecDepth 500000 in
 lemma bk_12_5_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_12 5 xs.toFinset) bk_12_5 :=
   buildBucketsBT_sound (by decide) gp_12 W_12_ok P_12_ok autos_12_ok bk_12_4_ok chk_12_5
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_12_ok : forestRootCheck R_12 G_12 [(VAR 2,12,8),(VAR 3,12,4),(VAR 4,24,8),(VAR 5,40,8)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_12_in : bucketContainsBT bk_12_5 R_12 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_12 : Lower R_12 G_12 6 := lower_of_forestBT root_12_ok bk_12_5_ok root_12_in
@@ -5773,57 +5831,66 @@ lemma P_13_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_13 G_13 c) P_1
 def bk_13_init : BT (List (List Nat)) := BT.empty
 lemma bk_13_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_13 (0 - 1) xs.toFinset) bk_13_init := trivial
 def nodes_13_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_13_0 : checkNodesBT W_13 G_13 fmask_13 P_13 autos_13 bk_13_init 0 nodes_13_0 = true := by decide +kernel
 def bk_13_0 : BT (List (List Nat)) := buildBucketsBT W_13 nodes_13_0
 set_option maxRecDepth 500000 in
 lemma bk_13_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_13 0 xs.toFinset) bk_13_0 :=
   buildBucketsBT_sound (by decide) gp_13 W_13_ok P_13_ok autos_13_ok bk_13_init_ok chk_13_0
 def nodes_13_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_13_1 : checkNodesBT W_13 G_13 fmask_13 P_13 autos_13 bk_13_0 1 nodes_13_1 = true := by decide +kernel
 def bk_13_1 : BT (List (List Nat)) := buildBucketsBT W_13 nodes_13_1
 set_option maxRecDepth 500000 in
 lemma bk_13_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_13 1 xs.toFinset) bk_13_1 :=
   buildBucketsBT_sound (by decide) gp_13 W_13_ok P_13_ok autos_13_ok bk_13_0_ok chk_13_1
 def nodes_13_2 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_13_2 : checkNodesBT W_13 G_13 fmask_13 P_13 autos_13 bk_13_1 2 nodes_13_2 = true := by decide +kernel
 def bk_13_2 : BT (List (List Nat)) := buildBucketsBT W_13 nodes_13_2
 set_option maxRecDepth 500000 in
 lemma bk_13_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_13 2 xs.toFinset) bk_13_2 :=
   buildBucketsBT_sound (by decide) gp_13 W_13_ok P_13_ok autos_13_ok bk_13_1_ok chk_13_2
 def nodes_13_3 : List NodeSpec := [([8,0,1,2],[],[]),([4,7,9,3],[0,1],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_13_3 : checkNodesBT W_13 G_13 fmask_13 P_13 autos_13 bk_13_2 3 nodes_13_3 = true := by decide +kernel
 def bk_13_3 : BT (List (List Nat)) := buildBucketsBT W_13 nodes_13_3
 set_option maxRecDepth 500000 in
 lemma bk_13_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_13 3 xs.toFinset) bk_13_3 :=
   buildBucketsBT_sound (by decide) gp_13 W_13_ok P_13_ok autos_13_ok bk_13_2_ok chk_13_3
 def nodes_13_4 : List NodeSpec := [([5,0,1,2,3],[],[]),([0,1,2,6,3],[2],[0]),([1,4,2,7,3],[0,3],[0])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_13_4 : checkNodesBT W_13 G_13 fmask_13 P_13 autos_13 bk_13_3 4 nodes_13_4 = true := by decide +kernel
 def bk_13_4 : BT (List (List Nat)) := buildBucketsBT W_13 nodes_13_4
 set_option maxRecDepth 500000 in
 lemma bk_13_4_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_13 4 xs.toFinset) bk_13_4 :=
   buildBucketsBT_sound (by decide) gp_13 W_13_ok P_13_ok autos_13_ok bk_13_3_ok chk_13_4
 def nodes_13_5 : List NodeSpec := [([0,1,4,2,3],[0,1,3,2],[0,1,2,3])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_13_5 : checkNodesBT W_13 G_13 fmask_13 P_13 autos_13 bk_13_4 5 nodes_13_5 = true := by decide +kernel
 def bk_13_5 : BT (List (List Nat)) := buildBucketsBT W_13 nodes_13_5
 set_option maxRecDepth 500000 in
 lemma bk_13_5_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_13 5 xs.toFinset) bk_13_5 :=
   buildBucketsBT_sound (by decide) gp_13 W_13_ok P_13_ok autos_13_ok bk_13_4_ok chk_13_5
 def nodes_13_6 : List NodeSpec := [([0,1,2,3],[0,1,3,2],[0,4,5,6,7,8])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_13_6 : checkNodesBT W_13 G_13 fmask_13 P_13 autos_13 bk_13_5 6 nodes_13_6 = true := by decide +kernel
 def bk_13_6 : BT (List (List Nat)) := buildBucketsBT W_13 nodes_13_6
 set_option maxRecDepth 500000 in
 lemma bk_13_6_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_13 6 xs.toFinset) bk_13_6 :=
   buildBucketsBT_sound (by decide) gp_13 W_13_ok P_13_ok autos_13_ok bk_13_5_ok chk_13_6
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_13_ok : forestRootCheck R_13 G_13 [(VAR 1,6,4),(VAR 2,6,2),(VAR 4,18,2),(VAR 5,34,2)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_13_in : bucketContainsBT bk_13_6 R_13 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_13 : Lower R_13 G_13 7 := lower_of_forestBT root_13_ok bk_13_6_ok root_13_in
@@ -5906,71 +5973,82 @@ lemma P_42_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_42 G_42 c) P_4
 def bk_42_init : BT (List (List Nat)) := BT.empty
 lemma bk_42_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_42 (0 - 1) xs.toFinset) bk_42_init := trivial
 def nodes_42_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_42_0 : checkNodesBT W_42 G_42 fmask_42 P_42 autos_42 bk_42_init 0 nodes_42_0 = true := by decide +kernel
 def bk_42_0 : BT (List (List Nat)) := buildBucketsBT W_42 nodes_42_0
 set_option maxRecDepth 500000 in
 lemma bk_42_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_42 0 xs.toFinset) bk_42_0 :=
   buildBucketsBT_sound (by decide) gp_42 W_42_ok P_42_ok autos_42_ok bk_42_init_ok chk_42_0
 def nodes_42_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_42_1 : checkNodesBT W_42 G_42 fmask_42 P_42 autos_42 bk_42_0 1 nodes_42_1 = true := by decide +kernel
 def bk_42_1 : BT (List (List Nat)) := buildBucketsBT W_42 nodes_42_1
 set_option maxRecDepth 500000 in
 lemma bk_42_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_42 1 xs.toFinset) bk_42_1 :=
   buildBucketsBT_sound (by decide) gp_42 W_42_ok P_42_ok autos_42_ok bk_42_0_ok chk_42_1
 def nodes_42_2 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_42_2 : checkNodesBT W_42 G_42 fmask_42 P_42 autos_42 bk_42_1 2 nodes_42_2 = true := by decide +kernel
 def bk_42_2 : BT (List (List Nat)) := buildBucketsBT W_42 nodes_42_2
 set_option maxRecDepth 500000 in
 lemma bk_42_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_42 2 xs.toFinset) bk_42_2 :=
   buildBucketsBT_sound (by decide) gp_42 W_42_ok P_42_ok autos_42_ok bk_42_1_ok chk_42_2
 def nodes_42_3 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_42_3 : checkNodesBT W_42 G_42 fmask_42 P_42 autos_42 bk_42_2 3 nodes_42_3 = true := by decide +kernel
 def bk_42_3 : BT (List (List Nat)) := buildBucketsBT W_42 nodes_42_3
 set_option maxRecDepth 500000 in
 lemma bk_42_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_42 3 xs.toFinset) bk_42_3 :=
   buildBucketsBT_sound (by decide) gp_42 W_42_ok P_42_ok autos_42_ok bk_42_2_ok chk_42_3
 def nodes_42_4 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_42_4 : checkNodesBT W_42 G_42 fmask_42 P_42 autos_42 bk_42_3 4 nodes_42_4 = true := by decide +kernel
 def bk_42_4 : BT (List (List Nat)) := buildBucketsBT W_42 nodes_42_4
 set_option maxRecDepth 500000 in
 lemma bk_42_4_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_42 4 xs.toFinset) bk_42_4 :=
   buildBucketsBT_sound (by decide) gp_42 W_42_ok P_42_ok autos_42_ok bk_42_3_ok chk_42_4
 def nodes_42_5 : List NodeSpec := [([0,1,2,3,7,4],[],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_42_5 : checkNodesBT W_42 G_42 fmask_42 P_42 autos_42 bk_42_4 5 nodes_42_5 = true := by decide +kernel
 def bk_42_5 : BT (List (List Nat)) := buildBucketsBT W_42 nodes_42_5
 set_option maxRecDepth 500000 in
 lemma bk_42_5_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_42 5 xs.toFinset) bk_42_5 :=
   buildBucketsBT_sound (by decide) gp_42 W_42_ok P_42_ok autos_42_ok bk_42_4_ok chk_42_5
 def nodes_42_6 : List NodeSpec := nodesWithIdentity [([5,0,1,2,6,3,4],[0,1,2,3,4,5,6,7,8])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_42_6 : checkNodesBT W_42 G_42 fmask_42 P_42 autos_42 bk_42_5 6 nodes_42_6 = true := by decide +kernel
 def bk_42_6 : BT (List (List Nat)) := buildBucketsBT W_42 nodes_42_6
 set_option maxRecDepth 500000 in
 lemma bk_42_6_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_42 6 xs.toFinset) bk_42_6 :=
   buildBucketsBT_sound (by decide) gp_42 W_42_ok P_42_ok autos_42_ok bk_42_5_ok chk_42_6
 def nodes_42_7 : List NodeSpec := nodesWithIdentity [([5,0,1,2,3,4],[7,9,0,10,11,2,3,4,1,8,12])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_42_7 : checkNodesBT W_42 G_42 fmask_42 P_42 autos_42 bk_42_6 7 nodes_42_7 = true := by decide +kernel
 def bk_42_7 : BT (List (List Nat)) := buildBucketsBT W_42 nodes_42_7
 set_option maxRecDepth 500000 in
 lemma bk_42_7_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_42 7 xs.toFinset) bk_42_7 :=
   buildBucketsBT_sound (by decide) gp_42 W_42_ok P_42_ok autos_42_ok bk_42_6_ok chk_42_7
 def nodes_42_8 : List NodeSpec := [([0,1,2,3,4],[9,7,10,2,4],[0,1,2,3,4,5])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_42_8 : checkNodesBT W_42 G_42 fmask_42 P_42 autos_42 bk_42_7 8 nodes_42_8 = true := by decide +kernel
 def bk_42_8 : BT (List (List Nat)) := buildBucketsBT W_42 nodes_42_8
 set_option maxRecDepth 500000 in
 lemma bk_42_8_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_42 8 xs.toFinset) bk_42_8 :=
   buildBucketsBT_sound (by decide) gp_42 W_42_ok P_42_ok autos_42_ok bk_42_7_ok chk_42_8
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_42_ok : forestRootCheck R_42 G_42 [(VAR 1,14,12),(VAR 2,14,10),(VAR 3,14,6),(VAR 4,26,10),(VAR 5,42,10)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_42_in : bucketContainsBT bk_42_8 R_42 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_42 : Lower R_42 G_42 9 := lower_of_forestBT root_42_ok bk_42_8_ok root_42_in
@@ -6020,36 +6098,42 @@ lemma P_0_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_0 G_0 c) P_0 :=
 def bk_0_init : BT (List (List Nat)) := BT.empty
 lemma bk_0_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 (0 - 1) xs.toFinset) bk_0_init := trivial
 def nodes_0_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_0_0 : checkNodesBT W_0 G_0 fmask_0 P_0 autos_0 bk_0_init 0 nodes_0_0 = true := by decide +kernel
 def bk_0_0 : BT (List (List Nat)) := buildBucketsBT W_0 nodes_0_0
 set_option maxRecDepth 500000 in
 lemma bk_0_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 0 xs.toFinset) bk_0_0 :=
   buildBucketsBT_sound (by decide) gp_0 W_0_ok P_0_ok autos_0_ok bk_0_init_ok chk_0_0
 def nodes_0_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_0_1 : checkNodesBT W_0 G_0 fmask_0 P_0 autos_0 bk_0_0 1 nodes_0_1 = true := by decide +kernel
 def bk_0_1 : BT (List (List Nat)) := buildBucketsBT W_0 nodes_0_1
 set_option maxRecDepth 500000 in
 lemma bk_0_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 1 xs.toFinset) bk_0_1 :=
   buildBucketsBT_sound (by decide) gp_0 W_0_ok P_0_ok autos_0_ok bk_0_0_ok chk_0_1
 def nodes_0_2 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_0_2 : checkNodesBT W_0 G_0 fmask_0 P_0 autos_0 bk_0_1 2 nodes_0_2 = true := by decide +kernel
 def bk_0_2 : BT (List (List Nat)) := buildBucketsBT W_0 nodes_0_2
 set_option maxRecDepth 500000 in
 lemma bk_0_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 2 xs.toFinset) bk_0_2 :=
   buildBucketsBT_sound (by decide) gp_0 W_0_ok P_0_ok autos_0_ok bk_0_1_ok chk_0_2
 def nodes_0_3 : List NodeSpec := [([0,1,2],[],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_0_3 : checkNodesBT W_0 G_0 fmask_0 P_0 autos_0 bk_0_2 3 nodes_0_3 = true := by decide +kernel
 def bk_0_3 : BT (List (List Nat)) := buildBucketsBT W_0 nodes_0_3
 set_option maxRecDepth 500000 in
 lemma bk_0_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_0 3 xs.toFinset) bk_0_3 :=
   buildBucketsBT_sound (by decide) gp_0 W_0_ok P_0_ok autos_0_ok bk_0_2_ok chk_0_3
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_0_ok : forestRootCheck R_0 G_0 [(VAR 3,24,16),(VAR 4,24,8),(VAR 5,40,8)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_0_in : bucketContainsBT bk_0_3 R_0 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_0 : Lower R_0 G_0 4 := lower_of_forestBT root_0_ok bk_0_3_ok root_0_in
@@ -6110,57 +6194,66 @@ lemma P_10_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_10 G_10 c) P_1
 def bk_10_init : BT (List (List Nat)) := BT.empty
 lemma bk_10_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_10 (0 - 1) xs.toFinset) bk_10_init := trivial
 def nodes_10_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_10_0 : checkNodesBT W_10 G_10 fmask_10 P_10 autos_10 bk_10_init 0 nodes_10_0 = true := by decide +kernel
 def bk_10_0 : BT (List (List Nat)) := buildBucketsBT W_10 nodes_10_0
 set_option maxRecDepth 500000 in
 lemma bk_10_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_10 0 xs.toFinset) bk_10_0 :=
   buildBucketsBT_sound (by decide) gp_10 W_10_ok P_10_ok autos_10_ok bk_10_init_ok chk_10_0
 def nodes_10_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_10_1 : checkNodesBT W_10 G_10 fmask_10 P_10 autos_10 bk_10_0 1 nodes_10_1 = true := by decide +kernel
 def bk_10_1 : BT (List (List Nat)) := buildBucketsBT W_10 nodes_10_1
 set_option maxRecDepth 500000 in
 lemma bk_10_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_10 1 xs.toFinset) bk_10_1 :=
   buildBucketsBT_sound (by decide) gp_10 W_10_ok P_10_ok autos_10_ok bk_10_0_ok chk_10_1
 def nodes_10_2 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_10_2 : checkNodesBT W_10 G_10 fmask_10 P_10 autos_10 bk_10_1 2 nodes_10_2 = true := by decide +kernel
 def bk_10_2 : BT (List (List Nat)) := buildBucketsBT W_10 nodes_10_2
 set_option maxRecDepth 500000 in
 lemma bk_10_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_10 2 xs.toFinset) bk_10_2 :=
   buildBucketsBT_sound (by decide) gp_10 W_10_ok P_10_ok autos_10_ok bk_10_1_ok chk_10_2
 def nodes_10_3 : List NodeSpec := [([8,0,1,2],[],[]),([4,7,9,3],[0,1],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_10_3 : checkNodesBT W_10 G_10 fmask_10 P_10 autos_10 bk_10_2 3 nodes_10_3 = true := by decide +kernel
 def bk_10_3 : BT (List (List Nat)) := buildBucketsBT W_10 nodes_10_3
 set_option maxRecDepth 500000 in
 lemma bk_10_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_10 3 xs.toFinset) bk_10_3 :=
   buildBucketsBT_sound (by decide) gp_10 W_10_ok P_10_ok autos_10_ok bk_10_2_ok chk_10_3
 def nodes_10_4 : List NodeSpec := [([5,0,1,2,3],[],[]),([0,1,2,6,3],[2],[0]),([1,4,2,7,3],[0,3],[0])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_10_4 : checkNodesBT W_10 G_10 fmask_10 P_10 autos_10 bk_10_3 4 nodes_10_4 = true := by decide +kernel
 def bk_10_4 : BT (List (List Nat)) := buildBucketsBT W_10 nodes_10_4
 set_option maxRecDepth 500000 in
 lemma bk_10_4_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_10 4 xs.toFinset) bk_10_4 :=
   buildBucketsBT_sound (by decide) gp_10 W_10_ok P_10_ok autos_10_ok bk_10_3_ok chk_10_4
 def nodes_10_5 : List NodeSpec := [([0,1,4,2,3],[0,1,3,2],[0,1,2,3])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_10_5 : checkNodesBT W_10 G_10 fmask_10 P_10 autos_10 bk_10_4 5 nodes_10_5 = true := by decide +kernel
 def bk_10_5 : BT (List (List Nat)) := buildBucketsBT W_10 nodes_10_5
 set_option maxRecDepth 500000 in
 lemma bk_10_5_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_10 5 xs.toFinset) bk_10_5 :=
   buildBucketsBT_sound (by decide) gp_10 W_10_ok P_10_ok autos_10_ok bk_10_4_ok chk_10_5
 def nodes_10_6 : List NodeSpec := [([0,1,2,3],[0,1,3,2],[0,4,5,6,7,8])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_10_6 : checkNodesBT W_10 G_10 fmask_10 P_10 autos_10 bk_10_5 6 nodes_10_6 = true := by decide +kernel
 def bk_10_6 : BT (List (List Nat)) := buildBucketsBT W_10 nodes_10_6
 set_option maxRecDepth 500000 in
 lemma bk_10_6_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_10 6 xs.toFinset) bk_10_6 :=
   buildBucketsBT_sound (by decide) gp_10 W_10_ok P_10_ok autos_10_ok bk_10_5_ok chk_10_6
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_10_ok : forestRootCheck R_10 G_10 [(VAR 0,3,2),(VAR 1,3,1),(VAR 2,5,1),(VAR 5,33,1)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_10_in : bucketContainsBT bk_10_6 R_10 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_10 : Lower R_10 G_10 7 := lower_of_forestBT root_10_ok bk_10_6_ok root_10_in
@@ -6550,50 +6643,58 @@ lemma P_11_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_11 G_11 c) P_1
 def bk_11_init : BT (List (List Nat)) := BT.empty
 lemma bk_11_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_11 (0 - 1) xs.toFinset) bk_11_init := trivial
 def nodes_11_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_11_0 : checkNodesBT W_11 G_11 fmask_11 P_11 autos_11 bk_11_init 0 nodes_11_0 = true := by decide +kernel
 def bk_11_0 : BT (List (List Nat)) := buildBucketsBT W_11 nodes_11_0
 set_option maxRecDepth 500000 in
 lemma bk_11_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_11 0 xs.toFinset) bk_11_0 :=
   buildBucketsBT_sound (by decide) gp_11 W_11_ok P_11_ok autos_11_ok bk_11_init_ok chk_11_0
 def nodes_11_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_11_1 : checkNodesBT W_11 G_11 fmask_11 P_11 autos_11 bk_11_0 1 nodes_11_1 = true := by decide +kernel
 def bk_11_1 : BT (List (List Nat)) := buildBucketsBT W_11 nodes_11_1
 set_option maxRecDepth 500000 in
 lemma bk_11_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_11 1 xs.toFinset) bk_11_1 :=
   buildBucketsBT_sound (by decide) gp_11 W_11_ok P_11_ok autos_11_ok bk_11_0_ok chk_11_1
 def nodes_11_2 : List NodeSpec := [([18,2,3],[],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_11_2 : checkNodesBT W_11 G_11 fmask_11 P_11 autos_11 bk_11_1 2 nodes_11_2 = true := by decide +kernel
 def bk_11_2 : BT (List (List Nat)) := buildBucketsBT W_11 nodes_11_2
 set_option maxRecDepth 500000 in
 lemma bk_11_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_11 2 xs.toFinset) bk_11_2 :=
   buildBucketsBT_sound (by decide) gp_11 W_11_ok P_11_ok autos_11_ok bk_11_1_ok chk_11_2
 def nodes_11_3 : List NodeSpec := [([6,4,1,3],[],[]),([0,11,2,3],[],[]),([5,12,2,3],[],[0]),([0,1,2,13],[],[]),([0,14,2,3],[],[]),([0,1,15,2],[],[]),([16,0,2,3],[],[]),([17,0,2,3],[],[]),([10,8,2,3],[],[0])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_11_3 : checkNodesBT W_11 G_11 fmask_11 P_11 autos_11 bk_11_2 3 nodes_11_3 = true := by decide +kernel
 def bk_11_3 : BT (List (List Nat)) := buildBucketsBT W_11 nodes_11_3
 set_option maxRecDepth 500000 in
 lemma bk_11_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_11 3 xs.toFinset) bk_11_3 :=
   buildBucketsBT_sound (by decide) gp_11 W_11_ok P_11_ok autos_11_ok bk_11_2_ok chk_11_3
 def nodes_11_4 : List NodeSpec := [([4,0,1,2,3],[],[0]),([5,0,1,2,3],[],[0]),([6,0,1,2,3],[],[0]),([0,1,2,7,3],[],[0,1]),([0,1,8,2,3],[],[0]),([9,0,1,2,3],[],[0,1]),([10,0,1,2,3],[],[0])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_11_4 : checkNodesBT W_11 G_11 fmask_11 P_11 autos_11 bk_11_3 4 nodes_11_4 = true := by decide +kernel
 def bk_11_4 : BT (List (List Nat)) := buildBucketsBT W_11 nodes_11_4
 set_option maxRecDepth 500000 in
 lemma bk_11_4_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_11 4 xs.toFinset) bk_11_4 :=
   buildBucketsBT_sound (by decide) gp_11 W_11_ok P_11_ok autos_11_ok bk_11_3_ok chk_11_4
 def nodes_11_5 : List NodeSpec := [([0,1,2,3],[],[0,2,1,3,4,5])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_11_5 : checkNodesBT W_11 G_11 fmask_11 P_11 autos_11 bk_11_4 5 nodes_11_5 = true := by decide +kernel
 def bk_11_5 : BT (List (List Nat)) := buildBucketsBT W_11 nodes_11_5
 set_option maxRecDepth 500000 in
 lemma bk_11_5_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_11 5 xs.toFinset) bk_11_5 :=
   buildBucketsBT_sound (by decide) gp_11 W_11_ok P_11_ok autos_11_ok bk_11_4_ok chk_11_5
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_11_ok : forestRootCheck R_11 G_11 [(VAR 1,10,8),(VAR 2,12,8),(VAR 3,10,2),(VAR 4,22,6)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_11_in : bucketContainsBT bk_11_5 R_11 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_11 : Lower R_11 G_11 6 := lower_of_forestBT root_11_ok bk_11_5_ok root_11_in
@@ -6644,64 +6745,74 @@ lemma P_37_ok : btAll (fun o => ∀ c, o = some c → ValidPool R_37 G_37 c) P_3
 def bk_37_init : BT (List (List Nat)) := BT.empty
 lemma bk_37_init_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_37 (0 - 1) xs.toFinset) bk_37_init := trivial
 def nodes_37_0 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_37_0 : checkNodesBT W_37 G_37 fmask_37 P_37 autos_37 bk_37_init 0 nodes_37_0 = true := by decide +kernel
 def bk_37_0 : BT (List (List Nat)) := buildBucketsBT W_37 nodes_37_0
 set_option maxRecDepth 500000 in
 lemma bk_37_0_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_37 0 xs.toFinset) bk_37_0 :=
   buildBucketsBT_sound (by decide) gp_37 W_37_ok P_37_ok autos_37_ok bk_37_init_ok chk_37_0
 def nodes_37_1 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_37_1 : checkNodesBT W_37 G_37 fmask_37 P_37 autos_37 bk_37_0 1 nodes_37_1 = true := by decide +kernel
 def bk_37_1 : BT (List (List Nat)) := buildBucketsBT W_37 nodes_37_1
 set_option maxRecDepth 500000 in
 lemma bk_37_1_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_37 1 xs.toFinset) bk_37_1 :=
   buildBucketsBT_sound (by decide) gp_37 W_37_ok P_37_ok autos_37_ok bk_37_0_ok chk_37_1
 def nodes_37_2 : List NodeSpec := []
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_37_2 : checkNodesBT W_37 G_37 fmask_37 P_37 autos_37 bk_37_1 2 nodes_37_2 = true := by decide +kernel
 def bk_37_2 : BT (List (List Nat)) := buildBucketsBT W_37 nodes_37_2
 set_option maxRecDepth 500000 in
 lemma bk_37_2_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_37 2 xs.toFinset) bk_37_2 :=
   buildBucketsBT_sound (by decide) gp_37 W_37_ok P_37_ok autos_37_ok bk_37_1_ok chk_37_2
 def nodes_37_3 : List NodeSpec := [([53,36,2,3],[],[]),([2,3,39,54],[],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_37_3 : checkNodesBT W_37 G_37 fmask_37 P_37 autos_37 bk_37_2 3 nodes_37_3 = true := by decide +kernel
 def bk_37_3 : BT (List (List Nat)) := buildBucketsBT W_37 nodes_37_3
 set_option maxRecDepth 500000 in
 lemma bk_37_3_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_37 3 xs.toFinset) bk_37_3 :=
   buildBucketsBT_sound (by decide) gp_37 W_37_ok P_37_ok autos_37_ok bk_37_2_ok chk_37_3
 def nodes_37_4 : List NodeSpec := [([6,35,0,1,4],[],[]),([0,1,2,3,19],[],[]),([36,14,1,2,3],[],[0]),([14,16,1,2,3],[],[]),([37,0,2,3,4],[],[]),([38,16,2,3,4],[],[]),([38,17,2,3,4],[],[]),([0,1,2,7,19],[],[]),([1,2,3,19,39],[],[0]),([35,0,1,2,4],[],[]),([0,1,3,7,19],[],[]),([5,0,1,2,19],[],[]),([6,0,1,3,19],[],[]),([20,1,2,3,19],[],[]),([40,2,21,3,4],[],[]),([14,17,1,2,3],[],[]),([35,0,1,3,4],[],[]),([2,21,41,3,4],[],[]),([5,1,2,21,4],[],[]),([1,2,21,7,4],[],[]),([14,0,1,2,3],[],[]),([42,1,2,3,19],[],[]),([43,0,2,3,4],[],[]),([5,18,0,1,4],[],[]),([44,14,1,2,3],[],[]),([16,1,2,3,4],[],[]),([0,45,2,3,4],[],[]),([0,1,2,3,46],[],[]),([5,0,23,2,4],[],[]),([10,1,2,31,4],[],[]),([0,2,47,3,4],[],[]),([5,35,0,1,4],[],[]),([11,1,26,3,4],[],[]),([48,0,1,2,3],[],[]),([6,5,0,1,4],[],[]),([49,0,2,3,4],[],[]),([0,1,2,3,50],[],[]),([0,51,2,3,4],[],[]),([1,2,34,8,4],[],[]),([52,0,1,2,3],[],[]),([1,2,21,3,19],[],[]),([1,2,21,3,4],[],[]),([0,23,2,7,4],[],[]),([1,22,12,3,4],[],[])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_37_4 : checkNodesBT W_37 G_37 fmask_37 P_37 autos_37 bk_37_3 4 nodes_37_4 = true := by decide +kernel
 def bk_37_4 : BT (List (List Nat)) := buildBucketsBT W_37 nodes_37_4
 set_option maxRecDepth 500000 in
 lemma bk_37_4_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_37 4 xs.toFinset) bk_37_4 :=
   buildBucketsBT_sound (by decide) gp_37 W_37_ok P_37_ok autos_37_ok bk_37_3_ok chk_37_4
 def nodes_37_5 : List NodeSpec := [([0,13,1,2,3,4],[],[]),([6,5,0,1,3,4],[],[0]),([6,5,0,1,2,4],[],[0]),([14,0,1,2,3,7],[0],[0,1]),([15,0,1,2,3,4],[1,0],[0]),([11,10,1,2,3,4],[2],[0]),([14,0,1,2,3],[],[0,1]),([6,0,1,2,3,4],[],[0]),([16,1,2,3,4],[3],[]),([0,1,2,3,7,4],[4,1,0],[0,1]),([17,1,2,3,7,4],[2,5],[0]),([0,1,9,3,7,4],[],[0]),([18,0,1,2,3,4],[4],[0]),([0,1,9,2,7,4],[],[0,1]),([0,1,9,2,3,19],[0],[0,1]),([11,1,2,12,3,4],[0,2],[]),([0,1,2,3,19],[],[0,1]),([5,0,1,2,3,4],[],[0]),([6,0,1,9,3,4],[0],[0]),([0,1,2,8,7,4],[4],[]),([20,1,9,2,3,4],[2,6],[0,1]),([16,0,1,2,3,4],[],[]),([0,1,2,21,3,4],[],[]),([1,2,21,3,4],[7],[0]),([6,5,0,1,4],[8],[0]),([0,1,22,2,3,4],[1,4,0],[0]),([0,1,9,2,3,4],[4,1,0],[0,1]),([10,1,2,3,8,4],[2],[]),([5,0,1,2,8,4],[4],[]),([5,10,0,1,2,4],[4],[0]),([16,1,2,3,7,4],[4,3],[1,0]),([0,23,2,3,4],[9],[0]),([5,0,1,9,2,4],[0],[0,1]),([0,24,1,2,3,4],[],[]),([0,25,1,2,3,4],[1],[0]),([10,0,23,2,3,4],[1,2],[]),([0,1,2,26,3,4],[],[0]),([27,0,2,12,3,4],[1],[]),([6,0,1,2,7,4],[0],[0]),([28,0,1,2,3,4],[],[]),([29,0,1,2,3,4],[1],[0]),([27,0,2,3,4],[10],[]),([30,0,1,2,3,4],[],[]),([10,0,1,2,7,4],[4],[0]),([0,1,2,3,31,4],[1,0],[0]),([5,0,1,3,7,4],[0],[0]),([0,1,2,3,32,4],[1,0],[0]),([1,9,2,21,3,4],[4,7],[0]),([1,2,12,3,8,4],[2],[0]),([33,0,1,2,3,4],[],[]),([0,1,2,34,3,4],[],[0])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_37_5 : checkNodesBT W_37 G_37 fmask_37 P_37 autos_37 bk_37_4 5 nodes_37_5 = true := by decide +kernel
 def bk_37_5 : BT (List (List Nat)) := buildBucketsBT W_37 nodes_37_5
 set_option maxRecDepth 500000 in
 lemma bk_37_5_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_37 5 xs.toFinset) bk_37_5 :=
   buildBucketsBT_sound (by decide) gp_37 W_37_ok P_37_ok autos_37_ok bk_37_4_ok chk_37_5
 def nodes_37_6 : List NodeSpec := [([5,0,1,2,3,4],[4,1,0,11],[0,1]),([6,0,1,2,3,4],[4,1,0,12],[0,1]),([0,1,2,3,7,4],[4,13,1],[0,1]),([0,1,2,3,8,4],[4,2,14],[0]),([0,1,9,2,3,4],[4,15,1],[0,1]),([10,0,1,2,3,4],[4,1,2,0,16],[0]),([11,0,1,2,3,4],[4,1,2,0,17],[0]),([0,1,2,12,3,4],[2,18],[0])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_37_6 : checkNodesBT W_37 G_37 fmask_37 P_37 autos_37 bk_37_5 6 nodes_37_6 = true := by decide +kernel
 def bk_37_6 : BT (List (List Nat)) := buildBucketsBT W_37 nodes_37_6
 set_option maxRecDepth 500000 in
 lemma bk_37_6_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_37 6 xs.toFinset) bk_37_6 :=
   buildBucketsBT_sound (by decide) gp_37 W_37_ok P_37_ok autos_37_ok bk_37_5_ok chk_37_6
 def nodes_37_7 : List NodeSpec := [([0,1,2,3,4],[4,2,0],[0,1])]
-set_option maxRecDepth 200000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
 lemma chk_37_7 : checkNodesBT W_37 G_37 fmask_37 P_37 autos_37 bk_37_6 7 nodes_37_7 = true := by decide +kernel
 def bk_37_7 : BT (List (List Nat)) := buildBucketsBT W_37 nodes_37_7
 set_option maxRecDepth 500000 in
 lemma bk_37_7_ok : btAll (fun bk => ∀ xs ∈ bk, Impossible G_37 7 xs.toFinset) bk_37_7 :=
   buildBucketsBT_sound (by decide) gp_37 W_37_ok P_37_ok autos_37_ok bk_37_6_ok chk_37_7
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_37_ok : forestRootCheck R_37 G_37 [(VAR 1,10,8),(VAR 2,12,8),(VAR 3,10,2),(VAR 4,22,6),(VAR 5,40,8)] = true := by decide +kernel
-set_option maxRecDepth 500000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 500000 in
+set_option maxHeartbeats 0 in
 lemma root_37_in : bucketContainsBT bk_37_7 R_37 = true := by decide +kernel
 set_option maxRecDepth 500000 in
 lemma low_37 : Lower R_37 G_37 8 := lower_of_forestBT root_37_ok bk_37_7_ok root_37_in
@@ -7157,7 +7268,8 @@ lemma h0Bound : Lower h0R h0G 12 := lower_of_forestBT (essPairs := [(VAR 0,6,7),
 def wit : List PEqualNP.CircuitLowerBounds.Gate := [⟨PEqualNP.CircuitLowerBounds.GateOp.or, [2, 3]⟩,⟨PEqualNP.CircuitLowerBounds.GateOp.and, [1, 6]⟩,⟨PEqualNP.CircuitLowerBounds.GateOp.or, [0, 7]⟩,⟨PEqualNP.CircuitLowerBounds.GateOp.and, [2, 3]⟩,⟨PEqualNP.CircuitLowerBounds.GateOp.and, [4, 5]⟩,⟨PEqualNP.CircuitLowerBounds.GateOp.or, [1, 6]⟩,⟨PEqualNP.CircuitLowerBounds.GateOp.or, [4, 5]⟩,⟨PEqualNP.CircuitLowerBounds.GateOp.and, [11, 12]⟩,⟨PEqualNP.CircuitLowerBounds.GateOp.or, [7, 13]⟩,⟨PEqualNP.CircuitLowerBounds.GateOp.and, [0, 14]⟩,⟨PEqualNP.CircuitLowerBounds.GateOp.or, [10, 15]⟩,⟨PEqualNP.CircuitLowerBounds.GateOp.or, [9, 16]⟩,⟨PEqualNP.CircuitLowerBounds.GateOp.and, [8, 17]⟩]
 def wo : Nat := 18
 lemma wit_mono : PEqualNP.MetaComplexity.Monotone2 ⟨wit, wo⟩ := by simp [PEqualNP.MetaComplexity.Monotone2, wit]
-set_option maxRecDepth 100000 in set_option maxHeartbeats 0 in
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
 lemma wit_eval : ∀ r : Row, PEqualNP.CircuitLowerBounds.Circuit.eval ⟨wit, wo⟩ (List.ofFn (evalInput6 r)) = ((4008372904 * 2 ^ 32 + 3936938112) ||| ((4008372904 * 2 ^ 32 + 3936938112) <<< 64)).testBit r.val := by decide +kernel
 lemma low_root : Lower (varsOf 63) ((4008372904 * 2 ^ 32 + 3936938112) ||| ((4008372904 * 2 ^ 32 + 3936938112) <<< 64)) 12 := h0Bound
 end PEqualNP.Outside.L_meta_48478
