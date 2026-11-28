@@ -13,13 +13,13 @@ def Al (R : ℕ → ℕ) (d : Bool) (a b : ℕ) : Prop := (R a &&& R b) ≤ (bif
 lemma Al.symm {d : Bool} {a b : ℕ} (h : Al R d a b) : Al R d b a := by unfold Al at *; rwa [Nat.and_comm]
 def Z0 : ℕ → ℕ := fun _ => 0
 lemma al0 (d : Bool) (a b : ℕ) : Al Z0 d a b := by simp [Al, Z0]
-inductive Sol (R : ℕ → ℕ) (m T : ℕ) : ℕ → Set ℕ → Prop
-  | done {q : ℕ} {S : Set ℕ} : T ∈ S → Sol R m T q S
-  | un {q : ℕ} {S : Set ℕ} {a : ℕ} : a ∈ S → Sol R m T q (insert (a ^^^ m) S) → Sol R m T (q + 1) S
-  | bi {q : ℕ} {S : Set ℕ} {d : Bool} {a b : ℕ} : a ∈ S → b ∈ S → Al R d a b →
-      Sol R m T q (insert (op d a b) S) → Sol R m T (q + 1) S
-lemma Sol.mono {m T q : ℕ} {S : Set ℕ} (h : Sol R m T q S) :
-    ∀ {q' : ℕ} {S' : Set ℕ}, q ≤ q' → S ⊆ S' → Sol R m T q' S' := by
+inductive Sol (R : ℕ → ℕ) (m T : ℕ) : ℕ → ℕ → Set ℕ → Prop
+  | done {q u : ℕ} {S : Set ℕ} : T ∈ S → Sol R m T q u S
+  | un {q u : ℕ} {S : Set ℕ} {a : ℕ} : a ∈ S → Sol R m T q u (insert (a ^^^ m) S) → Sol R m T (q + 1) (u + 1) S
+  | bi {q u : ℕ} {S : Set ℕ} {d : Bool} {a b : ℕ} : a ∈ S → b ∈ S → Al R d a b →
+      Sol R m T q u (insert (op d a b) S) → Sol R m T (q + 1) u S
+lemma Sol.mono {m T q u : ℕ} {S : Set ℕ} (h : Sol R m T q u S) :
+    ∀ {q' : ℕ} {S' : Set ℕ}, q ≤ q' → S ⊆ S' → Sol R m T q' u S' := by
   induction h with
   | done h => intro q' S' _ hs; exact .done (hs h)
   | un h _ ih =>
@@ -30,19 +30,28 @@ lemma Sol.mono {m T q : ℕ} {S : Set ℕ} (h : Sol R m T q S) :
     intro q' S' hq hs
     obtain ⟨r, rfl⟩ : ∃ r, q' = r + 1 := ⟨q' - 1, by omega⟩
     exact .bi (hs h1) (hs h2) ha (ih (by omega) (Set.insert_subset_insert hs))
-lemma Sol.rel {R' : ℕ → ℕ} {m T q : ℕ} {S : Set ℕ} (h : Sol R m T q S) (hR : ∀ d a b, Al R d a b → Al R' d a b) : Sol R' m T q S := by
+lemma Sol.monoU {m T q u : ℕ} {S : Set ℕ} (h : Sol R m T q u S) :
+    ∀ {u' : ℕ}, u ≤ u' → Sol R m T q u' S := by
+  induction h with
+  | done h => intro u' _; exact .done h
+  | un h _ ih =>
+    intro u' hu
+    obtain ⟨r, rfl⟩ : ∃ r, u' = r + 1 := ⟨u' - 1, by omega⟩
+    exact .un h (ih (by omega))
+  | bi h1 h2 ha _ ih => intro u' hu; exact .bi h1 h2 ha (ih hu)
+lemma Sol.rel {R' : ℕ → ℕ} {m T q u : ℕ} {S : Set ℕ} (h : Sol R m T q u S) (hR : ∀ d a b, Al R d a b → Al R' d a b) : Sol R' m T q u S := by
   induction h with
   | done h => exact .done h
   | un h _ ih => exact .un h ih
   | bi h1 h2 ha _ ih => exact .bi h1 h2 (hR _ _ _ ha) ih
-lemma Sol.to0 {m T q : ℕ} {S : Set ℕ} (h : Sol R m T q S) : Sol Z0 m T q S := h.rel fun d a b _ => al0 d a b
+lemma Sol.to0 {m T q u : ℕ} {S : Set ℕ} (h : Sol R m T q u S) : Sol Z0 m T q u S := h.rel fun d a b _ => al0 d a b
 inductive Live (R : ℕ → ℕ) (m T : ℕ) : ℕ → ℕ → Finset ℕ → Prop
   | stop : Live R m T 0 0 {T}
   | un {k t : ℕ} {a : ℕ} {U : Finset ℕ} : Live R m T k t (insert (a ^^^ m) U) →
       Live R m T (k + 1) (t + 1) (insert a U)
   | bi {k t : ℕ} {d : Bool} {a b : ℕ} {U : Finset ℕ} : a ≠ b → Al R d a b → Live R m T k t (insert (op d a b) U) →
       Live R m T (k + 1) t (insert a (insert b U))
-lemma Live.sol {m T k t : ℕ} {S : Finset ℕ} (h : Live R m T k t S) : Sol Z0 m T k (S : Set ℕ) := by
+lemma Live.sol {m T k t : ℕ} {S : Finset ℕ} (h : Live R m T k t S) : Sol Z0 m T k t (S : Set ℕ) := by
   induction h with
   | stop => exact .done (by simp)
   | @un k t a U _ ih =>
@@ -51,34 +60,34 @@ lemma Live.sol {m T k t : ℕ} {S : Finset ℕ} (h : Live R m T k t S) : Sol Z0 
   | @bi k t d a b U _ _ _ ih =>
     refine .bi (d := d) (a := a) (b := b) (by simp) (by simp) (al0 _ _ _) (ih.mono le_rfl ?_)
     intro x hx; simp at hx ⊢; tauto
-lemma Sol.live {m T q : ℕ} {S : Set ℕ} (h : Sol R m T q S) :
-    ∃ k ≤ q, ∃ t, ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live R m T k t S0 := by
+lemma Sol.live {m T q u : ℕ} {S : Set ℕ} (h : Sol R m T q u S) :
+    ∃ k ≤ q, ∃ t ≤ u, ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live R m T k t S0 := by
   induction h with
-  | @done q S h => exact ⟨0, by omega, 0, {T}, by simpa using h, .stop⟩
-  | @un q S a ha _ ih =>
-    obtain ⟨k, hk, t, S1, hs, hl⟩ := ih
+  | @done q u S h => exact ⟨0, by omega, 0, by omega, {T}, by simpa using h, .stop⟩
+  | @un q u S a ha _ ih =>
+    obtain ⟨k, hk, t, ht, S1, hs, hl⟩ := ih
     by_cases hg : a ^^^ m ∈ S1
-    · refine ⟨k + 1, by omega, t + 1, insert a (S1.erase (a ^^^ m)), ?_, .un (by rwa [Finset.insert_erase hg])⟩
+    · refine ⟨k + 1, by omega, t + 1, by omega, insert a (S1.erase (a ^^^ m)), ?_, .un (by rwa [Finset.insert_erase hg])⟩
       intro x hx
       simp at hx
       rcases hx with rfl | ⟨h1, h2⟩
       · exact ha
       · exact (hs h1).resolve_left h2
-    · exact ⟨k, by omega, t, S1, fun x hx => (hs hx).resolve_left (fun e => hg (e ▸ hx)), hl⟩
-  | @bi q S d a b ha hb hal _ ih =>
-    obtain ⟨k, hk, t, S1, hs, hl⟩ := ih
+    · exact ⟨k, by omega, t, by omega, S1, fun x hx => (hs hx).resolve_left (fun e => hg (e ▸ hx)), hl⟩
+  | @bi q u S d a b ha hb hal _ ih =>
+    obtain ⟨k, hk, t, ht, S1, hs, hl⟩ := ih
     by_cases hg : op d a b ∈ S1
     · by_cases hab : a = b
       · subst hab; rw [op_self] at hs
-        exact ⟨k, by omega, t, S1, fun x hx => (hs hx).elim (fun e => e ▸ ha) id, hl⟩
-      refine ⟨k + 1, by omega, t, insert a (insert b (S1.erase (op d a b))), ?_, .bi hab hal (by rwa [Finset.insert_erase hg])⟩
+        exact ⟨k, by omega, t, ht, S1, fun x hx => (hs hx).elim (fun e => e ▸ ha) id, hl⟩
+      refine ⟨k + 1, by omega, t, ht, insert a (insert b (S1.erase (op d a b))), ?_, .bi hab hal (by rwa [Finset.insert_erase hg])⟩
       intro x hx
       simp at hx
       rcases hx with rfl | rfl | ⟨h1, h2⟩
       · exact ha
       · exact hb
       · exact (hs h1).resolve_left h2
-    · exact ⟨k, by omega, t, S1, fun x hx => (hs hx).resolve_left (fun e => hg (e ▸ hx)), hl⟩
+    · exact ⟨k, by omega, t, ht, S1, fun x hx => (hs hx).resolve_left (fun e => hg (e ▸ hx)), hl⟩
 def C (m : ℕ) (S : Set ℕ) : Set ℕ := S ∪ {0, m}
 lemma C_mono {m : ℕ} {S S' : Set ℕ} (h : S ⊆ S') : C m S ⊆ C m S' := Set.union_subset_union_left _ h
 lemma sub_C (m : ℕ) (S : Set ℕ) : S ⊆ C m S := Set.subset_union_left
@@ -100,9 +109,9 @@ lemma Bi.sub {a b : ℕ} {d : Bool} {S S' : Finset ℕ} (h : Bi R d a b S S') :
   obtain ⟨_, U, rfl, rfl, _⟩ := h
   refine ⟨by simp, by simp, Finset.insert_subset_insert _ ?_⟩
   intro x hx; simp [hx]
-def Min (R : ℕ → ℕ) (m T k t : ℕ) (S : Finset ℕ) : Prop := Live R m T k t S ∧ ∀ q < k, ¬ Sol Z0 m T q (C m S)
-lemma Un.sol {m T a q : ℕ} {S S' : Finset ℕ} (h : Un m a S S') (hs : Sol Z0 m T q (C m S')) :
-    Sol Z0 m T (q + 1) (C m S) := by
+def Min (R : ℕ → ℕ) (m T k t : ℕ) (S : Finset ℕ) : Prop := Live R m T k t S ∧ ∀ q < k, ¬ Sol Z0 m T q t (C m S)
+lemma Un.sol {m T a q u : ℕ} {S S' : Finset ℕ} (h : Un m a S S') (hs : Sol Z0 m T q u (C m S')) :
+    Sol Z0 m T (q + 1) (u + 1) (C m S) := by
   obtain ⟨ha, hsub⟩ := h.sub
   refine .un (a := a) (sub_C _ _ (by simpa using ha)) (hs.mono le_rfl ?_)
   intro x hx
@@ -112,8 +121,8 @@ lemma Un.sol {m T a q : ℕ} {S S' : Finset ℕ} (h : Un m a S S') (hs : Sol Z0 
     · exact Or.inl rfl
     · exact Or.inr (Or.inl h')
   · exact Or.inr (Or.inr hx)
-lemma Bi.sol {m T a b q : ℕ} {d : Bool} {S S' : Finset ℕ} (h : Bi R d a b S S') (hs : Sol Z0 m T q (C m S')) :
-    Sol Z0 m T (q + 1) (C m S) := by
+lemma Bi.sol {m T a b q u : ℕ} {d : Bool} {S S' : Finset ℕ} (h : Bi R d a b S S') (hs : Sol Z0 m T q u (C m S')) :
+    Sol Z0 m T (q + 1) u (C m S) := by
   obtain ⟨ha, hb, hsub⟩ := h.sub
   refine .bi (d := d) (a := a) (b := b) (sub_C _ _ (by simpa using ha)) (sub_C _ _ (by simpa using hb)) (al0 _ _ _) (hs.mono le_rfl ?_)
   intro x hx
@@ -124,22 +133,22 @@ lemma Bi.sol {m T a b q : ℕ} {d : Bool} {S S' : Finset ℕ} (h : Bi R d a b S 
     · exact Or.inr (Or.inl h')
   · exact Or.inr (Or.inr hx)
 lemma Un.min {m T a k t : ℕ} {S S' : Finset ℕ} (h : Un m a S S') (hl : Live R m T k t S')
-    (hm : ∀ q < k + 1, ¬ Sol Z0 m T q (C m S)) : Min R m T k t S' :=
+    (hm : ∀ q < k + 1, ¬ Sol Z0 m T q (t + 1) (C m S)) : Min R m T k t S' :=
   ⟨hl, fun q hq hs => hm (q + 1) (by omega) (h.sol hs)⟩
 lemma Bi.min {m T a b k t : ℕ} {d : Bool} {S S' : Finset ℕ} (h : Bi R d a b S S') (hl : Live R m T k t S')
-    (hm : ∀ q < k + 1, ¬ Sol Z0 m T q (C m S)) : Min R m T k t S' :=
+    (hm : ∀ q < k + 1, ¬ Sol Z0 m T q t (C m S)) : Min R m T k t S' :=
   ⟨hl, fun q hq hs => hm (q + 1) (by omega) (h.sol hs)⟩
 lemma Un.fresh {m T a k t : ℕ} {S S' : Finset ℕ} (h : Un m a S S') (hl : Live R m T k t S')
-    (hm : ∀ q < k + 1, ¬ Sol Z0 m T q (C m S)) : a ^^^ m ∉ C m S := by
+    (hm : ∀ q < k + 1, ¬ Sol Z0 m T q (t + 1) (C m S)) : a ^^^ m ∉ C m S := by
   intro hg
   apply hm k (by omega)
-  refine hl.sol.mono le_rfl fun x hx => ?_
+  refine (hl.sol.monoU (by omega)).mono le_rfl fun x hx => ?_
   have := h.sub.2 hx; simp at this
   rcases this with rfl | h'
   · exact hg
   · exact Or.inl h'
 lemma Bi.fresh {m T a b k t : ℕ} {d : Bool} {S S' : Finset ℕ} (h : Bi R d a b S S') (hl : Live R m T k t S')
-    (hm : ∀ q < k + 1, ¬ Sol Z0 m T q (C m S)) : op d a b ∉ C m S := by
+    (hm : ∀ q < k + 1, ¬ Sol Z0 m T q t (C m S)) : op d a b ∉ C m S := by
   intro hg
   apply hm k (by omega)
   refine hl.sol.mono le_rfl fun x hx => ?_
@@ -214,14 +223,14 @@ lemma first_move {m T : ℕ} : ∀ (k t : ℕ) (S : Finset ℕ), Min R m T k t S
     generalize hS1 : insert (a ^^^ m) U = S1 at *
     have hnS1 : a ^^^ m ∈ S1 := by rw [← hS1]; simp
     have hst := phi_start hu hn
-    have dbl : ∀ {c k2 t2 S2}, Un m c S1 S2 → Live R m T k2 t2 S2 → k = k2 + 1 → c ≠ a ^^^ m ∧ c ^^^ m ≠ a ^^^ m := by
-      intro c k2 t2 S2 h2 hl2 hk
+    have dbl : ∀ {c k2 t2 S2}, Un m c S1 S2 → Live R m T k2 t2 S2 → k = k2 + 1 → t = t2 + 1 → c ≠ a ^^^ m ∧ c ^^^ m ≠ a ^^^ m := by
+      intro c k2 t2 S2 h2 hl2 hk ht2
       constructor
       · rintro rfl
         have hsub := h2.sub.2
         rw [hxx] at hsub
         apply hm (k2 + 1) (by omega)
-        refine .un (a := a) (sub_C _ _ (by simp)) (hl2.sol.mono le_rfl fun x hx => ?_)
+        refine .un (a := a) (sub_C _ _ (by simp)) ((hl2.sol.monoU (by omega)).mono le_rfl fun x hx => ?_)
         have h3 := hsub hx
         have h4 : x ∈ insert a (insert (a ^^^ m) U) := by rw [hS1]; exact h3
         simp at h4
@@ -230,7 +239,7 @@ lemma first_move {m T : ℕ} : ∀ (k t : ℕ) (S : Finset ℕ), Min R m T k t S
         · exact Or.inl rfl
         · exact Or.inr (sub_C _ _ (by simp [h4]))
       · intro e
-        exact h2.fresh hl2 (by rw [← hk]; exact hmin.2) (sub_C _ _ (by rw [e]; simpa using hnS1))
+        exact h2.fresh hl2 (by rw [← hk, ← ht2]; exact hmin.2) (sub_C _ _ (by rw [e]; simpa using hnS1))
     rcases ih k (by omega) t S1 hmin hc' with
       ⟨k0, d, x, y, S2, rfl, hb, hl2⟩ | ⟨k0, t0, c, d, y, S2, S3, rfl, rfl, h1, hb, hl2⟩ |
       ⟨k0, t0, c, c', d, S2, S3, S4, rfl, rfl, h1, hne, h2, hb, hl2⟩
@@ -243,7 +252,7 @@ lemma first_move {m T : ℕ} : ∀ (k t : ℕ) (S : Finset ℕ), Min R m T k t S
       · rw [← hst]; exact phi_bi hb hx hy hg
       · exact (phi_back (bi_keep hb hnS1 hx hy)).live hl2
     · have hb1 := hb.live hl2
-      obtain ⟨n1, n2⟩ := dbl h1 hb1 rfl
+      obtain ⟨n1, n2⟩ := dbl h1 hb1 rfl rfl
       have hm2 := h1.min hb1 hmin.2
       by_cases hy : y = a ^^^ m
       · subst hy
@@ -255,7 +264,7 @@ lemma first_move {m T : ℕ} : ∀ (k t : ℕ) (S : Finset ℕ), Min R m T k t S
       · exact (phi_back (bi_keep hb hk2 n2 hy)).live hl2
     · have hb1 := hb.live hl2
       have hb2 := h2.live hb1
-      obtain ⟨n1, n2⟩ := dbl h1 hb2 rfl
+      obtain ⟨n1, n2⟩ := dbl h1 hb2 rfl rfl
       have hm2 := h1.min hb2 hmin.2
       have hk2 := un_keep h1 hnS1 n1
       have hm3 := h2.min hb1 hm2.2
@@ -268,7 +277,7 @@ lemma first_move {m T : ℕ} : ∀ (k t : ℕ) (S : Finset ℕ), Min R m T k t S
           have : c ∈ insert (a ^^^ m) U := by rw [hS1]; exact hcS
           simp at this ⊢; exact Or.inr (this.resolve_left n1)
         apply hm (k0 + 1 + 1 + 1) (by omega)
-        refine .un (a := a) (sub_C _ _ (by simp)) (.un (a := c) (Or.inr (sub_C _ _ (by simpa using hcS'))) (hb1.sol.mono le_rfl fun x hx => ?_))
+        refine .un (a := a) (sub_C _ _ (by simp)) (.un (a := c) (Or.inr (sub_C _ _ (by simpa using hcS'))) ((hb1.sol.monoU (by omega)).mono le_rfl fun x hx => ?_))
         have h3 : x = a ∨ x = c ^^^ m ∨ x ∈ S1 := by
           have := hsub hx; simp at this
           rcases this with h | h
@@ -344,26 +353,26 @@ lemma C_Im_sub {n g : ℕ} {S S' : Finset ℕ} {Q : Set ℕ} (h : S' ⊆ insert 
 section proj
 variable {m T n : ℕ} (hn : n &&& m = n)
 include hn
-lemma Un.im {a q : ℕ} {S S' : Finset ℕ} (h : Un m a S S') (hs : Sol Z0 n (T &&& n) q (C n (Im n S'))) :
-    Sol Z0 n (T &&& n) (q + 1) (C n (Im n S)) := by
+lemma Un.im {a q u : ℕ} {S S' : Finset ℕ} (h : Un m a S S') (hs : Sol Z0 n (T &&& n) q u (C n (Im n S'))) :
+    Sol Z0 n (T &&& n) (q + 1) (u + 1) (C n (Im n S)) := by
   obtain ⟨ha, hsub⟩ := h.sub
   refine .un (Im_mem ha) (hs.mono le_rfl (C_Im_sub hsub ?_ (Set.subset_insert _ _)))
   rw [and_neg hn]; exact Or.inl rfl
 omit hn in
-lemma Bi.im {a b q : ℕ} {d : Bool} {S S' : Finset ℕ} (h : Bi R d a b S S') (hs : Sol Z0 n (T &&& n) q (C n (Im n S'))) :
-    Sol Z0 n (T &&& n) (q + 1) (C n (Im n S)) := by
+lemma Bi.im {a b q u : ℕ} {d : Bool} {S S' : Finset ℕ} (h : Bi R d a b S S') (hs : Sol Z0 n (T &&& n) q u (C n (Im n S'))) :
+    Sol Z0 n (T &&& n) (q + 1) u (C n (Im n S)) := by
   obtain ⟨ha, hb, hsub⟩ := h.sub
   refine .bi (d := d) (Im_mem ha) (Im_mem hb) (al0 _ _ _) (hs.mono le_rfl (C_Im_sub hsub ?_ (Set.subset_insert _ _)))
   rw [and_op]; exact Or.inl rfl
-lemma Un.kill {a q : ℕ} {S S' : Finset ℕ} (h : Un m a S S') (hc : Cst n a) (hs : Sol Z0 n (T &&& n) q (C n (Im n S'))) :
-    Sol Z0 n (T &&& n) q (C n (Im n S)) :=
+lemma Un.kill {a q u : ℕ} {S S' : Finset ℕ} (h : Un m a S S') (hc : Cst n a) (hs : Sol Z0 n (T &&& n) q u (C n (Im n S'))) :
+    Sol Z0 n (T &&& n) q u (C n (Im n S)) :=
   hs.mono le_rfl (C_Im_sub h.sub.2 (Cst_mem ((Cst_neg hn).2 hc)) subset_rfl)
 omit hn in
-lemma Bi.kill {a b q : ℕ} {d : Bool} {S S' : Finset ℕ} (h : Bi R d a b S S') (hc : Cst n a ∨ Cst n b)
-    (hs : Sol Z0 n (T &&& n) q (C n (Im n S'))) : Sol Z0 n (T &&& n) q (C n (Im n S)) :=
+lemma Bi.kill {a b q u : ℕ} {d : Bool} {S S' : Finset ℕ} (h : Bi R d a b S S') (hc : Cst n a ∨ Cst n b)
+    (hs : Sol Z0 n (T &&& n) q u (C n (Im n S'))) : Sol Z0 n (T &&& n) q u (C n (Im n S)) :=
   hs.mono le_rfl (C_Im_sub h.sub.2.2 (op_cst_mem d hc h.sub.1 h.sub.2.1) subset_rfl)
 lemma Min.const (hT0 : T &&& n ≠ 0) (hT1 : T &&& n ≠ n) {k t : ℕ} {S : Finset ℕ} (h : Min R m T k t S) :
-    ∃ q, q + (S.filter (Cst n)).card ≤ k ∧ Sol Z0 n (T &&& n) q (C n (Im n S)) := by
+    ∃ q, q + (S.filter (Cst n)).card ≤ k ∧ Sol Z0 n (T &&& n) q t (C n (Im n S)) := by
   obtain ⟨hl, hm⟩ := h
   induction hl with
   | stop =>
@@ -377,7 +386,7 @@ lemma Min.const (hT0 : T &&& n ≠ 0) (hT1 : T &&& n ≠ n) {k t : ℕ} {S : Fin
     have h1 : (U.filter (Cst n)).card ≤ ((insert (a ^^^ m) U).filter (Cst n)).card :=
       Finset.card_le_card (Finset.filter_subset_filter _ (Finset.subset_insert _ _))
     by_cases hc : Cst n a
-    · refine ⟨q, ?_, hu.kill hn hc hs⟩
+    · refine ⟨q, ?_, (hu.kill hn hc hs).monoU (by omega)⟩
       rw [Finset.filter_insert, ite_eq_left hc]
       have := Finset.card_insert_le a (U.filter (Cst n)); omega
     · refine ⟨q + 1, ?_, hu.im hn hs⟩
@@ -519,7 +528,7 @@ lemma phi_ne {x y g a b : ℕ} {U : Finset ℕ} (hg : g ∉ U) (ha : a ∈ inser
   · rintro rfl; tauto
   · exact hab
 lemma bi_tight {a b k t : ℕ} {d : Bool} {U : Finset ℕ} (hab : a ≠ b) (hal : Al R d a b) (hl : Live R m T k t (insert (op d a b) U))
-    (hm : ∀ q < k + 1, ¬ Sol Z0 m T q (C m ((insert a (insert b U) : Finset ℕ) : Set ℕ)))
+    (hm : ∀ q < k + 1, ¬ Sol Z0 m T q t (C m ((insert a (insert b U) : Finset ℕ) : Set ℕ)))
     (hc : (insert a (insert b U)).card + t = k + 2) :
     a ∉ U ∧ b ∉ U ∧ op d a b ∉ U ∧ (insert (op d a b) U).card + t = k + 1 ∧ Min R m T k t (insert (op d a b) U) := by
   have hu : Bi R d a b (insert a (insert b U)) (insert (op d a b) U) := ⟨hab, U, rfl, rfl, hal⟩
@@ -533,7 +542,7 @@ lemma bi_tight {a b k t : ℕ} {d : Bool} {U : Finset ℕ} (hab : a ≠ b) (hal 
   have hb : b ∉ U := fun h => by rw [Finset.insert_eq_of_mem h] at hc h1; omega
   exact ⟨fun h => ha (by simp [h]), hb, hf, by omega, hmin⟩
 lemma un_tight {a k t : ℕ} {U : Finset ℕ} (hl : Live R m T k t (insert (a ^^^ m) U))
-    (hm : ∀ q < k + 1, ¬ Sol Z0 m T q (C m ((insert a U : Finset ℕ) : Set ℕ)))
+    (hm : ∀ q < k + 1, ¬ Sol Z0 m T q (t + 1) (C m ((insert a U : Finset ℕ) : Set ℕ)))
     (hc : (insert a U).card + (t + 1) = k + 2) :
     a ∉ U ∧ a ^^^ m ∉ U ∧ (insert (a ^^^ m) U).card + t = k + 1 ∧ Min R m T k t (insert (a ^^^ m) U) := by
   have hu : Un m a (insert a U) (insert (a ^^^ m) U) := ⟨U, rfl, rfl⟩
@@ -544,7 +553,7 @@ lemma un_tight {a k t : ℕ} {U : Finset ℕ} (hl : Live R m T k t (insert (a ^^
   have h1 := Finset.card_insert_le a U
   have ha : a ∉ U := fun h => by rw [Finset.insert_eq_of_mem h] at hc; omega
   exact ⟨ha, hf, by omega, hmin⟩
-lemma rect0 {k : ℕ} {S : Finset ℕ} (hl : Live R m T k 0 S) (hm : ∀ q < k, ¬ Sol Z0 m T q (C m (S : Set ℕ)))
+lemma rect0 {k : ℕ} {S : Finset ℕ} (hl : Live R m T k 0 S) (hm : ∀ q < k, ¬ Sol Z0 m T q 0 (C m (S : Set ℕ)))
     (hc : S.card = k + 1) {i1 i2 j1 j2 : ℕ} (h1 : Lg N m T i1) (h2 : Lg N m T i2) (h3 : Lg N m T j1) (h4 : Lg N m T j2) :
     ∀ {a b : ℕ}, a ∈ S → b ∈ S → a ≠ b →
     (∀ w ∈ S, w.testBit i1 = w.testBit i2) → (∀ w ∈ S, w.testBit (N + j1) = w.testBit (N + j2)) →
@@ -588,7 +597,7 @@ lemma rect0 {k : ℕ} {S : Finset ℕ} (hl : Live R m T k 0 S) (hm : ∀ q < k, 
         rcases hw with rfl | hw
         · simp only [op_bit, r2 x (by simp), r2 y (by simp)]
         · exact r2 w (by simp [hw])
-lemma polar {k t : ℕ} {S : Finset ℕ} (hl : Live R m T k t S) (hm : ∀ q < k, ¬ Sol Z0 m T q (C m (S : Set ℕ)))
+lemma polar {k t : ℕ} {S : Finset ℕ} (hl : Live R m T k t S) (hm : ∀ q < k, ¬ Sol Z0 m T q t (C m (S : Set ℕ)))
     (hc : S.card + t = k + 1) {i j : ℕ} (h1 : Lg N m T i) (h2 : Lg N m T j) :
     ∀ {a : ℕ}, a ∈ S → Uq N true S a i → Uq N true S a j → a.testBit i = a.testBit j := by
   induction hl with
@@ -619,7 +628,7 @@ lemma polar {k t : ℕ} {S : Finset ℕ} (hl : Live R m T k t S) (hm : ∀ q < k
       unfold sepb; simp only [op_bit]
       cases d <;> simp <;> grind
     · exact this
-lemma rect1 {k t : ℕ} {S : Finset ℕ} (hl : Live R m T k t S) (hm : ∀ q < k, ¬ Sol Z0 m T q (C m (S : Set ℕ)))
+lemma rect1 {k t : ℕ} {S : Finset ℕ} (hl : Live R m T k t S) (hm : ∀ q < k, ¬ Sol Z0 m T q t (C m (S : Set ℕ)))
     (hc : S.card + t = k + 1) {i1 i2 j1 j2 : ℕ} (h1 : Lg N m T i1) (h2 : Lg N m T i2) (h3 : Lg N m T j1) (h4 : Lg N m T j2) :
     ∀ {a b : ℕ}, a ∈ S → b ∈ S → a ≠ b →
     (∀ w ∈ S, w.testBit i1 = w.testBit i2) → (∀ w ∈ S, w.testBit (N + j1) = w.testBit (N + j2)) →
@@ -810,7 +819,7 @@ lemma ht_un {a c1 c2 : ℕ} {U : Finset ℕ} (hc1 : c1 ∈ insert a U) (hc2 : c2
     rcases hw with rfl | hw
     · simp [r2 a (by simp), l3.2.1, l4.2.1]
     · exact r2 w (by simp [hw])
-lemma chrom {e : Bool} {k t : ℕ} {S : Finset ℕ} (hl : Live R m T k t S) (hm : ∀ q < k, ¬ Sol Z0 m T q (C m (S : Set ℕ)))
+lemma chrom {e : Bool} {k t : ℕ} {S : Finset ℕ} (hl : Live R m T k t S) (hm : ∀ q < k, ¬ Sol Z0 m T q t (C m (S : Set ℕ)))
     (he : e = true ∨ t = 0) :
     ∃ (x : ℕ) (f : ℕ → ℕ), S.card + t + x = k + 1 ∧ (∀ a ∈ S, f a ≤ x) ∧ ∀ a ∈ S, ∀ b ∈ S, a ≠ b → Ht N m T e S a b → f a ≠ f b := by
   induction hl with
@@ -991,23 +1000,23 @@ lemma chrom {e : Bool} {k t : ℕ} {S : Finset ℕ} (hl : Live R m T k t S) (hm 
               (ht_bi hab he2 hl h1 h2 (fun _ => ha) (fun _ => hb) (fun _ => ha) (fun _ => hb) hh)
 end chrom
 open Finset in
-def Acc (n T k b : ℕ) (D : ℕ → ℕ) (S : Finset ℕ) : Prop :=
-  ∀ U ⊆ S, ∀ q, q + b < k + ∑ w ∈ S \ U, D w → ¬ Sol Z0 n (T &&& n) q (C n (Im n U))
-lemma Acc.start {n T K b L : ℕ} {W : Set ℕ} {S : Finset ℕ} (h : ∀ q < L, ¬ Sol Z0 n (T &&& n) q (C n W)) (hS : Im n S ⊆ W)
-    (hb : K ≤ b + L) : Acc n T K b (fun _ => 0) S := by
+def Acc (n T k t b : ℕ) (D : ℕ → ℕ) (S : Finset ℕ) : Prop :=
+  ∀ U ⊆ S, ∀ q, q + b < k + ∑ w ∈ S \ U, D w → ¬ Sol Z0 n (T &&& n) q t (C n (Im n U))
+lemma Acc.start {n T K t u b L : ℕ} {W : Set ℕ} {S : Finset ℕ} (h : ∀ q < L, ¬ Sol Z0 n (T &&& n) q u (C n W)) (ht : t ≤ u) (hS : Im n S ⊆ W)
+    (hb : K ≤ b + L) : Acc n T K t b (fun _ => 0) S := by
   intro U hU q hq hs
   simp only [Finset.sum_const_zero] at hq
-  refine h q (by omega) (hs.mono le_rfl (C_mono (subset_trans ?_ hS)))
+  refine h q (by omega) ((hs.monoU ht).mono le_rfl (C_mono (subset_trans ?_ hS)))
   exact Set.image_mono (by exact_mod_cast hU)
 lemma Acc.const {m n T k k' t b : ℕ} {D : ℕ → ℕ} {S : Finset ℕ} (hn : n &&& m = n) (hT0 : T &&& n ≠ 0) (hT1 : T &&& n ≠ n)
-    (h : Acc n T k b D S) (hm : Min R m T k' t S) (hk : k' ≤ k) : (S.filter (Cst n)).card ≤ b := by
+    (h : Acc n T k t b D S) (hm : Min R m T k' t S) (hk : k' ≤ k) : (S.filter (Cst n)).card ≤ b := by
   obtain ⟨q, hq, hs⟩ := hm.const hn hT0 hT1
   by_contra hc
   exact h S subset_rfl q (by simp only [sdiff_self, Finset.bot_eq_empty, Finset.sum_empty]; omega) hs
-lemma Acc.step {n T k b δ c' : ℕ} {D D' : ℕ → ℕ} {S S' : Finset ℕ} (h : Acc n T (k + 1) b D S)
-    (H : ∀ U' ⊆ S', ∀ q, Sol Z0 n (T &&& n) q (C n (Im n U')) → ∃ U ⊆ S, ∃ r, Sol Z0 n (T &&& n) r (C n (Im n U)) ∧
+lemma Acc.step {n T k t t' b δ c' : ℕ} {D D' : ℕ → ℕ} {S S' : Finset ℕ} (h : Acc n T (k + 1) t b D S)
+    (H : ∀ U' ⊆ S', ∀ q, Sol Z0 n (T &&& n) q t' (C n (Im n U')) → ∃ U ⊆ S, ∃ r, Sol Z0 n (T &&& n) r t (C n (Im n U)) ∧
       r + δ + ∑ w ∈ S' \ U', D' w ≤ q + 1 + ∑ w ∈ S \ U, D w)
-    (he : ∃ q, q + c' ≤ k ∧ Sol Z0 n (T &&& n) q (C n (Im n S'))) : δ + c' ≤ b ∧ Acc n T k (b - δ) D' S' := by
+    (he : ∃ q, q + c' ≤ k ∧ Sol Z0 n (T &&& n) q t' (C n (Im n S'))) : δ + c' ≤ b ∧ Acc n T k t' (b - δ) D' S' := by
   have hd : δ + c' ≤ b := by
     obtain ⟨q, hq, hs⟩ := he
     obtain ⟨U, hU, r, hr, hle⟩ := H S' subset_rfl q hs
@@ -1087,10 +1096,10 @@ structure DStep (κ : Kd) (D D' : ℕ → ℕ) (g a c : ℕ) (S' : Finset ℕ) :
 lemma kpa_le (κ : Kd) (x : ℕ) : κ.kpa x ≤ x := by cases κ <;> simp [Kd.kpa]
 lemma kpc_le (κ : Kd) (x : ℕ) : κ.kpc x ≤ x := by cases κ <;> simp [Kd.kpc]
 theorem Acc.bi {m n T k k' t b : ℕ} {d : Bool} {a c : ℕ} {D D' : ℕ → ℕ} {S S' : Finset ℕ} (hn : n &&& m = n) (hT0 : T &&& n ≠ 0) (hT1 : T &&& n ≠ n)
-    (h : Acc n T (k + 1) b D S) (hb : Bi R d a c S S') (hm : Min R m T (k' + 1) t S) (hl : Live R m T k' t S') (hk : k' ≤ k)
+    (h : Acc n T (k + 1) t b D S) (hb : Bi R d a c S S') (hm : Min R m T (k' + 1) t S) (hl : Live R m T k' t S') (hk : k' ≤ k)
     (κ : Kd) (hκ : κ.ok n d a c) (hD : DStep κ D D' (op d a c) a c S') :
     κ.del (if a ∈ S' then 0 else D a) (if c ∈ S' then 0 else D c) + (S'.filter (Cst n)).card ≤ b ∧
-      Acc n T k (b - κ.del (if a ∈ S' then 0 else D a) (if c ∈ S' then 0 else D c)) D' S' := by
+      Acc n T k t (b - κ.del (if a ∈ S' then 0 else D a) (if c ∈ S' then 0 else D c)) D' S' := by
   have hfr : op d a c ∉ S := fun h' => hb.fresh hl hm.2 (sub_C _ _ (by simpa using h'))
   have hmin := hb.min hl hm.2
   obtain ⟨hac, U0, hS, hS', hal⟩ := hb
@@ -1228,10 +1237,10 @@ theorem Acc.bi {m n T k k' t b : ℕ} {d : Bool} {a c : ℕ} {D D' : ℕ → ℕ
   · obtain ⟨q, hq, hs⟩ := hmin.const hn hT0 hT1
     exact ⟨q, by omega, hs⟩
 theorem Acc.un {m n T k k' t b : ℕ} {a : ℕ} {D D' : ℕ → ℕ} {S S' : Finset ℕ} (hn : n &&& m = n) (hT0 : T &&& n ≠ 0) (hT1 : T &&& n ≠ n)
-    (h : Acc n T (k + 1) b D S) (hb : Un m a S S') (hm : Min R m T (k' + 1) (t + 1) S) (hl : Live R m T k' t S') (hk : k' ≤ k) (κ : Bool)
+    (h : Acc n T (k + 1) (t + 1) b D S) (hb : Un m a S S') (hm : Min R m T (k' + 1) (t + 1) S) (hl : Live R m T k' t S') (hk : k' ≤ k) (κ : Bool)
     (hκ : κ = true → Cst n a) (hg : D' (a ^^^ m) ≤ (if κ then 0 else 1) + (if a ∈ S' then 0 else D a))
     (hka : a ∈ S' → D' a ≤ if κ then D a else 0) (ho : ∀ w ∈ S', w ≠ a ^^^ m → w ≠ a → D' w ≤ D w) :
-    (if κ then 1 else 0) + (S'.filter (Cst n)).card ≤ b ∧ Acc n T k (b - if κ then 1 else 0) D' S' := by
+    (if κ then 1 else 0) + (S'.filter (Cst n)).card ≤ b ∧ Acc n T k t (b - if κ then 1 else 0) D' S' := by
   have hfr : a ^^^ m ∉ S := fun h' => hb.fresh hl hm.2 (sub_C _ _ (by simpa using h'))
   have hmin := hb.min hl hm.2
   obtain ⟨U0, hS, hS'⟩ := hb
@@ -1266,7 +1275,7 @@ theorem Acc.un {m n T k k' t b : ℕ} {a : ℕ} {D D' : ℕ → ℕ} {S S' : Fin
     · rw [ite_eq_left hgU', zero_add]
       by_cases hk1 : κ = true
       · have hc := hκ hk1
-        refine ⟨U'.erase g, hVS, q, hs.mono le_rfl (C_Im_sub hUi (Cst_mem (by rw [hgdef]; exact (Cst_neg hn).2 hc)) subset_rfl), ?_⟩
+        refine ⟨U'.erase g, hVS, q, (hs.monoU (by omega)).mono le_rfl (C_Im_sub hUi (Cst_mem (by rw [hgdef]; exact (Cst_neg hn).2 hc)) subset_rfl), ?_⟩
         have h1 : ∑ w ∈ U0 \ U'.erase g, D' w ≤ ∑ w ∈ U0 \ U'.erase g, D w := Finset.sum_le_sum fun w hw => hDle w (Finset.mem_sdiff.1 hw).1
         rw [par _ hV]; simp only [hk1, ite_true]; omega
       · refine ⟨insert a (U'.erase g), ?_, q + 1, ?_, ?_⟩
@@ -1289,7 +1298,7 @@ theorem Acc.un {m n T k k' t b : ℕ} {a : ℕ} {D D' : ℕ → ℕ} {S S' : Fin
     · rw [ite_eq_right hgU']
       have e : U'.erase g = U' := Finset.erase_eq_of_notMem hgU'
       rw [e] at hV hVS ⊢
-      refine ⟨U', hVS, q, hs, ?_⟩
+      refine ⟨U', hVS, q, hs.monoU (by omega), ?_⟩
       have h1 : ∑ w ∈ U0 \ U', D' w ≤ ∑ w ∈ U0 \ U', D w := Finset.sum_le_sum fun w hw => hDle w (Finset.mem_sdiff.1 hw).1
       rw [par _ hV]
       split_ifs at hg ⊢ <;> omega
@@ -1912,11 +1921,11 @@ lemma zflG_spec {N np q nc : ℕ} {f : ℕ → ℕ} (hf : ∀ j < 16, f j < 2 ^ 
   simp [b, hne] at this
 lemma zfl_spec {np q nc : ℕ} {f : ℕ → ℕ} (hf : ∀ j < 16, f j < 2 ^ (2 * NN)) (hnp : np = lane (WL NN) 16 f) (hw : 86 ≤ 2 * NN + 1) {j : ℕ}
     (h : (zfl np q nc).testBit (5 * j) = true) : j < 16 ∧ q &&& f j = 0 ∧ nc.testBit (5 * j) = true := zflG_spec hf hnp hw h
-structure StOk (P : List ℕ) (T l k z : ℕ) (v : List W) (S : Finset ℕ) : Prop where
+structure StOk (P : List ℕ) (T l k t z : ℕ) (v : List W) (S : Finset ℕ) : Prop where
   rep : Rep v S
   wok : ∀ w ∈ v, WOk P w
   good : ∀ w ∈ v, Good l w.s
-  bud : ∃ (b : ℕ → ℕ) (D : ℕ → ℕ → ℕ), (∀ j < P.length, b j ≤ 15) ∧ (∀ j < P.length, Acc (P.getD j 0) T k (b j) (D j) S) ∧
+  bud : ∃ (b : ℕ → ℕ) (D : ℕ → ℕ → ℕ), (∀ j < P.length, b j ≤ 15) ∧ (∀ j < P.length, Acc (P.getD j 0) T k t (b j) (D j) S) ∧
     (∀ w ∈ v, w.d = pk P.length (fun j => D j w.s)) ∧ (∀ j < P.length, k + ∑ s ∈ S, D j s ≤ 15) ∧ z = pk P.length (fun j => 16 + b j - cnt v j)
 structure Ctx (P : List ℕ) (l m g np T : ℕ) : Prop where
   lg : ∀ i, l.testBit i = true → Lg NN m T i ∧ AA.testBit i = true
@@ -1943,11 +1952,11 @@ section sound
 variable {P : List ℕ} {l m g np T : ℕ} (X : Ctx P l m g np T)
 include X
 lemma cnt_le {k k' t : ℕ} {v : List W} {S : Finset ℕ} {b : ℕ → ℕ} {D : ℕ → ℕ → ℕ} (hr : Rep v S) (hw : ∀ w ∈ v, WOk P w)
-    (hc : ∀ j < P.length, Acc (P.getD j 0) T k (b j) (D j) S) (hm : Min R m T k' t S) (hk : k' ≤ k) : ∀ j < P.length, cnt v j ≤ b j := by
+    (hc : ∀ j < P.length, Acc (P.getD j 0) T k t (b j) (D j) S) (hm : Min R m T k' t S) (hk : k' ≤ k) : ∀ j < P.length, cnt v j ≤ b j := by
   intro j hj
   obtain ⟨p1, p2, p3⟩ := X.hP j hj
   exact (cnt_card hr hw hj).trans ((hc j hj).const p1 p2 p3 hm hk)
-lemma guard_ok {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hr : StOk P T l k z v S) (hm : Min R m T k' t S) (hk : k' ≤ k) :
+lemma guard_ok {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hr : StOk P T l k t z v S) (hm : Min R m T k' t S) (hk : k' ≤ k) :
     Nat.beq (Nat.land z g) g = true := by
   obtain ⟨b, D, hb, hc, _, _, hz⟩ := hr.bud
   have hle := cnt_le X hr.rep hr.wok hc hm hk
@@ -1956,14 +1965,14 @@ lemma guard_ok {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hr : StOk P T l k
   have := hb j hj; have := hle j hj; omega
 lemma child_sound {f : ℕ → List W → Bool} {z t k k' : ℕ} {r : List W} {S : Finset ℕ} {kb : Bool}
     {mk : (List W → Bool) → Bool} (hmk : ∀ h, mk h = h r) (hkb : kb = false)
-    (hr : StOk P T l k z r S) (hm : Min R m T k' t S) (hk : k' ≤ k) (h : child f g kb mk z = false) : f z r = false := by
+    (hr : StOk P T l k t z r S) (hm : Min R m T k' t S) (hk : k' ≤ k) (h : child f g kb mk z = false) : f z r = false := by
   subst hkb
   simp only [child, bR, st_eq, guard_ok X hr hm hk, cond_true, cond_false, hmk] at h
   exact h
 end sound
-lemma StOk.start {P : List ℕ} {T l K : ℕ} {v : List W} {S : Finset ℕ} {b : ℕ → ℕ} (hrep : Rep v S) (hwok : ∀ w ∈ v, WOk P w) (hgood : ∀ w ∈ v, Good l w.s)
-    (hK : K ≤ 15) (hb : ∀ j < P.length, b j ≤ 15) (hd : ∀ w ∈ v, w.d = 0) (hA : ∀ j < P.length, Acc (P.getD j 0) T K (b j) (fun _ => 0) S) :
-    StOk P T l K (pk P.length (fun j => 16 + b j - cnt v j)) v S := by
+lemma StOk.start {P : List ℕ} {T l K t : ℕ} {v : List W} {S : Finset ℕ} {b : ℕ → ℕ} (hrep : Rep v S) (hwok : ∀ w ∈ v, WOk P w) (hgood : ∀ w ∈ v, Good l w.s)
+    (hK : K ≤ 15) (hb : ∀ j < P.length, b j ≤ 15) (hd : ∀ w ∈ v, w.d = 0) (hA : ∀ j < P.length, Acc (P.getD j 0) T K t (b j) (fun _ => 0) S) :
+    StOk P T l K t (pk P.length (fun j => 16 + b j - cnt v j)) v S := by
   refine ⟨hrep, hwok, hgood, b, fun _ _ => 0, hb, hA, fun w hw => ?_, fun j _ => by simpa using hK, rfl⟩
   rw [hd w hw]; simp [pk]
 lemma rm_eq (x y : ℕ) (v : List W) : ∀ h, rm x y v h = h (v.filter (fun w => !(Nat.beq w.s x || Nat.beq w.s y))) := by
@@ -2337,7 +2346,7 @@ section sound
 variable {P : List ℕ} {l m g np T : ℕ} (X : Ctx P l m g np T)
 include X
 lemma bi_st {k k' t z : ℕ} {v r : List W} {S S' : Finset ℕ} {d' : Bool} {a c : W} {ka kc : Bool} {eA eC w fA fC fN dn : ℕ}
-    (hs : StOk P T l (k + 1) z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hb : Bi R d' a.s c.s S S')
+    (hs : StOk P T l (k + 1) t z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hb : Bi R d' a.s c.s S S')
     (hl : Live R m T k' t S') (ha : a ∈ v) (hc : c ∈ v) (hka : ka = decide (a.s ∈ S')) (hkc : kc = decide (c.s ∈ S'))
     (hEA : isPk P.length eA) (hEC : isPk P.length eC)
     (he : ∀ j < P.length, fb eA j + fb eC j + max (fl a j) (max (fl c j) (fl (opW d' a c) j)) ≤ 1)
@@ -2348,7 +2357,7 @@ lemma bi_st {k k' t z : ℕ} {v r : List W} {S S' : Finset ℕ} {d' : Bool} {a c
     (hsh : Shape (wd (opW d' a c) dn) (upd a.s (Nat.land (MU (w + fC)) a.d) c.s (Nat.land (MU (w + fA)) c.d) a)
       (upd a.s (Nat.land (MU (w + fC)) a.d) c.s (Nat.land (MU (w + fA)) c.d) c)
       (v.map (upd a.s (Nat.land (MU (w + fC)) a.d) c.s (Nat.land (MU (w + fA)) c.d))) ka kc r) :
-    StOk P T l k (z + (a.c &&& c.c) - w - (eA + eC) - (bif ka then a.c else Nat.land (MU (w + fC)) a.d) -
+    StOk P T l k t (z + (a.c &&& c.c) - w - (eA + eC) - (bif ka then a.c else Nat.land (MU (w + fC)) a.d) -
       (bif kc then c.c else Nat.land (MU (w + fA)) c.d)) r S' ∧
     Nat.beq (Nat.land (z + (a.c &&& c.c) - w) g) g = true ∧ Nat.beq (Nat.land (z + (a.c &&& c.c) - w - (eA + eC)) g) g = true := by
   obtain ⟨b, D, hb15, hacc, hdv, hsum, hz⟩ := hs.bud
@@ -2470,7 +2479,7 @@ lemma bi_st {k k' t z : ℕ} {v r : List W} {S S' : Finset ℕ} {d' : Bool} {a c
         simp only [FC, q0] at q3; omega
     · trivial
   have hA : ∀ j < N, (κ j).del (if ka then 0 else D j a.s) (if kc then 0 else D j c.s) + (S'.filter (Cst (P.getD j 0))).card ≤ b j ∧
-      Acc (P.getD j 0) T k (b j - (κ j).del (if ka then 0 else D j a.s) (if kc then 0 else D j c.s)) (D' j) S' := by
+      Acc (P.getD j 0) T k t (b j - (κ j).del (if ka then 0 else D j a.s) (if kc then 0 else D j c.s)) (D' j) S' := by
     intro j hj
     obtain ⟨p1, p2, p3⟩ := X.hP j hj
     have := (hacc j hj).bi p1 p2 p3 hb hm hl hk (κ j) (hκ j hj) (hDS j)
@@ -2682,12 +2691,12 @@ lemma zfl_eq {q nc j : ℕ} {a o : ℕ} (hj : j < P.length) (hq : q = a ^^^ o) (
   revert this
   cases a.testBit i <;> cases o.testBit i <;> cases (P.getD j 0).testBit i <;> simp
 lemma gate_sound {f : ℕ → List W → Bool} {e n z t k k' : ℕ} {v : List W} {S S' : Finset ℕ} {a c : W} {d' : Bool} {oa oc ka kc kb : Bool}
-    (hs : StOk P T l (k + 1) z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hn : n = v.length)
+    (hs : StOk P T l (k + 1) t z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hn : n = v.length)
     (hSe : S'.card ≤ e) (hb : Bi R d' a.s c.s S S') (hl : Live R m T k' t S') (ha : a ∈ v) (hc : c ∈ v)
     (hoa : a.s ∉ S' → oa = true) (hoc : c.s ∉ S' → oc = true) (hka : a.s ∈ S' → c.s ∉ S' → ka = false) (hkc : c.s ∈ S' → a.s ∉ S' → kc = false)
     (hkb : a.s ∈ S' → c.s ∈ S' → kb = false)
     (hp : mid f m g np e (Nat.pred n) z v a c oa oc ka kc kb (opW d' a c).s (opW d' a c).a (opW d' a c).b = false) :
-    ∃ z' r, f z' r = false ∧ StOk P T l k z' r S' ∧ ∀ w ∈ r, (w.s = op d' a.s c.s ∧ w.r = 0) ∨ ∃ w' ∈ v, w'.s = w.s ∧ w'.r = w.r := by
+    ∃ z' r, f z' r = false ∧ StOk P T l k t z' r S' ∧ ∀ w ∈ r, (w.s = op d' a.s c.s ∧ w.r = 0) ∨ ∃ w' ∈ v, w'.s = w.s ∧ w'.r = w.r := by
   subst hn
   have hmin := hb.min hl hm.2
   have hfr := hb.fresh hl hm.2
@@ -2746,7 +2755,7 @@ lemma gate_sound {f : ℕ → List W → Bool} {e n z t k k' : ℕ} {v : List W}
       (∀ h, put m (opW d' a c).s (opW d' a c).a (opW d' a c).b v (fN + (bif qa then 0 else Nat.land (MU (fN + fA)) a.d) + (bif qc then 0 else Nat.land (MU (fN + fC)) c.d)) h = h r0) ∧
       ((r0.filter (kp a.s qa c.s qc)).map (upd a.s da c.s dc)).length = S'.card ∧
       ((r0.filter (kp a.s qa c.s qc)).map (upd a.s da c.s dc)).length + (bif qa then 0 else 1) + (bif qc then 0 else 1) = v.length + 1 ∧
-      StOk P T l k (z + (a.c &&& c.c) - w - (eA + eC) - (bif qa then a.c else da) - (bif qc then c.c else dc)) ((r0.filter (kp a.s qa c.s qc)).map (upd a.s da c.s dc)) S' ∧
+      StOk P T l k t (z + (a.c &&& c.c) - w - (eA + eC) - (bif qa then a.c else da) - (bif qc then c.c else dc)) ((r0.filter (kp a.s qa c.s qc)).map (upd a.s da c.s dc)) S' ∧
       (∀ x ∈ (r0.filter (kp a.s qa c.s qc)).map (upd a.s da c.s dc), (x.s = op d' a.s c.s ∧ x.r = 0) ∨ ∃ w' ∈ v, w'.s = x.s ∧ w'.r = x.r) ∧
       Nat.beq (Nat.land (z + (a.c &&& c.c) - w) g) g = true ∧ Nat.beq (Nat.land (z + (a.c &&& c.c) - w - (eA + eC)) g) g = true := by
     intro qa qc h1 h2
@@ -2833,10 +2842,10 @@ section sound
 variable {P : List ℕ} {l m g np T : ℕ} (X : Ctx P l m g np T)
 include X
 lemma un_st {k k' t z : ℕ} {v r0 : List W} {S S' : Finset ℕ} {a : W} {ka : Bool} {dn : ℕ}
-    (hs : StOk P T l (k + 1) z v S) (hm : Min R m T (k' + 1) (t + 1) S) (hk : k' ≤ k) (hb : Un m a.s S S')
+    (hs : StOk P T l (k + 1) (t + 1) z v S) (hm : Min R m T (k' + 1) (t + 1) S) (hk : k' ≤ k) (hb : Un m a.s S S')
     (hl : Live R m T k' t S') (ha : a ∈ v) (hka : ka = decide (a.s ∈ S'))
     (hdn : dn = (Nat.shiftRight g 4 - a.c) + (bif ka then 0 else a.d)) (hr0 : r0.Perm (wd (notW m a) dn :: v)) :
-    StOk P T l k (z - a.c - (bif ka then a.c else 0)) ((r0.filter (kp a.s ka a.s ka)).map (upd a.s 0 a.s 0)) S' ∧
+    StOk P T l k t (z - a.c - (bif ka then a.c else 0)) ((r0.filter (kp a.s ka a.s ka)).map (upd a.s 0 a.s 0)) S' ∧
     ∀ x ∈ (r0.filter (kp a.s ka a.s ka)).map (upd a.s 0 a.s 0), (x.s = a.s ^^^ m ∧ x.r = 0) ∨ ∃ w' ∈ v, w'.s = x.s ∧ w'.r = x.r := by
   obtain ⟨b, D, hb15, hacc, hdv, hsum, hz⟩ := hs.bud
   have hle := cnt_le X hs.rep hs.wok hacc hm (by omega)
@@ -2951,7 +2960,7 @@ lemma un_st {k k' t z : ℕ} {v r0 : List W} {S S' : Finset ℕ} {a : W} {ka : B
   have hg' : ∀ j, D' j (a.s ^^^ m) = (1 - fl a j) + (if a.s ∈ S' then 0 else D j a.s) := fun j => by rw [kaif]; simp only [D', ite_true]
   have ho' : ∀ j, ∀ s ∈ S', s ≠ a.s ^^^ m → s ≠ a.s → D' j s ≤ D j s := fun j s _ h1 h2 => by simp only [D', ite_eq_right h1, ite_eq_right h2]; exact le_rfl
   have hka' : ∀ j, D' j a.s = 0 := fun j => by simp only [D', ite_eq_right hne, ite_true]
-  have hA : ∀ j < P.length, fl a j + (S'.filter (Cst (P.getD j 0))).card ≤ b j ∧ Acc (P.getD j 0) T k (b j - fl a j) (D' j) S' := by
+  have hA : ∀ j < P.length, fl a j + (S'.filter (Cst (P.getD j 0))).card ≤ b j ∧ Acc (P.getD j 0) T k t (b j - fl a j) (D' j) S' := by
     intro j hj
     obtain ⟨p1, p2, p3⟩ := X.hP j hj
     have h1 := fl_le a j
@@ -3049,9 +3058,9 @@ section sound
 variable {P : List ℕ} {l m g np T : ℕ} (X : Ctx P l m g np T)
 include X
 lemma nots_sound {f : ℕ → ℕ → List W → Bool} {e n z q t k k' : ℕ} {v : List W} {S S' : Finset ℕ} {a : W}
-    (hs : StOk P T l (k + 1) z v S) (hm : Min R m T (k' + 1) (t + 1) S) (hk : k' ≤ k) (hn : n = v.length)
+    (hs : StOk P T l (k + 1) (t + 1) z v S) (hm : Min R m T (k' + 1) (t + 1) S) (hk : k' ≤ k) (hn : n = v.length)
     (hSe : S'.card ≤ e) (hb : Un m a.s S S') (hl : Live R m T k' t S') (ha : a ∈ v) (hq : a.s + 1 ≠ q) {rr : List W} (har' : a ∈ rr)
-    (hp : nots f m g e n z q v rr = false) : ∃ z' r, f (a.s ^^^ m) z' r = false ∧ StOk P T l k z' r S' ∧
+    (hp : nots f m g e n z q v rr = false) : ∃ z' r, f (a.s ^^^ m) z' r = false ∧ StOk P T l k t z' r S' ∧
       ∀ w ∈ r, (w.s = a.s ^^^ m ∧ w.r = 0) ∨ ∃ w' ∈ v, w'.s = w.s ∧ w'.r = w.r := by
   subst hn
   have hmin := hb.min hl hm.2
@@ -4145,7 +4154,7 @@ lemma tsn_eq (d : Bool) (l e : ℕ) (v : List W) (F : (ℕ → Bool) → (ℕ �
   unfold tsn
   beta_reduce
   rw [bR, bR, bR, bR, st_eq, st_eq, len_eq]
-lemma rect0_ok {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k z v S) (hm : Min R m T k' t S) (hk : k' ≤ k) (hn : v.length + t = k + 1) :
+lemma rect0_ok {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k t z v S) (hm : Min R m T k' t S) (hk : k' ≤ k) (hn : v.length + t = k + 1) :
     Nat.beq (edg (pos' t) l (wst (pos' t) l v) v) 0 = true := by
   have hl : ∀ i, l.testBit i = true → AA.testBit i = true := fun i hi => (X.lg i hi).2
   have key : ∀ p < 84, 12 ≤ p → p % 13 ≠ p % 12 := by decide
@@ -4160,7 +4169,7 @@ lemma tsn_gen (d : Bool) (l e : ℕ) (v : List W) (F : (ℕ → Bool) → (ℕ �
       (bif Nat.beq (v.length + 1) e then tst1 h F else (bif Nat.beq (v.length + 2) e then tst2 h F else F kF kF2)) := by
   subst e0 e1
   exact tsn_eq X d l e v F
-lemma tsn_sound {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k z v S) (hm : Min R m T k' t S) (hk : k' ≤ k) :
+lemma tsn_sound {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k t z v S) (hm : Min R m T k' t S) (hk : k' ≤ k) :
     ∃ (κ : ℕ → Bool) (κ2 : ℕ → ℕ → Bool), (∀ F, tsn (pos' t) l (k + 1 - t) v F = F κ κ2) ∧ KP R m T k' t S v κ κ2 := by
   have hl : ∀ i, l.testBit i = true → AA.testBit i = true := fun i hi => (X.lg i hi).2
   have hsz := hm.size
@@ -4391,7 +4400,7 @@ lemma modeH_false {h : W → W → Bool → Bool → Bool → Bool → Bool → 
 section sound
 variable {P : List ℕ} {l m g np T : ℕ} (X : Ctx P l m g np T)
 include X
-lemma cv_ok {t k k' z : ℕ} {v : List W} {S : Finset ℕ} {b : Bool} (hs : StOk P T l k z v S) (hl : Live R m T k' t S)
+lemma cv_ok {t k k' z : ℕ} {v : List W} {S : Finset ℕ} {b : Bool} (hs : StOk P T l k t z v S) (hl : Live R m T k' t S)
     (h : cv (pos' t) l v b = false) : b = false := by
   have hcov : Nat.beq (cov (pos' t) l v) l = true := by
     rw [Nat.beq_eq]
@@ -4411,18 +4420,18 @@ lemma cv_ok {t k k' z : ℕ} {v : List W} {S : Finset ℕ} {b : Bool} (hs : StOk
   cases hp : pos' t <;> rw [hp] at h <;> simpa using h
 lemma nodeH_bi {f : ℕ → List W → Bool} {h : W → W → Bool → Bool → Bool → Bool → Bool → Nat → Nat → Nat → Bool} {d : Bool} {e n z t k k' : ℕ} {v : List W} {S S' : Finset ℕ} {x y : ℕ} {d' : Bool}
     {κ : ℕ → Bool} {κ2 : ℕ → ℕ → Bool} {go : (L_meta_35960.X → L_meta_35960.X → Bool) → List L_meta_35960.X → Bool}
-    (hs : StOk P T l (k + 1) z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hd : d = pos' t) (hn : n = v.length)
+    (hs : StOk P T l (k + 1) t z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hd : d = pos' t) (hn : n = v.length)
     (hSe : S'.card ≤ e) (hb : Bi R d' x y S S') (hl : Live R m T k' t S') (hKP : KP R m T (k' + 1) t S v κ κ2)
     (hh : ∀ (a c : W) (oa oc ka kc kb : Bool) (x1 y1 : ℕ), op d' a.s c.s = op d' x y → h a c oa oc ka kc kb (op d' a.s c.s) x1 y1 = false →
       mid f m g np e (Nat.pred n) z v a c oa oc ka kc kb (op d' a.s c.s) x1 y1 = false)
     (hgo : ∀ h xs, go h xs = false → xs = mkX d l (wst d l v) v → ∀ a c : L_meta_35960.X, a ∈ xs → c ∈ xs → a.w ∈ v → c.w ∈ v → a.s = a.w.s → c.s = c.w.s → a.s = x → c.s = y →
       h a c = false ∨ h c a = false)
     (hp : nodeH h d l e n v κ κ2 go = false) :
-    ∃ z' r, f z' r = false ∧ StOk P T l k z' r S' ∧ ∀ w ∈ r, (w.s = op d' x y ∧ w.r = 0) ∨ ∃ w' ∈ v, w'.s = w.s ∧ w'.r = w.r := by
+    ∃ z' r, f z' r = false ∧ StOk P T l k t z' r S' ∧ ∀ w ∈ r, (w.s = op d' x y ∧ w.r = 0) ∨ ∃ w' ∈ v, w'.s = w.s ∧ w'.r = w.r := by
   rw [nodeH_eq] at hp
   have one : ∀ {a c : W} {i j : ℕ}, Pos v a i → Pos v c j → Bi R d' a.s c.s S S' → op d' a.s c.s = op d' x y →
       pair (modeH h n e κ κ2) (xof d l (wst d l v) a i) (xof d l (wst d l v) c j) = false →
-      ∃ z' r, f z' r = false ∧ StOk P T l k z' r S' ∧ ∀ w ∈ r, (w.s = op d' x y ∧ w.r = 0) ∨ ∃ w' ∈ v, w'.s = w.s ∧ w'.r = w.r := by
+      ∃ z' r, f z' r = false ∧ StOk P T l k t z' r S' ∧ ∀ w ∈ r, (w.s = op d' x y ∧ w.r = 0) ∨ ∃ w' ∈ v, w'.s = w.s ∧ w'.r = w.r := by
     intro a c i j ha hc hb1 hop hpp
     have hpp := pair_false hpp d'
     have filt : ∀ {x y : W}, (∀ i, (Nat.land (sp (pos' t) l x.s) (wst (pos' t) l v)).testBit i = true → bif d' then y.s.testBit (NN + i) = false else y.s.testBit i = true) →
@@ -4496,16 +4505,16 @@ variable {P : List ℕ} {l m g np T : ℕ} (X : Ctx P l m g np T)
 include X
 lemma node_bi {f : ℕ → List W → Bool} {d : Bool} {e n z t k k' : ℕ} {v : List W} {S S' : Finset ℕ} {x y : ℕ} {d' : Bool}
     {κ : ℕ → Bool} {κ2 : ℕ → ℕ → Bool} {go : (L_meta_35960.X → L_meta_35960.X → Bool) → List L_meta_35960.X → Bool}
-    (hs : StOk P T l (k + 1) z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hd : d = pos' t) (hn : n = v.length)
+    (hs : StOk P T l (k + 1) t z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hd : d = pos' t) (hn : n = v.length)
     (hSe : S'.card ≤ e) (hb : Bi R d' x y S S') (hl : Live R m T k' t S') (hKP : KP R m T (k' + 1) t S v κ κ2)
     (hgo : ∀ h xs, go h xs = false → xs = mkX d l (wst d l v) v → ∀ a c : L_meta_35960.X, a ∈ xs → c ∈ xs → a.w ∈ v → c.w ∈ v → a.s = a.w.s → c.s = c.w.s → a.s = x → c.s = y →
       h a c = false ∨ h c a = false)
     (hp : node f d l m g np e n z v κ κ2 go = false) :
-    ∃ z' r, f z' r = false ∧ StOk P T l k z' r S' ∧ ∀ w ∈ r, (w.s = op d' x y ∧ w.r = 0) ∨ ∃ w' ∈ v, w'.s = w.s ∧ w'.r = w.r :=
+    ∃ z' r, f z' r = false ∧ StOk P T l k t z' r S' ∧ ∀ w ∈ r, (w.s = op d' x y ∧ w.r = 0) ∨ ∃ w' ∈ v, w'.s = w.s ∧ w'.r = w.r :=
   nodeH_bi X hs hm hk hd hn hSe hb hl hKP (fun _ _ _ _ _ _ _ _ _ _ h => h) hgo hp
 lemma mv_sound (hR : RR R) {F : ℕ → ℕ → ℕ → List W → Bool}
-    (hF : ∀ (k t z : ℕ) (v : List W) (S : Finset ℕ), F k t z v = false → StOk P T l k z v S → Cod R v → ∀ k' ≤ k, ¬ Min R m T k' t S)
-    {k t z : ℕ} {v : List W} {S : Finset ℕ} {κ : ℕ → Bool} {κ2 : ℕ → ℕ → Bool} (hs : StOk P T l k z v S) (hcod : Cod R v) (hlen : 2 ≤ v.length)
+    (hF : ∀ (k t z : ℕ) (v : List W) (S : Finset ℕ), F k t z v = false → StOk P T l k t z v S → Cod R v → ∀ k' ≤ k, ¬ Min R m T k' t S)
+    {k t z : ℕ} {v : List W} {S : Finset ℕ} {κ : ℕ → Bool} {κ2 : ℕ → ℕ → Bool} (hs : StOk P T l k t z v S) (hcod : Cod R v) (hlen : 2 ≤ v.length)
     (h : mv F l m g np k t z v κ κ2 = false) : ∀ k' ≤ k, Min R m T k' t S → KP R m T k' t S v κ κ2 → False := by
   intro k' hk hm hKP
   obtain ⟨hA, hN⟩ := mv_false X F l m g np k t z v κ κ2 h
@@ -4577,7 +4586,7 @@ lemma mv_sound (hR : RR R) {F : ℕ → ℕ → ℕ → List W → Bool}
     obtain ⟨z', r, hf, hst, hmem⟩ := node_bi X hst2 hm2 (by omega) rfl rfl (sizeB (k := k + 1) hm2 (by omega) hb hl) hb hl hKP3 (fun h xs hp hxs a c ha hc hav hcv eas ecs hax hcy =>
       Or.inl (pairsQ_false hp ha hax hc hcy)) hf3
     exact hF _ _ _ _ _ hf hst (codB (codB (codB hcod hmem1) hmem2) hmem) k0 (by simpa using hk) (hb.min hl hm2.2)
-theorem look_sound (hR : RR R) : ∀ (fuel k t z : ℕ) (v : List W) (S : Finset ℕ), look l m g np fuel k t z v = false → StOk P T l k z v S → Cod R v →
+theorem look_sound (hR : RR R) : ∀ (fuel k t z : ℕ) (v : List W) (S : Finset ℕ), look l m g np fuel k t z v = false → StOk P T l k t z v S → Cod R v →
     ∀ k' ≤ k, ¬ Min R m T k' t S := by
   intro fuel
   induction fuel with
@@ -4611,7 +4620,7 @@ def tz (Z : ℕ) : ℕ := Nat.land TG (mz Z)
 def tw (e : Bool × ℕ × ℕ) : ℕ := op e.1 (rawP.getD e.2.1 0) (rawP.getD e.2.2 0)
 def rawL (E : List (Bool × ℕ × ℕ)) : List ℕ := rawP ++ E.map tw
 def WZ (E : List (Bool × ℕ × ℕ)) (Z : ℕ) : Set ℕ := {x | ∃ w ∈ rawL E, x = w &&& mz Z}
-def Imp (E : List (Bool × ℕ × ℕ)) (Z L : ℕ) : Prop := ∀ q < L, ¬ Sol Z0 (mz Z) (tz Z) q (C (mz Z) (WZ E Z))
+def Imp (E : List (Bool × ℕ × ℕ)) (Z L : ℕ) : Prop := ∀ q < L, ¬ Sol Z0 (mz Z) (tz Z) q 1 (C (mz Z) (WZ E Z))
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma AA_TG : AA &&& TG = AA := by decide +kernel
@@ -4701,8 +4710,8 @@ lemma impA {e : Bool × ℕ × ℕ} {Z L : ℕ} (h : trivE e Z = true) (hI : Imp
       · rw [Nat.eq_of_beq_eq_true h]; exact Or.inr (by simp)
       · rw [← Nat.eq_of_beq_eq_true h]; exact Or.inl ⟨w, by simp only [rawL, List.map_nil, List.append_nil]; exact hw, rfl⟩
   · exact Or.inr hx
-lemma sol_add {e : Bool × ℕ × ℕ} {E : List (Bool × ℕ × ℕ)} {Z q : ℕ} {S : Set ℕ} (hS : S ⊆ C (mz Z) (WZ E Z))
-    (hs : Sol Z0 (mz Z) (tz Z) q (insert (tw e &&& mz Z) S)) : Sol Z0 (mz Z) (tz Z) (q + 1) (C (mz Z) (WZ E Z)) := by
+lemma sol_add {e : Bool × ℕ × ℕ} {E : List (Bool × ℕ × ℕ)} {Z q u : ℕ} {S : Set ℕ} (hS : S ⊆ C (mz Z) (WZ E Z))
+    (hs : Sol Z0 (mz Z) (tz Z) q u (insert (tw e &&& mz Z) S)) : Sol Z0 (mz Z) (tz Z) (q + 1) u (C (mz Z) (WZ E Z)) := by
   refine .bi (d := e.1) (raw_avail E e.2.1 Z) (raw_avail E e.2.2 Z) (al0 _ _ _) (hs.mono le_rfl ?_)
   rw [← and_op]
   exact Set.insert_subset_insert hS
@@ -4716,7 +4725,7 @@ lemma impB {e : Bool × ℕ × ℕ} {Z L : ℕ} (hI : Imp [] Z L) : Imp [e] Z (L
     · exact Or.inl rfl
   · exact Or.inr (Or.inr hx)
 lemma forb_ok {E : List (Bool × ℕ × ℕ)} {f : Bool × ℕ × ℕ} {Z L : ℕ} (hE : E.length ≤ 1) (hf : Imp [f] Z (L + E.length)) :
-    ∀ q < L, ¬ Sol Z0 (mz Z) (tz Z) q (C (mz Z) (insert (tw f &&& mz Z) (WZ E Z))) := by
+    ∀ q < L, ¬ Sol Z0 (mz Z) (tz Z) q 1 (C (mz Z) (insert (tw f &&& mz Z) (WZ E Z))) := by
   intro q hq hs
   have hsub : C (mz Z) (insert (tw f &&& mz Z) (WZ [] Z)) ⊆ C (mz Z) (WZ [f] Z) := by
     rintro x ((rfl | hx) | hx)
@@ -5156,7 +5165,7 @@ lemma chkT_chk {top : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → �
 def TopOk (top : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → List W → Bool) : Prop :=
   ∀ {P : List ℕ} {l m g np T : ℕ}, Ctx P l m g np T → ∀ {R : ℕ → ℕ}, (∀ d a b, R a ≠ 0 → R b ≠ 0 → ¬ Al R d a b) → (∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) →
     ∀ {fm fh K k t z : ℕ} {v : List W} {S : Finset ℕ} {M : List (ℕ × ℕ)} {Fs : Set ℕ}, mFull M = true → (∀ p ∈ M, top l m g np fm fh K p.1 p.2 k t z v = false) →
-      StOk P T l k z v S → (∀ w ∈ v, w.r = R w.s) → ∀ {k' : ℕ}, k' ≤ k → Live Z0 m T k' t S → (∀ q < k', ¬ Sol Z0 m T q (C m ({x | R x ≠ 0} ∪ (S : Set ℕ)))) →
+      StOk P T l k t z v S → (∀ w ∈ v, w.r = R w.s) → ∀ {k' : ℕ}, k' ≤ k → Live Z0 m T k' t S → (∀ q < k', ¬ Sol Z0 m T q t (C m ({x | R x ≠ 0} ∪ (S : Set ℕ)))) →
       (∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit fm fh (op d x y) = true → op d x y ∈ Fs) →
       (∀ s ∈ Fs, ∀ q < k', ∀ S' : Finset ℕ, (S' : Set ℕ) ⊆ C m (insert s ({x | R x ≠ 0} ∪ (S : Set ℕ))) → ¬ Live Z0 m T q t S') → False
 lemma RZ_RR (E : List (Bool × ℕ × ℕ)) (Z : ℕ) : ∀ d a b, RZ E Z a ≠ 0 → RZ E Z b ≠ 0 → ¬ Al (RZ E Z) d a b := by
@@ -5172,7 +5181,7 @@ theorem imp_FK {top : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → �
     {E F : List (Bool × ℕ × ℕ)} {Q : List (ℕ × ℕ)} {fb : ℕ × ℕ} {Z L K : ℕ} (hLK : L ≤ K + 1) (hK : K ≤ 15) (hE : E = [] ∨ ∃ e, E = [e] ∧ e.2.1 < 8 ∧ e.2.2 < 8 ∧ Imp [] Z L)
     (hp : pOk Z Q = true) (hI : ∀ e ∈ Q, Imp E e.1 e.2)
     (hfb : fb = (1, 0) ∨ (Z = 0 ∧ fbOk E F fb = true)) (hF : ∀ e ∈ F, Imp [e] 0 (L - 1 + E.length))
-    (hb : (∃ e ∈ Q, L ≤ e.2) ∨ ∀ t < L, ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chkG top E Q fb Z K t p.1 p.2 = false) : Imp E Z L := by
+    (hb : (∃ e ∈ Q, L ≤ e.2) ∨ ∀ t ≤ 1, t < L → ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chkG top E Q fb Z K t p.1 p.2 = false) : Imp E Z L := by
   intro q hq hsol
   simp only [pOk, Bool.and_eq_true, Bool.not_eq_true', List.all_eq_true] at hp
   obtain ⟨⟨hp0, hp1⟩, hp2⟩ := hp
@@ -5180,15 +5189,15 @@ theorem imp_FK {top : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → �
   have hT : tz Z &&& mz Z = tz Z := by simp only [tz, nl, Nat.and_assoc, Nat.and_self]
   have hE1 : E.length ≤ 1 := by rcases hE with rfl | ⟨e, rfl, _⟩ <;> simp
   classical
-  have hex : ∃ q, Sol Z0 (mz Z) (tz Z) q (C (mz Z) (WZ E Z)) := ⟨q, hsol⟩
+  have hex : ∃ q, Sol Z0 (mz Z) (tz Z) q 1 (C (mz Z) (WZ E Z)) := ⟨q, hsol⟩
   have hqL : Nat.find hex < L := lt_of_le_of_lt (Nat.find_min' hex hsol) hq
-  obtain ⟨k, hk, t, S, hS, hl⟩ := (Nat.find_spec hex).live
+  obtain ⟨k, hk, t, ht1, S, hS, hl⟩ := (Nat.find_spec hex).live
   have hCS : C (mz Z) (S : Set ℕ) ⊆ C (mz Z) (WZ E Z) := by
     rintro x (hx | hx)
     · exact hS hx
     · exact Or.inr hx
-  have hkeq : k = Nat.find hex := le_antisymm hk (Nat.find_min' hex (hl.sol.mono le_rfl hS))
-  have hm : Min Z0 (mz Z) (tz Z) k t S := ⟨hl, fun q' hq' hs => Nat.find_min hex (by omega) (hs.mono le_rfl hCS)⟩
+  have hkeq : k = Nat.find hex := le_antisymm hk (Nat.find_min' hex ((hl.sol.monoU ht1).mono le_rfl hS))
+  have hm : Min Z0 (mz Z) (tz Z) k t S := ⟨hl, fun q' hq' hs => Nat.find_min hex (by omega) ((hs.monoU ht1).mono le_rfl hCS)⟩
   have hbd : ∀ x ∈ S, x &&& mz Z = x := by
     intro x hx
     rcases hS hx with ⟨w, _, rfl⟩ | h
@@ -5206,7 +5215,7 @@ theorem imp_FK {top : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → �
     intro e he
     obtain ⟨⟨a, b⟩, c⟩ := hp2 e he
     exact ⟨Nat.eq_of_beq_eq_true a, nb b, nb c⟩
-  have hno : ∀ e ∈ Q, ∀ q < e.2, ¬ Sol Z0 (mz e.1) (tz Z &&& mz e.1) q (C (mz e.1) (Im (mz e.1) S)) := by
+  have hno : ∀ e ∈ Q, ∀ q < e.2, ¬ Sol Z0 (mz e.1) (tz Z &&& mz e.1) q 1 (C (mz e.1) (Im (mz e.1) S)) := by
     intro e he q hq hs
     have h3 := (hproj e he).1
     rw [tz_sub h3] at hs
@@ -5215,13 +5224,13 @@ theorem imp_FK {top : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → �
   rcases hb with ⟨e, he, hle⟩ | hb
   · have h3 := hproj e he
     obtain ⟨q', hq', hs'⟩ := hm.const h3.1 (by rw [tz_sub h3.1]; exact h3.2.1) (by rw [tz_sub h3.1]; exact h3.2.2)
-    exact hno e he q' (by omega) hs'
+    exact hno e he q' (by omega) (hs'.monoU ht1)
   have hpw : pwr E Z = 0 ∨ pwr E Z ∈ S := by
     rcases hE with rfl | ⟨e, rfl, _, _, hraw⟩
     · exact Or.inl rfl
     · by_contra hc
       push Not at hc
-      refine hraw k (by omega) (hl.sol.mono le_rfl ?_)
+      refine hraw k (by omega) ((hl.sol.monoU ht1).mono le_rfl ?_)
       intro x hx
       obtain ⟨w, hw, rfl⟩ := hSW hx
       simp only [rawL, List.mem_append, List.map_cons, List.map_nil, List.mem_singleton] at hw
@@ -5229,7 +5238,7 @@ theorem imp_FK {top : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → �
       · exact Or.inl ⟨w, by simp only [rawL, List.map_nil, List.append_nil]; exact hw, rfl⟩
       · have hx : tw e &&& mz Z ∈ S := by simpa using hx
         exact absurd (show pwr [e] Z ∈ S from hx) hc.2
-  obtain ⟨M, hMf, hchk⟩ := hb t (by omega)
+  obtain ⟨M, hMf, hchk⟩ := hb t ht1 (by omega)
   obtain ⟨a1, a2⟩ := avl_spec (mz Z) (rawL E)
   set v := ((avl (mz Z) (rawL E)).filter (fun s => decide (s ∈ S))).map (mkW (PZ Q)) with hv
   have hsub : v.Sublist ((avl (mz Z) (rawL E)).map (mkW (PZ Q))) := List.filter_sublist.map _
@@ -5280,16 +5289,16 @@ theorem imp_FK {top : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → �
     · rw [pL_pk, List.length_map, hPlen]
       refine pk_congr fun j hj => ?_
       rw [List.getD_eq_getElem?_getD, List.getElem?_map, List.getElem?_eq_getElem hj]; rfl
-  have hA : ∀ j < (PZ Q).length, Acc ((PZ Q).getD j 0) (tz Z) K (K - (Q.getD j (0, K)).2) (fun _ => 0) S := by
+  have hA : ∀ j < (PZ Q).length, Acc ((PZ Q).getD j 0) (tz Z) K t (K - (Q.getD j (0, K)).2) (fun _ => 0) S := by
     intro j hj
     obtain ⟨e1, e2⟩ := hPget j hj
     rw [e1]
-    exact Acc.start (L := (Q.getD j (0, K)).2) (hno _ e2) subset_rfl (by omega)
+    exact Acc.start (L := (Q.getD j (0, K)).2) (hno _ e2) ht1 subset_rfl (by omega)
   have hle := cnt_le X (D := fun _ _ => 0) hrep hwok hA hm (by omega)
   have hz : pL (Q.map fun e => 16 + (K - e.2)) - sumc v = pk (PZ Q).length (fun j => 16 + (K - (Q.getD j (0, K)).2) - cnt v j) := by
     rw [sumc_eq hwok, pk16, pk_sub]
     intro j hj; have := hle j hj; omega
-  have hst : StOk (PZ Q) (tz Z) (lz Z) K (pL (Q.map fun e => 16 + (K - e.2)) - sumc v) v S := by
+  have hst : StOk (PZ Q) (tz Z) (lz Z) K t (pL (Q.map fun e => 16 + (K - e.2)) - sumc v) v S := by
     rw [hz]
     exact StOk.start hrep hwok hgood (by omega) (fun j _ => by omega) hd0 hA
   have hcov : ∀ i, (lz Z).testBit i = true → (0 : ℕ).testBit i = true ∨ (cov (pos t) (lz Z) v).testBit i = true := by
@@ -5316,7 +5325,7 @@ theorem imp_FK {top : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → �
   refine htop X (RZ_RR E Z) (RZ_R2 E Z) (Fs := {s | ∃ f ∈ F, s = tw f &&& mz Z ∧ Z = 0}) hMf all hst hcod (by omega) hl ?_ ?_ ?_
   · intro q hq hs
     rw [hW] at hs
-    exact Nat.find_min hex (show q < Nat.find hex by omega) hs
+    exact Nat.find_min hex (show q < Nat.find hex by omega) (hs.monoU ht1)
   · intro d x y hxy hx hy hbit
     rcases hfb with rfl | ⟨rfl, hfb⟩
     · rw [fbit_triv] at hbit; simp at hbit
@@ -5324,10 +5333,10 @@ theorem imp_FK {top : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → �
       exact ⟨f, hf, e, rfl⟩
   · rintro s ⟨f, hf, rfl, rfl⟩ q hq S' hS' hl'
     rw [hW] at hS'
-    exact forb_ok hE1 (hF f hf) q (by omega) (hl'.sol.mono le_rfl hS')
-lemma Live.W {m T k t : ℕ} {S : Finset ℕ} {Q : Set ℕ} (hl : Live R m T k t S) (hQ : (S : Set ℕ) ⊆ Q) : Sol Z0 m T k Q := hl.sol.mono le_rfl hQ
+    exact forb_ok hE1 (hF f hf) q (by omega) ((hl'.sol.monoU ht1).mono le_rfl hS')
+lemma Live.W {m T k t : ℕ} {S : Finset ℕ} {Q : Set ℕ} (hl : Live R m T k t S) (hQ : (S : Set ℕ) ⊆ Q) : Sol Z0 m T k t Q := hl.sol.mono le_rfl hQ
 lemma front {m T : ℕ} (hR : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {k t : ℕ} {S : Finset ℕ} (hl : Live Z0 m T k t S)
-    (hm : ∀ q < k, ¬ Sol Z0 m T q (C m ({x | R x ≠ 0} ∪ (S : Set ℕ)))) :
+    (hm : ∀ q < k, ¬ Sol Z0 m T q t (C m ({x | R x ≠ 0} ∪ (S : Set ℕ)))) :
     Live R m T k t S ∨ ∃ k0 d a b S1, k = k0 + 1 ∧ R a ≠ 0 ∧ R b ≠ 0 ∧ Bi Z0 d a b S S1 ∧ Live Z0 m T k0 t S1 := by
   induction hl with
   | stop => exact Or.inl .stop
@@ -5336,7 +5345,7 @@ lemma front {m T : ℕ} (hR : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {
     have hfr : a ^^^ m ∉ C m (Q ∪ ((insert a U : Finset ℕ) : Set ℕ)) := by
       intro hg
       apply hm k (by omega)
-      refine hl.sol.mono le_rfl fun x hx => ?_
+      refine (hl.sol.monoU (by omega)).mono le_rfl fun x hx => ?_
       simp only [Finset.coe_insert, Set.mem_insert_iff, Finset.mem_coe] at hx
       rcases hx with rfl | hx
       · exact hg
@@ -5344,7 +5353,7 @@ lemma front {m T : ℕ} (hR : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {
     have hfU : a ^^^ m ∉ U := fun h => hfr (Or.inl (Or.inr (by simp [h])))
     have hfR : R (a ^^^ m) = 0 := by
       by_contra h; exact hfr (Or.inl (Or.inl h))
-    have hm' : ∀ q < k, ¬ Sol Z0 m T q (C m (Q ∪ ((insert (a ^^^ m) U : Finset ℕ) : Set ℕ))) := by
+    have hm' : ∀ q < k, ¬ Sol Z0 m T q t (C m (Q ∪ ((insert (a ^^^ m) U : Finset ℕ) : Set ℕ))) := by
       intro q hq hs
       refine hm (q + 1) (by omega) (.un (a := a) (Or.inl (Or.inr (by simp))) (hs.mono le_rfl ?_))
       rintro x ((hx | hx) | hx)
@@ -5401,7 +5410,7 @@ lemma front {m T : ℕ} (hR : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {
     have hfb : op d0 a b ≠ b := fun h => hfr (Or.inl (Or.inr (by simp [h])))
     have hfR : R (op d0 a b) = 0 := by
       by_contra h; exact hfr (Or.inl (Or.inl h))
-    have hm' : ∀ q < k, ¬ Sol Z0 m T q (C m (Q ∪ ((insert (op d0 a b) U : Finset ℕ) : Set ℕ))) := by
+    have hm' : ∀ q < k, ¬ Sol Z0 m T q t (C m (Q ∪ ((insert (op d0 a b) U : Finset ℕ) : Set ℕ))) := by
       intro q hq hs
       refine hm (q + 1) (by omega) (.bi (d := d0) (a := a) (b := b) (Or.inl (Or.inr (by simp))) (Or.inl (Or.inr (by simp))) (al0 _ _ _) (hs.mono le_rfl ?_))
       rintro x ((hx | hx) | hx)
@@ -5441,9 +5450,9 @@ lemma front {m T : ℕ} (hR : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {
         have : insert (op d0 a b) (insert (op d x y) (V.erase o)) = insert (op d x y) V := by
           rw [Finset.insert_comm, ← ho, Finset.insert_erase hmV]
         rw [this]; exact hl1
-def MW (R : ℕ → ℕ) (m T k : ℕ) (S : Finset ℕ) : Prop := ∀ q < k, ¬ Sol Z0 m T q (C m ({x | R x ≠ 0} ∪ (S : Set ℕ)))
+def MW (R : ℕ → ℕ) (m T k t : ℕ) (S : Finset ℕ) : Prop := ∀ q < k, ¬ Sol Z0 m T q t (C m ({x | R x ≠ 0} ∪ (S : Set ℕ)))
 def MF (R : ℕ → ℕ) (m T k t : ℕ) (Fs : Set ℕ) (S : Finset ℕ) : Prop := ∀ s ∈ Fs, ∀ q < k, ∀ S' : Finset ℕ, (S' : Set ℕ) ⊆ C m (insert s ({x | R x ≠ 0} ∪ (S : Set ℕ))) → ¬ Live Z0 m T q t S'
-lemma MW.min {m T k t : ℕ} {S : Finset ℕ} (h : MW R m T k S) (hl : Live Z0 m T k t S) : Min Z0 m T k t S :=
+lemma MW.min {m T k t : ℕ} {S : Finset ℕ} (h : MW R m T k t S) (hl : Live Z0 m T k t S) : Min Z0 m T k t S :=
   ⟨hl, fun q hq hs => h q hq (hs.mono le_rfl (C_mono Set.subset_union_right))⟩
 lemma step_sub {m : ℕ} {A : Set ℕ} {S S1 : Finset ℕ} {g : ℕ} (h : S1 ⊆ insert g S) :
     C m (A ∪ (S1 : Set ℕ)) ⊆ insert g (C m (A ∪ (S : Set ℕ))) := by
@@ -5455,7 +5464,7 @@ lemma step_sub {m : ℕ} {A : Set ℕ} {S S1 : Finset ℕ} {g : ℕ} (h : S1 ⊆
     · exact Or.inl rfl
     · exact Or.inr (Or.inl (Or.inr hx'))
   · exact Or.inr (Or.inr hx)
-lemma MW.bi {m T k a b : ℕ} {d : Bool} {S S1 : Finset ℕ} (h : MW R m T (k + 1) S) (hb : Bi Z0 d a b S S1) : MW R m T k S1 := by
+lemma MW.bi {m T k t a b : ℕ} {d : Bool} {S S1 : Finset ℕ} (h : MW R m T (k + 1) t S) (hb : Bi Z0 d a b S S1) : MW R m T k t S1 := by
   intro q hq hs
   exact h (q + 1) (by omega) (.bi (d := d) (a := a) (b := b) (Or.inl (Or.inr hb.sub.1)) (Or.inl (Or.inr hb.sub.2.1)) (al0 _ _ _) (hs.mono le_rfl (step_sub hb.sub.2.2)))
 lemma MF.bi {m T k t a b : ℕ} {Fs : Set ℕ} {d : Bool} {S S1 : Finset ℕ} (h : MF R m T (k + 1) t Fs S) (hb : Bi Z0 d a b S S1) : MF R m T k t Fs S1 := by
@@ -5485,13 +5494,13 @@ lemma MF.gate {m T k t a b : ℕ} {Fs : Set ℕ} {d : Bool} {S S1 : Finset ℕ} 
   · exact Or.inl (Or.inl rfl)
   · exact Or.inl (Or.inr (Or.inr hx'))
 theorem phase_step (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {P : List ℕ} {m T l k k' t : ℕ} {f : ℕ → List W → Bool} {v : List W} {S : Finset ℕ} {fm fh : ℕ} {Fs : Set ℕ}
-    (hrep : Rep v S) (hcod : ∀ w ∈ v, w.r = R w.s) (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' S) (hFb : MF R m T k' t Fs S)
+    (hrep : Rep v S) (hcod : ∀ w ∈ v, w.r = R w.s) (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' t S) (hFb : MF R m T k' t Fs S)
     (hfb : ∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit fm fh (op d x y) = true → op d x y ∈ Fs)
     (hA : ¬ Min R m T k' t S)
     (hB : ∀ (d : Bool) (a c : W) (S1 : Finset ℕ) (k0 : ℕ), a ∈ v → c ∈ v → a.s ≠ c.s → a.r ≠ 0 → c.r ≠ 0 → k' = k0 + 1 → Bi Z0 d a.s c.s S S1 → Live Z0 m T k0 t S1 →
-      fbit fm fh (op d a.s c.s) = false → ∃ z' r, f z' r = false ∧ StOk P T l (k - 1) z' r S1 ∧ ∀ w ∈ r, (w.s = op d a.s c.s ∧ w.r = 0) ∨ ∃ w' ∈ v, w'.s = w.s ∧ w'.r = w.r)
-    (hF : ∀ (z' : ℕ) (r : List W) (S1 : Finset ℕ), f z' r = false → StOk P T l (k - 1) z' r S1 → (∀ w ∈ r, w.r = R w.s) → ∀ k0 ≤ k - 1, Live Z0 m T k0 t S1 →
-      MW R m T k0 S1 → MF R m T k0 t Fs S1 → False) : False := by
+      fbit fm fh (op d a.s c.s) = false → ∃ z' r, f z' r = false ∧ StOk P T l (k - 1) t z' r S1 ∧ ∀ w ∈ r, (w.s = op d a.s c.s ∧ w.r = 0) ∨ ∃ w' ∈ v, w'.s = w.s ∧ w'.r = w.r)
+    (hF : ∀ (z' : ℕ) (r : List W) (S1 : Finset ℕ), f z' r = false → StOk P T l (k - 1) t z' r S1 → (∀ w ∈ r, w.r = R w.s) → ∀ k0 ≤ k - 1, Live Z0 m T k0 t S1 →
+      MW R m T k0 t S1 → MF R m T k0 t Fs S1 → False) : False := by
   rcases front hR2 hl hmW with hlR | ⟨k0, d, a, b, S1, rfl, ha, hb', hb, hl1⟩
   · exact hA ⟨hlR, (hmW.min hl).2⟩
   · obtain ⟨wa, hwa, rfl⟩ := hrep.mem.1 hb.sub.1
@@ -5553,8 +5562,8 @@ lemma KP.toR {m T k' t : ℕ} {S : Finset ℕ} {v : List W} {κ : ℕ → Bool} 
   ⟨fun e hb hl ha hb' => h.g1 e (hb.rel fun d a b _ => al0 d a b) (hl.rel fun d a b _ => al0 d a b) ha hb',
     fun e hb hl ha hb' => h.g2 e (hb.rel fun d a b _ => al0 d a b) (hl.rel fun d a b _ => al0 d a b) ha hb'⟩
 def P1 (R : ℕ → ℕ) (P : List ℕ) (l m T : ℕ) (Fs : Set ℕ) (f : ℕ → ℕ → ℕ → List W → Bool) : Prop :=
-  ∀ (k t z : ℕ) (v : List W) (S : Finset ℕ), f k t z v = false → StOk P T l k z v S → (∀ w ∈ v, w.r = R w.s) →
-    ∀ k' ≤ k, Live Z0 m T k' t S → MW R m T k' S → MF R m T k' t Fs S → False
+  ∀ (k t z : ℕ) (v : List W) (S : Finset ℕ), f k t z v = false → StOk P T l k t z v S → (∀ w ∈ v, w.r = R w.s) →
+    ∀ k' ≤ k, Live Z0 m T k' t S → MW R m T k' t S → MF R m T k' t Fs S → False
 lemma mid1_false {fm fh : ℕ} {h : W → W → Bool → Bool → Bool → Bool → Bool → Nat → Nat → Nat → Bool} {a c : W} {oa oc ka kc kb : Bool} {s x y : ℕ}
     (hf : fbit fm fh s = false) (hh : mid1 fm fh h a c oa oc ka kc kb s x y = false) : h a c oa oc ka kc kb s x y = false := by
   have e : forb fm fh s = fbit fm fh s := rfl
@@ -5565,8 +5574,8 @@ variable {P : List ℕ} {l m g np T : ℕ} (X : Ctx P l m g np T)
 include X
 lemma one_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {fm fh fu : ℕ} {Fs : Set ℕ} {f : ℕ → ℕ → ℕ → List W → Bool}
     (hfb : ∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit fm fh (op d x y) = true → op d x y ∈ Fs)
-    (hF : P1 R P l m T Fs f) {k t z : ℕ} {v : List W} {S : Finset ℕ} {κ : ℕ → Bool} {κ2 : ℕ → ℕ → Bool} (hs : StOk P T l k z v S) (hcod : ∀ w ∈ v, w.r = R w.s) (hlen : 2 ≤ v.length)
-    {k' : ℕ} (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' S) (hFb : MF R m T k' t Fs S) (hKP : KP Z0 m T k' t S v κ κ2)
+    (hF : P1 R P l m T Fs f) {k t z : ℕ} {v : List W} {S : Finset ℕ} {κ : ℕ → Bool} {κ2 : ℕ → ℕ → Bool} (hs : StOk P T l k t z v S) (hcod : ∀ w ∈ v, w.r = R w.s) (hlen : 2 ≤ v.length)
+    {k' : ℕ} (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' t S) (hFb : MF R m T k' t Fs S) (hKP : KP Z0 m T k' t S v κ κ2)
     (h2 : mv (look l m g np fu) l m g np k t z v κ κ2 = false)
     (h1 : ∀ x y, x ∈ S → y ∈ S → x ≠ y → R x ≠ 0 → R y ≠ 0 → ∃ go : (L_meta_35960.X → L_meta_35960.X → Bool) → List L_meta_35960.X → Bool,
       node1 (f (k - 1) t) (pos' t) l m g np fm fh (k - t) v.length z v κ κ2 go = false ∧
@@ -5618,8 +5627,8 @@ theorem look1_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R
       refine one_sound X hR hR2 hfb ih hs hcod hlen hk hl hmW hFb hKP hy2 fun x y hx hy hne hxr hyr => ⟨pairsS, hy1, fun h xs hp a c ha hc har hcr ea ec => ?_⟩
       exact pairs_any hp (fs_mem ha har) (fs_mem hc hcr) (fun e => hne (by rw [← ea, ← ec, e]))
 theorem topC_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {fm fh K k t z : ℕ} {v : List W} {S : Finset ℕ} {M : List (ℕ × ℕ)} {Fs : Set ℕ}
-    (hM : mFull M = true) (h : ∀ p ∈ M, topC l m g np fm fh K p.1 p.2 k t z v = false) (hs : StOk P T l k z v S) (hcod : ∀ w ∈ v, w.r = R w.s)
-    {k' : ℕ} (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' S)
+    (hM : mFull M = true) (h : ∀ p ∈ M, topC l m g np fm fh K p.1 p.2 k t z v = false) (hs : StOk P T l k t z v S) (hcod : ∀ w ∈ v, w.r = R w.s)
+    {k' : ℕ} (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : MW R m T k' t S)
     (hfb : ∀ d x y, x ≠ y → R x ≠ 0 → R y ≠ 0 → fbit fm fh (op d x y) = true → op d x y ∈ Fs) (hFb : MF R m T k' t Fs S) : False := by
   simp only [mFull, Bool.and_eq_true, List.all_eq_true, List.mem_range, List.any_eq_true] at hM
   obtain ⟨hM1, p0, hp0, hp1⟩ := hM
@@ -5656,7 +5665,7 @@ theorem topC_ok : TopOk topC := by
   exact topC_sound X hR hR2 hM h hs hcod hk hl hmW hfb hFb
 abbrev TopT := ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → List W → Bool
 noncomputable def okR (top : TopT) (E : List (Bool × ℕ × ℕ)) (Q : List (ℕ × ℕ)) (x : ℕ × ℕ) : Bool :=
-  pOk x.1 Q && Nat.ble x.2 15 && (Q.any (fun y => Nat.ble x.2 y.2) || !chkT top E Q (1, 0) x.1 (x.2 - 1) (List.range x.2) FF 1)
+  pOk x.1 Q && Nat.ble x.2 15 && (Q.any (fun y => Nat.ble x.2 y.2) || !chkT top E Q (1, 0) x.1 (x.2 - 1) [0, 1] FF 1)
 def pr (T : List (ℕ × ℕ)) (c : ℕ) : List (ℕ × ℕ) := T.filter (fun y => Nat.beq (Nat.land c y.1) c && !Nat.beq c y.1)
 def pick (T : List (ℕ × ℕ)) (cs : List ℕ) : List (ℕ × ℕ) := cs.filterMap (fun c => T.find? (fun x => Nat.beq x.1 c))
 lemma pick_sub {T : List (ℕ × ℕ)} {cs : List ℕ} : ∀ x ∈ pick T cs, x ∈ T := by
@@ -5675,10 +5684,10 @@ lemma okR_imp {E : List (Bool × ℕ × ℕ)} {Q : List (ℕ × ℕ)} {x : ℕ �
     (h : okR top E Q x = true) (hI : ∀ y ∈ Q, Imp E y.1 y.2) : Imp E x.1 x.2 := by
   simp only [okR, Bool.and_eq_true, Bool.or_eq_true, List.any_eq_true, Bool.not_eq_true'] at h
   have hx15 := Nat.le_of_ble_eq_true h.1.2
-  refine imp_FK htop (F := []) (fb := (1, 0)) (K := x.2 - 1) (by omega) (by omega) hE h.1.1 hI (Or.inl rfl) (by simp) (h.2.imp (fun ⟨y, hy, hy2⟩ => ⟨y, hy, Nat.le_of_ble_eq_true hy2⟩) fun h t ht =>
+  refine imp_FK htop (F := []) (fb := (1, 0)) (K := x.2 - 1) (by omega) (by omega) hE h.1.1 hI (Or.inl rfl) (by simp) (h.2.imp (fun ⟨y, hy, hy2⟩ => ⟨y, hy, Nat.le_of_ble_eq_true hy2⟩) fun h t ht1 _ =>
     ⟨[(FF, 1)], ffull, fun p hp => ?_⟩)
   simp only [List.mem_singleton] at hp; subst hp
-  exact chkT_chk h t (List.mem_range.2 ht)
+  exact chkT_chk h t (by rcases Nat.le_one_iff_eq_zero_or_eq_one.mp ht1 with rfl | rfl <;> simp)
 lemma okAll {T U : List (ℕ × ℕ)} (h : U.all (fun x => okR top [] (pr T x.1) x) = true) (hT : ∀ x ∈ T, Imp [] x.1 x.2) : ∀ x ∈ U, Imp [] x.1 x.2 := fun x hx =>
   okR_imp htop (Or.inl rfl) (List.all_eq_true.1 h x hx) (fun y hy => hT y (List.mem_of_mem_filter hy))
 
@@ -5724,7 +5733,7 @@ lemma live1_E {e : Bool × ℕ × ℕ} {F : List (Bool × ℕ × ℕ)} {Q : List
   have hproj : ∀ x ∈ Q, mz x.1 &&& mz Z = mz x.1 ∧ tz x.1 ≠ 0 ∧ tz x.1 ≠ mz x.1 := by
     intro x hx; obtain ⟨⟨a, b⟩, c⟩ := hp2 x hx
     exact ⟨Nat.eq_of_beq_eq_true a, nb b, nb c⟩
-  have hno : ∀ x ∈ Q, ∀ q < x.2, ¬ Sol Z0 (mz x.1) (tz Z &&& mz x.1) q (C (mz x.1) (Im (mz x.1) S)) := by
+  have hno : ∀ x ∈ Q, ∀ q < x.2, ¬ Sol Z0 (mz x.1) (tz Z &&& mz x.1) q 1 (C (mz x.1) (Im (mz x.1) S)) := by
     intro x hx q hq hs
     have h3 := (hproj x hx).1
     rw [tz_sub h3] at hs
@@ -5772,13 +5781,13 @@ lemma live1_E {e : Bool × ℕ × ℕ} {F : List (Bool × ℕ × ℕ)} {Q : List
     · obtain ⟨e1, e2⟩ := hPget j hj; have h3 := hproj _ e2; rw [e1, tz_sub h3.1]; exact h3
     · rw [pL_pk, List.length_map, hPlen]; refine pk_congr fun j hj => ?_
       rw [List.getD_eq_getElem?_getD, List.getElem?_map, List.getElem?_eq_getElem hj]; rfl
-  have hA : ∀ j < (PZ Q).length, Acc ((PZ Q).getD j 0) (tz Z) K (K - (Q.getD j (0, K)).2) (fun _ => 0) S := by
+  have hA : ∀ j < (PZ Q).length, Acc ((PZ Q).getD j 0) (tz Z) K 1 (K - (Q.getD j (0, K)).2) (fun _ => 0) S := by
     intro j hj; obtain ⟨e1, e2⟩ := hPget j hj; rw [e1]
-    exact Acc.start (L := (Q.getD j (0, K)).2) (hno _ e2) subset_rfl (by omega)
+    exact Acc.start (L := (Q.getD j (0, K)).2) (hno _ e2) le_rfl subset_rfl (by omega)
   have hle := cnt_le X (D := fun _ _ => 0) hrep hwok hA hm (by omega)
   have hz : pL (Q.map fun x => 16 + (K - x.2)) - sumc v = pk (PZ Q).length (fun j => 16 + (K - (Q.getD j (0, K)).2) - cnt v j) := by
     rw [sumc_eq hwok, pk16, pk_sub]; intro j hj; have := hle j hj; omega
-  have hst : StOk (PZ Q) (tz Z) (lz Z) K (pL (Q.map fun x => 16 + (K - x.2)) - sumc v) v S := by
+  have hst : StOk (PZ Q) (tz Z) (lz Z) K 1 (pL (Q.map fun x => 16 + (K - x.2)) - sumc v) v S := by
     rw [hz]; exact StOk.start hrep hwok hgood (by omega) (fun j _ => by omega) hd0 hA
   have hcov : ∀ i, (lz Z).testBit i = true → (0 : ℕ).testBit i = true ∨ (cov (pos 1) (lz Z) v).testBit i = true := by
     intro i hli; right; rw [cov_bit]
@@ -5875,13 +5884,13 @@ lemma live1_split {Q : List (ℕ × ℕ)} {Z K : ℕ} (hK : K + 1 ≤ 15) (h0 : 
       · exact absurd hx h0m
       · exact absurd hx h1m
   have hW : {x | RZ [] Z x ≠ 0} ∪ (S : Set ℕ) = WZ [] Z := by rw [RZ_set]; exact Set.union_eq_self_of_subset_right hSW
-  have hmW : ∀ q < K + 1, ¬ Sol Z0 (mz Z) (tz Z) q (C (mz Z) ({x | RZ [] Z x ≠ 0} ∪ (S : Set ℕ))) := by
+  have hmW : ∀ q < K + 1, ¬ Sol Z0 (mz Z) (tz Z) q 1 (C (mz Z) ({x | RZ [] Z x ≠ 0} ∪ (S : Set ℕ))) := by
     intro q hq hs; rw [hW] at hs; exact h0 q hq hs
   rcases front (RZ_R2 [] Z) hl hmW with hlR | ⟨k0, d, a, b, S1, hk0, ha, hb, hbi, hl1⟩
   · have hproj : ∀ x ∈ Q, mz x.1 &&& mz Z = mz x.1 ∧ tz x.1 ≠ 0 ∧ tz x.1 ≠ mz x.1 := by
       intro x hx; obtain ⟨⟨a, b⟩, c⟩ := hp2 x hx
       exact ⟨Nat.eq_of_beq_eq_true a, nb b, nb c⟩
-    have hno : ∀ x ∈ Q, ∀ q < x.2, ¬ Sol Z0 (mz x.1) (tz Z &&& mz x.1) q (C (mz x.1) (Im (mz x.1) S)) := by
+    have hno : ∀ x ∈ Q, ∀ q < x.2, ¬ Sol Z0 (mz x.1) (tz Z &&& mz x.1) q 1 (C (mz x.1) (Im (mz x.1) S)) := by
       intro x hx q hq hs
       have h3 := (hproj x hx).1
       rw [tz_sub h3] at hs
@@ -5920,13 +5929,13 @@ lemma live1_split {Q : List (ℕ × ℕ)} {Z K : ℕ} (hK : K + 1 ≤ 15) (h0 : 
       · obtain ⟨e1, e2⟩ := hPget j hj; have h3 := hproj _ e2; rw [e1, tz_sub h3.1]; exact h3
       · rw [pL_pk, List.length_map, hPlen]; refine pk_congr fun j hj => ?_
         rw [List.getD_eq_getElem?_getD, List.getElem?_map, List.getElem?_eq_getElem hj]; rfl
-    have hA : ∀ j < (PZ Q).length, Acc ((PZ Q).getD j 0) (tz Z) (K + 1) ((K + 1) - (Q.getD j (0, K + 1)).2) (fun _ => 0) S := by
+    have hA : ∀ j < (PZ Q).length, Acc ((PZ Q).getD j 0) (tz Z) (K + 1) 1 ((K + 1) - (Q.getD j (0, K + 1)).2) (fun _ => 0) S := by
       intro j hj; obtain ⟨e1, e2⟩ := hPget j hj; rw [e1]
-      exact Acc.start (L := (Q.getD j (0, K + 1)).2) (hno _ e2) subset_rfl (by omega)
+      exact Acc.start (L := (Q.getD j (0, K + 1)).2) (hno _ e2) le_rfl subset_rfl (by omega)
     have hle := cnt_le X (D := fun _ _ => 0) hrep hwok hA hm (by omega)
     have hz : pL (Q.map fun x => 16 + ((K + 1) - x.2)) - sumc v = pk (PZ Q).length (fun j => 16 + ((K + 1) - (Q.getD j (0, K + 1)).2) - cnt v j) := by
       rw [sumc_eq hwok, pk16, pk_sub]; intro j hj; have := hle j hj; omega
-    have hst : StOk (PZ Q) (tz Z) (lz Z) (K + 1) (pL (Q.map fun x => 16 + ((K + 1) - x.2)) - sumc v) v S := by
+    have hst : StOk (PZ Q) (tz Z) (lz Z) (K + 1) 1 (pL (Q.map fun x => 16 + ((K + 1) - x.2)) - sumc v) v S := by
       rw [hz]; exact StOk.start hrep hwok hgood (by omega) (fun j _ => by omega) hd0 hA
     have hcov : ∀ i, (lz Z).testBit i = true → (0 : ℕ).testBit i = true ∨ (cov (pos 1) (lz Z) v).testBit i = true := by
       intro i hli; right; rw [cov_bit]
@@ -5983,20 +5992,46 @@ lemma live1_split {Q : List (ℕ × ℕ)} {Z K : ℕ} (hK : K + 1 ≤ 15) (h0 : 
       · exact Or.inl ⟨tw (d, j, i), by simp [rawL], by simp [tw, and_op, op_comm]⟩
       · exact Or.inl (WZ_nil_sub [(d, j, i)] Z (hSW hx'))
 
-noncomputable def okGate (Q_src : List (ℕ × ℕ)) (K : ℕ) (prev : List (Bool × ℕ × ℕ))
-    (g : (Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) : Bool :=
-  let Q := tabE g.1 [] (pick Q_src g.2.1)
-  pOk 0 Q && fbOk [g.1] prev g.2.2 && !chkG topC [g.1] Q g.2.2 0 K 1 FF 1
+noncomputable def okOwn (Q_src Q_sub : List (ℕ × ℕ)) (e : Bool × ℕ × ℕ) (r : (ℕ × ℕ) × List ℕ) : Bool :=
+  Q_src.all (fun x => !Nat.beq x.1 r.1.1 || Nat.beq x.2 r.1.2) &&
+  Q_src.any (fun x => Nat.beq x.1 r.1.1 && Nat.beq x.2 r.1.2) &&
+  okR topC [e] (tabE e [] (pick Q_sub r.2)) r.1
 
-noncomputable def okChain (Q_src : List (ℕ × ℕ)) (K : ℕ) :
-    List (Bool × ℕ × ℕ) → List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) → Bool
+lemma okOwn_sound {Q_src Q_sub : List (ℕ × ℕ)} {e : Bool × ℕ × ℕ} {owns : List ((ℕ × ℕ) × List ℕ)}
+    (he : e.2.1 < 8 ∧ e.2.2 < 8)
+    (hQ : ∀ x ∈ Q_src, Imp [] x.1 x.2) (hSub : ∀ x ∈ Q_sub, Imp [] x.1 x.2)
+    (h : owns.all (okOwn Q_src Q_sub e) = true) :
+    ∀ x ∈ Q_src, x.1 ∈ owns.map (fun r => r.1.1) → Imp [e] x.1 x.2 := by
+  intro x hx hm
+  obtain ⟨r, hr, hreq⟩ := List.mem_map.1 hm
+  have hok := List.all_eq_true.1 h r hr
+  simp only [okOwn, Bool.and_eq_true, List.all_eq_true, List.any_eq_true, Bool.or_eq_true, Bool.not_eq_true'] at hok
+  have hlen : x.2 = r.1.2 := by
+    rcases hok.1.1 x hx with h1 | h2
+    · rw [hreq, Nat.beq_refl] at h1; simp at h1
+    · exact Nat.eq_of_beq_eq_true h2
+  have hxe : x = r.1 := Prod.ext hreq.symm hlen
+  subst hxe
+  exact okR_imp topC_ok (Or.inr ⟨e, rfl, he.1, he.2, hQ _ hx⟩) hok.2
+    (tabE_ok (fun y hy => hSub y (pick_sub y hy)) (fun _ _ h0 => by simp at h0))
+
+noncomputable def okGate (Q_src Q_sub : List (ℕ × ℕ)) (K : ℕ) (prev : List (Bool × ℕ × ℕ))
+    (g : (Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) : Bool :=
+  let e := g.1
+  let owns := g.2.1
+  let Q := tabE e (owns.map (fun r => r.1.1)) (pick Q_src g.2.2.1)
+  Nat.blt e.2.1 8 && Nat.blt e.2.2 8 && owns.all (okOwn Q_src Q_sub e) &&
+  pOk 0 Q && fbOk [e] prev g.2.2.2 && !chkG topC [e] Q g.2.2.2 0 K 1 FF 1
+
+noncomputable def okChain (Q_src Q_sub : List (ℕ × ℕ)) (K : ℕ) :
+    List (Bool × ℕ × ℕ) → List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) → Bool
   | _, [] => true
-  | prev, g :: gs => okGate Q_src K prev g && okChain Q_src K (g.1 :: prev) gs
+  | prev, g :: gs => okGate Q_src Q_sub K prev g && okChain Q_src Q_sub K (g.1 :: prev) gs
 
-lemma chain_sound {Q_src : List (ℕ × ℕ)} {K : ℕ} (hK : K ≤ 15) (h0 : Imp [] 0 (K + 1))
-    (hQ : ∀ x ∈ Q_src, Imp [] x.1 x.2) :
-    ∀ (prev : List (Bool × ℕ × ℕ)) (gs : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ))),
-    (∀ f ∈ prev, Live1 [f] 0 K) → okChain Q_src K prev gs = true →
+lemma chain_sound {Q_src Q_sub : List (ℕ × ℕ)} {K : ℕ} (hK : K ≤ 15) (h0 : Imp [] 0 (K + 1))
+    (hQ : ∀ x ∈ Q_src, Imp [] x.1 x.2) (hSub : ∀ x ∈ Q_sub, Imp [] x.1 x.2) :
+    ∀ (prev : List (Bool × ℕ × ℕ)) (gs : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ))),
+    (∀ f ∈ prev, Live1 [f] 0 K) → okChain Q_src Q_sub K prev gs = true →
     ∀ g ∈ gs, Live1 [g.1] 0 K := by
   intro prev gs
   induction gs generalizing prev with
@@ -6006,8 +6041,11 @@ lemma chain_sound {Q_src : List (ℕ × ℕ)} {K : ℕ} (hK : K ≤ 15) (h0 : Im
     simp only [okChain, Bool.and_eq_true] at hch
     obtain ⟨hg_ok, hrest⟩ := hch
     simp only [okGate, Bool.and_eq_true, Bool.not_eq_true'] at hg_ok
+    have he1 : g.1.2.1 < 8 := Nat.le_of_ble_eq_true hg_ok.1.1.1.1.1
+    have he2 : g.1.2.2 < 8 := Nat.le_of_ble_eq_true hg_ok.1.1.1.1.2
+    have hown := okOwn_sound ⟨he1, he2⟩ hQ hSub hg_ok.1.1.1.2
     have hg : Live1 [g.1] 0 K :=
-      live1_E rfl hK h0 hg_ok.1.1 (tabE_ok (fun y hy => hQ y (pick_sub y hy)) (fun _ _ h => by simp at h))
+      live1_E rfl hK h0 hg_ok.1.1.2 (tabE_ok (fun y hy => hQ y (pick_sub y hy)) (fun y hy ho => hown y (pick_sub y hy) ho))
         hg_ok.1.2 hprev hg_ok.2
     have hprev' : ∀ f ∈ g.1 :: prev, Live1 [f] 0 K := fun f hf =>
       (List.mem_cons.1 hf).elim (fun eq => eq ▸ hg) (hprev f)
@@ -6015,27 +6053,28 @@ lemma chain_sound {Q_src : List (ℕ × ℕ)} {K : ℕ} (hK : K ≤ 15) (h0 : Im
     intro g' hg'
     exact (List.mem_cons.1 hg').elim (fun eq => eq ▸ hg) (htl g')
 
-lemma chain_map {Q_src : List (ℕ × ℕ)} {K : ℕ} (hK : K ≤ 15) (h0 : Imp [] 0 (K + 1))
-    (hQ : ∀ x ∈ Q_src, Imp [] x.1 x.2)
-    (prev : List (Bool × ℕ × ℕ)) (gs : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)))
-    (hprev : ∀ f ∈ prev, Live1 [f] 0 K) (hch : okChain Q_src K prev gs = true) :
+lemma chain_map {Q_src Q_sub : List (ℕ × ℕ)} {K : ℕ} (hK : K ≤ 15) (h0 : Imp [] 0 (K + 1))
+    (hQ : ∀ x ∈ Q_src, Imp [] x.1 x.2) (hSub : ∀ x ∈ Q_sub, Imp [] x.1 x.2)
+    (prev : List (Bool × ℕ × ℕ)) (gs : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)))
+    (hprev : ∀ f ∈ prev, Live1 [f] 0 K) (hch : okChain Q_src Q_sub K prev gs = true) :
     ∀ f ∈ gs.map Prod.fst, Live1 [f] 0 K := by
   intro f hf
   obtain ⟨g, hg, rfl⟩ := List.mem_map.1 hf
-  exact chain_sound hK h0 hQ prev gs hprev hch g hg
+  exact chain_sound hK h0 hQ hSub prev gs hprev hch g hg
 
-lemma chain_ext {Q_src : List (ℕ × ℕ)} {K : ℕ} (hK : K ≤ 15) (h0 : Imp [] 0 (K + 1))
-    (hQ : ∀ x ∈ Q_src, Imp [] x.1 x.2)
-    (prev : List (Bool × ℕ × ℕ)) (gs : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)))
-    (hprev : ∀ f ∈ prev, Live1 [f] 0 K) (hch : okChain Q_src K prev gs = true) :
+lemma chain_ext {Q_src Q_sub : List (ℕ × ℕ)} {K : ℕ} (hK : K ≤ 15) (h0 : Imp [] 0 (K + 1))
+    (hQ : ∀ x ∈ Q_src, Imp [] x.1 x.2) (hSub : ∀ x ∈ Q_sub, Imp [] x.1 x.2)
+    (prev : List (Bool × ℕ × ℕ)) (gs : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)))
+    (hprev : ∀ f ∈ prev, Live1 [f] 0 K) (hch : okChain Q_src Q_sub K prev gs = true) :
     ∀ f ∈ prev ++ gs.map Prod.fst, Live1 [f] 0 K := fun f hf =>
-  (List.mem_append.1 hf).elim (hprev f) (chain_map hK h0 hQ prev gs hprev hch f)
+  (List.mem_append.1 hf).elim (hprev f) (chain_map hK h0 hQ hSub prev gs hprev hch f)
 
 def rt3 : List (ℕ × ℕ) := [(7, 7), (11, 7), (13, 8), (14, 8), (19, 7), (21, 7), (22, 7), (25, 7), (26, 6), (28, 7), (35, 5), (37, 7), (38, 8), (41, 8), (42, 8), (44, 8), (49, 5), (50, 7), (52, 7), (56, 6), (67, 6), (69, 7), (70, 7), (73, 8), (74, 7), (76, 7), (81, 6), (82, 7), (84, 7), (88, 6), (97, 5), (98, 6), (100, 7), (104, 6), (112, 5), (131, 5), (133, 6), (134, 8), (137, 7), (138, 6), (140, 7), (145, 5), (146, 6), (148, 7), (152, 5), (161, 5), (162, 6), (164, 7), (168, 6), (176, 5), (193, 4), (194, 6), (196, 7), (200, 5), (208, 5), (224, 4)]
 def rt2 : List (ℕ × ℕ) := [(3, 9), (5, 10), (6, 10), (9, 10), (10, 10), (12, 10), (17, 9), (18, 9), (20, 10), (24, 8), (33, 8), (34, 9), (36, 10), (40, 9), (48, 8), (65, 9), (66, 9), (68, 10), (72, 10), (80, 9), (96, 8), (129, 8), (130, 9), (132, 10), (136, 9), (144, 8), (160, 8), (192, 8), (640, 7), (2049, 8), (2050, 7), (2052, 8), (2064, 7), (2080, 8), (2112, 7), (2176, 7), (8320, 7)]
 def rt1 : List (ℕ × ℕ) := [(1, 12), (2, 12), (4, 12), (8, 12), (16, 11), (32, 11), (64, 12), (128, 12), (2048, 10)]
 def rt12 : List (ℕ × ℕ) := rt1 ++ rt2
-def rt_root : List (ℕ × ℕ) := pick rt12 [1, 2, 4, 8, 64, 128, 16, 32, 5, 6, 9, 10, 12, 20, 36, 66]
+def rt23 : List (ℕ × ℕ) := rt2 ++ rt3
+def rt_root : List (ℕ × ℕ) := pick rt12 [1, 2, 4, 8, 64, 128, 16, 32, 5, 6, 9, 10, 12, 20, 36, 68]
 lemma apI3 {A B : List (ℕ × ℕ)} (ha : ∀ e ∈ A, Imp [] e.1 e.2) (hb : ∀ e ∈ B, Imp [] e.1 e.2) : ∀ e ∈ A ++ B, Imp [] e.1 e.2 := fun e he =>
   (List.mem_append.1 he).elim (ha e) (hb e)
 lemma one3 {Q : List (ℕ × ℕ)} {K t : ℕ} (h : chkG topC [] Q (1, 0) 0 K t FF 1 = false) :
@@ -6055,7 +6094,7 @@ set_option maxHeartbeats 0 in
 theorem r1_0 : okR topC [] (pick (rt2 ++ rt3) [5, 9, 3, 17, 65, 13, 33, 41, 73, 129, 2049, 7, 11, 19, 21, 25]) (1, 12) = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem r1_1 : okR topC [] (pick (rt2 ++ rt3) [6, 10, 66, 3, 18, 34, 130, 14, 38, 42, 134, 7, 11, 19, 22, 50]) (2, 12) = true := by decide +kernel
+theorem r1_1 : okR topC [] (pick (rt2 ++ rt3) [6, 10, 3, 18, 34, 66, 130, 14, 38, 42, 134, 7, 11, 19, 22, 50]) (2, 12) = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem r1_2 : okR topC [] (pick (rt2 ++ rt3) [5, 6, 12, 20, 36, 68, 132, 13, 14, 38, 44, 134, 2052, 7, 21, 22]) (4, 12) = true := by decide +kernel
@@ -6070,7 +6109,7 @@ set_option maxHeartbeats 0 in
 theorem r1_5 : okR topC [] (pick (rt2 ++ rt3) [36, 34, 40, 33, 38, 41, 42, 44, 48, 96, 160, 2080, 37, 50, 52, 100]) (32, 11) = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem r1_6 : okR topC [] (pick (rt2 ++ rt3) [66, 68, 72, 65, 80, 73, 96, 192, 69, 70, 74, 76, 82, 84, 100, 196]) (64, 12) = true := by decide +kernel
+theorem r1_6 : okR topC [] (pick (rt2 ++ rt3) [68, 72, 65, 66, 80, 73, 96, 192, 69, 70, 74, 76, 82, 84, 100, 196]) (64, 12) = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem r1_7 : okR topC [] (pick (rt2 ++ rt3) [132, 130, 136, 129, 134, 144, 160, 192, 137, 140, 148, 164, 196, 640, 2176, 8320]) (128, 12) = true := by decide +kernel
@@ -6091,6 +6130,7 @@ lemma i1 : ∀ e ∈ rt1, Imp [] e.1 e.2 := by
   · exact okR_imp topC_ok (Or.inl rfl) r1_7 (fun y hy => apI3 i2 i3 y (pick_sub y hy))
   · exact okR_imp topC_ok (Or.inl rfl) r1_8 (fun y hy => apI3 i2 i3 y (pick_sub y hy))
 lemma ir12 : ∀ e ∈ rt12, Imp [] e.1 e.2 := apI3 i1 i2
+lemma ir23 : ∀ e ∈ rt23, Imp [] e.1 e.2 := apI3 i2 i3
 lemma ir_root : ∀ e ∈ rt_root, Imp [] e.1 e.2 := fun e he => ir12 e (pick_sub e he)
 
 set_option maxRecDepth 100000 in
@@ -6098,43 +6138,71 @@ set_option maxHeartbeats 0 in
 theorem root_p : pOk 0 rt_root = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_all : chkT topC [] rt_root (1, 0) 0 13 (List.range 14) FF 1 = false := by decide +kernel
-lemma iroot : Imp [] 0 14 := imp_FK topC_ok (F := []) (fb := (1, 0)) (K := 13) (by norm_num) (by norm_num) (Or.inl rfl) root_p ir_root (Or.inl rfl) (by simp) (Or.inr fun t ht =>
-  one3 (chkT_chk root_all t (List.mem_range.2 ht)))
+theorem root_all : chkT topC [] rt_root (1, 0) 0 13 [0, 1] FF 1 = false := by decide +kernel
+lemma iroot : Imp [] 0 14 := imp_FK topC_ok (F := []) (fb := (1, 0)) (K := 13) (by norm_num) (by norm_num) (Or.inl rfl) root_p ir_root (Or.inl rfl) (by simp) (Or.inr fun t ht1 _ =>
+  one3 (chkT_chk root_all t (by rcases Nat.le_one_iff_eq_zero_or_eq_one.mp ht1 with rfl | rfl <;> simp)))
 
 def prev_0 : List (Bool × ℕ × ℕ) := []
-def gp_0 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 0, 1), [1, 2, 4, 8, 64, 128, 16, 32, 5, 6, 9, 10, 66, 12, 20, 36], (1, 0)), ((false, 0, 2), [1, 4, 2, 8, 64, 128, 16, 32, 5, 6, 9, 12, 20, 36, 68, 132], (28, 4194304)), ((false, 1, 2), [2, 4, 1, 8, 64, 128, 16, 32, 5, 6, 10, 12, 20, 36, 66, 68], (53, 8388608)), ((false, 1, 3), [2, 8, 1, 4, 64, 128, 16, 32, 6, 9, 10, 12, 66, 72, 2048, 5], (113, 1298074524118716728548061551263744))]
+def gp_0 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 0, 1), [], [1, 2, 4, 8, 64, 128, 16, 32, 5, 6, 9, 10, 12, 20, 36, 68], (1, 0)), ((false, 0, 2), [], [1, 4, 2, 8, 64, 128, 16, 32, 5, 6, 9, 12, 20, 36, 68, 132], (28, 4194304))]
 def prev_1 : List (Bool × ℕ × ℕ) := prev_0 ++ gp_0.map Prod.fst
-def gp_1 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 2, 3), [4, 8, 1, 2, 64, 128, 16, 32, 5, 6, 9, 10, 12, 20, 36, 68], (113, 1298074678861221639220595913654272)), ((false, 3, 6), [8, 64, 1, 2, 4, 128, 16, 32, 9, 10, 12, 66, 68, 72, 2048, 5], (133, 649038345256892740072487383990288)), ((false, 3, 7), [8, 128, 1, 2, 4, 64, 16, 32, 9, 10, 12, 72, 132, 2048, 5, 6], (133, 689603164464196080920381886562320)), ((false, 1, 5), [2, 1, 4, 8, 64, 128, 32, 16, 6, 10, 36, 66, 5, 9, 12, 20], (139, 1547425058330102053403099146))]
+def gp_1 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 1, 2), [], [2, 4, 1, 8, 64, 128, 16, 32, 5, 6, 10, 12, 20, 36, 68, 132], (53, 8388608)), ((false, 1, 3), [], [2, 8, 1, 4, 64, 128, 16, 32, 6, 9, 10, 12, 72, 2048, 5, 20], (113, 1298074524118716728548061551263744))]
 def prev_2 : List (Bool × ℕ × ℕ) := prev_1 ++ gp_1.map Prod.fst
-def gp_2 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 2, 4), [4, 1, 2, 8, 64, 128, 16, 32, 5, 6, 12, 20, 36, 68, 132, 9], (165, 205523670471917158319129049822781270958710718464)), ((false, 3, 4), [8, 1, 2, 4, 64, 128, 16, 32, 9, 10, 12, 20, 72, 2048, 5, 6], (165, 205523670471917158319129049822781270958710718592)), ((false, 5, 6), [64, 1, 2, 4, 8, 128, 32, 16, 36, 66, 68, 72, 5, 6, 9, 10], (211, 1645504557321206978429455789075863872246217522938836386951790592)), ((false, 0, 3), [1, 8, 2, 4, 64, 128, 16, 32, 5, 9, 10, 12, 72, 2048, 6, 20], (211, 1645504557321206978429455789078460020675484936753101635116400640))]
+def gp_2 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 2, 3), [], [4, 8, 1, 2, 64, 128, 16, 32, 5, 6, 9, 10, 12, 20, 36, 68], (113, 1298074678861221639220595913654272)), ((false, 3, 6), [], [8, 64, 1, 2, 4, 128, 16, 32, 9, 10, 12, 68, 72, 2048, 5, 6], (133, 649038345256892740072487383990288))]
 def prev_3 : List (Bool × ℕ × ℕ) := prev_2 ++ gp_2.map Prod.fst
-def gp_3 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 0, 6), [1, 64, 2, 4, 8, 128, 16, 32, 5, 9, 66, 68, 72, 6, 10, 12], (175, 5989233715531451777985629303999398695360051172868104)), ((false, 0, 7), [1, 128, 2, 4, 8, 64, 16, 32, 5, 9, 132, 6, 10, 12, 20, 36], (175, 5989233715531451777985629303999398695360051173130248)), ((false, 1, 6), [2, 64, 1, 4, 8, 128, 16, 32, 6, 10, 66, 68, 72, 5, 9, 12], (211, 1696926574761439910072828089465995583689558324062315789947043840)), ((false, 1, 7), [2, 128, 1, 4, 8, 64, 16, 32, 6, 10, 66, 132, 5, 9, 12, 20], (242, 106964223978151215518491407533367625142865175816527535136286179328))]
+def gp_3 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 3, 7), [], [8, 128, 1, 2, 4, 64, 16, 32, 9, 10, 12, 72, 132, 2048, 5, 6], (133, 689603164464196080920381886562320)), ((false, 1, 5), [], [2, 1, 4, 8, 64, 128, 32, 16, 6, 10, 36, 5, 9, 12, 20, 68], (139, 1547425058330102053403099146))]
 def prev_4 : List (Bool × ℕ × ℕ) := prev_3 ++ gp_3.map Prod.fst
-def gp_4 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 2, 6), [4, 64, 1, 2, 8, 128, 16, 32, 5, 6, 12, 20, 36, 66, 68, 72], (301, 288498306289636259367552177668313291768505658385089451955245348212892800853814018112)), ((false, 2, 7), [4, 128, 1, 2, 8, 64, 16, 32, 5, 6, 12, 20, 36, 68, 132, 9], (305, 12222215865595481380148136014714396001719106218517653779022802259015564062603376914899927040)), ((false, 6, 7), [64, 128, 1, 2, 4, 8, 16, 32, 66, 68, 72, 132, 5, 6, 9, 10], (217, 51013711944334490837032285264233446536496516192121825667088)), ((false, 0, 4), [1, 2, 4, 8, 64, 128, 16, 32, 5, 9, 20, 6, 10, 12, 36, 66], (211, 1700341318105490264408354758912220554219918005424104225259061248))]
+def gp_4 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 2, 4), [], [4, 1, 2, 8, 64, 128, 16, 32, 5, 6, 12, 20, 36, 68, 132, 9], (165, 205523670471917158319129049822781270958710718464)), ((false, 3, 4), [], [8, 1, 2, 4, 64, 128, 16, 32, 9, 10, 12, 20, 72, 2048, 5, 6], (165, 205523670471917158319129049822781270958710718592))]
 def prev_5 : List (Bool × ℕ × ℕ) := prev_4 ++ gp_4.map Prod.fst
-def gp_5 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 0, 5), [1, 2, 4, 8, 64, 128, 32, 16, 5, 9, 36, 6, 10, 12, 20, 66], (211, 1700341318105490264408354758912220554219918023870848298968612864)), ((false, 1, 4), [2, 1, 4, 8, 64, 128, 16, 32, 6, 10, 20, 66, 5, 9, 12, 36], (211, 1700341318871738034841299188091394067795072615680217860060413952)), ((false, 2, 5), [4, 1, 2, 8, 64, 128, 32, 16, 5, 6, 12, 20, 36, 68, 132, 9], (361, 36982665182906653738363665162500545251991034377247182648910860825595855194513633451884944347572227555721232)), ((false, 3, 5), [8, 1, 2, 4, 64, 128, 32, 16, 9, 10, 12, 36, 72, 2048, 5, 6], (301, 7957460280862875910749288031907363216218051261011028478696816347264176733635564142592064))]
+def gp_5 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 5, 6), [], [64, 1, 2, 4, 8, 128, 32, 16, 36, 68, 72, 5, 6, 9, 10, 12], (211, 1645504557321206978429455789075863872246217522938836386951790592)), ((false, 0, 3), [], [1, 8, 2, 4, 64, 128, 16, 32, 5, 9, 10, 12, 72, 2048, 6, 20], (211, 1645504557321206978429455789078460020675484936753101635116400640))]
 def prev_6 : List (Bool × ℕ × ℕ) := prev_5 ++ gp_5.map Prod.fst
-def gp_6 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 4, 6), [64, 1, 2, 4, 8, 128, 16, 32, 20, 66, 68, 72, 5, 6, 9, 10], (251, 27620465366923582694776185809999412937881824629281250333026084406165768)), ((false, 4, 7), [128, 1, 2, 4, 8, 64, 16, 32, 20, 132, 5, 6, 9, 10, 12, 36], (251, 27620465366923582694776185809999412937881983085606278861701271494066440)), ((false, 5, 7), [128, 1, 2, 4, 8, 64, 32, 16, 36, 132, 5, 6, 9, 10, 12, 20], (286, 2371423945253685210064768462399015707268197335959854447105310482780706082190791680)), ((true, 0, 3), [1, 8, 2, 4, 64, 128, 16, 32, 5, 9, 10, 12, 72, 2048, 6, 20], (301, 7957945948085932343017017897384069095944711862720791513577129300376056192672626209980480))]
+def gp_6 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 0, 6), [], [1, 64, 2, 4, 8, 128, 16, 32, 5, 9, 68, 72, 6, 10, 12, 20], (175, 5989233715531451777985629303999398695360051172868104)), ((false, 0, 7), [], [1, 128, 2, 4, 8, 64, 16, 32, 5, 9, 132, 6, 10, 12, 20, 36], (175, 5989233715531451777985629303999398695360051173130248))]
 def prev_7 : List (Bool × ℕ × ℕ) := prev_6 ++ gp_6.map Prod.fst
-def gp_7 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 1, 3), [2, 8, 1, 4, 64, 128, 16, 32, 6, 9, 10, 12, 66, 72, 2048, 5], (251, 28352603152168734571445371580715608026842622302028253025828549514848370952)), ((true, 2, 3), [4, 8, 1, 2, 64, 128, 16, 32, 5, 6, 9, 10, 12, 20, 36, 68], (365, 371546780199068827532960668672713162315332308917158036496918649122511532918682546446271146647835026034524160)), ((true, 2, 6), [4, 64, 1, 2, 8, 128, 16, 32, 5, 6, 12, 20, 36, 66, 68, 72], (365, 371546780199068827532960670569850752379520854736945054879261331390486961680537547668744203033483742055235584)), ((true, 3, 6), [8, 64, 1, 2, 4, 128, 16, 32, 9, 10, 12, 66, 68, 72, 2048, 5], (367, 71680580752592431614119090582987090825956809111973712555757792925725773452808702661019357949635421077636))]
+def gp_7 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 1, 6), [], [2, 64, 1, 4, 8, 128, 16, 32, 6, 10, 68, 72, 5, 9, 12, 20], (211, 1696926574761439910072828089465995583689558324062315789947043840)), ((false, 1, 7), [], [2, 128, 1, 4, 8, 64, 16, 32, 6, 10, 132, 5, 9, 12, 20, 36], (242, 106964223978151215518491407533367625142865175816527535136286179328))]
 def prev_8 : List (Bool × ℕ × ℕ) := prev_7 ++ gp_7.map Prod.fst
-def gp_8 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 1, 5), [2, 1, 4, 8, 64, 128, 32, 16, 6, 10, 36, 66, 5, 9, 12, 20], (251, 30340306100044416942226581269051396801666412421033575470987533916292776200)), ((true, 2, 5), [4, 1, 2, 8, 64, 128, 32, 16, 5, 6, 12, 20, 36, 68, 132, 9], (301, 7957945977728707187769963925818241258180508286256554811347025582742579633279582109434960)), ((true, 3, 4), [8, 1, 2, 4, 64, 128, 16, 32, 9, 10, 12, 20, 72, 2048, 5, 6], (247, 33131833759120112174479864522618502351916586176860800846165199346873665536)), ((true, 3, 5), [8, 1, 2, 4, 64, 128, 32, 16, 9, 10, 12, 36, 72, 2048, 5, 6], (307, 4078213722806486595260252677151789280854949341231359987105745043471089806432564539486633988))]
+def gp_8 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 2, 6), [], [4, 64, 1, 2, 8, 128, 16, 32, 5, 6, 12, 20, 36, 68, 72, 132], (301, 288498306289636259367552177668313291768505658385089451955245348212892800853814018112)), ((false, 2, 7), [], [4, 128, 1, 2, 8, 64, 16, 32, 5, 6, 12, 20, 36, 68, 132, 9], (305, 12222215865595481380148136014714396001719106218517653779022802259015564062603376914899927040))]
 def prev_9 : List (Bool × ℕ × ℕ) := prev_8 ++ gp_8.map Prod.fst
-def gp_9 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 0, 6), [1, 64, 2, 4, 8, 128, 16, 32, 5, 9, 66, 68, 72, 6, 10, 12], (226, 2535724129868156502055232724444661229538675706895605464346514493441)), ((true, 0, 7), [1, 128, 2, 4, 8, 64, 16, 32, 5, 9, 132, 6, 10, 12, 20, 36], (327, 20300457092451734681402639630366287535464805208967518429141654447779498454352760238979983637217280)), ((true, 1, 2), [2, 4, 1, 8, 64, 128, 16, 32, 5, 6, 10, 12, 20, 36, 66, 68], (287, 65094822263651921714248582374436146671240689858408827181691979122534539695156096958480)), ((true, 1, 6), [2, 64, 1, 4, 8, 128, 16, 32, 6, 10, 66, 68, 72, 5, 9, 12], (321, 37551294104118260719217101104382605378698547288495189017419422693508605379359929387647551193216))]
+def gp_9 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 6, 7), [], [64, 128, 1, 2, 4, 8, 16, 32, 68, 72, 132, 5, 6, 9, 10, 12], (217, 51013711944334490837032285264233446536496516192121825667088)), ((false, 0, 4), [], [1, 2, 4, 8, 64, 128, 16, 32, 5, 9, 20, 6, 10, 12, 36, 68], (211, 1700341318105490264408354758912220554219918005424104225259061248))]
 def prev_10 : List (Bool × ℕ × ℕ) := prev_9 ++ gp_9.map Prod.fst
-def gp_10 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 1, 7), [2, 128, 1, 4, 8, 64, 16, 32, 6, 10, 66, 132, 5, 9, 12, 20], (281, 60991876390573362262433976726492258023155164745929013345590757971952263363374940160)), ((true, 2, 7), [4, 128, 1, 2, 8, 64, 16, 32, 5, 6, 12, 20, 36, 68, 132, 9], (289, 121447845296157872997270666130366931332902206220864550380978035643719044008994052104)), ((true, 6, 7), [64, 128, 1, 2, 4, 8, 16, 32, 66, 68, 72, 132, 5, 6, 9, 10], (303, 1010187912947783590685094452133310901447538638891216152595572862765755359743994629228048)), ((true, 0, 4), [1, 2, 4, 8, 64, 128, 16, 32, 5, 9, 20, 6, 10, 12, 36, 66], (237, 169989203723252634992258540656683667352578014290321837199647294109259968))]
+def gp_10 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 0, 5), [], [1, 2, 4, 8, 64, 128, 32, 16, 5, 9, 36, 6, 10, 12, 20, 68], (211, 1700341318105490264408354758912220554219918023870848298968612864)), ((false, 1, 4), [], [2, 1, 4, 8, 64, 128, 16, 32, 6, 10, 20, 5, 9, 12, 36, 68], (211, 1700341318871738034841299188091394067795072615680217860060413952))]
 def prev_11 : List (Bool × ℕ × ℕ) := prev_10 ++ gp_10.map Prod.fst
-def gp_11 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 0, 5), [1, 2, 4, 8, 64, 128, 32, 16, 5, 9, 36, 6, 10, 12, 20, 66], (327, 88652042241920864906593694484546138481900208103440680887459109924753107541502878283380176694804480)), ((true, 1, 4), [2, 1, 4, 8, 64, 128, 16, 32, 6, 10, 20, 66, 5, 9, 12, 36], (371, 605964124821310261180251107062258127119944253578366249070777939501326894630229798897297005533141359511068479620)), ((true, 2, 4), [4, 1, 2, 8, 64, 128, 16, 32, 5, 6, 12, 20, 36, 68, 132, 9], (241, 220982429099491217261496626606693503060340703905464159347967029952905216)), ((true, 4, 6), [64, 1, 2, 4, 8, 128, 16, 32, 20, 66, 68, 72, 5, 6, 9, 10], (237, 169989203723252634992632685120441868896699403890568715984952239280363712))]
+def gp_11 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 2, 5), [], [4, 1, 2, 8, 64, 128, 32, 16, 5, 6, 12, 20, 36, 68, 132, 9], (361, 36982665182906653738363665162500545251991034377247182648910860825595855194513633451884944347572227555721232)), ((false, 3, 5), [], [8, 1, 2, 4, 64, 128, 32, 16, 9, 10, 12, 36, 72, 2048, 5, 6], (301, 7957460280862875910749288031907363216218051261011028478696816347264176733635564142592064))]
 def prev_12 : List (Bool × ℕ × ℕ) := prev_11 ++ gp_11.map Prod.fst
-def gp_12 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 4, 7), [128, 1, 2, 4, 8, 64, 16, 32, 20, 132, 5, 6, 9, 10, 12, 36], (257, 57952604864699199653785113147971556983707704292877980623705801904775956168724)), ((true, 5, 6), [64, 1, 2, 4, 8, 128, 32, 16, 36, 66, 68, 72, 5, 6, 9, 10], (231, 2645775191742570581401720186381403634960694546719828417564165901666304)), ((true, 5, 7), [128, 1, 2, 4, 8, 64, 32, 16, 36, 132, 5, 6, 9, 10, 12, 20], (273, 134089048589069208179982625146600764992207440114372905748110604615005714499250305)), ((false, 4, 5), [1, 2, 4, 8, 64, 128, 16, 32, 20, 36, 5, 6, 9, 10, 12, 66], (286, 17646716357661294014695145321388676805375898668170670437277974466371102379127870465))]
+def gp_12 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 4, 6), [], [64, 1, 2, 4, 8, 128, 16, 32, 20, 68, 72, 5, 6, 9, 10, 12], (251, 27620465366923582694776185809999412937881824629281250333026084406165768)), ((false, 4, 7), [], [128, 1, 2, 4, 8, 64, 16, 32, 20, 132, 5, 6, 9, 10, 12, 36], (251, 27620465366923582694776185809999412937881983085606278861701271494066440))]
 def prev_13 : List (Bool × ℕ × ℕ) := prev_12 ++ gp_12.map Prod.fst
-def gp_13 : List ((Bool × ℕ × ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 4, 5), [1, 2, 4, 8, 64, 128, 16, 32, 20, 36, 5, 6, 9, 10, 12, 66], (338, 4513353130731348137783568243457993841946838161508762378277678760081837159433966886336880836297901077)), ((true, 0, 1), [1, 2, 4, 8, 64, 128, 16, 32, 5, 6, 9, 10, 66, 12, 20, 36], (198, 6695664972148116702802495986210957916048728564555521737806)), ((true, 0, 2), [1, 4, 2, 8, 64, 128, 16, 32, 5, 6, 9, 12, 20, 36, 68, 132], (225, 315936932294259448842211379433608069773072815299208695126793746434)), ((true, 3, 7), [8, 128, 1, 2, 4, 64, 16, 32, 9, 10, 12, 72, 132, 2048, 5, 6], (257, 57952604864712363690243682796314505740189318299095333530412722714286201405460))]
+def gp_13 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((false, 5, 7), [], [128, 1, 2, 4, 8, 64, 32, 16, 36, 132, 5, 6, 9, 10, 12, 20], (286, 2371423945253685210064768462399015707268197335959854447105310482780706082190791680)), ((false, 4, 5), [], [1, 2, 4, 8, 64, 128, 16, 32, 20, 36, 5, 6, 9, 10, 12, 68], (286, 2371423945253685210064768462399015707268197335980623634539449793294828067507672064))]
 def prev_14 : List (Bool × ℕ × ℕ) := prev_13 ++ gp_13.map Prod.fst
+def gp_14 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 1, 3), [], [2, 8, 1, 4, 64, 128, 16, 32, 6, 9, 10, 12, 72, 2048, 5, 20], (251, 28297389181394410061145893533817391823223013430253307785026478579407388936)), ((true, 0, 3), [], [1, 8, 2, 4, 64, 128, 16, 32, 5, 9, 10, 12, 72, 2048, 6, 20], (365, 371546780199068827532960668672713162315332308917158036498412303795863715701086712345307187893923389093445632))]
+def prev_15 : List (Bool × ℕ × ℕ) := prev_14 ++ gp_14.map Prod.fst
+def gp_15 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 2, 3), [], [4, 8, 1, 2, 64, 128, 16, 32, 5, 6, 9, 10, 12, 20, 36, 68], (365, 371546780199068827532960668672713162315332308917158036498415226799138377506923119714972620459962700958531584)), ((true, 2, 6), [], [4, 64, 1, 2, 8, 128, 16, 32, 5, 6, 12, 20, 36, 68, 72, 132], (365, 371546780199068827532960670569850752379520854736945054880757909067113806268778120937445676845611416979243008))]
+def prev_16 : List (Bool × ℕ × ℕ) := prev_15 ++ gp_15.map Prod.fst
+def gp_16 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 3, 6), [], [8, 64, 1, 2, 4, 128, 16, 32, 9, 10, 12, 68, 72, 2048, 5, 6], (367, 71680580752592431614119090582987090825956809111973712555757792925725773452808702661019357949772860031108)), ((true, 1, 5), [], [2, 1, 4, 8, 64, 128, 32, 16, 6, 10, 36, 5, 9, 12, 20, 68], (423, 20173827773780874564837286184015299831392116726559862494969496066343558164858292159038489223758081361451784399199797252))]
+def prev_17 : List (Bool × ℕ × ℕ) := prev_16 ++ gp_16.map Prod.fst
+def gp_17 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 2, 5), [], [4, 1, 2, 8, 64, 128, 32, 16, 5, 6, 12, 20, 36, 68, 132, 9], (301, 7957945977728707187769963925818241258180508286256554811347026201712599275969719558997072)), ((true, 3, 4), [], [8, 1, 2, 4, 64, 128, 16, 32, 9, 10, 12, 20, 72, 2048, 5, 6], (247, 89670939832028410721145384546391894858396070876880607506056597788237498368))]
+def prev_18 : List (Bool × ℕ × ℕ) := prev_17 ++ gp_17.map Prod.fst
+def gp_18 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 3, 5), [], [8, 1, 2, 4, 64, 128, 32, 16, 9, 10, 12, 36, 72, 2048, 5, 6], (307, 4078213722806486595260252677151789280854949341231359987105745043471089806437068139114004484)), ((true, 0, 6), [], [1, 64, 2, 4, 8, 128, 16, 32, 5, 9, 68, 72, 6, 10, 12, 20], (226, 2535724129868156502055232724444666421835534241723233994842843713537))]
+def prev_19 : List (Bool × ℕ × ℕ) := prev_18 ++ gp_18.map Prod.fst
+def gp_19 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 1, 2), [], [2, 4, 1, 8, 64, 128, 16, 32, 5, 6, 10, 12, 20, 36, 68, 132], (287, 65094822263666056490766809436518609580473271678863868206451651241994801655838368890896)), ((true, 1, 6), [], [2, 64, 1, 4, 8, 128, 16, 32, 6, 10, 68, 72, 5, 9, 12, 20], (321, 37551294104118260719217101104382605391252750759268550545091001539923938060448912824746973380736))]
+def prev_20 : List (Bool × ℕ × ℕ) := prev_19 ++ gp_19.map Prod.fst
+def gp_20 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 1, 7), [], [2, 128, 1, 4, 8, 64, 16, 32, 6, 10, 132, 5, 9, 12, 20, 36], (281, 60991876390573362262433976726492258023155164745929013345590701303554468927632375808)), ((true, 2, 7), [], [4, 128, 1, 2, 8, 64, 16, 32, 5, 6, 12, 20, 36, 68, 132, 9], (289, 121447845296157872997270666130366931332902206220864550380978033282535804773194700808))]
+def prev_21 : List (Bool × ℕ × ℕ) := prev_20 ++ gp_20.map Prod.fst
+def gp_21 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 0, 4), [], [1, 2, 4, 8, 64, 128, 16, 32, 5, 9, 20, 6, 10, 12, 36, 68], (287, 65094822321562101109424907148310232113748741555521187309898450354304944859902684200976)), ((true, 0, 5), [], [1, 2, 4, 8, 64, 128, 32, 16, 5, 9, 36, 6, 10, 12, 20, 68], (327, 88652042242045195715696141145084984043936128663776250177048210674510736427812364866181352642314240))]
+def prev_22 : List (Bool × ℕ × ℕ) := prev_21 ++ gp_21.map Prod.fst
+def gp_22 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 1, 4), [], [2, 1, 4, 8, 64, 128, 16, 32, 6, 10, 20, 5, 9, 12, 36, 68], (246, 28380090537039668884542666818799121528519247199005605419131991490392310272)), ((true, 2, 4), [], [4, 1, 2, 8, 64, 128, 16, 32, 5, 6, 12, 20, 36, 68, 132, 9], (321, 37551294104118260719217101104382605391252750759291386519063332644561503867701027805148182331520))]
+def prev_23 : List (Bool × ℕ × ℕ) := prev_22 ++ gp_22.map Prod.fst
+def gp_23 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 5, 7), [], [128, 1, 2, 4, 8, 64, 32, 16, 36, 132, 5, 6, 9, 10, 12, 20], (301, 262587443078825017660831570324868020165572585547200463262320986716720975292658489517671504)), ((true, 0, 7), [], [1, 128, 2, 4, 8, 64, 16, 32, 5, 9, 132, 6, 10, 12, 20, 36], (246, 28380090537065379893250810663207792921997030319199921325214202989071385088))]
+def prev_24 : List (Bool × ℕ × ℕ) := prev_23 ++ gp_23.map Prod.fst
+def gp_24 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 4, 6), [], [64, 1, 2, 4, 8, 128, 16, 32, 20, 68, 72, 5, 6, 9, 10, 12], (241, 221413788246165627498398371057664172724648969874888050596780661498970112)), ((true, 4, 7), [], [128, 1, 2, 4, 8, 64, 16, 32, 20, 132, 5, 6, 9, 10, 12, 36], (221, 948023745176690970658067393638406910510592298998840027396112924697))]
+def prev_25 : List (Bool × ℕ × ℕ) := prev_24 ++ gp_24.map Prod.fst
+def gp_25 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 5, 6), [], [64, 1, 2, 4, 8, 128, 32, 16, 36, 68, 72, 5, 6, 9, 10, 12], (231, 2645775191748847683137106688739277836138917080850184591821737888860160)), ((true, 6, 7), [], [64, 128, 1, 2, 4, 8, 16, 32, 68, 72, 132, 5, 6, 9, 10, 12], (338, 4513353130731348137783568243457993841940410409331726417175510911712472509023878074361749664956695573))]
+def prev_26 : List (Bool × ℕ × ℕ) := prev_25 ++ gp_25.map Prod.fst
+def gp_26 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 4, 5), [], [1, 2, 4, 8, 64, 128, 16, 32, 20, 36, 5, 6, 9, 10, 12, 68], (338, 4513353130731348137783568243457993841946838161508762378277678760081837159433966886336880836297901077)), ((true, 0, 1), [], [1, 2, 4, 8, 64, 128, 16, 32, 5, 6, 9, 10, 12, 20, 36, 68], (198, 6695664972148116702802495986210957916048728564555521737806))]
+def prev_27 : List (Bool × ℕ × ℕ) := prev_26 ++ gp_26.map Prod.fst
+def gp_27 : List ((Bool × ℕ × ℕ) × List ((ℕ × ℕ) × List ℕ) × List ℕ × (ℕ × ℕ)) := [((true, 0, 2), [], [1, 4, 2, 8, 64, 128, 16, 32, 5, 6, 9, 12, 20, 36, 68, 132], (225, 315936932294259448842211379433608069773072815299208695126793746434)), ((true, 3, 7), [], [8, 128, 1, 2, 4, 64, 16, 32, 9, 10, 12, 72, 132, 2048, 5, 6], (257, 57952604864712363690243682796314505740189318299095333530412722714286201405460))]
+def prev_28 : List (Bool × ℕ × ℕ) := prev_27 ++ gp_27.map Prod.fst
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem cover56 : allGates.all (fun e => (prev_14).any (fun g => decide (g = e))) = true := by decide +kernel
+theorem cover56 : allGates.all (fun e => (prev_28).any (fun g => decide (g = e))) = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
@@ -6142,68 +6210,124 @@ theorem proot_mv : chkG topC [] rt_root (1, 0) 0 14 1 0 1 = false := by decide +
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c0 : okChain rt12 13 prev_0 gp_0 = true := by decide +kernel
+theorem proot_c0 : okChain rt12 rt23 13 prev_0 gp_0 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c1 : okChain rt12 13 prev_1 gp_1 = true := by decide +kernel
+theorem proot_c1 : okChain rt12 rt23 13 prev_1 gp_1 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c2 : okChain rt12 13 prev_2 gp_2 = true := by decide +kernel
+theorem proot_c2 : okChain rt12 rt23 13 prev_2 gp_2 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c3 : okChain rt12 13 prev_3 gp_3 = true := by decide +kernel
+theorem proot_c3 : okChain rt12 rt23 13 prev_3 gp_3 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c4 : okChain rt12 13 prev_4 gp_4 = true := by decide +kernel
+theorem proot_c4 : okChain rt12 rt23 13 prev_4 gp_4 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c5 : okChain rt12 13 prev_5 gp_5 = true := by decide +kernel
+theorem proot_c5 : okChain rt12 rt23 13 prev_5 gp_5 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c6 : okChain rt12 13 prev_6 gp_6 = true := by decide +kernel
+theorem proot_c6 : okChain rt12 rt23 13 prev_6 gp_6 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c7 : okChain rt12 13 prev_7 gp_7 = true := by decide +kernel
+theorem proot_c7 : okChain rt12 rt23 13 prev_7 gp_7 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c8 : okChain rt12 13 prev_8 gp_8 = true := by decide +kernel
+theorem proot_c8 : okChain rt12 rt23 13 prev_8 gp_8 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c9 : okChain rt12 13 prev_9 gp_9 = true := by decide +kernel
+theorem proot_c9 : okChain rt12 rt23 13 prev_9 gp_9 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c10 : okChain rt12 13 prev_10 gp_10 = true := by decide +kernel
+theorem proot_c10 : okChain rt12 rt23 13 prev_10 gp_10 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c11 : okChain rt12 13 prev_11 gp_11 = true := by decide +kernel
+theorem proot_c11 : okChain rt12 rt23 13 prev_11 gp_11 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c12 : okChain rt12 13 prev_12 gp_12 = true := by decide +kernel
+theorem proot_c12 : okChain rt12 rt23 13 prev_12 gp_12 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_c13 : okChain rt12 13 prev_13 gp_13 = true := by decide +kernel
+theorem proot_c13 : okChain rt12 rt23 13 prev_13 gp_13 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c14 : okChain rt12 rt23 13 prev_14 gp_14 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c15 : okChain rt12 rt23 13 prev_15 gp_15 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c16 : okChain rt12 rt23 13 prev_16 gp_16 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c17 : okChain rt12 rt23 13 prev_17 gp_17 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c18 : okChain rt12 rt23 13 prev_18 gp_18 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c19 : okChain rt12 rt23 13 prev_19 gp_19 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c20 : okChain rt12 rt23 13 prev_20 gp_20 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c21 : okChain rt12 rt23 13 prev_21 gp_21 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c22 : okChain rt12 rt23 13 prev_22 gp_22 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c23 : okChain rt12 rt23 13 prev_23 gp_23 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c24 : okChain rt12 rt23 13 prev_24 gp_24 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c25 : okChain rt12 rt23 13 prev_25 gp_25 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c26 : okChain rt12 rt23 13 prev_26 gp_26 = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_c27 : okChain rt12 rt23 13 prev_27 gp_27 = true := by decide +kernel
 
 lemma iroot_one : Live1 [] 0 14 := by
   have h0 : ∀ f ∈ prev_0, Live1 [f] 0 13 := fun _ h => by simp [prev_0] at h
-  have h1 : ∀ f ∈ prev_1, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_0 gp_0 h0 proot_c0
-  have h2 : ∀ f ∈ prev_2, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_1 gp_1 h1 proot_c1
-  have h3 : ∀ f ∈ prev_3, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_2 gp_2 h2 proot_c2
-  have h4 : ∀ f ∈ prev_4, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_3 gp_3 h3 proot_c3
-  have h5 : ∀ f ∈ prev_5, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_4 gp_4 h4 proot_c4
-  have h6 : ∀ f ∈ prev_6, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_5 gp_5 h5 proot_c5
-  have h7 : ∀ f ∈ prev_7, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_6 gp_6 h6 proot_c6
-  have h8 : ∀ f ∈ prev_8, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_7 gp_7 h7 proot_c7
-  have h9 : ∀ f ∈ prev_9, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_8 gp_8 h8 proot_c8
-  have h10 : ∀ f ∈ prev_10, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_9 gp_9 h9 proot_c9
-  have h11 : ∀ f ∈ prev_11, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_10 gp_10 h10 proot_c10
-  have h12 : ∀ f ∈ prev_12, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_11 gp_11 h11 proot_c11
-  have h13 : ∀ f ∈ prev_13, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_12 gp_12 h12 proot_c12
-  have h14 : ∀ f ∈ prev_14, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 prev_13 gp_13 h13 proot_c13
+  have h1 : ∀ f ∈ prev_1, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_0 gp_0 h0 proot_c0
+  have h2 : ∀ f ∈ prev_2, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_1 gp_1 h1 proot_c1
+  have h3 : ∀ f ∈ prev_3, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_2 gp_2 h2 proot_c2
+  have h4 : ∀ f ∈ prev_4, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_3 gp_3 h3 proot_c3
+  have h5 : ∀ f ∈ prev_5, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_4 gp_4 h4 proot_c4
+  have h6 : ∀ f ∈ prev_6, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_5 gp_5 h5 proot_c5
+  have h7 : ∀ f ∈ prev_7, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_6 gp_6 h6 proot_c6
+  have h8 : ∀ f ∈ prev_8, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_7 gp_7 h7 proot_c7
+  have h9 : ∀ f ∈ prev_9, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_8 gp_8 h8 proot_c8
+  have h10 : ∀ f ∈ prev_10, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_9 gp_9 h9 proot_c9
+  have h11 : ∀ f ∈ prev_11, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_10 gp_10 h10 proot_c10
+  have h12 : ∀ f ∈ prev_12, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_11 gp_11 h11 proot_c11
+  have h13 : ∀ f ∈ prev_13, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_12 gp_12 h12 proot_c12
+  have h14 : ∀ f ∈ prev_14, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_13 gp_13 h13 proot_c13
+  have h15 : ∀ f ∈ prev_15, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_14 gp_14 h14 proot_c14
+  have h16 : ∀ f ∈ prev_16, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_15 gp_15 h15 proot_c15
+  have h17 : ∀ f ∈ prev_17, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_16 gp_16 h16 proot_c16
+  have h18 : ∀ f ∈ prev_18, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_17 gp_17 h17 proot_c17
+  have h19 : ∀ f ∈ prev_19, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_18 gp_18 h18 proot_c18
+  have h20 : ∀ f ∈ prev_20, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_19 gp_19 h19 proot_c19
+  have h21 : ∀ f ∈ prev_21, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_20 gp_20 h20 proot_c20
+  have h22 : ∀ f ∈ prev_22, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_21 gp_21 h21 proot_c21
+  have h23 : ∀ f ∈ prev_23, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_22 gp_22 h22 proot_c22
+  have h24 : ∀ f ∈ prev_24, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_23 gp_23 h23 proot_c23
+  have h25 : ∀ f ∈ prev_25, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_24 gp_24 h24 proot_c24
+  have h26 : ∀ f ∈ prev_26, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_25 gp_25 h25 proot_c25
+  have h27 : ∀ f ∈ prev_27, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_26 gp_26 h26 proot_c26
+  have h28 : ∀ f ∈ prev_28, Live1 [f] 0 13 := chain_ext (by norm_num) iroot ir12 ir23 prev_27 gp_27 h27 proot_c27
   refine live1_split (by norm_num) iroot root_p ir_root proot_mv fun e he => ?_
   have hc := List.all_eq_true.1 cover56 e he
   simp only [List.any_eq_true, decide_eq_true_eq] at hc
   obtain ⟨g, hg, rfl⟩ := hc
-  exact h14 g hg
+  exact h28 g hg
 
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
 section circuit
@@ -6224,9 +6348,9 @@ lemma getD_mem {S : Set ℕ} {w : List ℕ} (hw : ∀ x ∈ w, x ∈ S) (h0 : 0 
   by_cases h : i < w.length
   · rw [List.getElem?_eq_getElem h]; exact hw _ (List.getElem_mem h)
   · rw [List.getElem?_eq_none (by omega)]; exact h0
-lemma ex_sol {T : ℕ} (gs : List Gate) : ∀ (w : List ℕ) (S : Set ℕ), (∀ x ∈ w, x ∈ S) → 0 ∈ S → m ∈ S →
-    (∀ g ∈ gs, g.op ∈ ({GateOp.and, GateOp.or, GateOp.not} : Set GateOp) ∧ g.inputs.length ≤ 2) →
-    (∃ i, (ex m gs w).getD i 0 = T) → Sol Z0 m T gs.length S := by
+lemma ex_sol_mono {T : ℕ} (gs : List Gate) : ∀ (w : List ℕ) (S : Set ℕ), (∀ x ∈ w, x ∈ S) → 0 ∈ S → m ∈ S →
+    (∀ g ∈ gs, (g.op = GateOp.and ∨ g.op = GateOp.or) ∧ g.inputs.length ≤ 2) →
+    (∃ i, (ex m gs w).getD i 0 = T) → Sol Z0 m T gs.length 0 S := by
   induction gs with
   | nil =>
     rintro w S hw h0 _ _ ⟨i, rfl⟩
@@ -6235,18 +6359,54 @@ lemma ex_sol {T : ℕ} (gs : List Gate) : ∀ (w : List ℕ) (S : Set ℕ), (∀
     intro w S hw h0 hm hg hT
     have hgs := fun x hx => hg x (List.mem_cons_of_mem _ hx)
     have rd := fun i => getD_mem hw h0 i
-    have stay : gv m w g ∈ S → Sol Z0 m T (g :: gs).length S := fun h =>
+    have stay : gv m w g ∈ S → Sol Z0 m T (g :: gs).length 0 S := fun h =>
       (ih (w ++ [gv m w g]) S (fun x hx => by
         simp only [List.mem_append, List.mem_singleton] at hx
         rcases hx with hx | rfl
         · exact hw x hx
         · exact h) h0 hm hgs hT).mono (by simp) subset_rfl
-    have go : Sol Z0 m T gs.length (insert (gv m w g) S) := ih (w ++ [gv m w g]) _ (fun x hx => by
+    have go : Sol Z0 m T gs.length 0 (insert (gv m w g) S) := ih (w ++ [gv m w g]) _ (fun x hx => by
+      simp only [List.mem_append, List.mem_singleton] at hx
+      rcases hx with hx | rfl
+      · exact Or.inr (hw x hx)
+      · exact Or.inl rfl) (Or.inr h0) (Or.inr hm) hgs hT
+    obtain ⟨hop, _⟩ := hg g List.mem_cons_self
+    obtain ⟨o, l⟩ := g
+    rcases hop with rfl | rfl
+    · match l with
+      | [] => exact stay hm
+      | [i] => exact stay (rd i)
+      | i :: j :: _ => exact .bi (d := false) (rd i) (rd j) (al0 _ _ _) go
+    · match l with
+      | [] => exact stay h0
+      | [i] => exact stay (rd i)
+      | i :: j :: _ => exact .bi (d := true) (rd i) (rd j) (al0 _ _ _) go
+lemma ex_sol_le1 {T : ℕ} (gs : List Gate) : ∀ (w : List ℕ) (S : Set ℕ), (∀ x ∈ w, x ∈ S) → 0 ∈ S → m ∈ S →
+    (∀ g ∈ gs, g.op ∈ ({GateOp.and, GateOp.or, GateOp.not} : Set GateOp) ∧ g.inputs.length ≤ 2) →
+    (∀ i j : Fin gs.length, (gs.get i).op = GateOp.not → (gs.get j).op = GateOp.not → i = j) →
+    (∃ i, (ex m gs w).getD i 0 = T) → Sol Z0 m T gs.length 1 S := by
+  induction gs with
+  | nil =>
+    rintro w S hw h0 _ _ _ ⟨i, rfl⟩
+    exact .done (getD_mem hw h0 i)
+  | cons g gs ih =>
+    intro w S hw h0 hm hg hone hT
+    have hgs := fun x hx => hg x (List.mem_cons_of_mem _ hx)
+    have hone' : ∀ i j : Fin gs.length, (gs.get i).op = GateOp.not → (gs.get j).op = GateOp.not → i = j :=
+      fun i j hi hj => Fin.succ_injective _ (hone i.succ j.succ hi hj)
+    have rd := fun i => getD_mem hw h0 i
+    have stay : gv m w g ∈ S → Sol Z0 m T (g :: gs).length 1 S := fun h =>
+      (ih (w ++ [gv m w g]) S (fun x hx => by
         simp only [List.mem_append, List.mem_singleton] at hx
         rcases hx with hx | rfl
-        · exact Or.inr (hw x hx)
-        · exact Or.inl rfl) (Or.inr h0) (Or.inr hm) hgs hT
-    obtain ⟨hop, hlen⟩ := hg g List.mem_cons_self
+        · exact hw x hx
+        · exact h) h0 hm hgs hone' hT).mono (by simp) subset_rfl
+    have go : Sol Z0 m T gs.length 1 (insert (gv m w g) S) := ih (w ++ [gv m w g]) _ (fun x hx => by
+      simp only [List.mem_append, List.mem_singleton] at hx
+      rcases hx with hx | rfl
+      · exact Or.inr (hw x hx)
+      · exact Or.inl rfl) (Or.inr h0) (Or.inr hm) hgs hone' hT
+    obtain ⟨hop, _⟩ := hg g List.mem_cons_self
     obtain ⟨o, l⟩ := g
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hop
     rcases hop with rfl | rfl | rfl
@@ -6258,9 +6418,26 @@ lemma ex_sol {T : ℕ} (gs : List Gate) : ∀ (w : List ℕ) (S : Set ℕ), (∀
       | [] => exact stay h0
       | [i] => exact stay (rd i)
       | i :: j :: _ => exact .bi (d := true) (rd i) (rd j) (al0 _ _ _) go
-    · match l with
+    · have hmono : ∀ g' ∈ gs, (g'.op = GateOp.and ∨ g'.op = GateOp.or) ∧ g'.inputs.length ≤ 2 := by
+        intro g' hg'
+        obtain ⟨hop', hlen'⟩ := hgs g' hg'
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hop'
+        rcases hop' with h | h | h
+        · exact ⟨Or.inl h, hlen'⟩
+        · exact ⟨Or.inr h, hlen'⟩
+        · obtain ⟨j, rfl⟩ := List.mem_iff_get.mp hg'
+          have h0' : ((⟨GateOp.not, l⟩ :: gs).get (0 : Fin (gs.length + 1))).op = GateOp.not := rfl
+          exact absurd (hone 0 j.succ h0' h).symm (Fin.succ_ne_zero j)
+      match l with
       | [] => exact stay hm
-      | i :: _ => exact .un (rd i) go
+      | i :: _ =>
+        have go0 : Sol Z0 m T gs.length 0 (insert (w.getD i 0 ^^^ m) S) :=
+          ex_sol_mono m gs (w ++ [gv m w ⟨.not, i :: _⟩]) _ (fun x hx => by
+            simp only [List.mem_append, List.mem_singleton] at hx
+            rcases hx with hx | rfl
+            · exact Or.inr (hw x hx)
+            · exact Or.inl rfl) (Or.inr h0) (Or.inr hm) hmono hT
+        exact .un (rd i) go0
 lemma gv_sub {w : List ℕ} (hw : ∀ x ∈ w, x &&& m = x) (g : Gate) : gv m w g &&& m = gv m w g := by
   have rd : ∀ i, w.getD i 0 &&& m = w.getD i 0 := fun i => getD_mem (S := {x | x &&& m = x}) hw (by simp) i
   unfold gv
@@ -6339,47 +6516,34 @@ lemma row_list (b : ℕ) : List.ofFn (fun v : Fin 8 => (rawP.getD v.val 0).testB
 lemma f_bit (k : ℕ) : EF.testBit k = f (fun v : Fin 8 => (rawP.getD v.val 0).testBit k) := by
   simp only [f, EF, Nat.testBit_or, Nat.testBit_and]
   rfl
-theorem bridge (D : PEqualNP.CircuitLowerBounds.Circuit) (hD : PEqualNP.MetaComplexity.FanInTwo D)
-    (hf : ∀ y : Fin 8 → Bool, D.eval (List.ofFn y) = f y) :
-    Sol Z0 (mz 0) (tz 0) D.size (C (mz 0) (WZ [] 0)) := by
+theorem bridge_le1 (D : Circuit) (hD : FanInTwo D)
+    (hone : ∀ i j : Fin D.gates.length, (D.gates.get i).op = GateOp.not → (D.gates.get j).op = GateOp.not → i = j)
+    (hf : ∀ y : Fin 8 → Bool, Circuit.eval D (List.ofFn y) = f y) :
+    Sol Z0 (mz 0) (tz 0) D.size 1 (C (mz 0) (WZ [] 0)) := by
   obtain ⟨gates, out⟩ := D
   let row : ℕ → Fin 8 → Bool := fun k v => (rawP.getD v.val 0).testBit k
   let init : List ℕ := rawP.map (· &&& mz 0)
   have hinit_sub : ∀ x ∈ init, x &&& mz 0 = x := by
-    intro x hx
-    simp only [init, List.mem_map] at hx
-    obtain ⟨w, _, rfl⟩ := hx
-    rw [Nat.and_assoc, Nat.and_self]
+    intro x hx; simp only [init, List.mem_map] at hx; obtain ⟨w, _, rfl⟩ := hx; rw [Nat.and_assoc, Nat.and_self]
   have hinit_mem : ∀ x ∈ init, x ∈ C (mz 0) (WZ [] 0) := by
-    intro x hx
-    simp only [init, List.mem_map] at hx
-    obtain ⟨w, hw, rfl⟩ := hx
-    exact Or.inl ⟨w, by simp [rawL, hw], rfl⟩
+    intro x hx; simp only [init, List.mem_map] at hx; obtain ⟨w, hw, rfl⟩ := hx; exact Or.inl ⟨w, by simp [rawL, hw], rfl⟩
   have hinit_bits : ∀ k, (mz 0).testBit k = true → init.map (fun x => x.testBit k) = List.ofFn (row k) := by
-    intro k hk
-    simp only [init, List.map_map, Function.comp_def, Nat.testBit_and, hk, Bool.and_true]
-    rw [row_list]
+    intro k hk; simp only [init, List.map_map, Function.comp_def, Nat.testBit_and, hk, Bool.and_true]; rw [row_list]
   have hout : (ex (mz 0) gates init).getD out 0 = tz 0 := by
     rw [← EF_ok]
     have hsub : ∀ x ∈ ex (mz 0) gates init, x &&& mz 0 = x := ex_sub (mz 0) hinit_sub
     have hsub' := getD_mem (S := {x | x &&& mz 0 = x}) hsub (by simp) out
     apply Nat.eq_of_testBit_eq; intro k
     have e1 := congrArg (fun x => x.testBit k) hsub'
-    simp only [Nat.testBit_and] at e1
-    rw [← e1, Nat.testBit_and]
+    simp only [Nat.testBit_and] at e1; rw [← e1, Nat.testBit_and]
     cases hk : (mz 0).testBit k with
     | false => simp
     | true =>
-      simp only [Bool.and_true]
-      rw [← getD_map, ex_bit (mz 0) hk gates init hD, hinit_bits k hk]
+      simp only [Bool.and_true]; rw [← getD_map, ex_bit (mz 0) hk gates init hD, hinit_bits k hk]
       have h := hf (row k)
-      change (gates.foldl (fun w g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)])
-        (List.ofFn (row k))).getD out false = f (row k) at h
-      rw [h]
-      exact (f_bit k).symm
-  exact ex_sol (mz 0) gates init (C (mz 0) (WZ [] 0))
-    hinit_mem (Or.inr (Set.mem_insert _ _)) (Or.inr (Set.mem_insert_of_mem _ rfl))
-    hD ⟨out, hout⟩
+      change (gates.foldl (fun w g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]) (List.ofFn (row k))).getD out false = f (row k) at h
+      rw [h]; exact (f_bit k).symm
+  exact ex_sol_le1 (mz 0) gates init (C (mz 0) (WZ [] 0)) hinit_mem (Or.inr (Set.mem_insert _ _)) (Or.inr (Set.mem_insert_of_mem _ rfl)) hD hone ⟨out, hout⟩
 
 theorem fanInTwo_of {gates : List Gate} {o : ℕ}
     (h : ∀ g ∈ gates, (g.op = GateOp.and ∨ g.op = GateOp.or ∨ g.op = GateOp.not) ∧ g.inputs.length ≤ 2) :
@@ -6444,7 +6608,7 @@ lemma ex_sol_one_not {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (
     (∀ i j : Fin gs.length, (gs.get i).op = GateOp.not → (gs.get j).op = GateOp.not → i = j) →
     (∃ g ∈ gs, g.op = GateOp.not) →
     (∃ i, (ex m gs w).getD i 0 = T) →
-    Sol Z0 m T (gs.length - 1) S ∨ ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T gs.length 1 S0 := by
+    Sol Z0 m T (gs.length - 1) 1 S ∨ ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T gs.length 1 S0 := by
   induction gs with
   | nil => intro _ _ _ _ _ _ _ hnot; simp at hnot
   | cons g gs ih =>
@@ -6464,8 +6628,8 @@ lemma ex_sol_one_not {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (
     · have hnot' : ∃ g' ∈ gs, g'.op = GateOp.not := by
         rcases hnot with ⟨g', hg', ho⟩; simp only [List.mem_cons] at hg'; rcases hg' with rfl | hg'; simp at ho; exact ⟨g', hg', ho⟩
       match l with
-      | [] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.and, []⟩]) S (hwm_stay hm) h0 hm hgs hT)
-      | [i] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.and, [i]⟩]) S (hwm_stay (rd i)) h0 hm hgs hT)
+      | [] => exact Or.inl (ex_sol_le1 m gs (w ++ [gv m w ⟨.and, []⟩]) S (hwm_stay hm) h0 hm hgs hone' hT)
+      | [i] => exact Or.inl (ex_sol_le1 m gs (w ++ [gv m w ⟨.and, [i]⟩]) S (hwm_stay (rd i)) h0 hm hgs hone' hT)
       | i :: j :: _ =>
         rcases ih (w ++ [gv m w ⟨.and, i :: j :: _⟩]) (insert (op false (w.getD i 0) (w.getD j 0)) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs hone' hnot' hT with hs | ⟨S1, hS1, hl1⟩
         · exact Or.inl ((Sol.bi (d := false) (rd i) (rd j) (al0 _ _ _) hs).mono (by cases gs <;> simp at hnot' ⊢) subset_rfl)
@@ -6479,8 +6643,8 @@ lemma ex_sol_one_not {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (
     · have hnot' : ∃ g' ∈ gs, g'.op = GateOp.not := by
         rcases hnot with ⟨g', hg', ho⟩; simp only [List.mem_cons] at hg'; rcases hg' with rfl | hg'; simp at ho; exact ⟨g', hg', ho⟩
       match l with
-      | [] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.or, []⟩]) S (hwm_stay h0) h0 hm hgs hT)
-      | [i] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.or, [i]⟩]) S (hwm_stay (rd i)) h0 hm hgs hT)
+      | [] => exact Or.inl (ex_sol_le1 m gs (w ++ [gv m w ⟨.or, []⟩]) S (hwm_stay h0) h0 hm hgs hone' hT)
+      | [i] => exact Or.inl (ex_sol_le1 m gs (w ++ [gv m w ⟨.or, [i]⟩]) S (hwm_stay (rd i)) h0 hm hgs hone' hT)
       | i :: j :: _ =>
         rcases ih (w ++ [gv m w ⟨.or, i :: j :: _⟩]) (insert (op true (w.getD i 0) (w.getD j 0)) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs hone' hnot' hT with hs | ⟨S1, hS1, hl1⟩
         · exact Or.inl ((Sol.bi (d := true) (rd i) (rd j) (al0 _ _ _) hs).mono (by cases gs <;> simp at hnot' ⊢) subset_rfl)
@@ -6502,7 +6666,7 @@ lemma ex_sol_one_not {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (
           have h0' : ((⟨GateOp.not, l⟩ :: gs).get (0 : Fin (gs.length + 1))).op = GateOp.not := rfl
           exact absurd (hone 0 j.succ h0' h).symm (Fin.succ_ne_zero j)
       match l with
-      | [] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.not, []⟩]) S (hwm_stay hm) h0 hm hgs hT)
+      | [] => exact Or.inl ((ex_sol_mono m gs (w ++ [gv m w ⟨.not, []⟩]) S (hwm_stay hm) h0 hm hmono hT).monoU (by omega))
       | i :: _ =>
         obtain ⟨k, hk, S1, hS1, hl1⟩ := ex_live_mono m gs (w ++ [gv m w ⟨.not, i :: _⟩]) (insert (w.getD i 0 ^^^ m) S) hwm_ins (Or.inr h0) (Or.inr hm) hmono hT
         by_cases hz : w.getD i 0 ^^^ m ∈ S1
@@ -6512,13 +6676,13 @@ lemma ex_sol_one_not {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (
           by_cases hkeq : k = gs.length
           · subst hkeq; exact Or.inr ⟨_, hsub, hlu⟩
           · exact Or.inl (hlu.sol.mono (by simp; omega) hsub)
-        · exact Or.inl (hl1.sol.mono (by simp; omega) (fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx))))
+        · exact Or.inl ((hl1.sol.monoU (by omega)).mono (by simp; omega) (fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx))))
 
 theorem bridge_one_not (gates : List Gate) (o : ℕ) (hD : FanInTwo ⟨gates, o⟩)
     (hone : ∀ i j : Fin gates.length, (gates.get i).op = GateOp.not → (gates.get j).op = GateOp.not → i = j)
     (hnot : ∃ g ∈ gates, g.op = GateOp.not)
     (hf : ∀ y : Fin 8 → Bool, Circuit.eval ⟨gates, o⟩ (List.ofFn y) = f y) :
-    Sol Z0 (mz 0) (tz 0) (gates.length - 1) (C (mz 0) (WZ [] 0)) ∨
+    Sol Z0 (mz 0) (tz 0) (gates.length - 1) 1 (C (mz 0) (WZ [] 0)) ∨
     ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ C (mz 0) (WZ [] 0) ∧ Live Z0 (mz 0) (tz 0) gates.length 1 S0 := by
   let row : ℕ → Fin 8 → Bool := fun k v => (rawP.getD v.val 0).testBit k
   let init : List ℕ := rawP.map (· &&& mz 0)
@@ -6600,7 +6764,7 @@ private theorem target_eq_f (x : Fin 8 → Bool) :
       List.ofFn_succ, List.ofFn_succ, List.ofFn_succ, List.ofFn_succ, List.ofFn_zero]
   exact target_eq_or (x 0) (x 1) (x 2) (x 3) (x 4) (x 5) (x 6) (x 7)
 
-def onWit : List Gate := [⟨.or, [0, 1]⟩, ⟨.or, [0, 7]⟩, ⟨.or, [6, 7]⟩, ⟨.or, [8, 4]⟩, ⟨.or, [2, 11]⟩, ⟨.and, [4, 8]⟩, ⟨.or, [5, 0]⟩, ⟨.and, [14, 3]⟩, ⟨.or, [13, 10]⟩, ⟨.or, [2, 9]⟩, ⟨.or, [5, 6]⟩, ⟨.and, [18, 17]⟩, ⟨.and, [16, 12]⟩, ⟨.or, [20, 15]⟩, ⟨.or, [19, 21]⟩]
+def onWit : List Gate := [⟨.or, [2, 0]⟩, ⟨.or, [7, 6]⟩, ⟨.or, [4, 9]⟩, ⟨.or, [5, 6]⟩, ⟨.or, [1, 0]⟩, ⟨.and, [10, 12]⟩, ⟨.or, [5, 0]⟩, ⟨.and, [14, 3]⟩, ⟨.or, [8, 4]⟩, ⟨.and, [9, 16]⟩, ⟨.or, [7, 8]⟩, ⟨.and, [11, 18]⟩, ⟨.or, [15, 13]⟩, ⟨.or, [19, 20]⟩, ⟨.or, [21, 17]⟩]
 def onOut : ℕ := 22
 
 theorem onWitBasis : ∀ g ∈ onWit,
@@ -6628,7 +6792,7 @@ theorem onFinal :
   · have hge : 15 ≤ gates.length := by
       by_contra hlt
       by_cases hlt2 : gates.length < 14
-      · exact iroot gates.length hlt2 (bridge ⟨gates, o⟩ (fanInTwo_of hfit) hf)
+      · exact iroot gates.length hlt2 (bridge_le1 ⟨gates, o⟩ (fanInTwo_of hfit) hone hf)
       · have heq : gates.length = 14 := by omega
         rcases bridge_one_not gates o (fanInTwo_of hfit) hone hnot hf with hsol | ⟨S0, hS0, hl0⟩
         · exact iroot (gates.length - 1) (by omega) hsol
