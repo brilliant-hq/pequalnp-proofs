@@ -14,7 +14,7 @@ import tempfile
 TOOLS = Path(__file__).resolve().parent
 # Set only at landing, from the single reviewed, private receipt export.
 # It commits to the release run number as well as membership and attribution.
-FROZEN_MANIFEST_SHA256 = None
+FROZEN_MANIFEST_SHA256 = 'acb49acf2171398c20ba027ab8a274a717823d1f56dfecacae30abcb7a227535'
 MAX_MANIFEST = 48 * 1024
 MAX_FILES = 4096
 MAX_SOURCE = 524288
