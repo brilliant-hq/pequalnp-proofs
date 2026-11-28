@@ -3385,52 +3385,6 @@ theorem childCut_sound {m : Nat} {book : Book} {s : Nat} {picks : List Nat} {pat
   · exact Bool.noConfusion (h.symm.trans (determined68_run hd hr))
   · exact sliceCheck_sound pri h ht hr
 
-def nodeRow (m : Nat) (book : Book) (j : Nat) : Bool :=
-  let cap := (book.record j).1
-  let (ws,path) := bankPath m book 12 j
-  let d := dom328 m
-  ws != [target328 &&& d] && (cap == 0 ||
-    !(nextD true d (cap+1-ws.length) ws (fun g zs=> !(childCut m book (cap-1) (book.picks j) (path++[g]) zs))))
-
-theorem allRows_sound (m : Nat) (book : Book) (hd : dom328 m &&& mask256 = dom328 m)
-    (pri : deps328 m) (num : ∀ j<book.count,nodeRow m book j = true) :
-    ∀ s j, j<book.count → (book.record j).1=s →
-    ∀ t ≤ s, ¬ RunD true (dom328 m) (target328 &&& dom328 m) t (bankPath m book 12 j).1 := by
-  intro s
-  induction s using Nat.strong_induction_on with
-  | ind s ih =>
-    intro j hj hcap t ht hr
-    have hh := num j hj
-    simp only [nodeRow,Bool.and_eq_true,bne_iff_ne,hcap] at hh
-    obtain ⟨hne,hn⟩ := hh
-    cases t with
-    | zero => exact hne (zero_done hr rfl)
-    | succ t =>
-      have pos : (s==0)=false := beq_eq_false_iff_ne.mpr (by omega)
-      simp only [pos,Bool.false_or,Bool.not_eq_true'] at hn
-      let ws := (bankPath m book 12 j).1
-      let ops := (bankPath m book 12 j).2
-      let F (g : Nat × Nat × Nat) (zs : Bank) := !(childCut m book (s-1) (book.picks j) (ops++[g]) zs)
-      have hf (g) (zs) (hz : RunD true (dom328 m) (target328 &&& dom328 m) t zs) :
-          F g zs = true := by
-        simp only [F,Bool.not_eq_true']
-        cases h : childCut m book (s-1) (book.picks j) (ops++[g]) zs with
-        | false => rfl
-        | true =>
-          exact False.elim (childCut_sound hd pri
-            (fun e he hcap => ih (s-1) (by omega) e he hcap) h t (by omega) hz)
-      have hn' := nextD_of_run_le68 hr (show t ≤ s-1 by omega) F hf
-      have he : s-1+2 = s+1 := by omega
-      rw [he] at hn'
-      exact Bool.noConfusion (hn.symm.trans hn')
-
-theorem treeWindow {m : Nat} (book : Book) (hd : dom328 m &&& mask256 = dom328 m)
-    (pri : deps328 m) (num : ∀ j<book.count,nodeRow m book j = true)
-    (root : childCut m book (lb328 m-1) [] [] ((roots328 m).map (· &&& dom328 m)) = true) :
-    runWindow328 m := by
-  apply childCut_sound hd pri _ root
-  intro j hj hb
-  exact allRows_sound m book hd pri num _ j hj hb
 
 end PEqualNP.Outside.L_meta_32836_aux.Cubes
 
@@ -3476,62 +3430,37 @@ theorem rowPairsOK (m : Nat) (hm : m < 128) : pairsOK (dom328 m) target328 (rowP
   have H : ∀ j : Fin 128,pairsOK (dom328 j.val) target328 (rowPairs j.val) = true := by decide +kernel
   exact H ⟨m,hm⟩
 
-def maskedRow (m : Nat) (book : Book) (j : Nat) : Bool :=
-  let cap := (book.record j).1
-  let (ws,path) := bankPath m book 12 j
-  let d := dom328 m
-  ws != [target328 &&& d] && (cap == 0 ||
-    !(stepCov d (cap+1-ws.length) (rowPairs m) ws (fun g zs=> !(childCut m book (cap-1) (book.picks j) (path++[g]) zs))))
 
-theorem maskedRows_sound (m : Nat) (book : Book) (hd : dom328 m &&& mask256 = dom328 m)
-    (hm : m < 128) (pri : deps328 m) (num : ∀ j<book.count,maskedRow m book j = true) :
-    ∀ s j, j<book.count → (book.record j).1=s →
-    ∀ t ≤ s, ¬ RunD true (dom328 m) (target328 &&& dom328 m) t (bankPath m book 12 j).1 := by
-  intro s
-  induction s using Nat.strong_induction_on with
-  | ind s ih =>
-    intro j hj hcap t ht hr
-    have hh := num j hj
-    simp only [maskedRow,Bool.and_eq_true,bne_iff_ne,hcap] at hh
-    obtain ⟨hne,hn⟩ := hh
-    cases t with
-    | zero => exact hne (zero_done hr rfl)
-    | succ t =>
-      have pos : (s==0)=false := beq_eq_false_iff_ne.mpr (by omega)
-      simp only [pos,Bool.false_or,Bool.not_eq_true'] at hn
-      let ws := (bankPath m book 12 j).1
-      let ops := (bankPath m book 12 j).2
-      let F (g : Nat × Nat × Nat) (zs : Bank) := !(childCut m book (s-1) (book.picks j) (ops++[g]) zs)
-      have hf (g) (zs) (hz : RunD true (dom328 m) (target328 &&& dom328 m) t zs) :
-          F g zs = true := by
-        simp only [F,Bool.not_eq_true']
-        cases h : childCut m book (s-1) (book.picks j) (ops++[g]) zs with
-        | false => rfl
-        | true =>
-          exact False.elim (childCut_sound hd pri
-            (fun e he hcap => ih (s-1) (by omega) e he hcap) h t (by omega) hz)
-      let Fc (g : Nat × Nat × Nat) (zs : Bank) := coversP true (rowPairs m) zs && F g zs
-      have hfc g zs (hz : RunD true (dom328 m) (target328 &&& dom328 m) t zs) : Fc g zs = true :=
-        by simpa only [Fc,Bool.and_eq_true] using And.intro (coversP_ok hd (rowPairs m) (rowPairsOK _ hm) hz) (hf _ _ hz)
-      have hn' := nextD_of_run_le68 hr (show t ≤ s-1 by omega) Fc hfc
-      have he : s-1+2 = s+1 := by omega
-      rw [he] at hn'
-      rw [stepCov_eq _ _ _ _ _ _ hd (rowPairsOK _ hm)] at hn
-      exact Bool.noConfusion (hn.symm.trans hn')
-
-theorem maskedWindow {m : Nat} (book : Book) (hd : dom328 m &&& mask256 = dom328 m)
-    (hm : m < 128) (pri : deps328 m) (num : ∀ j<book.count,maskedRow m book j = true)
-    (root : childCut m book (lb328 m-1) [] [] ((roots328 m).map (· &&& dom328 m)) = true) :
-    runWindow328 m := by
-  apply childCut_sound hd pri _ root
-  intro j hj hb
-  exact maskedRows_sound m book hd hm pri num _ j hj hb
 end PEqualNP.Outside.L_meta_32836_aux.Cubes
 
 namespace PEqualNP.Outside.L_meta_32836_aux.Cubes
 open PEqualNP.Outside.L_meta_32836_aux.Core PEqualNP.Outside.L_meta_32836_aux
 abbrev Pool328 := Nat × Nat × (Nat × List Nat)
 
+def area328 : Nat := (dom328 106) <<< 16
+def shifted328 : Nat := moveBits (dom328 106) 16 target328
+theorem areaLower328 (h : prior328 106) :
+    Lower true area328 (roots328 106) shifted328 7 := by
+  apply lower_iso (d1:=dom328 106) (T1:=target328) (roots1:=roots328 106)
+    [(dom328 106,16)] (by decide +kernel) (by decide +kernel) (by decide +kernel)
+    (by decide +kernel) (by decide +kernel)
+  exact h
+
+def areaCheck328 (m s : Nat) (ws : Bank) (path : Gates) : Bool :=
+  (106 &&& m == 106 && 106 < m && area328 &&& dom328 m == area328) &&
+      checkPool true area328 7 s (runOps true area328 (0,roots328 106) path) ws
+
+theorem areaCheck_ok328 {m s t : Nat} {ws : Bank} {path : Gates} (pri : deps328 m)
+    (h : areaCheck328 m s ws path = true) (ht : t ≤ s) :
+    ¬ RunD true (dom328 m) (target328 &&& dom328 m) t ws := by
+  simp only [areaCheck328,Bool.and_eq_true,beq_iff_eq,decide_eq_true_eq] at h
+  have hd : area328 &&& mask256 = area328 := by decide +kernel
+  have spl := areaLower328 (pri _ h.1.1.1 h.1.1.2)
+  have ini : ∀ w ∈ roots328 106, Avail true area328 (roots328 106) w :=
+    fun w hw => Or.inr (Or.inl ⟨w,hw,rfl⟩)
+  obtain ⟨bank,hr,hb⟩ := runOps_sound hd path (0,roots328 106) (roots328 106) rfl ini
+  exact checkPool_sound hd h.1.2 (by decide +kernel : target328 &&& area328 = shifted328 &&& area328)
+    (by decide +kernel) spl _ bank hr hb (checkPool_le68 _ _ _ _ _ ht _ _ h.2)
 def scopes328 (m : Nat) (picks : List Nat) (path : Gates) : List Pool328 :=
   (picks.filter (fun k => (k &&& m == k) && (k < m) &&
     subValidB (dom328 m) (dom328 k) target328 target328)).map fun k =>
@@ -3550,6 +3479,24 @@ theorem pathCut328_sound {m s : Nat} {picks : List Nat} {path : Gates} {ws : Ban
   rw [Bool.and_eq_true]
   exact ⟨hok,by simpa only [runOps,List.foldl_append,List.foldl_cons,List.foldl_nil] using hpool⟩
 
+def scopesPos (m : Nat) (picks : List Nat) (path : Gates) : List Pool328 :=
+  let cs:=scopes328 m picks path
+  if 106 &&& m == 106 && 106 < m && area328 &&& dom328 m == area328 then
+    cs ++ [(area328,7,runOps true area328 (0,roots328 106) path)] else cs
+
+theorem pathPosSound {m s : Nat} {picks : List Nat} {path : Gates} {ws : Bank} {g}
+    (pri : deps328 m) (h : pathCut328 (scopesPos m picks path) s g ws = true) {t} (ht : t ≤ s) :
+    ¬ RunD true (dom328 m) (target328 &&& dom328 m) t ws := by
+  unfold scopesPos at h
+  split at h
+  next ok =>
+    simp only [pathCut328,List.any_append,List.any_cons,List.any_nil,Bool.or_false,Bool.or_eq_true] at h
+    rcases h with base|pos
+    · exact pathCut328_sound pri base ht
+    · apply areaCheck_ok328 (path:=path++[g]) pri _ ht
+      simpa only [areaCheck328,ok,Bool.true_and,runOps,List.foldl_append,List.foldl_cons,List.foldl_nil] using pos
+  next => exact pathCut328_sound pri h ht
+
 def cachedCut (m : Nat) (book : Book) (s : Nat) (pool : List Pool328) (g : Nat × Nat × Nat) (ws : Bank) :=
   pathCut328 pool s g ws || childCut m book s [] [] ws
 
@@ -3557,64 +3504,275 @@ theorem cachedCut_sound {m s : Nat} {book : Book} {picks : List Nat} {path : Gat
     (hd : dom328 m &&& mask256 = dom328 m) (pri : deps328 m)
     (smaller : ∀ j<book.count, (book.record j).1 = s →
       ∀ t ≤ s, ¬RunD true (dom328 m) (target328 &&& dom328 m) t (bankPath m book 12 j).1)
-    (ok : cachedCut m book s (scopes328 m picks path) g ws = true) {t} (ht : t ≤ s) :
+    (ok : cachedCut m book s (scopesPos m picks path) g ws = true) {t} (ht : t ≤ s) :
     ¬ RunD true (dom328 m) (target328 &&& dom328 m) t ws := by
   rcases Bool.or_eq_true_iff.mp ok with h|h
-  · exact pathCut328_sound pri h ht
+  · exact pathPosSound pri h ht
   · exact childCut_sound hd pri smaller h _ ht
 
 def cachedRow (m : Nat) (book : Book) (j : Nat) : Bool :=
   let cap := (book.record j).1
   let (ws,path) := bankPath m book 12 j
   let d := dom328 m
-  let cache := scopes328 m (book.picks j) path
+  let cache := scopesPos m (book.picks j) path
   ws != [target328 &&& d] && (cap == 0 ||
     !(stepCov d (cap+1-ws.length) (rowPairs m) ws (fun g zs=> !(cachedCut m book (cap-1) cache g zs))))
 
-theorem cachedRows_sound (m : Nat) (book : Book) (hd : dom328 m &&& mask256 = dom328 m)
-    (hm : m < 128) (pri : deps328 m) (num : ∀ j<book.count,cachedRow m book j = true) :
+
+end PEqualNP.Outside.L_meta_32836_aux.Cubes
+
+namespace PEqualNP.Outside.L_meta_32836_aux.Cubes
+open PEqualNP.Outside.L_meta_32836_aux.Core
+abbrev ProjBank := List (Nat × Nat × Nat)
+def initProj (m : Nat) : ProjBank :=
+  let d := dom328 m
+  let rs := (roots328 m).map (· &&& d)
+  let ps : List (Nat × Nat) := match m with
+    | 47 => [(0x6c03,0xef07),(0xd18,0x4db8),(0x81d4,0xa5d5),(0xf020,0xf868),(0x2c0,0x12d2)]
+    | 55 => [(0x181,0x9c3),(0x5d0,0x17d4),(0x221a,0x62ba),(0x5460,0x7568),(0x7a04,0x7e15)]
+    | 59 => [(0x6c03,0xef07),(0xd28,0x4db8),(0xf010,0xf858),(0x81e4,0xa5e5),(0x2c0,0x12e2)]
+    | 61 => [(0x181,0x9c3),(0x221a,0x62ba),(0x5d0,0x17d4),(0x5460,0x7568),(0x7a04,0x7e15)]
+    | 63 => [(0x43b038c1054d440,0x4ef3ecc5574f550),(0xbbc01808954403d,0xb5441118b54c0bf),(0x3c0040026a9003b,0xc9100626eb007f),(0x400020334808742,0x1148023b488cf43),(0x8000803c9020b84,0x422200be9070f8c),(0xc30422b2880,0xa03cff05abb3aa0)]
+    | 79 => [(0x309819,0x51b89d),(0xf0441d,0xa24c5f),(0xc06426,0x547627),(0xb822,0xa8bd2a),(0x3c0,0xfc3f0)]
+    | 87 => [(0x200b,0x649b),(0x61e0,0x11e4),(0x4250,0x6b58),(0x11a0,0x11e1),(0x1c04,0x1e26)]
+    | 91 => [(0x6c03,0xef07),(0xd28,0x4db8),(0xf010,0xf858),(0x81e4,0xa5e5),(0x2c0,0x12e2)]
+    | 93 => [(0x200b,0x649b),(0x4250,0x6b58),(0x61e0,0x11e4),(0x11a0,0x11e1),(0x1c04,0x1e26)]
+    | 94 => [(0x1d09,0x9d59),(0xec22,0x1ef26),(0x1a030,0x1a8b8),(0x111c4,0x135c6),(0x2c0,0x52e1)]
+    | 95 => [(0xc0b02280817,0x545f06e88c1f),(0x3c020998131a,0x28805998333e),(0x300400527208,0x552521737258),(0x81067e804,0x2a009867f886),(0x30198585e0,0x30198787e1),(0x4030e40004e0,0x3cae61c4de0)]
+    | 103 => [(0x407,0x4c8f),(0xc60,0x2d70),(0x2868,0x2e69),(0x3090,0xb0b2),(0xc300,0xd344)]
+    | 106 => [(0x109,0x58d),(0x422,0x663),(0x844,0x956),(0x290,0xab8)]
+    | 109 => [(0x407,0x4c8f),(0x2868,0x2d69),(0xc60,0x2e70),(0x3090,0xb0b2),(0xc300,0xd344)]
+    | 111 => [(0x62c81083,0x62ea3487),(0x2e403068,0x1ec43878),(0x1d07a044,0x1d0fb145),(0x518a4090,0x15cac298),(0x258000,0x35c042),(0x100f00,0x6b110fa0)]
+    | 115 => [(0x3081,0x3ac3),(0x2380,0x23a4),(0x4722,0x2723),(0x44c,0x555c),(0x4830,0x4cb8)]
+    | 117 => [(0xf,0x89f),(0x70,0x1171),(0x780,0x7a2),(0x5e0,0x7e4),(0x1a00,0x1e48)]
+    | 118 => [(0x1d09,0x9d59),(0xec22,0x1ef26),(0x111c4,0x135c6),(0x1a030,0x1a8b8),(0x2c0,0x52e1)]
+    | 119 => [(0x1cd159001510,0x3ec54b815750),(0xfcb114770554,0xc131347f0575),(0x202c0414c047,0x1250a4034e44f),(0x1c30200eb0aa8,0x94208ef0aba),(0x20c0088c08b,0x525584c8d88f),(0x10002a2002a20,0x180aab312aba0)]
+    | 121 => [(0x3081,0x3ac3),(0x2380,0x23a4),(0x4722,0x2723),(0x44c,0x555c),(0x4830,0x4cb8)]
+    | 123 => [(0x3f00c286c2,0x3f00cf87c3),(0xc30154c240,0xc05354d2c4),(0xc02aa2480,0xa3aa2cc8),(0x333c7831,0x333ef833),(0x3400012c,0x553c60453c),(0xc8011810,0xaacc913a30)]
+    | 124 => [(0x6c03,0xef07),(0xd18,0x4db8),(0x81d4,0xa5d5),(0xf020,0xf868),(0x2c0,0x12d2)]
+    | 125 => [(0x1cd159001510,0x3ec54b815750),(0x202c0414c047,0x1250a4034e44f),(0xfcb114770554,0xc131347f0575),(0x1c30200eb0aa8,0x94208ef0aba),(0x20c0088c08b,0x525584c8d88f),(0x10002a2002a20,0x180aab312aba0)]
+    | 126 => [(0x2d8042c014,0x191f8a42d05c),(0xe3c0c5b602,0xe3c0dfb683),(0x5201292408,0x2a1695292e0c),(0x1c073a4961,0x1c073fc963),(0x8006941220,0x340927943330),(0x3800380009c0,0x7e078e04de0)]
+    | 127 => [(0xc00706c19c2011a030bb8000a3000308e,0x1c70c2ef0f09cd8611c437b3a40aab028389e),(0x80142384cc62240911a1800958a4b0202a,0x48921c62addc2210010480808d59acb0a12e),(0x18f0008710820cee8040804003808f110b21,0x10174811590a2cd6cc0300c4403c28f550f29),(0x3f004844081180c81222420016261a411884,0xbfa24c604e190090020800011e265e431a86),(0x200053080320100045b074061c7540e2c450,0x249010d63261101983074261e7d40f2c4d1),(0xc00180801302001224cc1442008141080741,0xc471c07a0381229325cc030a309163085761),(0x1000203000000100040000005e0000006c010,0x300db2880378040e628380d5e1041187e050)]
+    | _ => []
+  rs.zip ps
+
+def PairWord (ps : List (Nat × Nat)) (w : Nat) : Nat × Nat :=
+  (projBit (ps.map Prod.fst) w,projBit (ps.map Prod.snd) w)
+
+def accurate (ps : List (Nat × Nat)) (b : ProjBank) : Prop := ∀ e ∈ b, e.2 = PairWord ps e.1
+
+theorem initProj_valid {m : Nat} (hm : m < 128) : accurate (rowPairs m) (initProj m) := by
+  have H : ∀ i : Fin 128, (initProj i.val).all (fun e=>e.2 == PairWord (rowPairs i.val) e.1) = true := by decide +kernel
+  intro e he
+  exact beq_iff_eq.mp (List.all_eq_true.mp (H ⟨m,hm⟩) e he)
+
+def readProj (ps : List (Nat × Nat)) : ProjBank → Nat → Nat × Nat
+  | [], w => PairWord ps w
+  | e::b,w => if e.1 == w then e.2 else readProj ps b w
+
+theorem readProj_ok {ps : List (Nat × Nat)} {b : ProjBank} (h : accurate ps b) (w : Nat) :
+    readProj ps b w = PairWord ps w := by
+  induction b with
+  | nil => rfl
+  | cons a b ih =>
+    by_cases he : a.1 = w
+    · simpa only [readProj,he,beq_self_eq_true,if_true] using he ▸ (h a List.mem_cons_self)
+    · simp only [readProj,beq_eq_false_iff_ne.mpr he,if_false]
+      exact ih (fun e hv=>h e (List.mem_cons_of_mem a hv))
+
+def addProj (d : Nat) (ps : List (Nat × Nat)) (b : ProjBank) (g : Nat × Nat × Nat) : ProjBank :=
+  let pa:=readProj ps b g.2.1
+  let pb:=readProj ps b g.2.2
+  let mp:=maskP ps.length
+  (opD d g.1 g.2.1 g.2.2, opP mp g.1 pa.1 pb.1, opP mp g.1 pa.2 pb.2)::b
+
+theorem addProj_ok {d T : Nat} {ps : List (Nat × Nat)} (hd : d &&& mask256=d)
+    (hp : pairsOK d T ps=true) {b : ProjBank} (hb : accurate ps b) (g : Nat × Nat × Nat) :
+    accurate ps (addProj d ps b g) := by
+  intro e he
+  rcases List.mem_cons.mp he with rfl|he
+  · have M (f : (Nat × Nat) → Nat) (h : ∀ z ∈ ps, d.testBit (f z)=true) :
+        ∀ r∈ps.map f, d.testBit r=true := by
+      intro r hr; obtain ⟨z,hz,rfl⟩:=List.mem_map.mp hr;exact h _ hz
+    have ok z (hz : z ∈ ps) := List.all_eq_true.mp hp z hz
+    have A := M Prod.fst (fun z hz=>(Bool.and_eq_true_iff.mp (Bool.and_eq_true_iff.mp (Bool.and_eq_true_iff.mp (ok z hz)).1).1).1)
+    have B := M Prod.snd (fun z hz=>(Bool.and_eq_true_iff.mp (Bool.and_eq_true_iff.mp (Bool.and_eq_true_iff.mp (ok z hz)).1).1).2)
+    simp only [PairWord,projBit_opD hd A,projBit_opD hd B,List.length_map,readProj_ok hb]
+  · exact hb _ he
+
+theorem iterProj_ok {d T : Nat} {ps : List (Nat × Nat)} (hd : d &&& mask256=d)
+    (hp : pairsOK d T ps=true) (path : Gates) {b : ProjBank} (hb : accurate ps b) :
+    accurate ps (path.foldl (addProj d ps) b) := by
+  induction path generalizing b with
+  | nil => exact hb
+  | cons g path ih => exact ih (addProj_ok hd hp hb g)
+
+def projectedStep (m slack : Nat) (ws : Bank) (path : Gates)
+    (f : (Nat × Nat × Nat) → Bank → Bool) :=
+  let d:=dom328 m
+  let ps:=rowPairs m
+  let cache:=path.foldl (addProj d ps) (initProj m)
+  nextD_cov true d (maskP ps.length) slack (ws.map (fun w => (w,readProj ps cache w)))
+    (fun g zs => f g (zs.map Prod.fst))
+
+theorem projectedStep_eq {m : Nat} (hm : m<128) (hd : dom328 m &&& mask256=dom328 m)
+    (slack : Nat) (ws : Bank) (path : Gates) (f) :
+    projectedStep m slack ws path f = stepCov (dom328 m) slack (rowPairs m) ws f := by
+  have hb:=iterProj_ok hd (rowPairsOK m hm) path (initProj_valid hm)
+  simp only [projectedStep,stepCov,readProj_ok hb,PairWord]
+
+def projectedRow (m : Nat) (book : Book) (j : Nat) : Bool :=
+  let cap := (book.record j).1
+  let (ws,path) := bankPath m book 12 j
+  let d := dom328 m
+  let cache := scopesPos m (book.picks j) path
+  ws != [target328 &&& d] && (cap == 0 ||
+    !(projectedStep m (cap+1-ws.length) ws path (fun g zs=> !(cachedCut m book (cap-1) cache g zs))))
+
+theorem projectedRow_eq {m : Nat} (hm : m < 128) (hd : dom328 m &&& mask256=dom328 m)
+    (book : Book) (i : Nat) : projectedRow m book i = cachedRow m book i := by
+  simp only [projectedRow,cachedRow,projectedStep_eq hm hd]
+
+end PEqualNP.Outside.L_meta_32836_aux.Cubes
+
+namespace PEqualNP.Outside.L_meta_32836_aux.Cubes
+open PEqualNP.Outside.L_meta_32836_aux.Core
+
+def symTag := 0xcc00cc00cc00cc00cc00cc00cc00cc
+def symW (v : Nat) := moveBits symTag 6 v
+def symIndex (j : Nat) := if symTag.testBit j then 6+j else if (symTag <<< 6).testBit j then j-6 else j
+
+theorem symBit (v j : Nat) : (symW v).testBit j = v.testBit (symIndex j) := by
+  rw [symW,moved symTag 6 j v (by decide +kernel)]
+  unfold symIndex
+  split_ifs <;> rfl
+
+theorem symIndex_inv (j : Nat) : symIndex (symIndex j)=j := by
+  by_cases h : j<128
+  · exact (show ∀ i : Fin 128,symIndex (symIndex i.val)=i.val by decide +kernel) ⟨j,h⟩
+  · have pow : 2^128 ≤ 2^j := Nat.pow_le_pow_right (by decide) (by omega)
+    have a : symTag < 2^128 := by decide +kernel
+    have b : symTag<<<6 < 2^128 := by decide +kernel
+    have eq : symIndex j=j := by
+      simp [symIndex,Nat.testBit_lt_two_pow (lt_of_lt_of_le a pow),Nat.testBit_lt_two_pow (lt_of_lt_of_le b pow)]
+    rw [eq,eq]
+
+theorem symW_inj : Function.Injective symW := by
+  intro a b h
+  apply Nat.eq_of_testBit_eq
+  intro i
+  have x := congrArg (fun z : Nat => z.testBit (symIndex i)) h
+  simpa only [symBit,symIndex_inv] using x
+
+theorem symRun {d y : Nat} (hd : symW d=d) (hy : symW y=y) {s ws} (hr : RunD true d y s ws) :
+    RunD true d y s (ws.map symW) := by
+  have hop (op a b : Nat) : symW (opD d op a b)=opD d op (symW a) (symW b) := by
+    exact applyMoves_opD [(symTag,6)] (by decide +kernel) hd op a b
+  have h0 : symW 0=0 := by decide +kernel
+  induction hr using Run.fold with
+  | done => simpa [hy] using (@Run.done true d y)
+  | perm e _ ih => exact Run.perm (e.map symW) ih
+  | @two t a b r op ka kb ha hn hnd hnin _ ih =>
+    simp only [List.map_cons] at ih ⊢
+    have kn (w) (z : List Nat) (b : Bool) : (kept b w z).map symW = kept b (symW w) (z.map symW) := by
+      cases b <;> rfl
+    rw [kn,kn,hop] at ih
+    apply Run.two op ka kb ha _ _ _ ih
+    · rw [←hop,←h0];exact fun e => hn (symW_inj e)
+    · rw [←hop];intro e;exact hnd (symW_inj (e.trans hd.symm))
+    · rw [←hop];intro e
+      have hit : symW (opD d op a b) ∈ (a::b::r).map symW := e
+      obtain ⟨v,hv,eq⟩ := List.mem_map.mp hit
+      exact hnin ((symW_inj eq) ▸ hv)
+
+def posRow (link : Nat→Nat→Nat) (m : Nat) (book : Book) (i : Nat) : Bool :=
+  let x:=link m i
+  if x=4095 then
+    let q:=bankPath m book 12 i
+    areaCheck328 m (book.record i).1 q.1 q.2
+  else if x=0 then projectedRow m book i else
+    let j:=x-1
+    decide (j < i) && ((book.record j).1 == (book.record i).1) &&
+    (symW (dom328 m) == dom328 m) && (symW (target328 &&& dom328 m) == (target328 &&& dom328 m)) &&
+    ((bankPath m book 12 i).1.map symW).isPerm (bankPath m book 12 j).1
+
+theorem posSound (link : Nat→Nat→Nat) (m : Nat) (book : Book) (hd : dom328 m &&& mask256 = dom328 m)
+    (hm : m < 128) (pri : deps328 m) (num : ∀ j<book.count,posRow link m book j = true) :
     ∀ s j, j<book.count → (book.record j).1=s →
     ∀ t ≤ s, ¬ RunD true (dom328 m) (target328 &&& dom328 m) t (bankPath m book 12 j).1 := by
   intro s
   induction s using Nat.strong_induction_on with
   | ind s ih =>
-    intro j hj hcap t ht hr
-    have hh := num j hj
-    simp only [cachedRow,Bool.and_eq_true,bne_iff_ne,hcap] at hh
-    obtain ⟨hne,hn⟩ := hh
-    cases t with
-    | zero => exact hne (zero_done hr rfl)
-    | succ t =>
-      have pos : (s==0)=false := beq_eq_false_iff_ne.mpr (by omega)
-      simp only [pos,Bool.false_or,Bool.not_eq_true'] at hn
-      let ws := (bankPath m book 12 j).1
-      let ops := (bankPath m book 12 j).2
-      let F (g : Nat × Nat × Nat) (zs : Bank) := !(cachedCut m book (s-1) (scopes328 m (book.picks j) ops) g zs)
-      have hf (g) (zs) (hz : RunD true (dom328 m) (target328 &&& dom328 m) t zs) :
-          F g zs = true := by
-        simp only [F,Bool.not_eq_true']
-        cases h : cachedCut m book (s-1) (scopes328 m (book.picks j) ops) g zs with
-        | false => rfl
-        | true =>
-          exact False.elim (cachedCut_sound hd pri
-            (fun e he hcap => ih (s-1) (by omega) e he hcap) h (by omega) hz)
-      let Fc (g : Nat × Nat × Nat) (zs : Bank) := coversP true (rowPairs m) zs && F g zs
-      have hfc g zs (hz : RunD true (dom328 m) (target328 &&& dom328 m) t zs) : Fc g zs = true :=
-        by simpa only [Fc,Bool.and_eq_true] using And.intro (coversP_ok hd (rowPairs m) (rowPairsOK _ hm) hz) (hf _ _ hz)
-      have hn' := nextD_of_run_le68 hr (show t ≤ s-1 by omega) Fc hfc
-      have he : s-1+2 = s+1 := by omega
-      rw [he] at hn'
-      rw [stepCov_eq _ _ _ _ _ _ hd (rowPairsOK _ hm)] at hn
-      exact Bool.noConfusion (hn.symm.trans hn')
+    intro j
+    induction j using Nat.strong_induction_on with
+    | ind j prev =>
+      intro hj hcap t ht hr
+      have hh := num j hj
+      unfold posRow at hh
+      dsimp only at hh
+      split at hh
+      next => exact areaCheck_ok328 pri hh (hcap ▸ ht) hr
+      next =>
+        split at hh
+        case isFalse _ =>
+          simp only [Bool.and_eq_true,decide_eq_true_eq,beq_iff_eq,List.isPerm_iff] at hh
+          obtain ⟨⟨⟨⟨less,cap⟩,symD⟩,symY⟩,perm⟩ := hh
+          exact prev _ less (less.trans hj) (cap.trans hcap) _ ht (Run.perm perm (symRun symD symY hr))
+        case isTrue _ =>
+          rw [projectedRow_eq hm hd] at hh
+          simp only [cachedRow,Bool.and_eq_true,bne_iff_ne,hcap] at hh
+          obtain ⟨hne,hn⟩ := hh
+          cases t with
+          | zero => exact hne (zero_done hr rfl)
+          | succ t =>
+            have pos : (s==0)=false := beq_eq_false_iff_ne.mpr (by omega)
+            simp only [pos,Bool.false_or,Bool.not_eq_true'] at hn
+            let ws := (bankPath m book 12 j).1
+            let ops := (bankPath m book 12 j).2
+            let F (g : Nat × Nat × Nat) (zs : Bank) := !(cachedCut m book (s-1) (scopesPos m (book.picks j) ops) g zs)
+            have hf (g) (zs) (hz : RunD true (dom328 m) (target328 &&& dom328 m) t zs) :
+                F g zs = true := by
+              simp only [F,Bool.not_eq_true']
+              cases h : cachedCut m book (s-1) (scopesPos m (book.picks j) ops) g zs with
+              | false => rfl
+              | true =>
+                exact False.elim (cachedCut_sound hd pri
+                  (fun e he hcap => ih (s-1) (by omega) e he hcap) h (by omega) hz)
+            let Fc (g : Nat × Nat × Nat) (zs : Bank) := coversP true (rowPairs m) zs && F g zs
+            have hfc g zs (hz : RunD true (dom328 m) (target328 &&& dom328 m) t zs) : Fc g zs = true :=
+              by simpa only [Fc,Bool.and_eq_true] using And.intro (coversP_ok hd (rowPairs m) (rowPairsOK _ hm) hz) (hf _ _ hz)
+            have hn' := nextD_of_run_le68 hr (show t ≤ s-1 by omega) Fc hfc
+            have he : s-1+2 = s+1 := by omega
+            rw [he] at hn'
+            rw [stepCov_eq _ _ _ _ _ _ hd (rowPairsOK _ hm)] at hn
+            exact Bool.noConfusion (hn.symm.trans hn')
 
-theorem cachedWindow {m : Nat} (book : Book) (hd : dom328 m &&& mask256 = dom328 m)
-    (hm : m < 128) (pri : deps328 m) (num : ∀ j<book.count,cachedRow m book j = true)
+theorem posWindow {m : Nat} (link : Nat→Nat→Nat) (book : Book) (hd : dom328 m &&& mask256 = dom328 m)
+    (hm : m < 128) (pri : deps328 m) (num : ∀ j<book.count,posRow link m book j=true)
     (root : childCut m book (lb328 m-1) [] [] ((roots328 m).map (· &&& dom328 m)) = true) :
     runWindow328 m := by
   apply childCut_sound hd pri _ root
   intro j hj hb
-  exact cachedRows_sound m book hd hm pri num _ j hj hb
+  exact posSound link m book hd hm pri num _ j hj hb
+
 end PEqualNP.Outside.L_meta_32836_aux.Cubes
+namespace PEqualNP.Outside.L_meta_32836_aux.Cubes
+def leafTwin328 (m i : Nat) : Nat :=
+  let j:= i/64
+  let w : Nat := match m with
+    | 63 => 0x2b02a029026025000000000000028027000022000000000000000000000000000000000000000000000018017000000000000000000000000000000000005004003002000000000000000000000000000000000
+    | 79 => 0x6000005000000000002000000
+    | 95 => 0x1e01d01c01b01a019018000000000000000000016015000000000000000000000000000000000000000000000000000000003002007006000000000000000000000000
+    | 106 => 0xd00b00a008007000000000000000000000004003000000000000
+    | 111 => 0x3000000000
+    | 123 => 0xfff02e02d02c02b000000000000000ffffffffffff018fff016fff014012011fff00ffff00b00d00a000fff000fff000000000000fff000fff000000000000000ffffff004003000000000000
+    | 126 => (if j < 1 then 0x2102001fffffff017fff01501b01a01400002801c000000000000000000000ffffff000000fff000000000000000000000000ffffff000000000fff000000fff000000000fff000000000000000000fff005fff003fff000000fff000000000 else 0x55000000052000000ffffff03503203103002f02e02d02cffffff029024023022)
+    | 127 => (if j < 22 then (if j < 11 then (if j < 5 then (if j < 2 then (if j < 1 then 0xfff000fff000ffffff000000000ffffff000000000000000000000000000000fff000000000fff000000fff000000000000fff000fff00e00d00c00b009007ffffff000000004000000000000000000000000fff000000000000000 else 0xfffffffffffffff000000fffffffff000fff000000000000000ffffff000fff000000000000fff000000fff000000000000000000000000000ffffff000000000000000fff000fff000000000000000fff000000000ffffff000000000000) else (if j < 3 then 0xfff000fff000000000000000000000000000000000000000000000000000000000000000000000fff000000000ffffff000000000000000000000000000000ffffffffffff000000000000fff000000000000000000000000000000 else (if j < 4 then 0xffffffffffffffffffffffffffffffffffff000000000000000000000000000000fff000fff000000000000000fff0b0095fff000000000000000000fff000000000000000000fff000ffffff000000000000fffffffff000000fff000000 else 0xfff000fff000000000000000000fff000000000000fff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000fff000000))) else (if j < 8 then (if j < 6 then 0x4f000000000000fff000000fff000000000fff000000000000000000000000000000000000000000000fffffffffffffffffffffffffffffffff000fff000000000000000000000000000000fffffffffffffffffffff000fff000000000 else (if j < 7 then 0xfff000000000000fff00000000000019b1981970001a91a8000000000000000000000000fff000000000fff19900000000000000000000019119018f000000000000000fff178fff175000fff000fff04efff000000176 else 0xfff0ac0c50c0000ffffff1b9fff000fff0c20000000001ef1ee000000000fff1cb1c9fff0001e60000001e30000000001df0000000000000c1000000000000000000000000000000000000000000000000000000000000000fff000000000000)) else (if j < 9 then 0x23c23b23a0000000000001cc1c01bb00023123022f0000000000002262252221cf1cd1bf1be0000000001ce00000000021c21b21a00000000000021121020f20e20b1bd1bc000000000000000000000000000ffffff0cc0cb0ca0c9ffffff else (if j < 10 then 0x3102001f03afff02a02903002f01e00226e26d26c26b000000000000000000000000fff1d91d81d71d61d51d11d41d31c81c71c6fff1b81c21c41b7000fffffffff251fff000000000000000000fffffffffffffff2460000000001d01c1000 else 0x6005f05e05d05c04d04c04bfff049047ffffff06cfff06a069048068067fff065064053fff051fff04404307307207107006ffff05b05afff06206104204104003f03efff03cfff02d02c02b025fff022ffffff037036035fff02e023fff032)))) else (if j < 16 then (if j < 13 then (if j < 12 then 0xa00d514dffffffffffffffffffffffffffffff0f30f20b20970f10f00ef0ee0ed0ec0ebfff1221161111010b609b13113012f12912a128127126125fff12c12b0880b712e124084083082081080fffffffffffffff07a079fffffffff075fff else 0x94fffffffff145fff14214114013ffff09d14313e13d13cfff1231371361351340b90b8fff13813a1330d8fff0af0ad0d40d30d20d1fff0cffff08f08e08d08c087086fff08a089085156155154fff1530bc0ae0d615215115014ffff14e0a1) else (if j < 14 then 0xfff158fff12111f12011e11c11d11b11a11911511711811411311211010e10f10d10c10b10a109108107106105102104100ffffffffffffffffffffffffffffff0bf0befff0b50b40b30ba0ab0aa0a90a80a70a60a50a4fff0a209a09909809c else (if j < 15 then 0xfffffffffffffffffffffffffffffffff3a93a8fff3a63a43a33a2ffffff39d39f39c000000fff000000000000000ffffff000000000000000ffffff00039539400000000000016a169167168166165164ffffffffffffffffffffffffffffff else 0xffffffffffff000000fff3dc3db3da3d93d83d73d63d5ffffff000000000fff000000fff0000003d2fff3d03cf000000000000000000000000ffffff000fff000000000000ffffff3c63c53c43c3000000000000000fff))) else (if j < 19 then (if j < 17 then 0xffffff000000000000000000000417000000000000416000fffffffffffffffffffffffffffffffff000000000000fff000000000000000000000fff000000000000000000000000000fff000000000000000000000000ffffff3fd3fcfff else (if j < 18 then 0x440ffffff43a439438437435433434432430fffffffffffffffffffff000000000fff000000fff43d43c000462000000fff000000000000000fff43bfff00000041b41a419fff415414413412411409408fff40d40b40c410407000000000000 else 0xfff000000000000000000000fff0000000000000000000000000000000000004a90000000000000000000004a1000000000000ffffff496495fff000000000000000000000000ffffffffffffffffff000ffffffffffffffffff444443442441)) else (if j < 20 then 0xfff000000000000fff000000000fff000fff000000000000000000000ffffffffffffffffff000000000000ffffffffffffffffff000000fff000fff0000000000000004c1fff4bf4bbfff000fff0000000004bc000000000000fff000000000 else (if j < 21 then 0x53c000000000538000000534533000000000fff0000004b9fff4b74b64b54b44b34b14b04ae4af4b24ad00000000000050e50d000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffff else 0xfff52152051f51e51b51a51951851751651551351451251151050f50c50b50a509508507fffffffffffffffffffff4ff4fe4fd4fc4eefffffffffffffffffffff4f8fff4f6000ffffff4f400054b000000ffffff4f34f20000004ef4f0000))))) else (if j < 33 then (if j < 27 then (if j < 24 then (if j < 23 then 0xfff000000000fff000000000000000000000000000fff0000000005ab0000000005a75a6000000000000000ffffff599598597fff000000000000000000000000ffffffffffffffffffffffffffffff000587586000000000000fffffffff else 0xfff000fff000fff000000000000000000000000000000000000000000fff000fff000000000000000000000fff5dc5db5da5d95cafff000000000000000000fff000fff000000000000000000000000000000000000000000fffffffffffffff) else (if j < 25 then 0xffffffffffff000000000000000000000000000000000000000000000000000000000000000000000fff000000ffffffffffffffffffffffffffffffffffff000000000000000000000000000fff0000000000005ce000000000fff else (if j < 26 then 0x677676000000000000000000000fff000000000ffffff000000000fff00065f65dfff000000000000000000000000000000fff000000000000000000000000fffffffffffffffffffff000fff000000000000000000 else 0xfffffffff00000000000000068ffff68cfff000fff000000000000fffffffff68bffffff66a00000000068900000000000000000000000000000069700000000000067d67c67b67a000fff000000000000000000000000000000000fff000))) else (if j < 30 then (if j < 28 then 0x69d69c69b69a699688687686685684683fff68168067f67e669000000ffffffffffff000fff000fff000000000000000fff66f66dfff000000000000000000000000fffffffff else (if j < 29 then 0xfffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000ffffff000ffffff000fff000000fffffffffffffffffffff000ffffff000000000000000000000000000000000000000000000000 else 0xfff000000000000000000000fff000000000000000000000000ffffff000fffffffff000000ffffff000ffffffffffffffffffffffffffffff000000000000000000ffffff000000ffffff000ffffffffffffffffffffffffffffffffffff)) else (if j < 31 then 0xffffffffffff000000000fff000000fff000000000000000000000000000000fff000000000000000ffffff000ffffff000000642641640fff63f5bd63e000000000000000000000000000000000000000000000000000000000000fff else (if j < 32 then 0xffffff000000000fffffffffffffff0000000000000000000000000000000000000000000000000000000000000000000007cd7cc000000000000fff00078c78a000756755754000 else 0x759758757fff000000000000000000000000000000fff000000000ffffff000000fff000000000000000000fff000000000646645644fff5d55b75be643000fff000000000000000000000000000000000000000000000000000000000000000)))) else (if j < 38 then (if j < 35 then (if j < 34 then 0x5e861161060f60e60d5c0fff5b85b65bcfff5ba5b95b55b45b35b2fff5b05af000000000000000000000000000000000000000000000000000000000000ffffff00000000000000000000000084c0000007e17e07df7de7dd7dc7db7da78f7d9 else 0x62d62c62b62a629628627626625624623621620ffffffffffffffffffffffffffffff5d7fff5d35d25d15c95c85c75c6ffffff602ffffff5fffff5fb5fa5f95f8fff5fd5f35f25f15f05ef5eefff5ea5e95cd5ccfff5ec5e66136125d05f75f6) else (if j < 36 then 0x828827fff0000008fa000000fff000000fff8f3000000fffffffffffffffffffffffffff825824fff8228207a67a57a4ffffff7877a179d000654653652651650fffffffffffffffffffff648fff63963863763663563463363263163062f62e else (if j < 37 then 0xffffffffffffffffff836835834833fff83183082fffffff82c82b81581482690d90c90b908907906905904903fffffffffffffffffffffffffffffffff000fff91190a909fff000fff000000000000000000000000000000000000000000fff else 0xfff77e7b1fffffffff000000000000000000ffffff7b300096f000000ffffff7b2fff00000000096500000000095f00000000000095b000000000000ffffff95094f94e000000000000000000000000000000000fffffffffffffffffffff000))) else (if j < 41 then (if j < 39 then 0xfff768fff767fff764ffffffffffffffffffffffffffffffffffffffffff751750ffffff74dffffff72f9a3000000000000000fffffffffffffffffffff000000fffffffff000fff97a9799789779769757c17c07bfffffffffffff7ba7b97b8 else (if j < 40 then 0xfffffffff7e67e57e47e37e27947957937927917907867857847b07af7ae7897887ad7ac7ab7aafff7a87a77d87d77d67d578e78d7d47d37d27d17d0783782fff78077d77c77b77977a778fff776775774773772771770fff76ffff76cffffff else 0x85a859858ffffff855854fff83c83b83a83983883785385285185084f84e817fff81381181281080e80f80d80c80a80b8098088058078068047fc7fe8038028017fd8007ff7fb7fa7f97f67f77f87f57f47f37f27f1ffffff7ee7ed7ecffffff)) else (if j < 42 then 0xffffffffffffa6cfffa6bfffa68fffffffffffffffffffffffffffffffff000000ffffff000ffffffffffffffffffffffffffffffffffffffffff000ffffffffffffffffff00086a86b86986886586786686486386085f85e86186285d85c85b else (if j < 43 then 0xfff000fff000000fffaaaaa9000000000000000000000ffffffffffffa9b000000fff000000000000000000a95fff000fff000a8cfffa8bfffa88fff000000ffffff000fff000a83fff000fff000 else 0xffffff000aee000000ffffff000ac4ac2ac1ac0abfabeabcabbabdabaab9ab8ab7ab6ab5fff000000fff000000000000000000000000acd000000000fffffffffac3000000000000000000))))))
+    | _ => 0
+  (w >>> (12*(i%64))) &&& 4095
+
+end PEqualNP.Outside.L_meta_32836_aux.Cubes
+
 
 namespace PEqualNP.Outside.L_meta_32836_aux.Witness
 open PEqualNP.CircuitLowerBounds
@@ -3742,13 +3900,13 @@ set_option maxHeartbeats 0 in
 set_option maxRecDepth 100000 in
 def batchOK (m b : Nat) : Bool := (List.range 16).all (fun j=>
   let i := j+16*b
-  count328 m ≤ i || cachedRow m (verifiedBook m) i)
+  count328 m ≤ i || posRow leafTwin328 m (verifiedBook m) i)
 
 set_option maxHeartbeats 0 in
 set_option maxRecDepth 100000 in
 theorem fromBatches {m : Nat} (hm : m < 128) (pri : deps328 m) (hd : dom328 m &&& mask256 = dom328 m)
     (hr : rootOK m = true) (hb : ∀ b<(count328 m+15)/16,batchOK m b = true) : runWindow328 m := by
-  apply cachedWindow (verifiedBook m) hd hm pri _ hr
+  apply posWindow leafTwin328 (verifiedBook m) hd hm pri _ hr
   intro i hi
   change i < count328 m at hi
   have H := hb (i/16) (by omega)
