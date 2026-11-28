@@ -1,6 +1,8 @@
 import PEqualNP.Defs
 
 -- Search and soundness follow the merged L_meta_43882 by foudress and its predecessors.
+-- Four further restrictions identify two inputs. Their bounds and the restrictions with one more input fixed are checked below.
+-- Signed restrictions and the six-gate cutoff follow willakone’s L_meta_49521.
 -- The truth table, witness and restriction checks are for this desk assignment.
 namespace PEqualNP.Outside.L_meta_45020
 def bigNat_0 : Nat := 0x7ffbffdffefff5ffefffbffebffefffafffb6effdffdffdb6ffedffd5fff6dffdb5fff6bffed7ffdfff0000000000000000
@@ -2993,7 +2995,8 @@ def rawG : List ℕ := rawL six
 def FPM : ℕ := 2 ^ 64 - 1
 def FULL : ℕ := 2 ^ NN - 1
 def TG : ℕ := bigNat_9
-def kz (Z : ℕ) : ℕ := (List.range 8).foldr (fun i x => bif Nat.testBit Z i then Nat.lor x (Nat.land (Nat.lor (rawP.getD i 0) (Nat.shiftRight (rawP.getD i 0) NN)) FULL) else x) 0
+def cutMasks : List ℕ := [0x9982cc0e607341260a9bffe028efff80c392e0cc05005030028c0515fff01ffc34048080a0d7ffdfffaaaaaaaaaaaaaaaa, 0x1648524312fff06523148632bffe2928fff86232422822980ffe1ffc42140c22985fff60448d08a1fffcccccccccccccccc, 0x2231919ffe4860a8cfff924c143448d2fffb04518489ffc062441ffd044460489b04846bffe17ffc488f0f0f0f0f0f0f0f0, 0x44a3ffd6289141ffea6224883ffefffaa4c200a51ffc93006ffec93008986dffc009186bffec24c0930ff00ff00ff00ff00, 0x7ffb061830e181ffefffbffeb1c0c300c70040c61ffdffdb08e011c010e06dffdb5fff02380047011c0ffff0000ffff0000, 0x7ffbffdffefff5f00f803f003e00fc00f80008f81ffdffdb6ffedffd5fff01e0001e0003c0007801e00ffffffff00000000, 0xfffffffffffffffffffff619ffffe947fffff1fffffffffeffffbfffffd5fffafebffff7fffbfeb7fad5555555555555555, 0xffffffffffc36ffffffffffff295ffffcc579ffffffffff7feebfdd7bffffbfff7fde99ffff6ffffdd33333333333333333, 0xfffffff273fffffffaa4ffffffffffffad0cffffffffb77fdffffb76ffffdfffe5ffffdf6f3eedcffff0f0f0f0f0f0f0f0f, 0xfffd1afffffffeb17fffffffd6474d1dfffffffff6cfffffbb673fffffffb36cffffffb6d8f3fffffff00ff00ff00ff00ff, 0x873ffffffffffe70f383c70f7fffffffffffffffee3ee3ecffffffffffff96e3ecae1ffffffffffffff0000ffff0000ffff, 0x80fc07e03f01fbffffffffffffffffffffffffffe1fe1fe590ff61fea0fffffffffffffffffffffffff00000000ffffffff, 0x7ffbffce1870c0c18fffbffebffefffa63c2406318f1ffdb6ffed8f01878258f1b5fff6bffec63c18f000ffff0000ffff00, 0x3479c3dffefff0cdefff947ebffe61fa615b6663c6a1ffd86ffe06a146506c6a135fff4bffec7ffdfff3c3c3c3c3c3c3c3c, 0x7ffb2ad8d6e6b5ffefffb116b34efff8cb396ecadffdffda08c8d1915fff6d191a1fff0a320d7ffdfff5555aaaa5555aaaa, 0x4d3bffd6ce9675ffeacbbffe3ffea45aa8fb2ea9dffc96036ffe89615fff6c9603495063ffe97ffdfff55aa55aa55aa55aa]
+def kz (Z : ℕ) : ℕ := (List.range 16).foldr (fun i x => bif Nat.testBit Z i then Nat.lor x (cutMasks.getD i 0) else x) 0
 def lz (Z : ℕ) : ℕ := Nat.land AA (Nat.xor (kz Z) FULL)
 def fz (Z : ℕ) : ℕ := Nat.land FPM (Nat.xor (kz Z) FULL)
 def mz (Z : ℕ) : ℕ := Nat.lor (Nat.lor (lz Z) (fz Z)) (Nat.shiftLeft (lz Z) NN)
@@ -3694,24 +3697,24 @@ lemma imp_okE {E Q : List (ℕ × ℕ)} {e : ℕ × ℕ} (hE : E = [] ∨ ∃ e'
     ⟨[(FF, 1)], ffull, fun p hp => ?_⟩)
   simp only [List.mem_singleton] at hp; subst hp; exact h t ht
 def acc0 : List (ℕ × ℕ) := []
-def c0 : List (ℕ × ℕ) := [(3, 5), (5, 5), (6, 5), (9, 5), (10, 5), (12, 4), (17, 5), (18, 4), (20, 5), (24, 6), (33, 3), (34, 5), (36, 5), (40, 4), (48, 4)]
+def c0 : List (ℕ × ℕ) := [(3, 5), (5, 5), (9, 5), (17, 5), (33, 3), (129, 5), (257, 5), (513, 5), (1025, 5), (2049, 7), (6, 5), (10, 5), (18, 4), (34, 5), (66, 3), (258, 3), (514, 5), (1026, 7), (2050, 5), (12, 4), (20, 5), (36, 5), (68, 3), (132, 3), (516, 7), (1028, 5), (2052, 5), (24, 6), (40, 4), (72, 2), (136, 3), (264, 5), (1032, 5), (2056, 5), (48, 4), (80, 2), (144, 5), (272, 3), (528, 5), (2064, 5), (96, 3), (160, 3), (288, 3), (544, 5), (1056, 5), (576, 3), (1088, 3), (384, 3), (640, 3), (2176, 3), (1280, 3), (2304, 3), (1536, 3), (2560, 3), (3072, 3), (4097, 6), (4098, 5), (4100, 5), (4104, 6), (4608, 3), (4128, 5), (6144, 3), (8193, 6), (8194, 5), (8320, 3), (8200, 5), (8208, 5), (8224, 6), (10240, 3), (16385, 5), (16448, 3), (16386, 5), (16388, 6), (16392, 6), (16896, 3), (16416, 5), (32769, 5), (32832, 3), (32770, 6), (32772, 5), (32784, 6), (33792, 3), (32800, 5)]
 def acc1 : List (ℕ × ℕ) := c0 ++ acc0
-def c1 : List (ℕ × ℕ) := []
+def c1 : List (ℕ × ℕ) := [(4096, 9), (8192, 9), (16384, 9), (32768, 9)]
 def acc2 : List (ℕ × ℕ) := c1 ++ acc1
-def c2 : List (ℕ × ℕ) := [(32, 8)]
+def c2 : List (ℕ × ℕ) := [(32, 8), (2048, 8)]
 def acc3 : List (ℕ × ℕ) := c2 ++ acc2
-def c3 : List (ℕ × ℕ) := [(16, 9)]
+def c3 : List (ℕ × ℕ) := [(16, 9), (1024, 8)]
 def acc4 : List (ℕ × ℕ) := c3 ++ acc3
-def c4 : List (ℕ × ℕ) := [(8, 9)]
+def c4 : List (ℕ × ℕ) := [(8, 9), (512, 8)]
 def acc5 : List (ℕ × ℕ) := c4 ++ acc4
-def c5 : List (ℕ × ℕ) := [(4, 9)]
+def c5 : List (ℕ × ℕ) := [(4, 9), (256, 6)]
 def acc6 : List (ℕ × ℕ) := c5 ++ acc5
-def c6 : List (ℕ × ℕ) := [(2, 9)]
+def c6 : List (ℕ × ℕ) := [(2, 9), (128, 6)]
 def acc7 : List (ℕ × ℕ) := c6 ++ acc6
-def c7 : List (ℕ × ℕ) := [(1, 8)]
+def c7 : List (ℕ × ℕ) := [(1, 8), (64, 4)]
 def acc8 : List (ℕ × ℕ) := c7 ++ acc7
 def pr (T : List (ℕ × ℕ)) (Z : ℕ) : List (ℕ × ℕ) := T.filter (fun e => Nat.beq (Nat.land Z e.1) Z && !Nat.beq Z e.1)
-def rt : List (ℕ × ℕ) := acc8
+def rt : List (ℕ × ℕ) := acc8.filter (fun e => decide (6 ≤ e.2))
 lemma okAll {T U : List (ℕ × ℕ)} (h : U.all (fun e => okE [] (pr T e.1) e) = true)
     (hT : ∀ e ∈ T, Imp [] e.1 e.2) : ∀ e ∈ U, Imp [] e.1 e.2 := fun e he => imp_okE
   (Or.inl rfl) (List.all_eq_true.1 h e he) (fun e' h' => hT e' (List.mem_of_mem_filter h'))
@@ -3763,7 +3766,7 @@ set_option maxHeartbeats 0 in
 theorem k7 : c7.all (fun e => okE [] (pr acc7 e.1) e) = true := by decide +kernel
 lemma j7 : ∀ e ∈ c7, Imp [] e.1 e.2 := okAll k7 a7
 lemma a8 : ∀ e ∈ acc8, Imp [] e.1 e.2 := apI j7 a7
-lemma ir : ∀ e ∈ rt, Imp [] e.1 e.2 := a8
+lemma ir : ∀ e ∈ rt, Imp [] e.1 e.2 := fun e he => a8 e (List.mem_of_mem_filter he)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem root_p : pOk 0 rt = true := by decide +kernel
