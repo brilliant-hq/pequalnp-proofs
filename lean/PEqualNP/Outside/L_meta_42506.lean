@@ -1,5 +1,13 @@
 import PEqualNP.Defs
 
+-- The generic text of this file (the kernel-run search and its soundness proof, the circuit bridge) is copied
+-- from the merged PEqualNP.Outside.L_meta_30723 (xyzzyy, pull request 43863, Apache License 2.0); the only change is that
+-- it runs on six inputs instead of eight (the list rawP has six rows, and `Fin 8` became `Fin 6` in the bridge).
+-- Sibling files credit the search to PEqualNP.Outside.L_meta_1673 by Trey Kind (pull request 6929) and the
+-- NOT-aware root to L-meta-15028 (edmoreno). The sample positions, the bound tables, the root checks, the
+-- monotone witness and the six-input wrapper of this table were computed for this unit by our own generator.
+
+-- Six-input projection bridge adapted from Zigler, PR #49280.
 namespace PEqualNP.Outside.L_meta_42506
 def bigNat_0 : Nat := 0xfffdfffbfff5fffb6efff7775dffefff7ffd7ffd5ffbfeed6ad5ffeffedffdffdfff7ffb6dbffdbffbff6fff0000000000000000
 def bigNat_1 : Nat := 0x40112952a0010012002002000800492400240040090000000000000000000
@@ -3727,110 +3735,69 @@ set_option maxHeartbeats 0 in
 theorem root_p : pOk 0 rt = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem base_0 : chk [] rt 0 11 0 FF 1 = false := by decide +kernel
+theorem root_0 : chk [] rt 0 10 0 FF 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem base_1 : chk [] rt 0 11 1 FF 1 = false := by decide +kernel
+theorem root_1 : chk [] rt 0 10 1 FF 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem base_2 : chk [] rt 0 11 2 FF 1 = false := by decide +kernel
+theorem root_2 : chk [] rt 0 10 2 FF 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem base_3 : chk [] rt 0 11 3 FF 1 = false := by decide +kernel
+theorem root_3 : chk [] rt 0 10 3 FF 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem base_4 : chk [] rt 0 11 4 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem base_5 : chk [] rt 0 11 5 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem base_6 : chk [] rt 0 11 6 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem base_7 : chk [] rt 0 11 7 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem base_8 : chk [] rt 0 11 8 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem base_9 : chk [] rt 0 11 9 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem base_10 : chk [] rt 0 11 10 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem base_11 : chk [] rt 0 11 11 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pos_1 : chk [] rt 0 12 1 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pos_2 : chk [] rt 0 12 2 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pos_3 : chk [] rt 0 12 3 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pos_4 : chk [] rt 0 12 4 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pos_5 : chk [] rt 0 12 5 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pos_6 : chk [] rt 0 12 6 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pos_7 : chk [] rt 0 12 7 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pos_8 : chk [] rt 0 12 8 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pos_9 : chk [] rt 0 12 9 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pos_10 : chk [] rt 0 12 10 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pos_11 : chk [] rt 0 12 11 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pos_12 : chk [] rt 0 12 12 FF 1 = false := by decide +kernel
-lemma iroot : Imp [] 0 12 := imp_ts (Or.inl rfl) root_p (by norm_num) ir (fun t ht => by
+theorem root_hi : okT [] rt 0 11 [4, 5, 6, 7, 8, 9, 10] = true := by decide +kernel
+lemma iroot : Imp [] 0 11 := imp_ts (Or.inl rfl) root_p (by norm_num) ir (fun t ht => by
+  have h := root_hi
+  simp only [okT, List.all_cons, List.all_nil, Bool.and_true, Bool.and_eq_true, Bool.not_eq_true'] at h
+  obtain ⟨h4, h5, h6, h7, h8, h9, h10⟩ := h
   interval_cases t
-  · exact one base_0
-  · exact one base_1
-  · exact one base_2
-  · exact one base_3
-  · exact one base_4
-  · exact one base_5
-  · exact one base_6
-  · exact one base_7
-  · exact one base_8
-  · exact one base_9
-  · exact one base_10
-  · exact one base_11)
+  · exact one root_0
+  · exact one root_1
+  · exact one root_2
+  · exact one root_3
+  · exact one h4
+  · exact one h5
+  · exact one h6
+  · exact one h7
+  · exact one h8
+  · exact one h9
+  · exact one h10)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_1 : chk [] rt 0 11 1 FF 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_2 : chk [] rt 0 11 2 FF 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_3 : chk [] rt 0 11 3 FF 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_hi : okT [] rt 0 12 [4, 5, 6, 7, 8, 9, 10, 11] = true := by decide +kernel
 lemma iroot_pos {t : ℕ} {S : Finset ℕ} (ht1 : 1 ≤ t) (hS : (S : Set ℕ) ⊆ C (mz 0) (WZ [] 0))
-    (hl : Live Z0 (mz 0) (tz 0) 12 t S) : False := by
-  have hmin : ∀ q < 12, ¬ Sol Z0 (mz 0) (tz 0) q (C (mz 0) (WZ [] 0)) := fun q hq => iroot q hq
-  have hm0 : Min Z0 (mz 0) (tz 0) 12 t S := ⟨hl, fun q hq hs => hmin q hq (hs.mono le_rfl (by rintro x (hx | hx); exact hS hx; exact Or.inr hx))⟩
-  have htk : t < 13 := by have := hm0.size.2; omega
-  have hM : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 12 t p.1 p.2 = false := by
+    (hl : Live Z0 (mz 0) (tz 0) 11 t S) : False := by
+  have hmin : ∀ q < 11, ¬ Sol Z0 (mz 0) (tz 0) q (C (mz 0) (WZ [] 0)) := fun q hq => iroot q hq
+  have hm0 : Min Z0 (mz 0) (tz 0) 11 t S := ⟨hl, fun q hq hs => hmin q hq (hs.mono le_rfl (by rintro x (hx | hx); exact hS hx; exact Or.inr hx))⟩
+  have htk : t < 12 := by have := hm0.size.2; omega
+  have hM : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 11 t p.1 p.2 = false := by
+    have h := proot_hi
+    simp only [okT, List.all_cons, List.all_nil, Bool.and_true, Bool.and_eq_true, Bool.not_eq_true'] at h
+    obtain ⟨h4, h5, h6, h7, h8, h9, h10, h11⟩ := h
     interval_cases t
-    · exact one pos_1
-    · exact one pos_2
-    · exact one pos_3
-    · exact one pos_4
-    · exact one pos_5
-    · exact one pos_6
-    · exact one pos_7
-    · exact one pos_8
-    · exact one pos_9
-    · exact one pos_10
-    · exact one pos_11
-    · exact one pos_12
-  exact imp_of_live (L := 13) (Or.inl rfl) root_p (by norm_num) ir (by omega) hS hl hmin (Or.inr hM)
+    · exact one proot_1
+    · exact one proot_2
+    · exact one proot_3
+    · exact one h4
+    · exact one h5
+    · exact one h6
+    · exact one h7
+    · exact one h8
+    · exact one h9
+    · exact one h10
+    · exact one h11
+  exact imp_of_live (L := 12) (Or.inl rfl) root_p (by norm_num) ir (by omega) hS hl hmin (Or.inr hM)
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
 section circuit
 variable (m : ℕ)
@@ -3950,8 +3917,8 @@ lemma ex_bit {b : ℕ} (hb : m.testBit b = true) (gs : List Gate) : ∀ (w : Lis
     rw [List.map_append] at this
     exact this
 end circuit
-def f (x : Fin 6 → Bool) : Bool := (((((x 0 || x 1) && x 5) || ((x 0 || x 4) && (x 1 || x 2))) && x 3) || (((((x 1 || x 2) && x 5) || x 4) && x 0) || (x 1 && x 2)))
-def EF : ℕ := (((((rawP.getD 0 0 ||| rawP.getD 1 0) &&& rawP.getD 5 0) ||| ((rawP.getD 0 0 ||| rawP.getD 4 0) &&& (rawP.getD 1 0 ||| rawP.getD 2 0))) &&& rawP.getD 3 0) ||| (((((rawP.getD 1 0 ||| rawP.getD 2 0) &&& rawP.getD 5 0) ||| rawP.getD 4 0) &&& rawP.getD 0 0) ||| (rawP.getD 1 0 &&& rawP.getD 2 0)))
+def f (x : Fin 6 → Bool) : Bool := ((((((x 4 || x 5) || x 3) && x 0) || (x 2 && x 3)) && (x 1 || x 4)) || (((((x 4 || x 5) || x 3) && x 0) || x 1) && (((x 4 || x 5) && x 3) || x 2)))
+def EF : ℕ := ((((((rawP.getD 4 0 ||| rawP.getD 5 0) ||| rawP.getD 3 0) &&& rawP.getD 0 0) ||| (rawP.getD 2 0 &&& rawP.getD 3 0)) &&& (rawP.getD 1 0 ||| rawP.getD 4 0)) ||| (((((rawP.getD 4 0 ||| rawP.getD 5 0) ||| rawP.getD 3 0) &&& rawP.getD 0 0) ||| rawP.getD 1 0) &&& (((rawP.getD 4 0 ||| rawP.getD 5 0) &&& rawP.getD 3 0) ||| rawP.getD 2 0)))
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma EF_ok : EF &&& mz 0 = tz 0 := by decide +kernel
@@ -4112,7 +4079,7 @@ theorem f_target : ∀ x : Fin 6 → Bool, f x = target x := by
   decide +kernel
 
 def witness : Circuit :=
-  ⟨[⟨.or, [0, 1]⟩, ⟨.and, [6, 5]⟩, ⟨.or, [0, 4]⟩, ⟨.or, [1, 2]⟩, ⟨.and, [8, 9]⟩, ⟨.or, [7, 10]⟩, ⟨.and, [11, 3]⟩, ⟨.and, [9, 5]⟩, ⟨.or, [13, 4]⟩, ⟨.and, [14, 0]⟩, ⟨.and, [1, 2]⟩, ⟨.or, [15, 16]⟩, ⟨.or, [12, 17]⟩], 18⟩
+  ⟨[⟨.or, [4, 5]⟩, ⟨.or, [6, 3]⟩, ⟨.and, [7, 0]⟩, ⟨.and, [2, 3]⟩, ⟨.or, [8, 9]⟩, ⟨.or, [1, 4]⟩, ⟨.and, [10, 11]⟩, ⟨.or, [8, 1]⟩, ⟨.and, [6, 3]⟩, ⟨.or, [14, 2]⟩, ⟨.and, [13, 15]⟩, ⟨.or, [12, 16]⟩], 17⟩
 
 theorem witness_mono : Monotone2 witness := by
   simp [Monotone2, witness]
@@ -4126,14 +4093,14 @@ theorem solve (s : ℕ) (h : HasCircuitSize 6 target s) :
     ∃ D : Circuit, Monotone2 D ∧ D.size ≤ s ∧ ∀ x : Fin 6 → Bool, D.eval (List.ofFn x) = target x := by
   obtain ⟨⟨gates, o⟩, fits, size, computes⟩ := h
   have hsz : Circuit.size ⟨gates, o⟩ = gates.length := rfl
-  have hws : witness.size = 13 := rfl
+  have hws : witness.size = 12 := rfl
   have hf : ∀ y : Fin 6 → Bool, Circuit.eval ⟨gates, o⟩ (List.ofFn y) = f y := fun y => (computes y).trans (f_target y).symm
   by_cases hnot : ∃ g ∈ gates, g.op = GateOp.not
-  · have hge : 13 ≤ gates.length := by
+  · have hge : 12 ≤ gates.length := by
       by_contra hlt
-      by_cases hlt2 : gates.length < 12
+      by_cases hlt2 : gates.length < 11
       · exact iroot gates.length hlt2 (bridge ⟨gates, o⟩ fits hf)
-      · have heq : gates.length = 12 := by omega
+      · have heq : gates.length = 11 := by omega
         rcases bridge_not gates o fits hnot hf with hsol | ⟨t, ht1, S0, hS0, hl0⟩
         · exact iroot (gates.length - 1) (by omega) hsol
         · rw [heq] at hl0; exact iroot_pos ht1 hS0 hl0
