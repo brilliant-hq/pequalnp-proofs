@@ -39,7 +39,6 @@ lemma Sol.rel {R' : ℕ → ℕ} {m T q : ℕ} {S : Set ℕ} (h : Sol R m T q S)
   | done h => exact .done h
   | un h _ ih => exact .un h ih
   | bi h1 h2 ha _ ih => exact .bi h1 h2 (hR _ _ _ ha) ih
-lemma Sol.to0 {m T q : ℕ} {S : Set ℕ} (h : Sol R m T q S) : Sol Z0 m T q S := h.rel fun d a b _ => al0 d a b
 inductive Live (R : ℕ → ℕ) (m T : ℕ) : ℕ → ℕ → Finset ℕ → Prop
   | stop : Live R m T 0 0 {T}
   | un {k t : ℕ} {a : ℕ} {U : Finset ℕ} : Live R m T k t (insert (a ^^^ m) U) →
@@ -1153,7 +1152,6 @@ def mvRawC (NN AA HX HY : Nat) (restrict : Bool) (F : Nat → Nat → Nat → Li
 def lookRawCore (NN AA HX HY : Nat) (restrict : Bool) (l m g : Nat) (enabled : Bool) (fuel : Nat) : Nat → Nat → Nat → List W → Bool :=
   Nat.rec (motive := fun _ => Nat → Nat → Nat → List W → Bool) (fun _ _ _ _ => true)
     (fun _ ih k t z v => Bool.rec (motive := fun _ => Bool) (guardedCoverage NN enabled (pos t) l v (tstC NN AA HX HY (pos t) l (Nat.sub (Nat.succ k) t) v (fun y => mvRawC NN AA HX HY restrict ih l m g k t z v y))) true (Nat.ble v.length 1)) fuel
--- Check coverage at each step of the fourteen-gate search.
 abbrev lookRawC (NN AA HX HY : Nat) (restrict : Bool) (l m g fuel : Nat) : Nat → Nat → Nat → List W → Bool :=
   lookRawCore NN AA HX HY restrict l m g (Nat.beq fuel 14) fuel
 def look1RawC (NN AA HX HY : Nat) (restrict : Bool) (l m g K : Nat) (fuel : Nat) : Nat → Nat → Nat → List W → Bool :=
@@ -3563,7 +3561,6 @@ def startRawvC (NN AA HX HY l m g B K t p H ph : ℕ) (v : List W) : Bool :=
   Bool.rec (motive := fun _ => Bool) false (Bool.rec (motive := fun _ => Bool) false
     (child (fun z r => topRawCC NN AA HX HY l m g K H ph K t z r) g (fun h => h v) (Nat.sub B (sumc v)))
     (Nat.ble v.length (Nat.sub (Nat.succ K) t))) (hasP p v)
-abbrev startRawv := startRawvC I.NN I.AA I.HX I.HY
 
 end
 lemma frc_eq (v : List W) : ∀ h, frc v h = h v := by
@@ -6176,16 +6173,12 @@ lemma sampleWire_ok (i : Fin 8) : sampleWire i.val ∈ WZ [] 0 := by
   exact List.getElem_mem _
 
 
-lemma sampleWire_covers {s : ℕ} (member : s ∈ WZ [] 0) :
-    ∃ i : Fin 8, s = sampleWire i.val := by
-  obtain ⟨w, hw, rfl⟩ := member
+lemma sampleWire_covers {s : ℕ} (hs : s ∈ WZ [] 0) : ∃ i : Fin 8, s = sampleWire i.val := by
+  obtain ⟨w, hw, rfl⟩ := hs
   change w ∈ rawP0 ++ [] at hw
   rw [List.append_nil] at hw
-  obtain ⟨i, hi, eq⟩ := List.mem_iff_getElem.mp hw
-  refine ⟨⟨i, by simpa only [rawP_len0] using hi⟩, ?_⟩
-  unfold sampleWire
-  rw [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem hi]
-  simp [eq]
+  obtain ⟨i, rfl⟩ := rawP_mem_getD hw
+  exact ⟨i, rfl⟩
 
 def binaryRepresentatives : List (ℕ × ℕ) :=
   [(0,1),(0,2),(0,3),(0,5),(0,6),(0,7),(1,2),(1,4),(1,6),(1,7),(2,3),(2,6),(2,7),(6,7)]
@@ -6215,7 +6208,7 @@ lemma fullLower (lower : Imp [] 0 14) {k : ℕ} (hk : k < 14)
     (hl : Sol Z0 fullMask fullTarget k (C fullMask fullStock)) : False :=
   lower k hk ((hl.mapSignals (pull 0) (pull_target 0) (pull_neg 0) (pull_op 0)).mono le_rfl (pull_initial 0))
 
--- For each sampled assignment, store an active position carrying the same assignment.
+-- Store one active position per sampled assignment.
 def rootSamplePositions : ℕ := 0x1b30000000000000000000000000a000000000000000006c40001ae0000000000000000000000002000000000000280000000358018000000000000500000fc0001a700000680321a50d1809c33a3410038000000000000000000019b000000000000000000000001990000000000000000065c0001950000000000000000064c0000170000000000182000000000003e00000002fc03d00000002f403c00005a400016700000880000040aa000c2a003b09f807407442100000e401600000e000000011e01c000000011c000046422c3400048000000037000044c020036000043804c10c0848cfc20c3fb00a800000000e00000002040ff00000001f80f907b03cc67c3e800000d402c0ef07683a81d00d906b034c0360c119e8f2078a3bd00f80d006603200f00c402233c01800bc05c0b4000004c15c3a300080b40000a80078cec058398015827c0180140458e000f8376012004801a33a01280180e0365004000867235f01500846b83500118ce00a43470278d1005233719b0d7868c3831a18d3466a334
 
 set_option maxRecDepth 100000 in
@@ -7101,7 +7094,7 @@ noncomputable def transitionFromCode (width : ℕ) (parentAt : ℕ → SearchSta
   let kept := 2 ^ before.2.length - 1 - dropLeft - dropRight
   secondTransition before left right kept (entry.testBit (width + 10))
 
--- Each block stores a common parent index and packs shorter relative parent indices.
+-- Each block packs parent indices relative to a shared base.
 def relativeTransitionCode (parentWidth block index : ℕ) : ℕ :=
   let base := block % (1 <<< parentWidth)
   let width := (block >>> parentWidth) % 16
@@ -7474,7 +7467,7 @@ def decodeDeltas (fuel : ℕ) : ℕ → ℕ → List ℕ :=
         let following := before + lead
         (following - 1) :: rest following (data >>> 8)) fuel
 
--- The most common deltas fit in one nibble. Three tags encode larger deltas and runs.
+-- Small gaps use one nibble. Tags encode large gaps and runs.
 def decodeThirdDeltas (fuel : ℕ) : ℕ → ℕ → List ℕ :=
   Nat.rec (motive := fun _ => ℕ → ℕ → List ℕ) (fun _ _ => [])
     (fun _ rest before packed =>
@@ -9128,22 +9121,34 @@ set_option maxHeartbeats 0 in
 theorem rawNegOpening7_complete :
     rawNegPure 13 (rawNegStart 2) (frontierMissing rawNegOpening7) = false := by decide +kernel
 
-set_option maxHeartbeats 0 in
 lemma rawNegFirst_checked (i : ℕ) (hi : i < 112)
     (coverage : rangeCheck rawNegCover 0 112 = true)
     (mixed : rangeCheck rawNegMixedTest 0 112 = true)
     (second : rangeCheck rawNegSecondTest 0 1229 = true) :
     rawNegAfterOpen (rawNegFirst i).1 (rawNegFirst i).2 = false := by
-  have h := rangeCheck_at coverage hi
-  simp only [rawNegCover, Bool.and_eq_true, decide_eq_true_eq] at h
-  obtain ⟨complete, valid, htwo, hsmall⟩ := h
-  refine rawNegAfterOpen_false (rawNegFirst i) htwo hsmall (boolOfNeg (rangeCheck_at mixed hi)) ?_
-  refine rawNegPure_from_frontier 12 (rawNegFirst i) ((rawNegSuccessors i).map rawNegSecond)
-    rawNegAfterTwo (boolOfNeg complete) ?_
-  intro state member
-  obtain ⟨j, hj, rfl⟩ := List.mem_map.mp member
-  have bound : j < 1229 := of_decide_eq_true (List.all_eq_true.mp valid j hj)
-  exact boolOfNeg (rangeCheck_at second bound)
+  have finish (state : SearchState) (ids : List ℕ) (next : ℕ → SearchState)
+      (checked : (!rawNegPure 12 state (frontierMissing (ids.map next))) &&
+        ((ids.all fun j => decide (j < 1229)) &&
+         (decide (1 < state.2.length) && decide (state.2.length < 12))) = true)
+      (hm : rawNegMixed state = false)
+      (hn : ∀ j < 1229, rawNegAfterTwo (next j) = false) :
+      rawNegAfterOpen state.1 state.2 = false := by
+    simp only [Bool.and_eq_true, decide_eq_true_eq] at checked
+    obtain ⟨complete, valid, htwo, hsmall⟩ := checked
+    refine rawNegAfterOpen_false state htwo hsmall hm ?_
+    refine rawNegPure_from_frontier 12 state (ids.map next) rawNegAfterTwo (boolOfNeg complete) ?_
+    rintro _ member
+    obtain ⟨j, hj, rfl⟩ := List.mem_map.mp member
+    exact hn j (of_decide_eq_true (List.all_eq_true.mp valid j hj))
+  have hc := @rangeCheck_at rawNegCover 112 i coverage hi
+  simp only [rawNegCover] at hc
+  have hm := @rangeCheck_at rawNegMixedTest 112 i mixed hi
+  simp only [rawNegMixedTest] at hm
+  have tails (j : ℕ) (hj : j < 1229) : rawNegAfterTwo (rawNegSecond j) = false := by
+    have h := @rangeCheck_at rawNegSecondTest 1229 j second hj
+    simp only [rawNegSecondTest] at h
+    exact boolOfNeg h
+  exact finish (rawNegFirst i) (rawNegSuccessors i) rawNegSecond hc (boolOfNeg hm) tails
 
 lemma rawNeg_checked (i root start count : ℕ)
     (selected : ((subChoices I.NN false I.AA (rawNegWords i) 0).filter
