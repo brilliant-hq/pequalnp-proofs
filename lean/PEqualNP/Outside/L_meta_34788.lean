@@ -3241,74 +3241,83 @@ end PEqualNP.Outside.L_meta_34788.Contraction
 namespace PEqualNP.Outside.L_meta_34788.Cert
 open PEqualNP.Outside.L_meta_34788.Contraction
 
-def qS0 : WordMoveStep := ([(0xff00ff0000ff00ffff00ff0000ff00ffff00ff0000ff00ffff00ff0000ff00ff, 0), (0xff00ff0000000000ff00ff0000000000ff00ff0000000000ff00ff00, 24)], [(0xff00ff0000000000ff00ff0000000000ff00ff0000000000ff00ff00000000, 24)])
-def qS1 : WordMoveStep := ([(0xaa55aa55aa55aa55aa55aa55aa55aa55aa55aa55aa55aa55aa55aa55aa55aa55, 0), (0xaa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa, 7)], [(0x5500550055005500550055005500550055005500550055005500550055005500, 7)])
-def qS2 : WordMoveStep := ([(0xaaaaaaaa55555555aaaaaaaa55555555aaaaaaaa55555555aaaaaaaa55555555, 0), (0xaaaaaaaa00000000aaaaaaaa00000000aaaaaaaa00000000aaaaaaaa, 31)], [(0x5555555500000000555555550000000055555555000000005555555500000000, 31)])
-def qS3 : WordMoveStep := ([(0x9999999999999999999999999999999999999999999999999999999999999999, 0), (0x2222222222222222222222222222222222222222222222222222222222222222, 1)], [(0x4444444444444444444444444444444444444444444444444444444444444444, 1)])
-def qS4 : WordMoveStep := ([(0xff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ff, 0), (0xff000000ff000000ff000000ff000000ff000000ff000000ff000000ff00, 8)], [(0xff000000ff000000ff000000ff000000ff000000ff000000ff000000ff0000, 8)])
-def qS5 : WordMoveStep := ([(0xffffffff0000000000000000ffffffffffffffff0000000000000000ffffffff, 0), (0xffffffff000000000000000000000000ffffffff00000000, 32)], [(0xffffffff000000000000000000000000ffffffff0000000000000000, 32)])
-def qS6 : WordMoveStep := ([(0xffffffff00000000ffffffff0000000000000000ffffffff00000000ffffffff, 0), (0xffffffff00000000ffffffff00000000, 96)], [(0xffffffff00000000ffffffff00000000000000000000000000000000, 96)])
-def qS7 : WordMoveStep := ([(0xffffffffffffffff00000000000000000000000000000000ffffffffffffffff, 0), (0xffffffffffffffff0000000000000000, 64)], [(0xffffffffffffffff00000000000000000000000000000000, 64)])
-def qS8 : WordMoveStep := ([(0xffff00000000ffffffff00000000ffffffff00000000ffffffff00000000ffff, 0), (0xffff000000000000ffff000000000000ffff000000000000ffff0000, 16)], [(0xffff000000000000ffff000000000000ffff000000000000ffff00000000, 16)])
-def qS9 : WordMoveStep := ([(0xcc33cc33cc33cc33cc33cc33cc33cc33cc33cc33cc33cc33cc33cc33cc33cc33, 0), (0xcc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc, 6)], [(0x3300330033003300330033003300330033003300330033003300330033003300, 6)])
-def qS10 : WordMoveStep := ([(0xf00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00f, 0), (0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4)], [(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f00, 4)])
-def qS11 : WordMoveStep := ([(0xff00ff00ff00ff0000ff00ff00ff00ffff00ff00ff00ff0000ff00ff00ff00ff, 0), (0xff00ff00ff00ff000000000000000000ff00ff00ff00ff00, 56)], [(0xff00ff00ff00ff000000000000000000ff00ff00ff00ff0000000000000000, 56)])
-def qS12 : WordMoveStep := ([(0xffff0000ffff00000000ffff0000ffffffff0000ffff00000000ffff0000ffff, 0), (0xffff0000ffff00000000000000000000ffff0000ffff0000, 48)], [(0xffff0000ffff00000000000000000000ffff0000ffff0000000000000000, 48)])
-def qS13 : WordMoveStep := ([(0xa5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5, 0), (0xa0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a, 3)], [(0x5050505050505050505050505050505050505050505050505050505050505050, 3)])
-def qS14 : WordMoveStep := ([(0xc3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3, 0), (0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c, 2)], [(0x3030303030303030303030303030303030303030303030303030303030303030, 2)])
-def qS15 : WordMoveStep := ([], [(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 4)])
-def qS16 : WordMoveStep := ([], [(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 16)])
-def qS17 : WordMoveStep := ([], [(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 64)])
-def qS18 : WordMoveStep := ([], [(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 1)])
-def qS19 : WordMoveStep := ([], [(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 8)])
+def qS0 : WordMoveStep := ([(0x9999999999999999999999999999999999999999999999999999999999999999, 0), (0x2222222222222222222222222222222222222222222222222222222222222222, 1)], [(0x4444444444444444444444444444444444444444444444444444444444444444, 1)])
+def qS1 : WordMoveStep := ([(0xff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ff, 0), (0xff000000ff000000ff000000ff000000ff000000ff000000ff000000ff00, 8)], [(0xff000000ff000000ff000000ff000000ff000000ff000000ff000000ff0000, 8)])
+def qS2 : WordMoveStep := ([(0x3333333333333333333333333333333333333333333333333333333333333333, 0)], [(0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc, 2)])
+def qS3 : WordMoveStep := ([(0xffffffffffffffff0000000000000000ffffffffffffffff, 0)], [(0xffffffffffffffff0000000000000000ffffffffffffffff0000000000000000, 64)])
+def qS4 : WordMoveStep := ([(0x5555555555555555555555555555555555555555555555555555555555555555, 1)], [(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, 1)])
+def qS5 : WordMoveStep := ([(0xcc33cc33cc33cc33cc33cc33cc33cc33cc33cc33cc33cc33cc33cc33cc33cc33, 0), (0xcc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc00cc, 6)], [(0x3300330033003300330033003300330033003300330033003300330033003300, 6)])
+def qS6 : WordMoveStep := ([(0xf00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00f, 0), (0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f0, 4)], [(0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f00, 4)])
+def qS7 : WordMoveStep := ([(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, 0), (0x5555555555555555555555555555555555555555555555555555555555555555, 16)], [])
+def qS8 : WordMoveStep := ([(0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc, 0), (0x3333333333333333333333333333333333333333333333333333333333333333, 8)], [])
+def qS9 : WordMoveStep := ([(0xffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff, 0)], [(0xffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000, 16)])
+def qS10 : WordMoveStep := ([(0xffffffff00000000ffffffff00000000ffffffff00000000ffffffff, 0)], [(0xffffffff00000000ffffffff00000000ffffffff00000000ffffffff00000000, 32)])
+def qS11 : WordMoveStep := ([(0xaa55aa55aa55aa55aa55aa55aa55aa55aa55aa55aa55aa55aa55aa55aa55aa55, 0), (0xaa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa00aa, 7)], [(0x5500550055005500550055005500550055005500550055005500550055005500, 7)])
+def qS12 : WordMoveStep := ([(0xcccc3333cccc3333cccc3333cccc3333cccc3333cccc3333cccc3333cccc3333, 0), (0xcccc0000cccc0000cccc0000cccc0000cccc0000cccc0000cccc0000cccc, 14)], [(0x3333000033330000333300003333000033330000333300003333000033330000, 14)])
+def qS13 : WordMoveStep := ([(0xffffffffffffffffffffffffffffffff, 0)], [(0xffffffffffffffffffffffffffffffff00000000000000000000000000000000, 128)])
+def qS14 : WordMoveStep := ([(0xcccccccccccccccc3333333333333333cccccccccccccccc3333333333333333, 0), (0xcccccccccccccccc0000000000000000cccccccccccccccc, 62)], [(0x3333333333333333000000000000000033333333333333330000000000000000, 62)])
+def qS15 : WordMoveStep := ([(0xf0f0f0f0f0f0f0f00f0f0f0f0f0f0f0ff0f0f0f0f0f0f0f00f0f0f0f0f0f0f0f, 0), (0xf0f0f0f0f0f0f0f00000000000000000f0f0f0f0f0f0f0f0, 60)], [(0xf0f0f0f0f0f0f0f00000000000000000f0f0f0f0f0f0f0f0000000000000000, 60)])
+def qS16 : WordMoveStep := ([(0xff00ff00ff00ff0000ff00ff00ff00ffff00ff00ff00ff0000ff00ff00ff00ff, 0), (0xff00ff00ff00ff000000000000000000ff00ff00ff00ff00, 56)], [(0xff00ff00ff00ff000000000000000000ff00ff00ff00ff0000000000000000, 56)])
+def qS17 : WordMoveStep := ([(0xffff0000ffff00000000ffff0000ffffffff0000ffff00000000ffff0000ffff, 0), (0xffff0000ffff00000000000000000000ffff0000ffff0000, 48)], [(0xffff0000ffff00000000000000000000ffff0000ffff0000000000000000, 48)])
+def qS18 : WordMoveStep := ([(0xffffffff0000000000000000ffffffffffffffff0000000000000000ffffffff, 0), (0xffffffff000000000000000000000000ffffffff00000000, 32)], [(0xffffffff000000000000000000000000ffffffff0000000000000000, 32)])
+def qS19 : WordMoveStep := ([(0xffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff, 16)], [(0xffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000, 16)])
 def qS20 : WordMoveStep := ([(0xaaaa5555aaaa5555aaaa5555aaaa5555aaaa5555aaaa5555aaaa5555aaaa5555, 0), (0xaaaa0000aaaa0000aaaa0000aaaa0000aaaa0000aaaa0000aaaa0000aaaa, 15)], [(0x5555000055550000555500005555000055550000555500005555000055550000, 15)])
-def qS21 : WordMoveStep := ([(0xcccccccc33333333cccccccc33333333cccccccc33333333cccccccc33333333, 0), (0xcccccccc00000000cccccccc00000000cccccccc00000000cccccccc, 30)], [(0x3333333300000000333333330000000033333333000000003333333300000000, 30)])
-def qS22 : WordMoveStep := ([(0xff00ff00ff00ff00ff00ff00ff00ff0000ff00ff00ff00ff00ff00ff00ff00ff, 0), (0xff00ff00ff00ff00ff00ff00ff00ff00, 120)], [(0xff00ff00ff00ff00ff00ff00ff00ff00000000000000000000000000000000, 120)])
-def qS23 : WordMoveStep := ([(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa55555555555555555555555555555555, 0), (0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, 127)], [(0x5555555555555555555555555555555500000000000000000000000000000000, 127)])
-def qS24 : WordMoveStep := ([(0xcccccccccccccccc3333333333333333cccccccccccccccc3333333333333333, 0), (0xcccccccccccccccc0000000000000000cccccccccccccccc, 62)], [(0x3333333333333333000000000000000033333333333333330000000000000000, 62)])
-def qS25 : WordMoveStep := ([(0xf0f0f0f0f0f0f0f00f0f0f0f0f0f0f0ff0f0f0f0f0f0f0f00f0f0f0f0f0f0f0f, 0), (0xf0f0f0f0f0f0f0f00000000000000000f0f0f0f0f0f0f0f0, 60)], [(0xf0f0f0f0f0f0f0f00000000000000000f0f0f0f0f0f0f0f0000000000000000, 60)])
-def qS26 : WordMoveStep := ([(0xcccccccccccccccccccccccccccccccc33333333333333333333333333333333, 0), (0xcccccccccccccccccccccccccccccccc, 126)], [(0x3333333333333333333333333333333300000000000000000000000000000000, 126)])
-def qS27 : WordMoveStep := ([(0xf0f00f0ff0f00f0ff0f00f0ff0f00f0ff0f00f0ff0f00f0ff0f00f0ff0f00f0f, 0), (0xf0f00000f0f00000f0f00000f0f00000f0f00000f0f00000f0f00000f0f0, 12)], [(0xf0f00000f0f00000f0f00000f0f00000f0f00000f0f00000f0f00000f0f0000, 12)])
-def qS28 : WordMoveStep := ([(0xaaaaaaaaaaaaaaaa5555555555555555aaaaaaaaaaaaaaaa5555555555555555, 0), (0xaaaaaaaaaaaaaaaa0000000000000000aaaaaaaaaaaaaaaa, 63)], [(0x5555555555555555000000000000000055555555555555550000000000000000, 63)])
-def qS29 : WordMoveStep := ([(0xf0f0f0f00f0f0f0ff0f0f0f00f0f0f0ff0f0f0f00f0f0f0ff0f0f0f00f0f0f0f, 0), (0xf0f0f0f000000000f0f0f0f000000000f0f0f0f000000000f0f0f0f0, 28)], [(0xf0f0f0f000000000f0f0f0f000000000f0f0f0f000000000f0f0f0f00000000, 28)])
+def qS21 : WordMoveStep := ([(0xf0f00f0ff0f00f0ff0f00f0ff0f00f0ff0f00f0ff0f00f0ff0f00f0ff0f00f0f, 0), (0xf0f00000f0f00000f0f00000f0f00000f0f00000f0f00000f0f00000f0f0, 12)], [(0xf0f00000f0f00000f0f00000f0f00000f0f00000f0f00000f0f00000f0f0000, 12)])
+def qS22 : WordMoveStep := ([(0xff00ff0000ff00ffff00ff0000ff00ffff00ff0000ff00ffff00ff0000ff00ff, 0), (0xff00ff0000000000ff00ff0000000000ff00ff0000000000ff00ff00, 24)], [(0xff00ff0000000000ff00ff0000000000ff00ff0000000000ff00ff00000000, 24)])
+def qS23 : WordMoveStep := ([(0xaaaaaaaa55555555aaaaaaaa55555555aaaaaaaa55555555aaaaaaaa55555555, 0), (0xaaaaaaaa00000000aaaaaaaa00000000aaaaaaaa00000000aaaaaaaa, 31)], [(0x5555555500000000555555550000000055555555000000005555555500000000, 31)])
+def qS24 : WordMoveStep := ([(0xffffffff00000000ffffffff0000000000000000ffffffff00000000ffffffff, 0), (0xffffffff00000000ffffffff00000000, 96)], [(0xffffffff00000000ffffffff00000000000000000000000000000000, 96)])
+def qS25 : WordMoveStep := ([(0xffffffffffffffff00000000000000000000000000000000ffffffffffffffff, 0), (0xffffffffffffffff0000000000000000, 64)], [(0xffffffffffffffff00000000000000000000000000000000, 64)])
+def qS26 : WordMoveStep := ([(0xffff00000000ffffffff00000000ffffffff00000000ffffffff00000000ffff, 0), (0xffff000000000000ffff000000000000ffff000000000000ffff0000, 16)], [(0xffff000000000000ffff000000000000ffff000000000000ffff00000000, 16)])
+def qS27 : WordMoveStep := ([(0xa5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5, 0), (0xa0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a, 3)], [(0x5050505050505050505050505050505050505050505050505050505050505050, 3)])
+def qS28 : WordMoveStep := ([(0xc3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3, 0), (0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c, 2)], [(0x3030303030303030303030303030303030303030303030303030303030303030, 2)])
+def qS29 : WordMoveStep := ([], [(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 4)])
+def qS30 : WordMoveStep := ([], [(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 16)])
+def qS31 : WordMoveStep := ([], [(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 64)])
+def qS32 : WordMoveStep := ([], [(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 1)])
+def qS33 : WordMoveStep := ([], [(0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff, 8)])
+def qS34 : WordMoveStep := ([(0xff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff, 0)], [(0xff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00, 8)])
+def qS35 : WordMoveStep := ([(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f, 4)], [(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0, 4)])
+def qS36 : WordMoveStep := ([(0xff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff, 8)], [(0xff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00, 8)])
+def qS37 : WordMoveStep := ([(0xffffffffffffffff0000000000000000ffffffffffffffff, 64)], [(0xffffffffffffffff0000000000000000ffffffffffffffff0000000000000000, 64)])
+def qS38 : WordMoveStep := ([(0xffffffff00000000ffffffff00000000ffffffff00000000ffffffff, 32)], [(0xffffffff00000000ffffffff00000000ffffffff00000000ffffffff00000000, 32)])
+def qS39 : WordMoveStep := ([(0xff00ff00ff00ff00ff00ff00ff00ff0000ff00ff00ff00ff00ff00ff00ff00ff, 0), (0xff00ff00ff00ff00ff00ff00ff00ff00, 120)], [(0xff00ff00ff00ff00ff00ff00ff00ff00000000000000000000000000000000, 120)])
+def qS40 : WordMoveStep := ([(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa55555555555555555555555555555555, 0), (0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, 127)], [(0x5555555555555555555555555555555500000000000000000000000000000000, 127)])
+def qS41 : WordMoveStep := ([(0xff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00, 0), (0xff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff, 64)], [])
+def qS42 : WordMoveStep := ([(0xf0f0f0f00f0f0f0ff0f0f0f00f0f0f0ff0f0f0f00f0f0f0ff0f0f0f00f0f0f0f, 0), (0xf0f0f0f000000000f0f0f0f000000000f0f0f0f000000000f0f0f0f0, 28)], [(0xf0f0f0f000000000f0f0f0f000000000f0f0f0f000000000f0f0f0f00000000, 28)])
+def qS43 : WordMoveStep := ([(0x3333333333333333333333333333333333333333333333333333333333333333, 2)], [(0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc, 2)])
+def qS44 : WordMoveStep := ([(0xaaaaaaaaaaaaaaaa5555555555555555aaaaaaaaaaaaaaaa5555555555555555, 0), (0xaaaaaaaaaaaaaaaa0000000000000000aaaaaaaaaaaaaaaa, 63)], [(0x5555555555555555000000000000000055555555555555550000000000000000, 63)])
+def qS45 : WordMoveStep := ([(0xcccccccc33333333cccccccc33333333cccccccc33333333cccccccc33333333, 0), (0xcccccccc00000000cccccccc00000000cccccccc00000000cccccccc, 30)], [(0x3333333300000000333333330000000033333333000000003333333300000000, 30)])
+def qS46 : WordMoveStep := ([(0xffff0000ffff0000ffff0000ffff00000000ffff0000ffff0000ffff0000ffff, 0), (0xffff0000ffff0000ffff0000ffff0000, 112)], [(0xffff0000ffff0000ffff0000ffff00000000000000000000000000000000, 112)])
+def qS47 : WordMoveStep := ([(0xcccccccccccccccccccccccccccccccc33333333333333333333333333333333, 0), (0xcccccccccccccccccccccccccccccccc, 126)], [(0x3333333333333333333333333333333300000000000000000000000000000000, 126)])
 def qBase : List Word := [0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, 0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc, 0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0, 0xff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00, 0xffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000, 0xffffffff00000000ffffffff00000000ffffffff00000000ffffffff00000000, 0xffffffffffffffff0000000000000000ffffffffffffffff0000000000000000, 0xffffffffffffffffffffffffffffffff00000000000000000000000000000000]
 def qGoal : Word := 0xfffffffffffffffffffffffffffefffefffffffefffffefcffeeffeeeeccaa00
-def q0M : Word := 0x30300000303
+def q0M : Word := 0x1040208
 abbrev q0G : Word := qGoal &&& q0M
-abbrev q0W : List Word := projectDAGStock q0M qBase [0, 3, 5]
-def q0F : Bound := (q0M, q0W, 4, q0G)
-def q0E := unpackWitnesses q0W [16928, 282656, 544776]
+abbrev q0W : List Word := projectDAGStock q0M qBase [0, 1]
+def q0E := unpackWitnesses q0W [4632, 271384]
 abbrev q0N : List Word := normStock q0M q0W
 def q0C : List Bound := []
-def q0S : DagSample := (0x40244021008840209100a01028, 6)
-def q0L : DagLinkList := dagExtractLinks 0x9 0x7 2 1 3 1 3
-def q0D : Forest := fun i => decodeNode 1 4 0xe i
-def q0T := dagTraceTagsBin q0M 6 (dagTagBases q0N 0x3624 0x337ad 6) 3 q0D
-def q0St := dagTraceBin q0M q0N 3 q0D
-def q0Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
-def q0Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
-def q0Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q0Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q0Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
-def q0Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
-def q0Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
-def q0Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
-def q0Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
-def q0Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
-def q0Mv := dagMoves ([([qS0], q0Mp0, q0Mi0), ([qS1], q0Mp1, q0Mi1), ([qS2, qS0], q0Mp2, q0Mi2), ([qS1, qS0], q0Mp3, q0Mi3), ([qS2], q0Mp4, q0Mi4)] : List (DagMoveRecord 256))
+def q0S : DagSample := (0x184806090c0483009, 4)
+def q0L : DagLinkList := dagExtractLinks 0x9 0x3 2 1 2 1 1
+def q0D : Forest := fun i => decodeNode 1 3 0x6 i
+def q0T := dagTraceTagsBin q0M 4 (dagTagBases q0N 0xa5 0xcc 4) 2 q0D
+def q0St := dagTraceBin q0M q0N 2 q0D
+def q0Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [1, 0, 2, 4, 3, 5, 6, 7] 0 i.val)
+def q0Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [1, 0, 2, 4, 3, 5, 6, 7] 0 i.val)
+def q0Mv := dagMoves ([([qS0, qS1], q0Mp0, q0Mi0)] : List (DagMoveRecord 256))
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem q0A : DagMovesOK q0M q0G 256 q0Mv := dagMovesOfCheck (by decide +kernel)
 def q0NB : Nat → List Bound := dagNodeBounds q0C.toArray 0x0 0x0 2 1 1
 def q0Ck := dagCheckNodeBin q0M q0G q0NB 1 q0St q0Mv q0L q0S q0T
 def q0RA (token : Nat) : Bool :=
-  let s := rootState q0N 3 token
+  let s := rootState q0N 2 token
   !dagAllowedRootBin q0M q0E s.2.1 || dagLocalBin q0M q0G (dagKnownClosesBin q0G q0C) s ||
   dagRefBin q0M 1 q0St q0Mv (fun p tok => dagFindLink (q0L p) tok) 0 token s
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q0RB0 : treeBlock 0 8 q0RA = true := by decide +kernel
-theorem q0R : dagCheckRootsBin q0M q0G (dagKnownClosesBin q0G q0C) q0E (dagRefBin q0M 1 q0St q0Mv (fun p tok => dagFindLink (q0L p) tok) 0) q0N 3 = true := q0RB0
+theorem q0RB0 : treeBlock 0 4 q0RA = true := by decide +kernel
+theorem q0R : dagCheckRootsBin q0M q0G (dagKnownClosesBin q0G q0C) q0E (dagRefBin q0M 1 q0St q0Mv (fun p tok => dagFindLink (q0L p) tok) 0) q0N 2 = true := q0RB0
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem q0B0 : treeBlock 0 1 q0Ck = true := by decide +kernel
@@ -3316,7 +3325,7 @@ theorem q0Bk : treeBlock 0 1 q0Ck = true := q0B0
 theorem q0K : KnownBin q0C := (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h))
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q0Bin : BinLower q0M q0W q0G 4 := by
+theorem q0Bin : BinLower q0M q0W q0G 3 := by
   apply lowerDagBin _ _ _ _ q0A _ _ _ q0K _ (fun _ b hb => dagNodeBounds_mem b hb) q0R q0Bk
   · unfold Masked; decide +kernel
   · unfold Masked; decide +kernel
@@ -3328,914 +3337,428 @@ theorem q0Bin : BinLower q0M q0W q0G 4 := by
   · have h : q0C.all (fun b => q0M &&& b.1 == b.1) = true := by decide +kernel
     intro b hb
     exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q1M : Word := 0x500050000000000050005
+def q1M : Word := 0x60000000000000600
 abbrev q1G : Word := qGoal &&& q1M
-abbrev q1W : List Word := projectDAGStock q1M qBase [1, 4, 6]
-def q1F : Bound := (q1M, q1W, 4, q1G)
+abbrev q1W : List Word := projectDAGStock q1M qBase [0, 3]
+def q1F : Bound := (q1M, q1W, 3, q1G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q1Bin : BinLower q1M q1W q1G 4 := dagShiftLowerBin (width := 256) [qS3, qS4, qS5] q0Bin (by decide +kernel)
-def q2M : Word := 0x30300000000000000000000000000000303
+theorem q1Bin : BinLower q1M q1W q1G 3 := dagShiftLowerBin (width := 256) [qS2, qS3, qS4, qS5, qS6, qS7, qS8] q0Bin (by decide +kernel)
+def q2M : Word := 0x100020000000001000200
 abbrev q2G : Word := qGoal &&& q2M
-abbrev q2W : List Word := projectDAGStock q2M qBase [0, 3, 7]
-def q2F : Bound := (q2M, q2W, 4, q2G)
+abbrev q2W : List Word := projectDAGStock q2M qBase [0, 3]
+def q2F : Bound := (q2M, q2W, 3, q2G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q2Bin : BinLower q2M q2W q2G 4 := dagShiftLowerBin (width := 256) [qS6, qS7] q0Bin (by decide +kernel)
-def q3M : Word := 0x30000000300000000000000000000000300000003
+theorem q2Bin : BinLower q2M q2W q2G 3 := dagShiftLowerBin (width := 256) [qS9, qS3, qS4, qS5, qS6, qS7, qS8] q0Bin (by decide +kernel)
+def q3M : Word := 0x1000000040000010000000400
 abbrev q3G : Word := qGoal &&& q3M
-abbrev q3W : List Word := projectDAGStock q3M qBase [0, 5, 7]
-def q3F : Bound := (q3M, q3W, 4, q3G)
+abbrev q3W : List Word := projectDAGStock q3M qBase [1, 3]
+def q3F : Bound := (q3M, q3W, 3, q3G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q3Bin : BinLower q3M q3W q3G 4 := dagShiftLowerBin (width := 256) [qS0, qS8, qS6, qS7] q0Bin (by decide +kernel)
-def q4M : Word := 0x50000000500000000000000000000000500000005
+theorem q3Bin : BinLower q3M q3W q3G 3 := dagShiftLowerBin (width := 256) [qS10, qS3, qS0, qS5, qS6, qS7, qS8] q0Bin (by decide +kernel)
+def q4M : Word := 0x1000100000000010001000000
 abbrev q4G : Word := qGoal &&& q4M
-abbrev q4W : List Word := projectDAGStock q4M qBase [1, 5, 7]
-def q4F : Bound := (q4M, q4W, 4, q4G)
+abbrev q4W : List Word := projectDAGStock q4M qBase [3, 4]
+def q4F : Bound := (q4M, q4W, 3, q4G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q4Bin : BinLower q4M q4W q4G 4 := dagShiftLowerBin (width := 256) [qS3, qS0, qS8, qS6, qS7] q0Bin (by decide +kernel)
-def q5M : Word := 0x1010000010100000000000000000000010100000101
+theorem q4Bin : BinLower q4M q4W q4G 3 := dagShiftLowerBin (width := 256) [qS10, qS3, qS11, qS12, qS6, qS1, qS7, qS8] q0Bin (by decide +kernel)
+def q5M : Word := 0x1000200000000000100020000000000000000
 abbrev q5G : Word := qGoal &&& q5M
-abbrev q5W : List Word := projectDAGStock q5M qBase [3, 5, 7]
-def q5F : Bound := (q5M, q5W, 4, q5G)
+abbrev q5W : List Word := projectDAGStock q5M qBase [0, 6]
+def q5F : Bound := (q5M, q5W, 3, q5G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q5Bin : BinLower q5M q5W q5G 4 := dagShiftLowerBin (width := 256) [qS1, qS9, qS10, qS0, qS8, qS6, qS7] q0Bin (by decide +kernel)
-def q6M : Word := 0x5000000000000000500000000000000050000000000000005
+theorem q5Bin : BinLower q5M q5W q5G 3 := dagShiftLowerBin (width := 256) [qS9, qS13, qS14, qS15, qS16, qS17, qS18, qS7, qS8] q0Bin (by decide +kernel)
+def q6M : Word := 0x1010000000000000101000000000000000000
 abbrev q6G : Word := qGoal &&& q6M
-abbrev q6W : List Word := projectDAGStock q6M qBase [1, 6, 7]
-def q6F : Bound := (q6M, q6W, 4, q6G)
+abbrev q6W : List Word := projectDAGStock q6M qBase [3, 6]
+def q6F : Bound := (q6M, q6W, 3, q6G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q6Bin : BinLower q6M q6W q6G 4 := dagShiftLowerBin (width := 256) [qS3, qS11, qS12, qS6] q0Bin (by decide +kernel)
-def q7M : Word := 0x11000000000000001100000000000000110000000000000011
+theorem q6Bin : BinLower q6M q6W q6G 3 := dagShiftLowerBin (width := 256) [qS9, qS13, qS11, qS14, qS6, qS16, qS17, qS18, qS7, qS8] q0Bin (by decide +kernel)
+def q7M : Word := 0x10001000000000001000100000000000000000000
 abbrev q7G : Word := qGoal &&& q7M
-abbrev q7W : List Word := projectDAGStock q7M qBase [2, 6, 7]
-def q7F : Bound := (q7M, q7W, 4, q7G)
+abbrev q7W : List Word := projectDAGStock q7M qBase [4, 6]
+def q7F : Bound := (q7M, q7W, 3, q7G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q7Bin : BinLower q7M q7W q7G 4 := dagShiftLowerBin (width := 256) [qS13, qS14, qS11, qS12, qS6] q0Bin (by decide +kernel)
-def q8M : Word := 0x303000003030
+theorem q7Bin : BinLower q7M q7W q7G 3 := dagShiftLowerBin (width := 256) [qS10, qS13, qS19, qS20, qS14, qS21, qS16, qS18, qS7, qS8] q0Bin (by decide +kernel)
+def q8M : Word := 0x30300000303
 abbrev q8G : Word := qGoal &&& q8M
 abbrev q8W : List Word := projectDAGStock q8M qBase [0, 3, 5]
 def q8F : Bound := (q8M, q8W, 4, q8G)
+def q8E := unpackWitnesses q8W [16928, 282656, 544776]
+abbrev q8N : List Word := normStock q8M q8W
+def q8C : List Bound := []
+def q8S : DagSample := (0x40244021008840209100a01028, 6)
+def q8L : DagLinkList := dagExtractLinks 0x9 0x7 2 1 3 1 3
+def q8D : Forest := fun i => decodeNode 1 4 0xe i
+def q8T := dagTraceTagsBin q8M 6 (dagTagBases q8N 0x3624 0x337ad 6) 3 q8D
+def q8St := dagTraceBin q8M q8N 3 q8D
+def q8Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
+def q8Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
+def q8Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q8Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q8Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
+def q8Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
+def q8Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
+def q8Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
+def q8Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
+def q8Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
+def q8Mv := dagMoves ([([qS22], q8Mp0, q8Mi0), ([qS11], q8Mp1, q8Mi1), ([qS23, qS22], q8Mp2, q8Mi2), ([qS11, qS22], q8Mp3, q8Mi3), ([qS23], q8Mp4, q8Mi4)] : List (DagMoveRecord 256))
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q8Bin : BinLower q8M q8W q8G 4 := dagShiftLowerBin (width := 256) [qS15] q0Bin (by decide +kernel)
-def q9M : Word := 0x303000003030000
+theorem q8A : DagMovesOK q8M q8G 256 q8Mv := dagMovesOfCheck (by decide +kernel)
+def q8NB : Nat → List Bound := dagNodeBounds q8C.toArray 0x0 0x0 2 1 1
+def q8Ck := dagCheckNodeBin q8M q8G q8NB 1 q8St q8Mv q8L q8S q8T
+def q8RA (token : Nat) : Bool :=
+  let s := rootState q8N 3 token
+  !dagAllowedRootBin q8M q8E s.2.1 || dagLocalBin q8M q8G (dagKnownClosesBin q8G q8C) s ||
+  dagRefBin q8M 1 q8St q8Mv (fun p tok => dagFindLink (q8L p) tok) 0 token s
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q8RB0 : treeBlock 0 8 q8RA = true := by decide +kernel
+theorem q8R : dagCheckRootsBin q8M q8G (dagKnownClosesBin q8G q8C) q8E (dagRefBin q8M 1 q8St q8Mv (fun p tok => dagFindLink (q8L p) tok) 0) q8N 3 = true := q8RB0
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q8B0 : treeBlock 0 1 q8Ck = true := by decide +kernel
+theorem q8Bk : treeBlock 0 1 q8Ck = true := q8B0
+theorem q8K : KnownBin q8C := (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h))
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q8Bin : BinLower q8M q8W q8G 4 := by
+  apply lowerDagBin _ _ _ _ q8A _ _ _ q8K _ (fun _ b hb => dagNodeBounds_mem b hb) q8R q8Bk
+  · unfold Masked; decide +kernel
+  · unfold Masked; decide +kernel
+  · unfold properWord; decide +kernel
+  · decide +kernel
+  · exact stockMaskedOfCheck (by decide +kernel)
+  · decide +kernel
+  · decide +kernel
+  · have h : q8C.all (fun b => q8M &&& b.1 == b.1) = true := by decide +kernel
+    intro b hb
+    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
+def q9M : Word := 0x500050000000000050005
 abbrev q9G : Word := qGoal &&& q9M
-abbrev q9W : List Word := projectDAGStock q9M qBase [0, 3, 5]
+abbrev q9W : List Word := projectDAGStock q9M qBase [1, 4, 6]
 def q9F : Bound := (q9M, q9W, 4, q9G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q9Bin : BinLower q9M q9W q9G 4 := dagShiftLowerBin (width := 256) [qS16] q0Bin (by decide +kernel)
-def q10M : Word := 0x303000003030000000000000000
+theorem q9Bin : BinLower q9M q9W q9G 4 := dagShiftLowerBin (width := 256) [qS0, qS1, qS18] q8Bin (by decide +kernel)
+def q10M : Word := 0x30300000000000000000000000000000303
 abbrev q10G : Word := qGoal &&& q10M
-abbrev q10W : List Word := projectDAGStock q10M qBase [0, 3, 5]
+abbrev q10W : List Word := projectDAGStock q10M qBase [0, 3, 7]
 def q10F : Bound := (q10M, q10W, 4, q10G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q10Bin : BinLower q10M q10W q10G 4 := dagShiftLowerBin (width := 256) [qS17] q0Bin (by decide +kernel)
-def q11M : Word := 0xa000a00000000000a000a
+theorem q10Bin : BinLower q10M q10W q10G 4 := dagShiftLowerBin (width := 256) [qS24, qS25] q8Bin (by decide +kernel)
+def q11M : Word := 0x30000000300000000000000000000000300000003
 abbrev q11G : Word := qGoal &&& q11M
-abbrev q11W : List Word := projectDAGStock q11M qBase [1, 4, 6]
+abbrev q11W : List Word := projectDAGStock q11M qBase [0, 5, 7]
 def q11F : Bound := (q11M, q11W, 4, q11G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q11Bin : BinLower q11M q11W q11G 4 := dagShiftLowerBin (width := 256) [qS18, qS3, qS4, qS5] q0Bin (by decide +kernel)
-def q12M : Word := 0x50005000000000005000500
+theorem q11Bin : BinLower q11M q11W q11G 4 := dagShiftLowerBin (width := 256) [qS22, qS26, qS24, qS25] q8Bin (by decide +kernel)
+def q12M : Word := 0x50000000500000000000000000000000500000005
 abbrev q12G : Word := qGoal &&& q12M
-abbrev q12W : List Word := projectDAGStock q12M qBase [1, 4, 6]
+abbrev q12W : List Word := projectDAGStock q12M qBase [1, 5, 7]
 def q12F : Bound := (q12M, q12W, 4, q12G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q12Bin : BinLower q12M q12W q12G 4 := dagShiftLowerBin (width := 256) [qS19, qS3, qS4, qS5] q0Bin (by decide +kernel)
-def q13M : Word := 0x303000000000000000000000000000003030000
+theorem q12Bin : BinLower q12M q12W q12G 4 := dagShiftLowerBin (width := 256) [qS0, qS22, qS26, qS24, qS25] q8Bin (by decide +kernel)
+def q13M : Word := 0x1010000010100000000000000000000010100000101
 abbrev q13G : Word := qGoal &&& q13M
-abbrev q13W : List Word := projectDAGStock q13M qBase [0, 3, 7]
+abbrev q13W : List Word := projectDAGStock q13M qBase [3, 5, 7]
 def q13F : Bound := (q13M, q13W, 4, q13G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q13Bin : BinLower q13M q13W q13G 4 := dagShiftLowerBin (width := 256) [qS16, qS6, qS7] q0Bin (by decide +kernel)
-def q14M : Word := 0x300000003000000000000000000000003000000030000
+theorem q13Bin : BinLower q13M q13W q13G 4 := dagShiftLowerBin (width := 256) [qS11, qS5, qS6, qS22, qS26, qS24, qS25] q8Bin (by decide +kernel)
+def q14M : Word := 0x5000000000000000500000000000000050000000000000005
 abbrev q14G : Word := qGoal &&& q14M
-abbrev q14W : List Word := projectDAGStock q14M qBase [0, 5, 7]
+abbrev q14W : List Word := projectDAGStock q14M qBase [1, 6, 7]
 def q14F : Bound := (q14M, q14W, 4, q14G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q14Bin : BinLower q14M q14W q14G 4 := dagShiftLowerBin (width := 256) [qS16, qS0, qS8, qS6, qS7] q0Bin (by decide +kernel)
-def q15M : Word := 0xf000f000f000f
+theorem q14Bin : BinLower q14M q14W q14G 4 := dagShiftLowerBin (width := 256) [qS0, qS16, qS17, qS24] q8Bin (by decide +kernel)
+def q15M : Word := 0x11000000000000001100000000000000110000000000000011
 abbrev q15G : Word := qGoal &&& q15M
-abbrev q15W : List Word := projectDAGStock q15M qBase [0, 1, 4, 5]
+abbrev q15W : List Word := projectDAGStock q15M qBase [2, 6, 7]
 def q15F : Bound := (q15M, q15W, 4, q15G)
-def q15E := unpackWitnesses q15W [25136, 287792, 534019, 811537]
-abbrev q15N : List Word := normStock q15M q15W
-def q15C : List Bound := []
-def q15S : DagSample := (0x88480612180884021018882012180480412008842221, 10)
-def q15L : DagLinkList := dagExtractLinks 0x9 0xf 2 1 4 1 1
-def q15D : Forest := fun i => decodeNode 1 5 0x1e i
-def q15T := dagTraceTagsBin q15M 10 (dagTagBases q15N 0xef04338f1c 0x372db59b37 10) 3 q15D
-def q15St := dagTraceBin q15M q15N 3 q15D
-def q15Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 5, 2, 3, 0, 1, 6, 7] 0 i.val)
-def q15Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 5, 2, 3, 0, 1, 6, 7] 0 i.val)
-def q15Mv := dagMoves ([([qS20, qS21], q15Mp0, q15Mi0)] : List (DagMoveRecord 256))
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q15A : DagMovesOK q15M q15G 256 q15Mv := dagMovesOfCheck (by decide +kernel)
-def q15NB : Nat → List Bound := dagNodeBounds q15C.toArray 0x0 0x0 2 1 1
-def q15Ck := dagCheckNodeBin q15M q15G q15NB 1 q15St q15Mv q15L q15S q15T
-def q15RA (token : Nat) : Bool :=
-  let s := rootState q15N 3 token
-  !dagAllowedRootBin q15M q15E s.2.1 || dagLocalBin q15M q15G (dagKnownClosesBin q15G q15C) s ||
-  dagRefBin q15M 1 q15St q15Mv (fun p tok => dagFindLink (q15L p) tok) 0 token s
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q15RB0 : treeBlock 0 16 q15RA = true := by decide +kernel
-theorem q15R : dagCheckRootsBin q15M q15G (dagKnownClosesBin q15G q15C) q15E (dagRefBin q15M 1 q15St q15Mv (fun p tok => dagFindLink (q15L p) tok) 0) q15N 3 = true := q15RB0
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q15B0 : treeBlock 0 1 q15Ck = true := by decide +kernel
-theorem q15Bk : treeBlock 0 1 q15Ck = true := q15B0
-theorem q15K : KnownBin q15C := (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h))
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q15Bin : BinLower q15M q15W q15G 4 := by
-  apply lowerDagBin _ _ _ _ q15A _ _ _ q15K _ (fun _ b hb => dagNodeBounds_mem b hb) q15R q15Bk
-  · unfold Masked; decide +kernel
-  · unfold Masked; decide +kernel
-  · unfold properWord; decide +kernel
-  · decide +kernel
-  · exact stockMaskedOfCheck (by decide +kernel)
-  · decide +kernel
-  · decide +kernel
-  · have h : q15C.all (fun b => q15M &&& b.1 == b.1) = true := by decide +kernel
-    intro b hb
-    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q16M : Word := 0x3030000030300000000000000000000030300000303
+theorem q15Bin : BinLower q15M q15W q15G 4 := dagShiftLowerBin (width := 256) [qS27, qS28, qS16, qS17, qS24] q8Bin (by decide +kernel)
+def q16M : Word := 0x303000003030
 abbrev q16G : Word := qGoal &&& q16M
-abbrev q16W : List Word := projectDAGStock q16M qBase [0, 3, 5, 7]
-def q16F : Bound := (q16M, q16W, 7, q16G)
-def q16E := unpackWitnesses q16W [66176, 331904, 606336, 868384]
-abbrev q16N : List Word := normStock q16M q16W
-def q16C : List Bound := [q2F, q0F, q3F, q5F]
-def q16S : DagSample := (0x100844028040a0100940204020940220108800a0402214028040a0, 12)
-def q16L : DagLinkList := dagExtractLinks 0x884420300789e02c01 0x68300504c3c8420c83234442044323304e320420303e020328183369433194236103311023010130000f 9 4 12 3 5
-def q16D : Forest := fun i => decodeNode 3 15 0x10614131a19203e4064804c8078 i
-def q16T := dagTraceTagsBin q16M 12 (dagTagBases q16N 0x63388f1f8f44 0xfb3cef3fef5d 12) 6 q16D
-def q16St := dagTraceBin q16M q16N 6 q16D
-def q16Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 4, 7, 6, 5] 0 i.val)
-def q16Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 4, 7, 6, 5] 0 i.val)
-def q16Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
-def q16Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
-def q16Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 7, 4, 3, 6, 5] 0 i.val)
-def q16Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 7, 6, 3] 0 i.val)
-def q16Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 7, 6, 3] 0 i.val)
-def q16Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 7, 4, 3, 6, 5] 0 i.val)
-def q16Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 7, 4, 5, 6, 3] 0 i.val)
-def q16Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 7, 4, 5, 6, 3] 0 i.val)
-def q16Mp5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q16Mi5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q16Mp6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 7, 6, 5] 0 i.val)
-def q16Mi6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 7, 6, 5] 0 i.val)
-def q16Mp7 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
-def q16Mi7 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
-def q16Mp8 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [7, 1, 2, 0, 4, 3, 6, 5] 0 i.val)
-def q16Mi8 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 7, 6, 0] 0 i.val)
-def q16Mp9 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 7, 6, 3] 0 i.val)
-def q16Mi9 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 7, 4, 0, 6, 5] 0 i.val)
-def q16Mp10 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [7, 1, 2, 0, 4, 5, 6, 3] 0 i.val)
-def q16Mi10 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 7, 4, 5, 6, 0] 0 i.val)
-def q16Mp11 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
-def q16Mi11 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
-def q16Mp12 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 7, 4, 0, 6, 5] 0 i.val)
-def q16Mi12 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 7, 6, 3] 0 i.val)
-def q16Mp13 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
-def q16Mi13 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
-def q16Mp14 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [7, 1, 2, 3, 4, 0, 6, 5] 0 i.val)
-def q16Mi14 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 7, 6, 0] 0 i.val)
-def q16Mp15 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 7, 4, 0, 6, 3] 0 i.val)
-def q16Mi15 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 7, 4, 0, 6, 3] 0 i.val)
-def q16Mv := dagMoves ([([qS6], q16Mp0, q16Mi0), ([qS0], q16Mp1, q16Mi1), ([qS22, qS6], q16Mp2, q16Mi2), ([qS0, qS6], q16Mp3, q16Mi3), ([qS22], q16Mp4, q16Mi4), ([qS1], q16Mp5, q16Mi5), ([qS1, qS6], q16Mp6, q16Mi6), ([qS2, qS0], q16Mp7, q16Mi7), ([qS23, qS22, qS6], q16Mp8, q16Mi8), ([qS2, qS0, qS6], q16Mp9, q16Mi9), ([qS23, qS22], q16Mp10, q16Mi10), ([qS1, qS0], q16Mp11, q16Mi11), ([qS1, qS22, qS6], q16Mp12, q16Mi12), ([qS2], q16Mp13, q16Mi13), ([qS23, qS6], q16Mp14, q16Mi14), ([qS2, qS22], q16Mp15, q16Mi15)] : List (DagMoveRecord 256))
+abbrev q16W : List Word := projectDAGStock q16M qBase [0, 3, 5]
+def q16F : Bound := (q16M, q16W, 4, q16G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q16A : DagMovesOK q16M q16G 256 q16Mv := dagMovesOfCheck (by decide +kernel)
-def q16NB : Nat → List Bound := dagNodeBounds q16C.toArray 0x16ac4a9105204 0x63e1e1 7 3 2
-def q16Ck := dagCheckNodeBin q16M q16G q16NB 7 q16St q16Mv q16L q16S q16T
-def q16RA (token : Nat) : Bool :=
-  let s := rootState q16N 6 token
-  !dagAllowedRootBin q16M q16E s.2.1 || dagLocalBin q16M q16G (dagKnownClosesBin q16G q16C) s ||
-  dagRefBin q16M 7 q16St q16Mv (fun p tok => dagFindLink (q16L p) tok) 0 token s
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q16RB0 : treeBlock 0 16 q16RA = true := by decide +kernel
-theorem q16R : dagCheckRootsBin q16M q16G (dagKnownClosesBin q16G q16C) q16E (dagRefBin q16M 7 q16St q16Mv (fun p tok => dagFindLink (q16L p) tok) 0) q16N 6 = true := q16RB0
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q16B0 : treeBlock 0 7 q16Ck = true := by decide +kernel
-theorem q16Bk : treeBlock 0 7 q16Ck = true := q16B0
-theorem q16K : KnownBin q16C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q5Bin) q3Bin) q0Bin) q2Bin)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q16Bin : BinLower q16M q16W q16G 7 := by
-  apply lowerDagBin _ _ _ _ q16A _ _ _ q16K _ (fun _ b hb => dagNodeBounds_mem b hb) q16R q16Bk
-  · unfold Masked; decide +kernel
-  · unfold Masked; decide +kernel
-  · unfold properWord; decide +kernel
-  · decide +kernel
-  · exact stockMaskedOfCheck (by decide +kernel)
-  · decide +kernel
-  · decide +kernel
-  · have h : q16C.all (fun b => q16M &&& b.1 == b.1) = true := by decide +kernel
-    intro b hb
-    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q17M : Word := 0x505050505050505
+theorem q16Bin : BinLower q16M q16W q16G 4 := dagShiftLowerBin (width := 256) [qS29] q8Bin (by decide +kernel)
+def q17M : Word := 0x303000003030000
 abbrev q17G : Word := qGoal &&& q17M
-abbrev q17W : List Word := projectDAGStock q17M qBase [1, 3, 4, 5]
+abbrev q17W : List Word := projectDAGStock q17M qBase [0, 3, 5]
 def q17F : Bound := (q17M, q17W, 4, q17G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q17Bin : BinLower q17M q17W q17G 4 := dagShiftLowerBin (width := 256) [qS1, qS10] q15Bin (by decide +kernel)
-def q18M : Word := 0x55000000550000005500000055
+theorem q17Bin : BinLower q17M q17W q17G 4 := dagShiftLowerBin (width := 256) [qS30] q8Bin (by decide +kernel)
+def q18M : Word := 0x303000003030000000000000000
 abbrev q18G : Word := qGoal &&& q18M
-abbrev q18W : List Word := projectDAGStock q18M qBase [1, 2, 5, 6]
+abbrev q18W : List Word := projectDAGStock q18M qBase [0, 3, 5]
 def q18F : Bound := (q18M, q18W, 4, q18G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q18Bin : BinLower q18M q18W q18G 4 := dagShiftLowerBin (width := 256) [qS13, qS8, qS5] q15Bin (by decide +kernel)
-def q19M : Word := 0xf000f000000000000000000000000000f000f
+theorem q18Bin : BinLower q18M q18W q18G 4 := dagShiftLowerBin (width := 256) [qS31] q8Bin (by decide +kernel)
+def q19M : Word := 0xa000a00000000000a000a
 abbrev q19G : Word := qGoal &&& q19M
-abbrev q19W : List Word := projectDAGStock q19M qBase [0, 1, 4, 7]
+abbrev q19W : List Word := projectDAGStock q19M qBase [1, 4, 6]
 def q19F : Bound := (q19M, q19W, 4, q19G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q19Bin : BinLower q19M q19W q19G 4 := dagShiftLowerBin (width := 256) [qS6, qS7] q15Bin (by decide +kernel)
-def q20M : Word := 0x505050500000000000000000000000005050505
+theorem q19Bin : BinLower q19M q19W q19G 4 := dagShiftLowerBin (width := 256) [qS32, qS0, qS1, qS18] q8Bin (by decide +kernel)
+def q20M : Word := 0x50005000000000005000500
 abbrev q20G : Word := qGoal &&& q20M
-abbrev q20W : List Word := projectDAGStock q20M qBase [1, 3, 4, 7]
+abbrev q20W : List Word := projectDAGStock q20M qBase [1, 4, 6]
 def q20F : Bound := (q20M, q20W, 4, q20G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q20Bin : BinLower q20M q20W q20G 4 := dagShiftLowerBin (width := 256) [qS1, qS10, qS6, qS7] q15Bin (by decide +kernel)
-def q21M : Word := 0x30003000000000003000300000000000300030000000000030003
+theorem q20Bin : BinLower q20M q20W q20G 4 := dagShiftLowerBin (width := 256) [qS33, qS0, qS1, qS18] q8Bin (by decide +kernel)
+def q21M : Word := 0x300000003000000000000000000000003000000030000
 abbrev q21G : Word := qGoal &&& q21M
-abbrev q21W : List Word := projectDAGStock q21M qBase [0, 4, 6, 7]
+abbrev q21W : List Word := projectDAGStock q21M qBase [0, 5, 7]
 def q21F : Bound := (q21M, q21W, 4, q21G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q21Bin : BinLower q21M q21W q21G 4 := dagShiftLowerBin (width := 256) [qS24, qS25, qS11, qS6] q15Bin (by decide +kernel)
-def q22M : Word := 0x1000100010001000100010001000100010001000100010001000100010001
+theorem q21Bin : BinLower q21M q21W q21G 4 := dagShiftLowerBin (width := 256) [qS30, qS22, qS26, qS24, qS25] q8Bin (by decide +kernel)
+def q22M : Word := 0xa0005000a0005
 abbrev q22G : Word := qGoal &&& q22M
-abbrev q22W : List Word := projectDAGStock q22M qBase [4, 5, 6, 7]
+abbrev q22W : List Word := projectDAGStock q22M qBase [0, 1, 5]
 def q22F : Bound := (q22M, q22W, 4, q22G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q22Bin : BinLower q22M q22W q22G 4 := dagShiftLowerBin (width := 256) [qS20, qS26, qS27, qS22, qS8, qS5] q15Bin (by decide +kernel)
-def q23M : Word := 0x30300000303000000000000000000000303000003030000
+theorem q22Bin : BinLower q22M q22W q22G 4 := dagShiftLowerBin (width := 256) [qS9, qS28, qS6] q8Bin (by decide +kernel)
+def q23M : Word := 0x500000505000005
 abbrev q23G : Word := qGoal &&& q23M
-abbrev q23W : List Word := projectDAGStock q23M qBase [0, 3, 5, 7]
-def q23F : Bound := (q23M, q23W, 7, q23G)
+abbrev q23W : List Word := projectDAGStock q23M qBase [1, 3, 5]
+def q23F : Bound := (q23M, q23W, 4, q23G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q23Bin : BinLower q23M q23W q23G 7 := dagShiftLowerBin (width := 256) [qS16] q16Bin (by decide +kernel)
-def q24M : Word := 0xf0f0f0f0f0f0f0f
+theorem q23Bin : BinLower q23M q23W q23G 4 := dagShiftLowerBin (width := 256) [qS9, qS0] q8Bin (by decide +kernel)
+def q24M : Word := 0x50000000050000005000000005
 abbrev q24G : Word := qGoal &&& q24M
-abbrev q24W : List Word := projectDAGStock q24M qBase [0, 1, 3, 4, 5]
-def q24F : Bound := (q24M, q24W, 7, q24G)
-def q24E := unpackWitnesses q24W [25136, 287792, 553008, 799754, 1077272]
-abbrev q24N : List Word := normStock q24M q24W
-def q24C : List Bound := [q0F, q9F, q15F, q17F]
-def q24S : DagSample := (0xa030280884c140b05024060b0c06806090184c30190c024141a088642209040244021080480422100886012008241028100a01422008840412088c42221, 28)
-def q24L : DagLinkList := dagExtractLinks 0xe38e31341 0x405c3843a04f9043202f1023001f 6 3 12 3 1
-def q24D : Forest := fun i => decodeNode 3 15 0x2e2843205e408c80f8 i
-def q24T := dagTraceTagsBin q24M 28 (dagTagBases q24N 0xc210f74c96f0eb2081f1fdd276f93ffe984 0xda73f74e26fbeba58dfaf9d936fcfffecdf 28) 6 q24D
-def q24St := dagTraceBin q24M q24N 6 q24D
-def q24Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q24Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q24Mv := dagMoves ([([qS1], q24Mp0, q24Mi0)] : List (DagMoveRecord 256))
+abbrev q24W : List Word := projectDAGStock q24M qBase [1, 2, 6]
+def q24F : Bound := (q24M, q24W, 4, q24G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q24A : DagMovesOK q24M q24G 256 q24Mv := dagMovesOfCheck (by decide +kernel)
-def q24NB : Nat → List Bound := dagNodeBounds q24C.toArray 0x4072a9084 0x9378 7 3 2
-def q24Ck := dagCheckNodeBin q24M q24G q24NB 5 q24St q24Mv q24L q24S q24T
-def q24RA (token : Nat) : Bool :=
-  let s := rootState q24N 6 token
-  !dagAllowedRootBin q24M q24E s.2.1 || dagLocalBin q24M q24G (dagKnownClosesBin q24G q24C) s ||
-  dagRefBin q24M 5 q24St q24Mv (fun p tok => dagFindLink (q24L p) tok) 0 token s
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q24RB0 : treeBlock 0 32 q24RA = true := by decide +kernel
-theorem q24R : dagCheckRootsBin q24M q24G (dagKnownClosesBin q24G q24C) q24E (dagRefBin q24M 5 q24St q24Mv (fun p tok => dagFindLink (q24L p) tok) 0) q24N 6 = true := q24RB0
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q24B0 : treeBlock 0 5 q24Ck = true := by decide +kernel
-theorem q24Bk : treeBlock 0 5 q24Ck = true := q24B0
-theorem q24K : KnownBin q24C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q17Bin) q15Bin) q9Bin) q0Bin)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q24Bin : BinLower q24M q24W q24G 7 := by
-  apply lowerDagBin _ _ _ _ q24A _ _ _ q24K _ (fun _ b hb => dagNodeBounds_mem b hb) q24R q24Bk
-  · unfold Masked; decide +kernel
-  · unfold Masked; decide +kernel
-  · unfold properWord; decide +kernel
-  · decide +kernel
-  · exact stockMaskedOfCheck (by decide +kernel)
-  · decide +kernel
-  · decide +kernel
-  · have h : q24C.all (fun b => q24M &&& b.1 == b.1) = true := by decide +kernel
-    intro b hb
-    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q25M : Word := 0xf000f000f000f0000000000000000000f000f000f000f
+theorem q24Bin : BinLower q24M q24W q24G 4 := dagShiftLowerBin (width := 256) [qS10, qS0, qS6, qS18] q8Bin (by decide +kernel)
+def q25M : Word := 0xc0300000000000000000000000000000c03
 abbrev q25G : Word := qGoal &&& q25M
-abbrev q25W : List Word := projectDAGStock q25M qBase [0, 1, 4, 5, 7]
-def q25F : Bound := (q25M, q25W, 7, q25G)
-def q25E := unpackWitnesses q25W [74384, 337040, 534019, 876688, 1138736]
-abbrev q25N : List Word := normStock q25M q25W
-def q25C : List Bound := [q4F, q14F, q15F, q3F, q19F]
-def q25S : DagSample := (0x120a0182802213088480613180c4061201088402218048223108884402140204201201209008248048041208a44228100a0402214028040a0, 25)
-def q25L : DagLinkList := dagExtractLinks 0xd59 0x15c24c1f 3 1 7 2 1
-def q25D : Forest := fun i => decodeNode 2 9 0x5c89a7c i
-def q25T := dagTraceTagsBin q25M 25 (dagTagBases q25N 0x1a787c3c43c1fe0cec7ce91ff07ff4c4 0x18b9fc3f4fedf85c6d3eecdffcfff67d 25) 6 q25D
-def q25St := dagTraceBin q25M q25N 6 q25D
-def q25Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 4, 7, 6, 5] 0 i.val)
-def q25Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 4, 7, 6, 5] 0 i.val)
-def q25Mv := dagMoves ([([qS6], q25Mp0, q25Mi0)] : List (DagMoveRecord 256))
+abbrev q25W : List Word := projectDAGStock q25M qBase [0, 1, 7]
+def q25F : Bound := (q25M, q25W, 4, q25G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q25A : DagMovesOK q25M q25G 256 q25Mv := dagMovesOfCheck (by decide +kernel)
-def q25NB : Nat → List Bound := dagNodeBounds q25C.toArray 0x101585 0x444283 7 3 3
-def q25Ck := dagCheckNodeBin q25M q25G q25NB 3 q25St q25Mv q25L q25S q25T
-def q25RA (token : Nat) : Bool :=
-  let s := rootState q25N 6 token
-  !dagAllowedRootBin q25M q25E s.2.1 || dagLocalBin q25M q25G (dagKnownClosesBin q25G q25C) s ||
-  dagRefBin q25M 3 q25St q25Mv (fun p tok => dagFindLink (q25L p) tok) 0 token s
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q25RB0 : treeBlock 0 32 q25RA = true := by decide +kernel
-theorem q25R : dagCheckRootsBin q25M q25G (dagKnownClosesBin q25G q25C) q25E (dagRefBin q25M 3 q25St q25Mv (fun p tok => dagFindLink (q25L p) tok) 0) q25N 6 = true := q25RB0
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q25B0 : treeBlock 0 3 q25Ck = true := by decide +kernel
-theorem q25Bk : treeBlock 0 3 q25Ck = true := q25B0
-theorem q25K : KnownBin q25C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q19Bin) q3Bin) q15Bin) q14Bin) q4Bin)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q25Bin : BinLower q25M q25W q25G 7 := by
-  apply lowerDagBin _ _ _ _ q25A _ _ _ q25K _ (fun _ b hb => dagNodeBounds_mem b hb) q25R q25Bk
-  · unfold Masked; decide +kernel
-  · unfold Masked; decide +kernel
-  · unfold properWord; decide +kernel
-  · decide +kernel
-  · exact stockMaskedOfCheck (by decide +kernel)
-  · decide +kernel
-  · decide +kernel
-  · have h : q25C.all (fun b => q25M &&& b.1 == b.1) = true := by decide +kernel
-    intro b hb
-    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q26M : Word := 0xf0f0000000000000f0f0000000000000f0f0000000000000f0f
+theorem q25Bin : BinLower q25M q25W q25G 4 := dagShiftLowerBin (width := 256) [qS34, qS28, qS6, qS24, qS25] q8Bin (by decide +kernel)
+def q26M : Word := 0xa0005000000000000000000000000000a0005
 abbrev q26G : Word := qGoal &&& q26M
-abbrev q26W : List Word := projectDAGStock q26M qBase [0, 1, 3, 6, 7]
-def q26F : Bound := (q26M, q26W, 8, q26G)
-def q26E := unpackWitnesses q26W [66176, 328832, 594048, 884864, 1151048]
-abbrev q26N : List Word := normStock q26M q26W
-def q26C : List Bound := [q2F, q6F]
-def q26S : DagSample := (0x30082c12432082430502c14090182c904a01824064324124900905128824920824100940204804201209008201a0402090422100880520802810110880c0403008281, 30)
-def q26L : DagLinkList := dagExtractLinks 0xa0280a028098a519425094250942328c1d65d8da07001 0x50450104400f85c4e05c0e04c49031090210a01d0d0190c015050118b45e8a4520b43e0a4320442d0402189852098320442d8605e850520804d0704c0603e050320402da3c43238338344303423c204fc10432203f210334202f410230201f010130001f 10 4 12 5 3
-def q26D : Forest := fun i => decodeNode 5 17 0x880d85c602618064802a443e1a190e0c8409a204c101f080c8405a2423080f8404c203e0 i
-def q26T := dagTraceTagsBin q26M 30 (dagTagBases q26N 0x28421ceee4b78f5f4103e3f0e93bfc47ffd108 0x2b4e7ceef137d75f4b1bf5f8ec9bfebfffdbbd 30) 7 q26D
-def q26St := dagTraceBin q26M q26N 7 q26D
-def q26Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 6, 2, 3, 4, 5, 1, 7] 0 i.val)
-def q26Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 6, 2, 3, 4, 5, 1, 7] 0 i.val)
-def q26Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [1, 0, 2, 6, 4, 5, 3, 7] 0 i.val)
-def q26Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [1, 0, 2, 6, 4, 5, 3, 7] 0 i.val)
-def q26Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 0, 2, 1, 4, 5, 3, 7] 0 i.val)
-def q26Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [1, 3, 2, 6, 4, 5, 0, 7] 0 i.val)
-def q26Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q26Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q26Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 6, 2, 0, 4, 5, 1, 7] 0 i.val)
-def q26Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 6, 2, 0, 4, 5, 1, 7] 0 i.val)
-def q26Mp5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [1, 3, 2, 6, 4, 5, 0, 7] 0 i.val)
-def q26Mi5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 0, 2, 1, 4, 5, 3, 7] 0 i.val)
-def q26Mp6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 3, 2, 1, 4, 5, 0, 7] 0 i.val)
-def q26Mi6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 3, 2, 1, 4, 5, 0, 7] 0 i.val)
-def q26Mv := dagMoves ([([qS24], q26Mp0, q26Mi0), ([qS3, qS11], q26Mp1, q26Mi1), ([qS28, qS24, qS11], q26Mp2, q26Mi2), ([qS1], q26Mp3, q26Mi3), ([qS1, qS24], q26Mp4, q26Mi4), ([qS3, qS9, qS11], q26Mp5, q26Mi5), ([qS28, qS9], q26Mp6, q26Mi6)] : List (DagMoveRecord 256))
+abbrev q26W : List Word := projectDAGStock q26M qBase [0, 1, 7]
+def q26F : Bound := (q26M, q26W, 4, q26G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q26A : DagMovesOK q26M q26G 256 q26Mv := dagMovesOfCheck (by decide +kernel)
-def q26NB : Nat → List Bound := dagNodeBounds q26C.toArray 0x44891223e72e192d58b13213448502 0x164aa 7 2 1
-def q26Ck := dagCheckNodeBin q26M q26G q26NB 17 q26St q26Mv q26L q26S q26T
-def q26RA (token : Nat) : Bool :=
-  let s := rootState q26N 7 token
-  !dagAllowedRootBin q26M q26E s.2.1 || dagLocalBin q26M q26G (dagKnownClosesBin q26G q26C) s ||
-  dagRefBin q26M 17 q26St q26Mv (fun p tok => dagFindLink (q26L p) tok) 0 token s
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q26RB0 : treeBlock 0 32 q26RA = true := by decide +kernel
-theorem q26R : dagCheckRootsBin q26M q26G (dagKnownClosesBin q26G q26C) q26E (dagRefBin q26M 17 q26St q26Mv (fun p tok => dagFindLink (q26L p) tok) 0) q26N 7 = true := q26RB0
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q26B0 : treeBlock 0 16 q26Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q26B16 : treeBlock 16 1 q26Ck = true := by decide +kernel
-theorem q26Bk : treeBlock 0 17 q26Ck = true := (@treeBlock_merge 0 16 1 q26Ck q26B0 q26B16)
-theorem q26K : KnownBin q26C := (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q6Bin) q2Bin)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q26Bin : BinLower q26M q26W q26G 8 := by
-  apply lowerDagBin _ _ _ _ q26A _ _ _ q26K _ (fun _ b hb => dagNodeBounds_mem b hb) q26R q26Bk
-  · unfold Masked; decide +kernel
-  · unfold Masked; decide +kernel
-  · unfold properWord; decide +kernel
-  · decide +kernel
-  · exact stockMaskedOfCheck (by decide +kernel)
-  · decide +kernel
-  · decide +kernel
-  · have h : q26C.all (fun b => q26M &&& b.1 == b.1) = true := by decide +kernel
-    intro b hb
-    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q27M : Word := 0x550055000000000055005500000000005500550000000000550055
+theorem q26Bin : BinLower q26M q26W q26G 4 := dagShiftLowerBin (width := 256) [qS9, qS28, qS6, qS24, qS25] q8Bin (by decide +kernel)
+def q27M : Word := 0xa0000000000000005000000000000000a0000000000000005
 abbrev q27G : Word := qGoal &&& q27M
-abbrev q27W : List Word := projectDAGStock q27M qBase [1, 2, 4, 6, 7]
-def q27F : Bound := (q27M, q27W, 7, q27G)
-def q27E := unpackWitnesses q27W [74896, 338064, 565312, 893072, 1146944]
-abbrev q27N : List Word := normStock q27M q27W
-def q27C : List Bound := [q1F, q7F]
-def q27S : DagSample := (0xa05828120305920940304880420211020502014028440804900822011100840104828940a21004820110880c0403012050, 22)
-def q27L : DagLinkList := dagExtractLinks 0x9 0x1f 2 1 5 1 1
-def q27D : Forest := fun i => decodeNode 1 6 0x3e i
-def q27T := dagTraceTagsBin q27M 22 (dagTagBases q27N 0x4f3674db27c1973ef837c3bfa89 0x35ff6715be7cba79efb77efbfafc 22) 6 q27D
-def q27St := dagTraceBin q27M q27N 6 q27D
-def q27Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 7, 4, 3, 2, 5, 6, 1] 0 i.val)
-def q27Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 7, 4, 3, 2, 5, 6, 1] 0 i.val)
-def q27Mv := dagMoves ([([qS26, qS27], q27Mp0, q27Mi0)] : List (DagMoveRecord 256))
+abbrev q27W : List Word := projectDAGStock q27M qBase [0, 1, 7]
+def q27F : Bound := (q27M, q27W, 4, q27G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q27A : DagMovesOK q27M q27G 256 q27Mv := dagMovesOfCheck (by decide +kernel)
-def q27NB : Nat → List Bound := dagNodeBounds q27C.toArray 0x2 0x2 4 2 1
-def q27Ck := dagCheckNodeBin q27M q27G q27NB 1 q27St q27Mv q27L q27S q27T
-def q27RA (token : Nat) : Bool :=
-  let s := rootState q27N 6 token
-  !dagAllowedRootBin q27M q27E s.2.1 || dagLocalBin q27M q27G (dagKnownClosesBin q27G q27C) s ||
-  dagRefBin q27M 1 q27St q27Mv (fun p tok => dagFindLink (q27L p) tok) 0 token s
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q27RB0 : treeBlock 0 32 q27RA = true := by decide +kernel
-theorem q27R : dagCheckRootsBin q27M q27G (dagKnownClosesBin q27G q27C) q27E (dagRefBin q27M 1 q27St q27Mv (fun p tok => dagFindLink (q27L p) tok) 0) q27N 6 = true := q27RB0
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q27B0 : treeBlock 0 1 q27Ck = true := by decide +kernel
-theorem q27Bk : treeBlock 0 1 q27Ck = true := q27B0
-theorem q27K : KnownBin q27C := (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q7Bin) q1Bin)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q27Bin : BinLower q27M q27W q27G 7 := by
-  apply lowerDagBin _ _ _ _ q27A _ _ _ q27K _ (fun _ b hb => dagNodeBounds_mem b hb) q27R q27Bk
-  · unfold Masked; decide +kernel
-  · unfold Masked; decide +kernel
-  · unfold properWord; decide +kernel
-  · decide +kernel
-  · exact stockMaskedOfCheck (by decide +kernel)
-  · decide +kernel
-  · decide +kernel
-  · have h : q27C.all (fun b => q27M &&& b.1 == b.1) = true := by decide +kernel
-    intro b hb
-    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q28M : Word := 0xf0f00000f0f00000f0f00000f0f
+theorem q27Bin : BinLower q27M q27W q27G 4 := dagShiftLowerBin (width := 256) [qS3, qS28, qS6, qS24, qS25] q8Bin (by decide +kernel)
+def q28M : Word := 0x22000000000000001100000000000000220000000000000011
 abbrev q28G : Word := qGoal &&& q28M
-abbrev q28W : List Word := projectDAGStock q28M qBase [0, 1, 3, 5, 6]
-def q28F : Bound := (q28M, q28W, 7, q28G)
+abbrev q28W : List Word := projectDAGStock q28M qBase [0, 2, 7]
+def q28F : Bound := (q28M, q28W, 4, q28G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q28Bin : BinLower q28M q28W q28G 7 := dagShiftLowerBin (width := 256) [qS12] q24Bin (by decide +kernel)
-def q29M : Word := 0xf000f000f000f000f000f000f000f
+theorem q28Bin : BinLower q28M q28W q28G 4 := dagShiftLowerBin (width := 256) [qS3, qS6, qS24, qS25] q8Bin (by decide +kernel)
+def q29M : Word := 0x500000500000000000000000000000005000005
 abbrev q29G : Word := qGoal &&& q29M
-abbrev q29W : List Word := projectDAGStock q29M qBase [0, 1, 4, 5, 6]
-def q29F : Bound := (q29M, q29W, 7, q29G)
+abbrev q29W : List Word := projectDAGStock q29M qBase [1, 3, 7]
+def q29F : Bound := (q29M, q29W, 4, q29G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q29Bin : BinLower q29M q29W q29G 7 := dagShiftLowerBin (width := 256) [qS20, qS21, qS11] q24Bin (by decide +kernel)
-def q30M : Word := 0x5050505050505050505050505050505
+theorem q29Bin : BinLower q29M q29W q29G 4 := dagShiftLowerBin (width := 256) [qS9, qS0, qS24, qS25] q8Bin (by decide +kernel)
+def q30M : Word := 0x1100000000000000001100000000000011000000000000000011
 abbrev q30G : Word := qGoal &&& q30M
-abbrev q30W : List Word := projectDAGStock q30M qBase [1, 3, 4, 5, 6]
-def q30F : Bound := (q30M, q30W, 7, q30G)
+abbrev q30W : List Word := projectDAGStock q30M qBase [2, 3, 7]
+def q30F : Bound := (q30M, q30W, 4, q30G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q30Bin : BinLower q30M q30W q30G 7 := dagShiftLowerBin (width := 256) [qS20, qS21, qS27, qS11, qS12] q24Bin (by decide +kernel)
-def q31M : Word := 0xf0f0f0f0000000000000000000000000f0f0f0f
+theorem q30Bin : BinLower q30M q30W q30G 4 := dagShiftLowerBin (width := 256) [qS3, qS27, qS28, qS24, qS25] q8Bin (by decide +kernel)
+def q31M : Word := 0x1000000000001000100000000000100010000000000010001000000000001
 abbrev q31G : Word := qGoal &&& q31M
-abbrev q31W : List Word := projectDAGStock q31M qBase [0, 1, 3, 4, 7]
-def q31F : Bound := (q31M, q31W, 7, q31G)
+abbrev q31W : List Word := projectDAGStock q31M qBase [4, 6, 7]
+def q31F : Bound := (q31M, q31W, 4, q31G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q31Bin : BinLower q31M q31W q31G 7 := dagShiftLowerBin (width := 256) [qS6, qS7] q24Bin (by decide +kernel)
-def q32M : Word := 0x50505050505050500000000000000000505050505050505
+theorem q31Bin : BinLower q31M q31W q31G 4 := dagShiftLowerBin (width := 256) [qS10, qS20, qS12, qS21, qS16, qS24] q8Bin (by decide +kernel)
+def q32M : Word := 0x500050000000000500050
 abbrev q32G : Word := qGoal &&& q32M
-abbrev q32W : List Word := projectDAGStock q32M qBase [1, 3, 4, 5, 7]
-def q32F : Bound := (q32M, q32W, 7, q32G)
+abbrev q32W : List Word := projectDAGStock q32M qBase [1, 2, 4]
+def q32F : Bound := (q32M, q32W, 4, q32G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q32Bin : BinLower q32M q32W q32G 7 := dagShiftLowerBin (width := 256) [qS1, qS10] q25Bin (by decide +kernel)
-def q33M : Word := 0x3333000000000000333300000000000033330000000000003333
+theorem q32Bin : BinLower q32M q32W q32G 4 := dagShiftLowerBin (width := 256) [qS3, qS35, qS0, qS6, qS26] q8Bin (by decide +kernel)
+def q33M : Word := 0x500050000000005000500
 abbrev q33G : Word := qGoal &&& q33M
-abbrev q33W : List Word := projectDAGStock q33M qBase [0, 2, 3, 6, 7]
-def q33F : Bound := (q33M, q33W, 8, q33G)
+abbrev q33W : List Word := projectDAGStock q33M qBase [1, 3, 4]
+def q33F : Bound := (q33M, q33W, 4, q33G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q33Bin : BinLower q33M q33W q33G 8 := dagShiftLowerBin (width := 256) [qS14] q26Bin (by decide +kernel)
-def q34M : Word := 0xf000f00000000000f000f00000000000f000f00000000000f000f
+theorem q33Bin : BinLower q33M q33W q33G 4 := dagShiftLowerBin (width := 256) [qS3, qS36, qS0, qS26] q8Bin (by decide +kernel)
+def q34M : Word := 0x3000000030000030000000300
 abbrev q34G : Word := qGoal &&& q34M
-abbrev q34W : List Word := projectDAGStock q34M qBase [0, 1, 4, 6, 7]
-def q34F : Bound := (q34M, q34W, 7, q34G)
+abbrev q34W : List Word := projectDAGStock q34M qBase [0, 3, 5]
+def q34F : Bound := (q34M, q34W, 4, q34G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q34Bin : BinLower q34M q34W q34G 7 := dagShiftLowerBin (width := 256) [qS20, qS26, qS6, qS7] q25Bin (by decide +kernel)
-def q35M : Word := 0xf0000000f0000000f0000000f0000000f0000000f0000000f0000000f
+theorem q34Bin : BinLower q34M q34W q34G 4 := dagShiftLowerBin (width := 256) [qS3] q8Bin (by decide +kernel)
+def q35M : Word := 0x11000000000000001100000000000000220000000000000022
 abbrev q35G : Word := qGoal &&& q35M
-abbrev q35W : List Word := projectDAGStock q35M qBase [0, 1, 5, 6, 7]
-def q35F : Bound := (q35M, q35W, 7, q35G)
+abbrev q35W : List Word := projectDAGStock q35M qBase [0, 2, 6]
+def q35F : Bound := (q35M, q35W, 4, q35G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q35Bin : BinLower q35M q35W q35G 7 := dagShiftLowerBin (width := 256) [qS13, qS12, qS5, qS7] q27Bin (by decide +kernel)
-def q36M : Word := 0x3300000033000000330000003300000033000000330000003300000033
+theorem q35Bin : BinLower q35M q35W q35G 4 := dagShiftLowerBin (width := 256) [qS13, qS4, qS6, qS18] q8Bin (by decide +kernel)
+def q36M : Word := 0x30300000000000003030000000000000000
 abbrev q36G : Word := qGoal &&& q36M
-abbrev q36W : List Word := projectDAGStock q36M qBase [0, 2, 5, 6, 7]
-def q36F : Bound := (q36M, q36W, 8, q36G)
+abbrev q36W : List Word := projectDAGStock q36M qBase [0, 3, 6]
+def q36F : Bound := (q36M, q36W, 4, q36G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q36Bin : BinLower q36M q36W q36G 8 := dagShiftLowerBin (width := 256) [qS14, qS0, qS8] q26Bin (by decide +kernel)
-def q37M : Word := 0x5500000055000000550000005500000055000000550000005500000055
+theorem q36Bin : BinLower q36M q36W q36G 4 := dagShiftLowerBin (width := 256) [qS13, qS37, qS18] q8Bin (by decide +kernel)
+def q37M : Word := 0x11000000000000001100000000000011000000000000001100
 abbrev q37G : Word := qGoal &&& q37M
-abbrev q37W : List Word := projectDAGStock q37M qBase [1, 2, 5, 6, 7]
-def q37F : Bound := (q37M, q37W, 7, q37G)
+abbrev q37W : List Word := projectDAGStock q37M qBase [2, 3, 6]
+def q37F : Bound := (q37M, q37W, 4, q37G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q37Bin : BinLower q37M q37W q37G 7 := dagShiftLowerBin (width := 256) [qS8, qS7] q27Bin (by decide +kernel)
-def q38M : Word := 0x111100001111000011110000111100001111000011110000111100001111
+theorem q37Bin : BinLower q37M q37W q37G 4 := dagShiftLowerBin (width := 256) [qS13, qS36, qS27, qS28, qS18] q8Bin (by decide +kernel)
+def q38M : Word := 0x30000000300000003000000030000000000000000
 abbrev q38G : Word := qGoal &&& q38M
-abbrev q38W : List Word := projectDAGStock q38M qBase [2, 3, 5, 6, 7]
-def q38F : Bound := (q38M, q38W, 8, q38G)
+abbrev q38W : List Word := projectDAGStock q38M qBase [0, 5, 6]
+def q38F : Bound := (q38M, q38W, 4, q38G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q38Bin : BinLower q38M q38W q38G 8 := dagShiftLowerBin (width := 256) [qS13, qS9, qS11, qS12, qS5] q26Bin (by decide +kernel)
-def q39M : Word := 0x3000300030003000300030003000300030003000300030003000300030003
+theorem q38Bin : BinLower q38M q38W q38G 4 := dagShiftLowerBin (width := 256) [qS13, qS37, qS22, qS26, qS18] q8Bin (by decide +kernel)
+def q39M : Word := 0x11000000000000001100000011000000000000001100000000
 abbrev q39G : Word := qGoal &&& q39M
-abbrev q39W : List Word := projectDAGStock q39M qBase [0, 4, 5, 6, 7]
-def q39F : Bound := (q39M, q39W, 7, q39G)
+abbrev q39W : List Word := projectDAGStock q39M qBase [2, 5, 6]
+def q39F : Bound := (q39M, q39W, 4, q39G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q39Bin : BinLower q39M q39W q39G 7 := dagShiftLowerBin (width := 256) [qS24, qS25, qS0, qS6] q24Bin (by decide +kernel)
-def q40M : Word := 0x5000500050005000500050005000500050005000500050005000500050005
+theorem q39Bin : BinLower q39M q39W q39G 4 := dagShiftLowerBin (width := 256) [qS13, qS38, qS27, qS28, qS22, qS26, qS18] q8Bin (by decide +kernel)
+def q40M : Word := 0x11000000000011000000000000000000110000000000110000
 abbrev q40G : Word := qGoal &&& q40M
-abbrev q40W : List Word := projectDAGStock q40M qBase [1, 4, 5, 6, 7]
-def q40F : Bound := (q40M, q40W, 7, q40G)
+abbrev q40W : List Word := projectDAGStock q40M qBase [2, 4, 7]
+def q40F : Bound := (q40M, q40W, 4, q40G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q40Bin : BinLower q40M q40W q40G 7 := dagShiftLowerBin (width := 256) [qS26, qS27, qS4, qS8, qS7] q27Bin (by decide +kernel)
-def q41M : Word := 0xf0f0f0f0f0f0f0f0
+theorem q40Bin : BinLower q40M q40W q40G 4 := dagShiftLowerBin (width := 256) [qS3, qS19, qS27, qS28, qS1, qS24, qS25] q8Bin (by decide +kernel)
+def q41M : Word := 0xa000a0000000005000500
 abbrev q41G : Word := qGoal &&& q41M
-abbrev q41W : List Word := projectDAGStock q41M qBase [0, 1, 3, 4, 5]
-def q41F : Bound := (q41M, q41W, 7, q41G)
+abbrev q41W : List Word := projectDAGStock q41M qBase [0, 1, 4]
+def q41F : Bound := (q41M, q41W, 4, q41G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q41Bin : BinLower q41M q41W q41G 7 := dagShiftLowerBin (width := 256) [qS15] q24Bin (by decide +kernel)
-def q42M : Word := 0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f
+theorem q41Bin : BinLower q41M q41W q41G 4 := dagShiftLowerBin (width := 256) [qS34, qS3, qS28, qS6, qS26] q8Bin (by decide +kernel)
+def q42M : Word := 0x30000000300000c0000000c00
 abbrev q42G : Word := qGoal &&& q42M
-abbrev q42W : List Word := projectDAGStock q42M qBase [0, 1, 3, 4, 5, 6]
-def q42F : Bound := (q42M, q42W, 10, q42G)
-def q42E := unpackWitnesses q42W [49760, 312416, 577632, 843872, 1101896, 1368112]
-abbrev q42N : List Word := normStock q42M q42W
-def q42C : List Bound := [q0F, q10F, q1F, q30F, q24F, q29F, q12F, q28F, q11F, q9F]
-def q42S : DagSample := (0x280008860320188c142a00108824324128c06230088c068209449058089443058081400261241a022130502c14090182c301a0182406130c0643009050682219088244021010884022180481028100a01422088c4c0700888410090190c9049240242012201080209051288249208240412201400442008846070209848221, 57)
-def q42L : DagLinkList := dagExtractLinks 0x1e83d07a0f03e03c0780ec3d83a0f02ccb98330641c81886d25a09cd09a103856c2d801d001 0x3246c180220b80f2590f82c04c95629ab917d588a62e43f162198aa1f05085da74609362819a1404c0a11906352437e8218c4909f208431101745c18d410de9e8631042787a10c380781b0634c437a5a18c3109e168430a01e61417f060a706c5382625c0b10d910a64c84b254219220cf188bf8a4538922784912c2088e0e4438621fc290cc8885e424234402983012c14086080330301181006c040260003f 11 5 13 5 3
-def q42D : Forest := fun i => decodeNode 5 18 0x2365c089321fbc866f43e3085ca0282509e70171d09e64219807868319109e44219007832258488e12218409610218406610118403610098407e0 i
-def q42T := dagTraceTagsBin q42M 57 (dagTagBases q42N 0x3b7ad0847e834e9007f92dc6f65af76d5a083cf4c3feff06e93dcfbe6c1c7cfff103ffe1f0807ffffb34c9 0x3b7ad69cfeaf4e9cfffc4ddef7daff6f5a58fd74effeffc6ec9dd7bfef7c7ffff4b7fff7f80f7ffffb965c 57) 9 q42D
-def q42St := dagTraceBin q42M q42N 9 q42D
-def q42Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 6, 5, 4, 7] 0 i.val)
-def q42Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 6, 5, 4, 7] 0 i.val)
-def q42Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q42Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q42Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 6, 5, 4, 7] 0 i.val)
-def q42Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 6, 5, 4, 7] 0 i.val)
-def q42Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 5, 2, 6, 0, 1, 3, 7] 0 i.val)
-def q42Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 5, 2, 6, 0, 1, 3, 7] 0 i.val)
-def q42Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 5, 2, 4, 0, 1, 3, 7] 0 i.val)
-def q42Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 5, 2, 6, 3, 1, 0, 7] 0 i.val)
-def q42Mp5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 5, 2, 6, 3, 1, 0, 7] 0 i.val)
-def q42Mi5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 5, 2, 4, 0, 1, 3, 7] 0 i.val)
-def q42Mp6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 5, 2, 4, 3, 1, 0, 7] 0 i.val)
-def q42Mi6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 5, 2, 4, 3, 1, 0, 7] 0 i.val)
-def q42Mv := dagMoves ([([qS12], q42Mp0, q42Mi0), ([qS1], q42Mp1, q42Mi1), ([qS1, qS12], q42Mp2, q42Mi2), ([qS20, qS21, qS11], q42Mp3, q42Mi3), ([qS28, qS21, qS4, qS12], q42Mp4, q42Mi4), ([qS20, qS21, qS11, qS12], q42Mp5, q42Mi5), ([qS28, qS21, qS4], q42Mp6, q42Mi6)] : List (DagMoveRecord 256))
+abbrev q42W : List Word := projectDAGStock q42M qBase [0, 1, 5]
+def q42F : Bound := (q42M, q42W, 4, q42G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q42A : DagMovesOK q42M q42G 256 q42Mv := dagMovesOfCheck (by decide +kernel)
-def q42NB : Nat → List Bound := dagNodeBounds q42C.toArray 0xa0280a02799c66294a428920b7b1d36d19b5f16a5311e3b8be254821744309004 0x34200220682071073103504510410431021682074352068912068352073510614351072106817435 10 3 4
-def q42Ck := dagCheckNodeBin q42M q42G q42NB 26 q42St q42Mv q42L q42S q42T
-def q42RA (token : Nat) : Bool :=
-  let s := rootState q42N 9 token
-  !dagAllowedRootBin q42M q42E s.2.1 || dagLocalBin q42M q42G (dagKnownClosesBin q42G q42C) s ||
-  dagRefBin q42M 26 q42St q42Mv (fun p tok => dagFindLink (q42L p) tok) 0 token s
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q42RB0 : treeBlock 0 64 q42RA = true := by decide +kernel
-theorem q42R : dagCheckRootsBin q42M q42G (dagKnownClosesBin q42G q42C) q42E (dagRefBin q42M 26 q42St q42Mv (fun p tok => dagFindLink (q42L p) tok) 0) q42N 9 = true := q42RB0
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q42B0 : treeBlock 0 16 q42Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q42B16 : treeBlock 16 10 q42Ck = true := by decide +kernel
-theorem q42Bk : treeBlock 0 26 q42Ck = true := (@treeBlock_merge 0 16 10 q42Ck q42B0 q42B16)
-theorem q42K : KnownBin q42C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q9Bin) q11Bin) q28Bin) q12Bin) q29Bin) q24Bin) q30Bin) q1Bin) q10Bin) q0Bin)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q42Bin : BinLower q42M q42W q42G 10 := by
-  apply lowerDagBin _ _ _ _ q42A _ _ _ q42K _ (fun _ b hb => dagNodeBounds_mem b hb) q42R q42Bk
-  · unfold Masked; decide +kernel
-  · unfold Masked; decide +kernel
-  · unfold properWord; decide +kernel
-  · decide +kernel
-  · exact stockMaskedOfCheck (by decide +kernel)
-  · decide +kernel
-  · decide +kernel
-  · have h : q42C.all (fun b => q42M &&& b.1 == b.1) = true := by decide +kernel
-    intro b hb
-    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q43M : Word := 0xf0f0f0f0f0f0f0f00000000000000000f0f0f0f0f0f0f0f
+theorem q42Bin : BinLower q42M q42W q42G 4 := dagShiftLowerBin (width := 256) [qS34, qS3, qS28, qS6] q8Bin (by decide +kernel)
+def q43M : Word := 0x3000000030300000003000000
 abbrev q43G : Word := qGoal &&& q43M
-abbrev q43W : List Word := projectDAGStock q43M qBase [0, 1, 3, 4, 5, 7]
-def q43F : Bound := (q43M, q43W, 10, q43G)
-def q43E := unpackWitnesses q43W [74384, 337040, 602256, 799754, 1138832, 1400880]
-abbrev q43N : List Word := normStock q43M q43W
-def q43C : List Bound := [q4F, q23F, q15F, q24F, q31F, q16F, q25F, q13F, q32F, q0F, q19F, q17F, q20F]
-def q43S : DagSample := (0x1029100a400280022006220c0e03028180e1209101a080683180c4142a48260148a0c2603088482c120a0182c060a00884c140b05024060b0c06806090184c30190c024141a088642209100840422100886012040a0402805088223108884100940204201201209008248048020904221008805208041208a44228100a0402214028040a0, 59)
-def q43L : DagLinkList := dagExtractLinks 0x9e09e09e09e09e09e09e09e09e09e09e09b39659339309219029008f18f08e18e08e08b38838268117f27f07f07f07e17e07c27a27a07a07a07827627516f66695f75875535505054d34b241a3983633152f22691f714b07d016001 0xe086168420740183d2106e485d68422390171a0088ed8c0f4860b32181b8080e98c06c430390301cc180e10c0ec840b40301c4181d90816c4607742f3b2148dc8bc6c452b502f598148dc8616c860364201a9181d10c0684603483019a182c80d86204cb2036190130c40c8608616b420979180908445202e1a0111851c1b98a0d6850ae2381190c26484156070590180a0081b98c4d886e6b431171188888605806e2b03117c182b90c25c841a72174c90889c05c320222d22c9610c484025568612b420901088a805c28022298311411b89c0c44c07c2502e7221c1910a0c0840a423812114080881340701a0280e8130500804906223431112100848dc404629c0374c81887c09abe8501f228098140798dc3ac6213626ae1188700c42645c1b03e0d4189650c432462180370b81b4580d82a06514031098137488c2a44414c218c90184480821803109009894188450c6208410f231041088380dc1a0630c0310580b8280460802209831e421892108510462082214381be180dd0a0638403103813c1809c0a0430402101b14f088a684433820298100cc040260003f 12 4 13 6 2
-def q43D : Forest := fun i => decodeNode 6 19 0x6305ec60b20c144182421844840848c0ec181a4303404c540c8a51c1283020841408b2790c4f4209a02e360c4611b8c0311807c2c0b85c188943112840248dc49188922810c6e1d8c438188703e0d062148c4281b850368a06c140ca2818850268b0620d0c61a10432310606e0c0c6181883017060230e0c61110820278404e080861010826298203304026080fc0 i
-def q43T := dagTraceTagsBin q43M 59 (dagTagBases q43N 0xfd3fe108fc3de1fbcafc96e37873f08f07c1079df1fff4d55749eeede7c439e1ffe20fffc778c03fffff4c44 0x3de7fed39fcfde1fbcafe26ef7df3f79f47cb1fadfafff0d40764ee6df3efbbf9ffe97ffff7fbdcffffff66fd 59) 9 q43D
-def q43St := dagTraceBin q43M q43N 9 q43D
-def q43Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 4, 7, 6, 5] 0 i.val)
-def q43Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 4, 7, 6, 5] 0 i.val)
-def q43Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q43Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q43Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 7, 6, 5] 0 i.val)
-def q43Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 7, 6, 5] 0 i.val)
-def q43Mv := dagMoves ([([qS6], q43Mp0, q43Mi0), ([qS1], q43Mp1, q43Mi1), ([qS1, qS6], q43Mp2, q43Mi2)] : List (DagMoveRecord 256))
+abbrev q43W : List Word := projectDAGStock q43M qBase [0, 3, 5]
+def q43F : Bound := (q43M, q43W, 4, q43G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q43A : DagMovesOK q43M q43G 256 q43Mv := dagMovesOfCheck (by decide +kernel)
-def q43NB : Nat → List Bound := dagNodeBounds q43C.toArray 0x8510a2144218410660c411821042084097e6fc1f4be17b2f45e4bc8790f21e0bc0772e55c4b816f2dc5adb51676cc594b28642c4988310612bb16d2ae50a99125a1e3f878cde98e2ca4d87f8c713a19c1b006 0x2702910447100210543479867083150001503210c2a25043b21904120b20b3271004520a26173012596416753618453a863152a620435643106124305186435816435 11 3 4
-def q43Ck := dagCheckNodeBin q43M q43G q43NB 60 q43St q43Mv q43L q43S q43T
-def q43RA (token : Nat) : Bool :=
-  let s := rootState q43N 9 token
-  !dagAllowedRootBin q43M q43E s.2.1 || dagLocalBin q43M q43G (dagKnownClosesBin q43G q43C) s ||
-  dagRefBin q43M 60 q43St q43Mv (fun p tok => dagFindLink (q43L p) tok) 0 token s
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q43RB0 : treeBlock 0 64 q43RA = true := by decide +kernel
-theorem q43R : dagCheckRootsBin q43M q43G (dagKnownClosesBin q43G q43C) q43E (dagRefBin q43M 60 q43St q43Mv (fun p tok => dagFindLink (q43L p) tok) 0) q43N 9 = true := q43RB0
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q43B0 : treeBlock 0 16 q43Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q43B16 : treeBlock 16 16 q43Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q43B32 : treeBlock 32 16 q43Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q43B48 : treeBlock 48 12 q43Ck = true := by decide +kernel
-theorem q43Bk : treeBlock 0 60 q43Ck = true := (@treeBlock_merge 0 32 28 q43Ck (@treeBlock_merge 0 16 16 q43Ck q43B0 q43B16) (@treeBlock_merge 32 16 12 q43Ck q43B32 q43B48))
-theorem q43K : KnownBin q43C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q20Bin) q17Bin) q19Bin) q0Bin) q32Bin) q13Bin) q25Bin) q16Bin) q31Bin) q24Bin) q15Bin) q23Bin) q4Bin)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q43Bin : BinLower q43M q43W q43G 10 := by
-  apply lowerDagBin _ _ _ _ q43A _ _ _ q43K _ (fun _ b hb => dagNodeBounds_mem b hb) q43R q43Bk
-  · unfold Masked; decide +kernel
-  · unfold Masked; decide +kernel
-  · unfold properWord; decide +kernel
-  · decide +kernel
-  · exact stockMaskedOfCheck (by decide +kernel)
-  · decide +kernel
-  · decide +kernel
-  · have h : q43C.all (fun b => q43M &&& b.1 == b.1) = true := by decide +kernel
-    intro b hb
-    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q44M : Word := 0x333300003333000033330000333300003333000033330000333300003333
+theorem q43Bin : BinLower q43M q43W q43G 4 := dagShiftLowerBin (width := 256) [qS9, qS3] q8Bin (by decide +kernel)
+def q44M : Word := 0x50005000000000000000005000500
 abbrev q44G : Word := qGoal &&& q44M
-abbrev q44W : List Word := projectDAGStock q44M qBase [0, 2, 3, 5, 6, 7]
-def q44F : Bound := (q44M, q44W, 11, q44G)
-def q44E := unpackWitnesses q44W [66176, 329856, 594048, 868480, 1147008, 1425504]
-abbrev q44N : List Word := normStock q44M q44W
-def q44C : List Bound := [q7F, q0F, q36F, q10F, q16F, q33F, q2F, q38F, q8F, q5F, q3F]
-def q44S : DagSample := (0x100a9040a50089400850029100250009041240021008a002a000a8400a80428040680092500a1402a10028008a48068100a40289042240a8402a140028042a0106804320902824300908812094c0610022040a80623040e030300c0a0120b0182c301a090680028048a40030082c124320c0e020914180d060240a0d241300a09100840a25301900a21100a0102802914904924024184c20924820912190826120884100940204804402211008402a0402090422100880621002211028100a01221002810211080c0403008281, 91)
-def q44L : DagLinkList := dagExtractLinks 0x5e502f2817940bca05e502f2817940bca05e502f2817940bca05e502f2817940bca05e502f2817940bca05e502f2817940bca05e502f2817940bca05e502f2817940bca05e502f2817940bca05e502f2817940bca05e502f2817940bca05e502f2817883bc405e202f1017880bc20de006f0017800bc005e002f0017800bc005e002ee0976c1bb40dda02ed017680bb20dd902ec037600bb005d802ec017600bb005d706eb037541baa05d406ea0174c1ba40dd202e9017480ba20dd102e80373c1b9c0dce02e6057300b960dcb02e5037241b900dc412e1056f06b7805bc02de016ec1b7605b90adc816e01b6e0db606da056d00b6805b10ed7856b42b5615a90ad4816a40b5205a70ad28568c2b4605a10ad0036800b3e0d9e06ce0566c1b3215970acb036541b280d920ac80563c1b1c0d8e02c7016341b1a058d02c6816340b1a058d02c6816301b18058b06c5816242b1205870ac3816142b0a058406c1056080b04058106c0816001b00058002c0016000b00058002c0015f82afc057c0abe015e82af4057a02bd015e80af4057a02bc835d44aea05730ab9815c81ae20d7102b8035b43ad80d6c02b6015b00ad8056c02b6015b00ad8056c02b5835a81ad20d6806b38359c0acc0d6602b3015980ac61d6206b1015880ac4056106b00357c1abe055e06af015780abc055e02af015780abc055e02ae835740aba055c06ac875583aaa0d5406aa015500aa60d5302a98154c0aa6055302a9815481aa4055202a9015480aa4055202a8835401a9e0d4f02a78153c0a9c0d4d06a6815301a98054c02a6015300a98054c02a6015300a98054c02a5835107a7e2d3f029e074dc5a6c0d35069a034c04a6005300296874a83a463d210a90814801a40051a1a8a8b4540a2615130289814385a1a0d0a0e84053ecd9ee24f40e79053bc39d624e80e728738839ba2cdd026d8536819b404d31e659131c49881cc20a5f872e859720cb8065a872c8395c24aa12530928c3946049e164b8f228d90e1c7e263a1517188b60c551a280b1286888343e1a1e050ec18701c321a1805098a840341e0a0e0505c5826240e16060502c18140c070e0206ffc57f03bf315f68cfb017d21be319f006f7437b02bd609e614f20478a1bc309df88ee4676633b109d784eac474e239f21cc0ee4c57144b8029bb14dc846d8336325b084d6876a8334f15a50ad20268e0b4605a204d0c16840b41059f06cec36701b350d9a02cc4365243260d908ac74463223160d8a82c4836220b0f098684c2c26101b011d7c90bdc25e232ee0d7214b8045ba1adb096c06b5c15ac0ad4096904b3c359c0ace016682b2c258e22c6056204b08258012bf055e84af4056a42ad215584aa0354c12a4095182a84253c1a98194792a14a4fa427c053a1099cd4c42a5f0d289c91ca48a123f191f028f4146e32244d0f0c854942612110907847d5a3b2e1d120e412708637249a64cc4ba5cd62bca9466096b2490923451170c86163dd51dc48e0386e8634ca18290bc1459922c0315430a514508826c6102d0723c2fa60e2704e88144c00a60001 0xc0c050081808010680c020d230041906048248c0105114020922004164380829890104b120208226440a060081c8b8103a0e0202218040c46048048c030011012002300bd844048108c02f5b1305ec626040a84c08158ba10221b02034300408c6c080e0c08fb21325f723643ee06c17f887a0ff0134a01628840285157fc8ba30111151ff02e840404508060d810031615f92360bd644007fc8c08fe01b11fe23043e606007fd8b92fc11705f202823fd06047f40d82f5b1611fa03603fcc6087c40c00ff41801fd03623f8c6c47f40c08fd31b01fd43003f886007e80c02f9c1701fc62e03f206087a80c10f551b05f722803f605c07ed0c02f8c1701fa62e0be4c4d07e009a0fc91701f84300be645c17c48b80fb81305f222e03ec04c17ce0c02f8c1801f663003ee46007d88c00fbc1801f66300be604d07cc07a2f901341f101e8be706017c60c00f8b1801f583003e845c07cd8c00f911801f383003e246007ca0c00f8b1801ee02e03e006c07b40b82f781301ef01e03dc06c07b40c88f611811eb23003d8c6c07b18c00f5b1601ea23603d486c07910700f481701e802e03d244007a58800f401b15e622e23cc44c07988790f251821e443603ce86007808588f331801e683003c001187910d82f2a1301e541e43c886c17910980f220f01e543203c843407910700f181b01e202e03c205c078e0c00f111001e262003c206c07810d8499017c90f029aada04145b40620b6808413200f821e013a74e8c30e9a1861c923682c006d85700d82df11401be2200298430077c8e00ef11805bd028037a04007680600eea1705bc02083b846c057c0db0ae01b05db02683b603d05308500ed10901d703e0bac05c07580980ea00f05d983103b2c6287090d40ec21889d742903ae421075005a0eb01f01d502e03a807c86ec0c22dd81041d301c8214021046403a0e800561ba03083a405986e40a20db008410900883a206e86e40c40e831211ce238039e46007388a00e611001cf829839d06207348dc0e611881cb22f839445347218da4e0b1789196290390c4d558506c0ae20d01c121c823243186cc0c30d701805b30208b5c04007240520e431201c743e029683c86c00e08e2a1f014a41e436407055858900a4a0f01c7838038b06847158f80e341b61b4030c35e060052c0420e341c11c36384362070470e8db0cf818414a010a38707c07158b80e220e11c36368386c4d07090740ae20e01490108382c4807008d80e0314d1ad230a35046055b0882ab59101182030a2da060067009acddc1851bb430a36646d46b88d80d610c41a7218233c06d06fc0aa8d591851a6230035644106988800d291401be214037a42406f18b80d211401bb82e234647016888a00dd31a05a1220231807c06e40d00dc01901b70160b4045046888e00d1114156a220036cc6e46848c40da80d41b4638033ec68151c8808c501f01b483e0366c5c46a88e02a41140547626036087006c90d08c481f01af430036285a466c0da0d831b41af6360a90c4d06b90988cd01b41ada38035705046a50e02a4217256c23802e244c15cc0b80d641b81ab831035486e06a50c4489a178908429034884e044d07c08420c95882372ad846246200dc8b601881aa62002e043c15c0098ad4d1c11a9838035305055bd0b88b7a13256f23e02de44c85bc0f82b781701a88301b4505206998802d12105581230cad6460152089a2cb10f5198036832a04d268e0a60d3b1781a6629134ac43068d0a60d2a0cd59922fab0a45e56008a6ab59148d412279a76443069087e2a090bc53b211a33205f46140bc8c0014d16b029128204f24ec0860d200fc1410178276023068e0a00d141881a14372b0846e55a88c40d01094193026833ec6806758800cb910118f03e0ab404046718e00ce3141196238032c45085640e02ac814119c838033cc5c06648e00ca914119103e0ab605006760dc0ce418819a237033046206440dc8bf818814462e0328450064c8a00cdc1a019a4200ab0040465a0e00ccb1c01986284b0645c46400f82ab814014342602dc44c065e0dc0cb41881956311326c5206518840c9a0c419221e832006e45f80c40a180f418f834231ec7c46450e00c8a101190038032004046398e02ad313118ea368ae4031463a0f82acc17018f62e031a87006180e08c731b418e626c2e206115c40820c6b18455b626831006106140c02b9810418c22e0308070062c8d80a0117018a834428c07015c00810a351b418962d0ab083d85c60e00c431c214623e0ade450061c0b84c251841866308aaec4d06150c00c21186146036830604d060a0e00c0a1c017d2380ab245c05cc0980c151c018043802fe47c156c8b80be01f017102602f207c15608980bc01f017001e030347006020e00bf11f055722e02f607c05bc0982acc18017f63802fc47005f68e02af117215e03e02f8c7005c58c00bc11f017b23842bc07015588b80ba813017a63112f2c5205e50620bc11b814221e927e05e24e80a40a100f413f017027402215548b88bb81f017602e02e804c45dc0f80bb817156602602ec07405b80980a9917017503e02e807405b80b80b9c18817263702e2c6205c08dc0b7918816e02682db06005b08c20b591801690368ab604d056407a0b511c016703e428a47005840f90a2d1b41640368ab003d056005a2b651c016c838428a87c05980f84b5518456b83002d6c6005a90c30a291b41680368aae04d055c07a2b4c1c055983002d2c7005658c00b211f016823842ba07085768da4b3c18416723082c206d05980c22b2c18816563102c846e25480bc4a8014855602682ac03d054805c0a8008896382d92c5053058c8b60b1114c16102f82c005b244409e483810c11100f820e013057c0db0ae01b095102f129e052155409a2aa013015501e82a803c054405c0a7808a15d23e02be07c15780b80af013215d036c2b806c157409a2ae013015d01e82b803c056e0c40ad31b815963102b046e055c8c40ab01b415503282a8064054c09a0a901f015103a02a047c053c8e80a701f014d036026605c14cc0980a600b114b63e0296c5c05258988a411c0148228028a440052e0c40a531b8149631228e462051009a0a44188147637028c46e05148c40a1813414462e028645005080f80a09140114624028005c05060a00a0117013f03e227c47c04f88b809e113013e831027ac6e04f18c409da140139036026a05c04ee0a009c01b013402e026e06c04e88f809b01b013302e2272c6204e588489c1188138221226e06e44d80c409b8138136021026ac5004d08a00998140132a38425247c14a48b8890113012021e423247004c48c8294113012821e424e47c149c8b8093913011b21e026087c14bd0b8097a13012d21e0a5c45c04b889809690f012c012025445c03d885829091700f52160256c7c03d085809531401216240a4285c44a58e0094b140127620424087014810a0092213011b4200253062448d8dc8903188126626825086e049d0c428a81040f6008824cc5014690a0092b1b81246310a34c4d048d0c428a01040f50088a34c5c04890f8090a1305208310240c62047d0dc08f21b411d4360238865046d0c428d213411a41e81e8011046589088c11f011822e022c44c04620c408bb1b8116631022a85c044c8a008ab140114624022405c044e0a0089117011103e0220024043e8e008301b210a43841fc07c04140b808201b01030360a1c85c043909808681f010c0360a1605c042c098085312010963741f406e04210a008101b0108828020206c04000d808391f00ff0360a0d06204198c4082a1b81044310a04041040806208180a40ff010a204c6204098848809188101221220006e43fc0c408001380ff02101fcc4803f109807eb1b80fc63121f646203ed0dc07d11b80f903601ee04c03e58a607c31b80f763109ec85c03d909807a20f10f663101ecc4243d50dc87a21880f542701e884203ce0c1064818486802f90a0053132408284500c408a01080d001f0140027470c1860e1230c1ae06d03c80b2433813c84f02189900310320042033807c04f009c18e06121980be427014c4c7020818e03101f8042033007c04e00981e245c13180a206301040e8018809a021018c03a07800640ef00a809401123b10dc431a1884ee42e89da85c03b909a076a1300e341e81d683c03b085203190844c5028818a041038c062431117c84c22980c442f013084607580780ea43011d285003a484047431880e841881c643d039c0fa07301f08e2037109406213940ba27201700e502681c804c038c07a07100b804a01101c2c4883100e226201454890208180031012404202b80740dc00c81b601500f4022a6fa1b90df23701c0c6e037c8c5061818c0de01c817e021012002206e91b80dc83181b706343648c486c11800da22801b2442036088006bb1210d643ea1a487c23310dc42ba1880d642e81a485c035109a067213007a41e8198429015c84305e81c60b9038097a05112e40a0a44010548702000f4031035a8e406ac1f80d483901a687e01e507905e01c80d283101a2c6f03418dc067b18c0ce631219406e82f80c705d8188079010819a86e82e80c4066418c0cb22e0994c6e03288dc864b1c08c06310192c50031d88006020c60b8238c16847012e08a225a11400ba226290c441521488003d10f5099038c11407021c00dc41e8188099028891405002bc09a051013008e02080fc04001e807a03800b803d011318946303260c406431b80c7631118cc5343110c606320cd0bd237a17246e42e08c685a118885522f908e45302dc88205991000c521f80aa42f011c84685701bd0a1037213006342280c443a817c86e029815a04d031407e03a80bc06e0118189072030d0fc85911c84b1228214007e42240e406100a40c1012818106342fd0dc05fa1390b1231016244242ac0de84b818c0ab027812e04302fa0fc05eb1c90b623908f045042740fc84401c80bc6378176c6e02e98c423c31340b9431215406f42700dc84b018d087031097147202e20e405bc1400b643f016a872214d0dc423218847842e00f084c014d07c02320c949b23f290c47212a089a045913109b03f210c07202a00ba24581708b2a31896906232c60a405a31888b16290166c4002c90c6258a1040b1418a95246f52688dca4a918d48523118e645f31b48a623c11344a721e88e642f11b484685481bd09a037212a06342140c4439817c86d029814e04d01e007a03980bc06d011816107e02be0e4046c1740ae6391156c6202b58a005631080ab418815447e02a48e405411440a722800ee43d02980fc84a01c887203710d806202340a223e814007701e80e402e01b0044450518c0a56378148c6e028d8c6051318889f62f913cc5311f589a050a1880a0231813e43b027886604e81bc09c037013606302680c4429017c8450298916041014803e022804c099a390131072225e0c404bb10409643f012a87201d909a04a11f809323910e246e21ac8c4046917447d22e00ec44d01c487c03590c809203f012207d02400f804781d408e039011a05d023009a0458130889a31891506202298c4044a18c088237810e46e02188c6042918885122f9088453014485e022108c084037810606e02080da04081b008003280fe06301f80c443e017c87b02988fa04d01f407a03e00bc07b01180f506341e58dc03cb13907823100f044241dc0de83b018c07702780ec04341d60e403ac14907443f00e885e41cc8e4039914907203f20e207201c80bc0388148070831a0de46e01bc89c83741c806e82920da87201b50a483611f906b23900d845e01ac8a483481f806a03600d205e11a28e403441c806763f00ccc7281748fd02b91c846122e88b845c018489a02e113006521f00be43d016087803210d4063219007442d11540a202a810406201c80a203100e8042830c1c806182920c0c7e417d8e4030317805f62920bc47e01788bc01c90b005d831a0b8c62017188482da1bd05a43720b286341610c402da13c05a42700b2843016108502a018c4540218072011015e0c682b11b805622720ab07201560a482a21f805442f20a6472014c8a482901f905103900a405e01440a422851c8050839009ec7e01398e5024a1c804d419088e451011c88202610e4044218807442d81000fd01e81c8043036808406c012c07c02500c803a016809306341210dc024213a03e037087c04e411e0e4023c149046439008c85241148fc82211c804522f008845201040d8a21c18d0436318086c4351098a6821214c042419c0820531104066020808c040831a07e86e00fd09c81f118803e221007b06340ec0dc01e017003b027287506340e98c601d310e039437087284e00e507d417d18c4388310070c6200dd0dc01b218883542f106885320b10a5017918c035214806842300b084301481be023031902605f20380a62110104022018806602f009805a01900a403101280600230060042009807c00e009805f06340b90c4017210902d237205846200b489c016110a02103188420430080062006808401000e805601900a802a0040044029831a05086f409d0dc813218882542f102085200a109e013a138026421002e83d00948520081085024037403e06380780c4012013841f021883c042005c062c10d18c023831904305340898c441031480226212042863008508601020c501f237a03c46e40748c680e118880f22f9018453007c89e00f113801d2218038442005c87a00790bc00c211a03606f40680dc80c818d018031102c05f20540bc40a014c808029003604f006809c00c810c018021002e03d005805e00a80b80140118010022504e0c6809b18c013621c02446f80448dd0081188412227882244e104088400910fc01121f0020432001c85b007818c40f021801e033001c042a07418d00e631801cc4380350c4206a10800d4194018463103088600610cc007216c01206e80200c4005817400a02e081204e102008400480f8008019000e02da0160a6a03314cc05621a00c853201508600320ce005229880a4330014847002017e003029900404f200408620200fc403019800802f000c046001007c001009800003f 17 6 13 10 4
-def q44D : Forest := fun i => decodeNode 10 23 0x8c0edc181da21c3a2c48741890e79131cb41c3824606f98bad7b1b1ab8303540456a20d8d23161a262e3350606590c0c8b1718e430310c5c61c8b8c2a181848302e0c605c20c0b31171648302b50605618c0ac01b15001e2a006c5380c8a731814862c29086c51d8809c81b13743025b0604850c88da0e11783020ec404080d88021b0f52381e04603c10b87791b0ed01e9d84243a58c473a188e72109ce07c3980b87301f0e401c9c40593840dc6fb120dc8299b70623688dc6d1188da22f9b24533640526c3120d78381a90703498b86820e0d062699e83a33d89066b14ccc02a99242831c84863b170c682e18ac683100d0620190c4016186c6e30006a6041f0be62e17c8682f50b45e31b4ba63617484c2ea8e05cc1b8b8831170c402de0a05b4180b562f168c522d10665a00fcb48281670622c90dc591094b2634162c5c2be0dc574188ae8341568402ad8e0553140aa8371510622a18c4543108a841895043d2a1080538100a762e148c4d28d8c2511170a12361410682798b44eb1c09c02e138c6126d0c04d91849b0269374702668e04b41c09663812a4702568e04a31c093238126c622450624891b89102e11e0742380f84681d08d831118c6e2318c44611b88c23111804d2320c045c1c08763010c8612198e04291c0852309080612118c44191b88322d9044532080be41016c8203e10004c20007a3f80f07f8310fcc6e1f98c43f11b87e2310fc06d1f80ca3f01907e0268fc07c1f40e83e91f07c23a0f807c1f00d83e00b07c8310f4c6e1e98c43d4188796370f246e1e48c43cb170782280f007c1de0a03a11707303e0e50621c18dc383188708280dc47c1b18843591086b0270d60421ad8a03511406a0280d54701a48c83421f0664260cc44c1908783200906363e0c0c5017e0c42ea1b85d4310bac501718dc2db1885b4310b687c1690982d3188594370b286d1650d82ca194594310b283d1658902c4188576370aec6215d8a02ab120558280a845c14c0f829009052a380a284c1300f82581b04b026096c481298dc24c1404723e08ac6210d0dc21a18843014886c4210888421013842021084c481058dc2031884043707e46e0fd8a61eb1b83c631078c420e909c1d21083a8300720590e08b81b00643500a86a84d0d10981a10a43400f0668600c88401920c43103e86207c0c409a1881303101e86202e0c58901831b82e23105c0390b88dc16c18c2c8318564500ac8841591002b6240554720a60fc14c1c82943f0530620a18de1431b828631850c620a10dc13c18c2622e04c46e0960c411b1b82363104683308c07e11c1c82243f04402908804a11418c2142704307e0818e41031bc1f63703ec6207d0c40fc1c81e82803c87e0790e40f31881d62003a8630750620ec1f81c839038c720718a00e31081c41883847e0708e40e11441c22803807e0718de0db1b81b631836c6206d0c40d918c1b21d83643306c0de0d81b81b03183606206e8e40d41c81a62083487e0690e40d11f81a23903407e0680fa0d01f01a03a8340720680ba0d01341a026034c620650c60c91bc192370324630648c40c81bc1903703206d0640d80c81941903183206206407a0c80bc1901183306306189c0c1108180278300430620a40ba1781722902e05e05c0a40bc18c1622702d0520550a40a91781522902a06c0540bc0ac1c81463f028c7205087c0a10d4142190280390520a409b1781362902645e04e0c60931081242782484e0490860921081283182244e0460a40821781022902005e0400a40841c80f63f01ec7203d0640790e40f01f01e03203e0c60721380e82901a8520348bc0691480d62181883302c04605c18c0a42701444202a0c604817009027012c4302107c0431880743700e86201c85203908c0701780e02901c04a03808c0783180c84201889c0311080600c80c01501a0c602a13c0542700a84201485202813805831808c420110860220c40422780844e0108860211080402780804e0100860201080401e80802f01005c02008c0462180643f00c87c0190c803019806c430090640110cc0202e80405c00807c0100c8020168048330048460080bc0101180201f0040260080fc00 i
-def q44T := dagTraceTagsBin q44M 91 (dagTagBases q44N 0x1b9a2fe7ffd845890e7777fffff9fddcef2676de3dd710b480c16387b079077c7fe4e02078b2a03bf03f1ff8fffbf3dfcb73983bb9277ff8afe19e15303c0fffffd1108 0x3fe3bb4fffffdb55b93e7777fffff9fddcef8ab6df5dd7befbfee07bd7b2fd1f7ebfff7fbf7ff285bbf57f7ffd7fffffdff1799c3bbc937ffd22ff8fffffffffffffdbbbd 91) 10 q44D
-def q44St := dagTraceBin q44M q44N 10 q44D
-def q44Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
-def q44Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
-def q44Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 6, 3, 4, 5, 2, 7] 0 i.val)
-def q44Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 6, 3, 4, 5, 2, 7] 0 i.val)
-def q44Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 6, 5, 4, 3, 2, 7] 0 i.val)
-def q44Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 6, 5, 4, 3, 2, 7] 0 i.val)
-def q44Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q44Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q44Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
-def q44Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
-def q44Mp5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 6, 0, 4, 5, 2, 7] 0 i.val)
-def q44Mi5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 6, 0, 4, 5, 2, 7] 0 i.val)
-def q44Mp6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 6, 0, 4, 3, 2, 7] 0 i.val)
-def q44Mi6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 6, 5, 4, 0, 2, 7] 0 i.val)
-def q44Mp7 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
-def q44Mi7 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
-def q44Mp8 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
-def q44Mi8 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
-def q44Mp9 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 6, 5, 4, 0, 2, 7] 0 i.val)
-def q44Mi9 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 6, 0, 4, 3, 2, 7] 0 i.val)
-def q44Mp10 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 6, 3, 4, 0, 2, 7] 0 i.val)
-def q44Mi10 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 6, 3, 4, 0, 2, 7] 0 i.val)
-def q44Mv := dagMoves ([([qS0], q44Mp0, q44Mi0), ([qS25], q44Mp1, q44Mi1), ([qS25, qS0], q44Mp2, q44Mi2), ([qS1], q44Mp3, q44Mi3), ([qS2, qS0], q44Mp4, q44Mi4), ([qS1, qS25], q44Mp5, q44Mi5), ([qS2, qS25, qS0], q44Mp6, q44Mi6), ([qS1, qS0], q44Mp7, q44Mi7), ([qS2], q44Mp8, q44Mi8), ([qS1, qS25, qS0], q44Mp9, q44Mi9), ([qS2, qS25], q44Mp10, q44Mi10)] : List (DagMoveRecord 256))
+abbrev q44W : List Word := projectDAGStock q44M qBase [1, 3, 4]
+def q44F : Bound := (q44M, q44W, 4, q44G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q44A : DagMovesOK q44M q44G 256 q44Mv := dagMovesOfCheck (by decide +kernel)
-def q44NB : Nat → List Bound := dagNodeBounds q44C.toArray 0x208040f181e103c207840f081e103c207840f081e103c207840f081e103c207840f081e103c207840f081e10386068c0d081830302058c0b0816102c205840b0816102c2050c0a081410246048409080e50186030405180650086008c0017fe2ffc1ff0bfd17fa0ff05fd8bfb07f60fec1fd83fa17f04fd89fa8bf327e60fc49f80bef17da4fb05f58beb07d42fa81f503e827d00f9c5f30be517ca0f905f18be217c22f841f083df27bc2f745ee0bdb17b06f5c5eb0bd517a64f449e80bcf17986f24de31bc517864f085e08bc0177e2ef85de8bbc17762ee85dc13b7176e0ed85da8bb417662ec85d88bb107602ebc5d70bad175a0eb05d603ab17542ea81d48ba907502e9c5d30ba517482e8c5d10ba117402e7c5cf0b9e073c0e745ce0b9b17342e681cc8b9907302e601cb8b96172a2e505c98b9217222e405c78b8e171a2e341c6838d07182e2c5c50b8a07122e205c38b86170a2e105c18b8217040e081c1038026fe2df85bf037d16f64dec1bd0b7916f20de41bc0b7716ec2dd45b9937216e40dc45b8837016da6db05b58b6a16d40da45b3936616ca2d88db1036116c02d7c5af0b5d16ba0d6c9ad0b5a06b22d605ab8b5616aa2d541aa0b5316a60d485a88b5106a20d405a8034f169e0d3c1a6934c16944d245a48349068c6d145a20b4316842d0099f8b3b46742ce099c033806700cdc59b0b36066a2cd059a033316660ccc1990b3116602cbc5970b2d16528c95191931e5632ac6058a2311361a8c2c984930546064bfd17f0afc25f44bdcd7a92f235e04bb117512e735c68b7d16da2d835ae2b5496a0ad315a24b38d6612c8458e2b0d16092bc55708ad895a8ab2355e6ab0d558aa9254c6a94551929d65346a6094b129425226a3c9461a8a250aaa0c9410a7f34f2c9dc939a27124dc69acd34926724c6898492f1a5b34ae895492a0a4f549c292552392443484490091f8a3e147848e891c8a381466a8c85188a2f245c28acd1492254448288c5110a202436a86850c1217142c285450a0a11341a8825102a203240427f90fe11fa23ee67d0cf899ee33da27a8cf411e533c64780cef11db33ae874d0e729cb338e870d0e019bd337646e48db19b6036a26d40d919b0235c46b08d499a5434646794ce1198432886410c6998a331046188c2898232fc85eccbb297422e445b90b4316622c485790ad995832a8853d4a5a14652866500c9e2138426884c4c97192a424aa48148e99176224a439084310351fca3e907b20f151da839d87038dc41acc34906630c84182e2ed85ab0b051588299850309c41290235c43387f70f681d5838a06980c6c17d02d285640a0c125c22283e6070c0cd417a02a504aa08140d3013701e802940230004 0x602664515050000002660120760010010266601301100111830001010100830830a600303331000101001103501003100000000000004000000000000110040010000000094401010101106110141642676017206500006101072710041012161124605500464361492269332324442450831030a5360a51600853053483101010506350245005050543401603020363023624607261172676101000108301083100831010246317251100830830a600303a03432436012361010108301083010854301008308245303040237021071050104361107105128035207783107823107030934340070700072304002002502024500002082035039000025083402540254040083102034304210215120572021324633047a2302053461243016a3473047253612920101050150120290252601642122174572250426102051621162616299424301431a546034535601243016362431436143193453619231592512360105103123407253475351454174208431084310430a5436085340834072541021540236405403230654603723654172682543102501832510250174235125018254310854320a254037462325018325102458032540785430127832540782354078235407521725043725372546013912540725117254725192605193215047425392453174253172531725147253742517254072543684372517254725147253147254 15 4 4
-def q44Ck := dagCheckNodeBin q44M q44G q44NB 526 q44St q44Mv q44L q44S q44T
-def q44RA (token : Nat) : Bool :=
-  let s := rootState q44N 10 token
-  !dagAllowedRootBin q44M q44E s.2.1 || dagLocalBin q44M q44G (dagKnownClosesBin q44G q44C) s ||
-  dagRefBin q44M 526 q44St q44Mv (fun p tok => dagFindLink (q44L p) tok) 0 token s
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44RB0 : treeBlock 0 64 q44RA = true := by decide +kernel
-theorem q44R : dagCheckRootsBin q44M q44G (dagKnownClosesBin q44G q44C) q44E (dagRefBin q44M 526 q44St q44Mv (fun p tok => dagFindLink (q44L p) tok) 0) q44N 10 = true := q44RB0
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B0 : treeBlock 0 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B16 : treeBlock 16 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B32 : treeBlock 32 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B48 : treeBlock 48 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B64 : treeBlock 64 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B80 : treeBlock 80 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B96 : treeBlock 96 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B112 : treeBlock 112 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B128 : treeBlock 128 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B144 : treeBlock 144 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B160 : treeBlock 160 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B176 : treeBlock 176 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B192 : treeBlock 192 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B208 : treeBlock 208 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B224 : treeBlock 224 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B240 : treeBlock 240 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B256 : treeBlock 256 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B272 : treeBlock 272 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B288 : treeBlock 288 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B304 : treeBlock 304 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B320 : treeBlock 320 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B336 : treeBlock 336 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B352 : treeBlock 352 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B368 : treeBlock 368 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B384 : treeBlock 384 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B400 : treeBlock 400 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B416 : treeBlock 416 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B432 : treeBlock 432 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B448 : treeBlock 448 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B464 : treeBlock 464 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B480 : treeBlock 480 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B496 : treeBlock 496 16 q44Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44B512 : treeBlock 512 14 q44Ck = true := by decide +kernel
-theorem q44Bk : treeBlock 0 526 q44Ck = true := (@treeBlock_merge 0 272 254 q44Ck (@treeBlock_merge 0 144 128 q44Ck (@treeBlock_merge 0 80 64 q44Ck (@treeBlock_merge 0 48 32 q44Ck (@treeBlock_merge 0 32 16 q44Ck (@treeBlock_merge 0 16 16 q44Ck q44B0 q44B16) q44B32) (@treeBlock_merge 48 16 16 q44Ck q44B48 q44B64)) (@treeBlock_merge 80 32 32 q44Ck (@treeBlock_merge 80 16 16 q44Ck q44B80 q44B96) (@treeBlock_merge 112 16 16 q44Ck q44B112 q44B128))) (@treeBlock_merge 144 64 64 q44Ck (@treeBlock_merge 144 32 32 q44Ck (@treeBlock_merge 144 16 16 q44Ck q44B144 q44B160) (@treeBlock_merge 176 16 16 q44Ck q44B176 q44B192)) (@treeBlock_merge 208 32 32 q44Ck (@treeBlock_merge 208 16 16 q44Ck q44B208 q44B224) (@treeBlock_merge 240 16 16 q44Ck q44B240 q44B256)))) (@treeBlock_merge 272 128 126 q44Ck (@treeBlock_merge 272 64 64 q44Ck (@treeBlock_merge 272 32 32 q44Ck (@treeBlock_merge 272 16 16 q44Ck q44B272 q44B288) (@treeBlock_merge 304 16 16 q44Ck q44B304 q44B320)) (@treeBlock_merge 336 32 32 q44Ck (@treeBlock_merge 336 16 16 q44Ck q44B336 q44B352) (@treeBlock_merge 368 16 16 q44Ck q44B368 q44B384))) (@treeBlock_merge 400 64 62 q44Ck (@treeBlock_merge 400 32 32 q44Ck (@treeBlock_merge 400 16 16 q44Ck q44B400 q44B416) (@treeBlock_merge 432 16 16 q44Ck q44B432 q44B448)) (@treeBlock_merge 464 32 30 q44Ck (@treeBlock_merge 464 16 16 q44Ck q44B464 q44B480) (@treeBlock_merge 496 16 14 q44Ck q44B496 q44B512)))))
-theorem q44K : KnownBin q44C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q3Bin) q5Bin) q8Bin) q38Bin) q2Bin) q33Bin) q16Bin) q10Bin) q36Bin) q0Bin) q7Bin)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q44Bin : BinLower q44M q44W q44G 11 := by
-  apply lowerDagBin _ _ _ _ q44A _ _ _ q44K _ (fun _ b hb => dagNodeBounds_mem b hb) q44R q44Bk
-  · unfold Masked; decide +kernel
-  · unfold Masked; decide +kernel
-  · unfold properWord; decide +kernel
-  · decide +kernel
-  · exact stockMaskedOfCheck (by decide +kernel)
-  · decide +kernel
-  · decide +kernel
-  · have h : q44C.all (fun b => q44M &&& b.1 == b.1) = true := by decide +kernel
-    intro b hb
-    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q45M : Word := 0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f
+theorem q44Bin : BinLower q44M q44W q44G 4 := dagShiftLowerBin (width := 256) [qS10, qS3, qS36, qS0, qS26] q8Bin (by decide +kernel)
+def q45M : Word := 0x3030000030300000000000000000000030300000303
 abbrev q45G : Word := qGoal &&& q45M
-abbrev q45W : List Word := projectDAGStock q45M qBase [0, 1, 4, 5, 6, 7]
-def q45F : Bound := (q45M, q45W, 10, q45G)
-def q45E := unpackWitnesses q45W [74384, 337040, 581728, 876688, 1155216, 1425504]
+abbrev q45W : List Word := projectDAGStock q45M qBase [0, 3, 5, 7]
+def q45F : Bound := (q45M, q45W, 7, q45G)
+def q45E := unpackWitnesses q45W [66176, 331904, 606336, 868384]
 abbrev q45N : List Word := normStock q45M q45W
-def q45C : List Bound := [q11F, q14F, q1F, q3F, q15F, q4F, q35F, q19F, q29F, q25F, q39F, q34F, q40F, q21F]
-def q45S : DagSample := (0x3020820a00010800c0008c46022180c8062330088824320908c06220944225148301209101a09209201a0d20b0182c060a03030120d020b04c0e00884c22120184c6031018480422100886012088c4c07008884064330184c021201088050181c0826120884402140204201201209008248048041208a4422810088500a01028002810110880c0403012050, 62)
-def q45L : DagLinkList := dagExtractLinks 0xcd066833419a0cd066833419a0cd06683341981cc065872c1903c6163031818c0c50e283103880c30e00ef47762ba0dd02e81740ba05d02e81740ba05c86e03700b70db06d05680b40588ec41620a7551928073c29e04f027813c09d0ce06609300970c81e3c3145852c0920410017b2bb91c0ed276713289902c045d1ae055caae05702b051de8a23679910c425472148a34066001 0x1af0505a2282d310351080a80305a6286a214164898b045057216ac210355060aa040d54192b00f950064b0c50d54282bd181580a0ac450552282a1141558a0a8850c36296621494c0bd7f060ca630582181288807e430302105c8100e4060a202c2e01067e1c3258c07c430370182910f9448646e42dcec381b90f1408a07a430508286131053c87e9c4334703e26b103190b9628404b2302301f0c40605c0204503e26b149310bd628524a2295c814b018a0968514a418a490f4c00449105947621a3110d1486684460444205920c1048c0640402e0185920c9008a06a03e310192231490d0bd648523f2291e9100ec0bc7205242a3020b145010a07e8323e2169a00f8c00647a832330199e2124ec8447403c394191c00f8b80646e02d3642f1a9148d00a4668503262918a148c08a45e05e2e0290e00ce968d343461946294da14ab48bd584538c22915014c94092420411b0188a0084b4032580130c00895c14e790a74146093628cd2144a9066404401a21909908aa407f5003ea7019c780c8a405e5002e270118780889a0b3470519862192a0cc9007c4705922828cbb10c8506640442122110f80fc7a0a72ac521d4298e210c6d0623445219036478148300443146917a308b314c550a42883213229091100440bc200530f0290700f834066180328582cc2414e0e0a216c5387621c4a14e05087148330a229c1110c24866104230702983010c14072080330301881008c040260003f 13 5 13 7 1
-def q45D : Forest := fun i => decodeNode 7 20 0x6284b2264762840a303f22835628314283102f2e21f29219298282121fa1219a16291c42f1c4289b4189b21e9b82c9a6219a2219a2199a6291542f15a30146289442814419142169441913424922111201e114191001f100169042f0f2290f0290f4280e6290d4290d2290d02f0d0290d00c8900989829884198701787017070118782c864198601f0582c8482884419842210401f84829834298342183418832290303603a3482a3082629824290241902229022200202f02029820290201f02019820190262981229812198121181029810218101c810198101881011810098101f80 i
-def q45T := dagTraceTagsBin q45M 62 (dagTagBases q45N 0xf6b2df53d0e1f1bd603c7f10edf83f7f5f2a6c18f9ec7fac1bf8ee9130ff1fcf81fc3fe90fffc0bff000fffff4c89 0xf6935f45d3e7f1bffbfd7fd3effdbf7b9f8a2cb97ded3f9e5bfc6ecb36ffdf7f07fd3fec27ffeffff2bbfffff67bc 62) 9 q45D
-def q45St := dagTraceBin q45M q45N 9 q45D
-def q45Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 7, 2, 3, 0, 6, 5, 1] 0 i.val)
-def q45Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 7, 2, 3, 0, 6, 5, 1] 0 i.val)
-def q45Mv := dagMoves ([([qS20, qS26, qS5], q45Mp0, q45Mi0)] : List (DagMoveRecord 256))
+def q45C : List Bound := [q10F, q8F, q11F, q13F]
+def q45S : DagSample := (0x100844028040a0100940204020940220108800a0402214028040a0, 12)
+def q45L : DagLinkList := dagExtractLinks 0x884420300789e02c01 0x68300504c3c8420c83234442044323304e320420303e020328183369433194236103311023010130000f 9 4 12 3 5
+def q45D : Forest := fun i => decodeNode 3 15 0x10614131a19203e4064804c8078 i
+def q45T := dagTraceTagsBin q45M 12 (dagTagBases q45N 0x63388f1f8f44 0xfb3cef3fef5d 12) 6 q45D
+def q45St := dagTraceBin q45M q45N 6 q45D
+def q45Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 4, 7, 6, 5] 0 i.val)
+def q45Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 4, 7, 6, 5] 0 i.val)
+def q45Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
+def q45Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
+def q45Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 7, 4, 3, 6, 5] 0 i.val)
+def q45Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 7, 6, 3] 0 i.val)
+def q45Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 7, 6, 3] 0 i.val)
+def q45Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 7, 4, 3, 6, 5] 0 i.val)
+def q45Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 7, 4, 5, 6, 3] 0 i.val)
+def q45Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 7, 4, 5, 6, 3] 0 i.val)
+def q45Mp5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q45Mi5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q45Mp6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 7, 6, 5] 0 i.val)
+def q45Mi6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 7, 6, 5] 0 i.val)
+def q45Mp7 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
+def q45Mi7 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
+def q45Mp8 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [7, 1, 2, 0, 4, 3, 6, 5] 0 i.val)
+def q45Mi8 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 7, 6, 0] 0 i.val)
+def q45Mp9 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 7, 6, 3] 0 i.val)
+def q45Mi9 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 7, 4, 0, 6, 5] 0 i.val)
+def q45Mp10 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [7, 1, 2, 0, 4, 5, 6, 3] 0 i.val)
+def q45Mi10 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 7, 4, 5, 6, 0] 0 i.val)
+def q45Mp11 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
+def q45Mi11 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
+def q45Mp12 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 7, 4, 0, 6, 5] 0 i.val)
+def q45Mi12 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 7, 6, 3] 0 i.val)
+def q45Mp13 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
+def q45Mi13 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
+def q45Mp14 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [7, 1, 2, 3, 4, 0, 6, 5] 0 i.val)
+def q45Mi14 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 7, 6, 0] 0 i.val)
+def q45Mp15 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 7, 4, 0, 6, 3] 0 i.val)
+def q45Mi15 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 7, 4, 0, 6, 3] 0 i.val)
+def q45Mv := dagMoves ([([qS24], q45Mp0, q45Mi0), ([qS22], q45Mp1, q45Mi1), ([qS39, qS24], q45Mp2, q45Mi2), ([qS22, qS24], q45Mp3, q45Mi3), ([qS39], q45Mp4, q45Mi4), ([qS11], q45Mp5, q45Mi5), ([qS11, qS24], q45Mp6, q45Mi6), ([qS23, qS22], q45Mp7, q45Mi7), ([qS40, qS39, qS24], q45Mp8, q45Mi8), ([qS23, qS22, qS24], q45Mp9, q45Mi9), ([qS40, qS39], q45Mp10, q45Mi10), ([qS11, qS22], q45Mp11, q45Mi11), ([qS11, qS39, qS24], q45Mp12, q45Mi12), ([qS23], q45Mp13, q45Mi13), ([qS40, qS24], q45Mp14, q45Mi14), ([qS23, qS39], q45Mp15, q45Mi15)] : List (DagMoveRecord 256))
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem q45A : DagMovesOK q45M q45G 256 q45Mv := dagMovesOfCheck (by decide +kernel)
-def q45NB : Nat → List Bound := dagNodeBounds q45C.toArray 0x1c4388710e21c4388709df5bab746dada3b0b596a9d51a6b48e89d11a0740672cd396b2c64ac838e711e12c13806f5de8bb5762ec5d1b856cad4d9ab155cea6d2ca3540e794d49772aa4d48a8f51aa2d44386506dfe3ea76ee6dbe36a6b4cf18e2ee5a6ad14a27b4aa8b5061d73846c8ca15f278438728c413a19c1b006 0x3130201002652700260110303024120211132130020330302015013277402027012108214133232121201120211251365321576501921a0a6922101d1044081740132403402102144134012301324740274901320505b815b769105a052a8012382603062160821ca01692498105cba698 11 3 4
-def q45Ck := dagCheckNodeBin q45M q45G q45NB 91 q45St q45Mv q45L q45S q45T
+def q45NB : Nat → List Bound := dagNodeBounds q45C.toArray 0x16ac4a9105204 0x63e1e1 7 3 2
+def q45Ck := dagCheckNodeBin q45M q45G q45NB 7 q45St q45Mv q45L q45S q45T
 def q45RA (token : Nat) : Bool :=
-  let s := rootState q45N 9 token
+  let s := rootState q45N 6 token
   !dagAllowedRootBin q45M q45E s.2.1 || dagLocalBin q45M q45G (dagKnownClosesBin q45G q45C) s ||
-  dagRefBin q45M 91 q45St q45Mv (fun p tok => dagFindLink (q45L p) tok) 0 token s
+  dagRefBin q45M 7 q45St q45Mv (fun p tok => dagFindLink (q45L p) tok) 0 token s
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q45RB0 : treeBlock 0 64 q45RA = true := by decide +kernel
-theorem q45R : dagCheckRootsBin q45M q45G (dagKnownClosesBin q45G q45C) q45E (dagRefBin q45M 91 q45St q45Mv (fun p tok => dagFindLink (q45L p) tok) 0) q45N 9 = true := q45RB0
+theorem q45RB0 : treeBlock 0 16 q45RA = true := by decide +kernel
+theorem q45R : dagCheckRootsBin q45M q45G (dagKnownClosesBin q45G q45C) q45E (dagRefBin q45M 7 q45St q45Mv (fun p tok => dagFindLink (q45L p) tok) 0) q45N 6 = true := q45RB0
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q45B0 : treeBlock 0 16 q45Ck = true := by decide +kernel
+theorem q45B0 : treeBlock 0 7 q45Ck = true := by decide +kernel
+theorem q45Bk : treeBlock 0 7 q45Ck = true := q45B0
+theorem q45K : KnownBin q45C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q13Bin) q11Bin) q8Bin) q10Bin)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q45B16 : treeBlock 16 16 q45Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q45B32 : treeBlock 32 16 q45Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q45B48 : treeBlock 48 16 q45Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q45B64 : treeBlock 64 16 q45Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q45B80 : treeBlock 80 11 q45Ck = true := by decide +kernel
-theorem q45Bk : treeBlock 0 91 q45Ck = true := (@treeBlock_merge 0 48 43 q45Ck (@treeBlock_merge 0 32 16 q45Ck (@treeBlock_merge 0 16 16 q45Ck q45B0 q45B16) q45B32) (@treeBlock_merge 48 32 11 q45Ck (@treeBlock_merge 48 16 16 q45Ck q45B48 q45B64) q45B80))
-theorem q45K : KnownBin q45C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q21Bin) q40Bin) q34Bin) q39Bin) q25Bin) q29Bin) q19Bin) q35Bin) q4Bin) q15Bin) q3Bin) q1Bin) q14Bin) q11Bin)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q45Bin : BinLower q45M q45W q45G 10 := by
+theorem q45Bin : BinLower q45M q45W q45G 7 := by
   apply lowerDagBin _ _ _ _ q45A _ _ _ q45K _ (fun _ b hb => dagNodeBounds_mem b hb) q45R q45Bk
   · unfold Masked; decide +kernel
   · unfold Masked; decide +kernel
@@ -4247,53 +3770,42 @@ theorem q45Bin : BinLower q45M q45W q45G 10 := by
   · have h : q45C.all (fun b => q45M &&& b.1 == b.1) = true := by decide +kernel
     intro b hb
     exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q46M : Word := 0x55005500550055005500550055005500550055005500550055005500550055
+def q46M : Word := 0xf000f000000000f000f00
 abbrev q46G : Word := qGoal &&& q46M
-abbrev q46W : List Word := projectDAGStock q46M qBase [1, 2, 4, 5, 6, 7]
-def q46F : Bound := (q46M, q46W, 9, q46G)
-def q46E := unpackWitnesses q46W [74896, 338064, 581728, 876688, 1155216, 1425504]
+abbrev q46W : List Word := projectDAGStock q46M qBase [0, 1, 3, 4]
+def q46F : Bound := (q46M, q46W, 6, q46G)
+def q46E := unpackWitnesses q46W [12824, 296513, 565272, 827969]
 abbrev q46N : List Word := normStock q46M q46W
-def q46C : List Bound := [q1F, q4F, q7F, q18F, q22F, q27F, q37F, q40F]
-def q46S : DagSample := (0x30088c0a0120886050480480c460321860a048340c0e00a058281203059209403048402203098c0640308920b0301c0c0502010820502014028441219048440804900822011100840104828940a21004221028100a01221004820110880c0403012050, 44)
-def q46L : DagLinkList := dagExtractLinks 0x1242484819011c63844388110209c01788ec5c9390702e01c0344662b5951a464266d8c917220e1e40b001 0x3a0401d6202db141ec8a0364301c4280da0c1e40a0390501b6210d0138640843003d1a2103cc1406506030830178292a3149d08a4244301602e49a180d10616646014220480180300b9674601543019a0c0520a42685212418088178400a41c04d0c8281890804406121460304180811013c0b85e04c0f01e1720c0388801b05e0c82935c149250a61683167229039089a80a61402309a311421889d06010462072200301b8140c40805d0302e414149048a644421610298100c4040260003f 11 4 13 5 3
-def q46D : Forest := fun i => decodeNode 5 18 0x6206a0a146214c841241845060f829300b8b430260a484292106080181c880601e18880582f120a444188c0463a31088c42220080dc2031080ba202e0806210098407e0 i
-def q46T := dagTraceTagsBin q46M 44 (dagTagBases q46N 0x51c45df36e7f9d33f8c9dfe741e2773fe1ebe07dfe3feb3fb00dff0bc3beffa909 0xf9f55fff6e7d9c55f8f9dfe64beeb79fe0ebeb3cff5f3fbfb17dffbf77beffafbc 44) 8 q46D
-def q46St := dagTraceBin q46M q46N 8 q46D
-def q46Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 5, 4, 7, 6] 0 i.val)
-def q46Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 5, 4, 7, 6] 0 i.val)
-def q46Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 7, 4, 3, 5, 2, 1, 6] 0 i.val)
-def q46Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 6, 5, 3, 2, 4, 7, 1] 0 i.val)
-def q46Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 6, 5, 3, 4, 2, 1, 7] 0 i.val)
-def q46Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 6, 5, 3, 4, 2, 1, 7] 0 i.val)
-def q46Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 7, 4, 3, 2, 5, 6, 1] 0 i.val)
-def q46Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 7, 4, 3, 2, 5, 6, 1] 0 i.val)
-def q46Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 6, 5, 3, 2, 4, 7, 1] 0 i.val)
-def q46Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 7, 4, 3, 5, 2, 1, 6] 0 i.val)
-def q46Mv := dagMoves ([([qS8, qS7], q46Mp0, q46Mi0), ([qS26, qS27, qS8, qS7], q46Mp1, q46Mi1), ([qS24, qS29], q46Mp2, q46Mi2), ([qS26, qS27], q46Mp3, q46Mi3), ([qS24, qS29, qS8, qS7], q46Mp4, q46Mi4)] : List (DagMoveRecord 256))
+def q46C : List Bound := [q2F, q33F, q1F]
+def q46S : DagSample := (0x414082192090c140b0502482510c064300904024301a201081442050688209201403050, 16)
+def q46L : DagLinkList := dagExtractLinks 0x808079717054493a0e01 0x403c4030bc3eb4323c2e342238403440283c24231831902f8823101f0813000f 8 3 11 4 1
+def q46D : Forest := fun i => decodeNode 4 15 0x306080710081e14231062207c409880f0 i
+def q46T := dagTraceTagsBin q46M 16 (dagTagBases q46N 0x807bcf8739b45bcc 0x9bfbe7e7fcbe9bd9 16) 5 q46D
+def q46St := dagTraceBin q46M q46N 5 q46D
+def q46Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 4, 2, 3, 1, 5, 6, 7] 0 i.val)
+def q46Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 4, 2, 3, 1, 5, 6, 7] 0 i.val)
+def q46Mv := dagMoves ([([qS12], q46Mp0, q46Mi0)] : List (DagMoveRecord 256))
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem q46A : DagMovesOK q46M q46G 256 q46Mv := dagMovesOfCheck (by decide +kernel)
-def q46NB : Nat → List Bound := dagNodeBounds q46C.toArray 0xe8e8e8e8e8e8e8e8e8e8e8e1e0d9d8d8d8d8cac1b9b19b9182796a4c3306 0x24185820804344223ea88 8 3 3
-def q46Ck := dagCheckNodeBin q46M q46G q46NB 30 q46St q46Mv q46L q46S q46T
+def q46NB : Nat → List Bound := dagNodeBounds q46C.toArray 0x2082081d652343 0x9109 6 2 2
+def q46Ck := dagCheckNodeBin q46M q46G q46NB 9 q46St q46Mv q46L q46S q46T
 def q46RA (token : Nat) : Bool :=
-  let s := rootState q46N 8 token
+  let s := rootState q46N 5 token
   !dagAllowedRootBin q46M q46E s.2.1 || dagLocalBin q46M q46G (dagKnownClosesBin q46G q46C) s ||
-  dagRefBin q46M 30 q46St q46Mv (fun p tok => dagFindLink (q46L p) tok) 0 token s
+  dagRefBin q46M 9 q46St q46Mv (fun p tok => dagFindLink (q46L p) tok) 0 token s
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q46RB0 : treeBlock 0 64 q46RA = true := by decide +kernel
-theorem q46R : dagCheckRootsBin q46M q46G (dagKnownClosesBin q46G q46C) q46E (dagRefBin q46M 30 q46St q46Mv (fun p tok => dagFindLink (q46L p) tok) 0) q46N 8 = true := q46RB0
+theorem q46RB0 : treeBlock 0 16 q46RA = true := by decide +kernel
+theorem q46R : dagCheckRootsBin q46M q46G (dagKnownClosesBin q46G q46C) q46E (dagRefBin q46M 9 q46St q46Mv (fun p tok => dagFindLink (q46L p) tok) 0) q46N 5 = true := q46RB0
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q46B0 : treeBlock 0 16 q46Ck = true := by decide +kernel
+theorem q46B0 : treeBlock 0 9 q46Ck = true := by decide +kernel
+theorem q46Bk : treeBlock 0 9 q46Ck = true := q46B0
+theorem q46K : KnownBin q46C := (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q1Bin) q33Bin) q2Bin)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q46B16 : treeBlock 16 14 q46Ck = true := by decide +kernel
-theorem q46Bk : treeBlock 0 30 q46Ck = true := (@treeBlock_merge 0 16 14 q46Ck q46B0 q46B16)
-theorem q46K : KnownBin q46C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q40Bin) q37Bin) q27Bin) q22Bin) q18Bin) q7Bin) q4Bin) q1Bin)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q46Bin : BinLower q46M q46W q46G 9 := by
+theorem q46Bin : BinLower q46M q46W q46G 6 := by
   apply lowerDagBin _ _ _ _ q46A _ _ _ q46K _ (fun _ b hb => dagNodeBounds_mem b hb) q46R q46Bk
   · unfold Masked; decide +kernel
   · unfold Masked; decide +kernel
@@ -4305,56 +3817,190 @@ theorem q46Bin : BinLower q46M q46W q46G 9 := by
   · have h : q46C.all (fun b => q46M &&& b.1 == b.1) = true := by decide +kernel
     intro b hb
     exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q47M : Word := 0x505050505050505050505050505050505050505050505050505050505050505
+def q47M : Word := 0x30300000303000000000000000000000303000003030000
 abbrev q47G : Word := qGoal &&& q47M
-abbrev q47W : List Word := projectDAGStock q47M qBase [1, 3, 4, 5, 6, 7]
-def q47F : Bound := (q47M, q47W, 10, q47G)
+abbrev q47W : List Word := projectDAGStock q47M qBase [0, 3, 5, 7]
+def q47F : Bound := (q47M, q47W, 7, q47G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q47Bin : BinLower q47M q47W q47G 10 := dagShiftLowerBin (width := 256) [qS1, qS10] q45Bin (by decide +kernel)
-def q48M : Word := 0xffffffff00000000ffffffff00000000ffffffff00000000ffffffff
+theorem q47Bin : BinLower q47M q47W q47G 7 := dagShiftLowerBin (width := 256) [qS30] q45Bin (by decide +kernel)
+def q48M : Word := 0x30300000030300000000000000000000303000000303
 abbrev q48G : Word := qGoal &&& q48M
-abbrev q48W : List Word := projectDAGStock q48M qBase [0, 1, 2, 3, 4, 6, 7]
-def q48F : Bound := (q48M, q48W, 11, q48G)
-def q48E := unpackWitnesses q48W [74384, 337040, 600208, 864400, 1093704, 1417360, 1675336]
-abbrev q48N : List Word := normStock q48M q48W
-def q48C : List Bound := [q1F, q33F, q13F, q12F, q11F, q31F, q27F, q26F]
-def q48S : DagSample := (0x2a850e2300a45031180c860a250184c0c160008848260148a0623030980a21030880030120d020b0490c80884c140b0502482450603418090a05828120182c301a018240a0d241300a090184c30190c0240c16482500c12050682219088240643241249009201080844051288249208242050201402844040250081080480482402092012201100884402100a8100824108840220148201048229108a0402810110880c0403012050, 75)
-def q48L : DagLinkList := dagExtractLinks 0x3c1e0f0783c1e0e170381c0d1646e561b050a6303712903201 0x51175345c48175005c441352431450c100213e0e0e439341f0b42e2908c9422310f0b030290c4943020174705c9918c6433941be4063140fc40330c084201f0404c007f 9 4 12 5 1
-def q48D : Forest := fun i => decodeNode 5 17 0x8baf45c7a18a50c120428838321c981f0a87830301a18890c040ba205c1219840fc20661021080f8404c20fe0 i
-def q48T := dagTraceTagsBin q48M 75 (dagTagBases q48N 0xbfff40d21e0e73f9e3f9f7f9e1ed36bf87f3b80f5fe5e79fefbf1fffbc05d2604e263bfe3fff56edf2f20ff9dbfcfb33f877fbff211fbff819800ffffdfffe98889 0xbfff5bd27e3e7ff9e3f9f7fcfaed37bfdff3b80f5ff0ebafefbfafffbcc5d276cee6fbff5fe7562df2f967fadbfe7bfffe77fbff8cbfbffdffdfbffffdfffecddfc 75) 10 q48D
-def q48St := dagTraceBin q48M q48N 10 q48D
-def q48Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q48Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q48Mv := dagMoves ([([qS1], q48Mp0, q48Mi0)] : List (DagMoveRecord 256))
+abbrev q48W : List Word := projectDAGStock q48M qBase [0, 2, 3, 7]
+def q48F : Bound := (q48M, q48W, 7, q48G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q48A : DagMovesOK q48M q48G 256 q48Mv := dagMovesOfCheck (by decide +kernel)
-def q48NB : Nat → List Bound := dagNodeBounds q48C.toArray 0x1e9ed74777aacd62af56aad52a59056eb0d568c3292c4a04 0x102341204108201461460d8e914b446644650a44748a77 9 3 3
-def q48Ck := dagCheckNodeBin q48M q48G q48NB 21 q48St q48Mv q48L q48S q48T
-def q48RA (token : Nat) : Bool :=
-  let s := rootState q48N 10 token
-  !dagAllowedRootBin q48M q48E s.2.1 || dagLocalBin q48M q48G (dagKnownClosesBin q48G q48C) s ||
-  dagRefBin q48M 21 q48St q48Mv (fun p tok => dagFindLink (q48L p) tok) 0 token s
+theorem q48Bin : BinLower q48M q48W q48G 7 := dagShiftLowerBin (width := 256) [qS10, qS21, qS1, qS26] q45Bin (by decide +kernel)
+def q49M : Word := 0xa0005000a00050000000000000000000a0005000a0005
+abbrev q49G : Word := qGoal &&& q49M
+abbrev q49W : List Word := projectDAGStock q49M qBase [0, 1, 5, 7]
+def q49F : Bound := (q49M, q49W, 7, q49G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q48RB0 : treeBlock 0 64 q48RA = true := by decide +kernel
+theorem q49Bin : BinLower q49M q49W q49G 7 := dagShiftLowerBin (width := 256) [qS9, qS28, qS6] q45Bin (by decide +kernel)
+def q50M : Word := 0xa0000000a00000005000000050000000a0000000a0000000500000005
+abbrev q50G : Word := qGoal &&& q50M
+abbrev q50W : List Word := projectDAGStock q50M qBase [0, 1, 5, 7]
+def q50F : Bound := (q50M, q50W, 7, q50G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q48RB64 : treeBlock 64 64 q48RA = true := by decide +kernel
-theorem q48R : dagCheckRootsBin q48M q48G (dagKnownClosesBin q48G q48C) q48E (dagRefBin q48M 21 q48St q48Mv (fun p tok => dagFindLink (q48L p) tok) 0) q48N 10 = true := (@treeBlock_merge 0 64 64 q48RA q48RB0 q48RB64)
+theorem q50Bin : BinLower q50M q50W q50G 7 := dagShiftLowerBin (width := 256) [qS3, qS28, qS6] q45Bin (by decide +kernel)
+def q51M : Word := 0x30300000000000000000000030300000303000000000000000000000303
+abbrev q51G : Word := qGoal &&& q51M
+abbrev q51W : List Word := projectDAGStock q51M qBase [0, 3, 5, 7]
+def q51F : Bound := (q51M, q51W, 7, q51G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q48B0 : treeBlock 0 16 q48Ck = true := by decide +kernel
+theorem q51Bin : BinLower q51M q51W q51G 7 := dagShiftLowerBin (width := 256) [qS3] q45Bin (by decide +kernel)
+def q52M : Word := 0x50000050500000500000000000000000500000505000005
+abbrev q52G : Word := qGoal &&& q52M
+abbrev q52W : List Word := projectDAGStock q52M qBase [1, 3, 5, 7]
+def q52F : Bound := (q52M, q52W, 7, q52G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q48B16 : treeBlock 16 5 q48Ck = true := by decide +kernel
-theorem q48Bk : treeBlock 0 21 q48Ck = true := (@treeBlock_merge 0 16 5 q48Ck q48B0 q48B16)
-theorem q48K : KnownBin q48C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q26Bin) q27Bin) q31Bin) q11Bin) q12Bin) q13Bin) q33Bin) q1Bin)
+theorem q52Bin : BinLower q52M q52W q52G 7 := dagShiftLowerBin (width := 256) [qS9, qS0] q45Bin (by decide +kernel)
+def q53M : Word := 0xa000500000000000a000500000000000a000500000000000a0005
+abbrev q53G : Word := qGoal &&& q53M
+abbrev q53W : List Word := projectDAGStock q53M qBase [0, 1, 6, 7]
+def q53F : Bound := (q53M, q53W, 7, q53G)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q48Bin : BinLower q48M q48W q48G 11 := by
-  apply lowerDagBin _ _ _ _ q48A _ _ _ q48K _ (fun _ b hb => dagNodeBounds_mem b hb) q48R q48Bk
+theorem q53Bin : BinLower q53M q53W q53G 7 := dagShiftLowerBin (width := 256) [qS9, qS28, qS6, qS18] q45Bin (by decide +kernel)
+def q54M : Word := 0x500005000000000050000500000000005000050000000000500005
+abbrev q54G : Word := qGoal &&& q54M
+abbrev q54W : List Word := projectDAGStock q54M qBase [1, 2, 6, 7]
+def q54F : Bound := (q54M, q54W, 7, q54G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q54Bin : BinLower q54M q54W q54G 7 := dagShiftLowerBin (width := 256) [qS9, qS0, qS6, qS18] q45Bin (by decide +kernel)
+def q55M : Word := 0x5000000005000000500000000500000050000000050000005000000005
+abbrev q55G : Word := qGoal &&& q55M
+abbrev q55W : List Word := projectDAGStock q55M qBase [1, 2, 6, 7]
+def q55F : Bound := (q55M, q55W, 7, q55G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q55Bin : BinLower q55M q55W q55G 7 := dagShiftLowerBin (width := 256) [qS10, qS0, qS6, qS18] q45Bin (by decide +kernel)
+def q56M : Word := 0x5000000000005000500000000000500050000000000050005000000000005
+abbrev q56G : Word := qGoal &&& q56M
+abbrev q56W : List Word := projectDAGStock q56M qBase [1, 4, 6, 7]
+def q56F : Bound := (q56M, q56W, 7, q56G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q56Bin : BinLower q56M q56W q56G 7 := dagShiftLowerBin (width := 256) [qS10, qS0, qS1, qS18] q45Bin (by decide +kernel)
+def q57M : Word := 0x30303030c0c0c0c
+abbrev q57G : Word := qGoal &&& q57M
+abbrev q57W : List Word := projectDAGStock q57M qBase [0, 1, 3, 4]
+def q57F : Bound := (q57M, q57W, 6, q57G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q57Bin : BinLower q57M q57W q57G 6 := dagShiftLowerBin (width := 256) [qS10, qS20, qS12, qS1, qS41] q46Bin (by decide +kernel)
+def q58M : Word := 0xf0000000f00000f0000000f00
+abbrev q58G : Word := qGoal &&& q58M
+abbrev q58W : List Word := projectDAGStock q58M qBase [0, 1, 3, 5]
+def q58F : Bound := (q58M, q58W, 6, q58G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q58Bin : BinLower q58M q58W q58G 6 := dagShiftLowerBin (width := 256) [qS3, qS36, qS0, qS26, qS41] q46Bin (by decide +kernel)
+def q59M : Word := 0x3030000030300000000000000000000303000003030
+abbrev q59G : Word := qGoal &&& q59M
+abbrev q59W : List Word := projectDAGStock q59M qBase [0, 2, 3, 5]
+def q59F : Bound := (q59M, q59W, 7, q59G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q59Bin : BinLower q59M q59W q59G 7 := dagShiftLowerBin (width := 256) [qS13, qS35, qS21, qS1, qS17, qS18, qS25] q45Bin (by decide +kernel)
+def q60M : Word := 0x30003000300030300030003000300
+abbrev q60G : Word := qGoal &&& q60M
+abbrev q60W : List Word := projectDAGStock q60M qBase [0, 3, 4, 5]
+def q60F : Bound := (q60M, q60W, 6, q60G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q60Bin : BinLower q60M q60W q60G 6 := dagShiftLowerBin (width := 256) [qS3, qS36, qS20, qS12, qS21, qS26, qS41] q46Bin (by decide +kernel)
+def q61M : Word := 0x50005000500050500050005000500
+abbrev q61G : Word := qGoal &&& q61M
+abbrev q61W : List Word := projectDAGStock q61M qBase [1, 3, 4, 5]
+def q61F : Bound := (q61M, q61W, 6, q61G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q61Bin : BinLower q61M q61W q61G 6 := dagShiftLowerBin (width := 256) [qS3, qS23, qS42, qS41] q46Bin (by decide +kernel)
+def q62M : Word := 0x30003000c000c00030003000c000c
+abbrev q62G : Word := qGoal &&& q62M
+abbrev q62W : List Word := projectDAGStock q62M qBase [0, 1, 4, 6]
+def q62F : Bound := (q62M, q62W, 6, q62G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q62Bin : BinLower q62M q62W q62G 6 := dagShiftLowerBin (width := 256) [qS10, qS43, qS12, qS1, qS17, qS18, qS41] q46Bin (by decide +kernel)
+def q63M : Word := 0x303030300000000030303030000000000000000
+abbrev q63G : Word := qGoal &&& q63M
+abbrev q63W : List Word := projectDAGStock q63M qBase [0, 3, 4, 6]
+def q63F : Bound := (q63M, q63W, 6, q63G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q63Bin : BinLower q63M q63W q63G 6 := dagShiftLowerBin (width := 256) [qS13, qS20, qS12, qS21, qS16, qS17, qS18, qS41] q46Bin (by decide +kernel)
+def q64M : Word := 0x3030000030300000303000003030000000000000000
+abbrev q64G : Word := qGoal &&& q64M
+abbrev q64W : List Word := projectDAGStock q64M qBase [0, 3, 5, 6]
+def q64F : Bound := (q64M, q64W, 7, q64G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q64Bin : BinLower q64M q64W q64G 7 := dagShiftLowerBin (width := 256) [qS13, qS37, qS25] q45Bin (by decide +kernel)
+def q65M : Word := 0x300030003000300030003000300030000000000000000
+abbrev q65G : Word := qGoal &&& q65M
+abbrev q65W : List Word := projectDAGStock q65M qBase [0, 4, 5, 6]
+def q65F : Bound := (q65M, q65W, 6, q65G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q65Bin : BinLower q65M q65W q65G 6 := dagShiftLowerBin (width := 256) [qS13, qS20, qS12, qS21, qS16, qS26, qS41] q46Bin (by decide +kernel)
+def q66M : Word := 0x10101010101010101010101010101010000000000000000
+abbrev q66G : Word := qGoal &&& q66M
+abbrev q66W : List Word := projectDAGStock q66M qBase [3, 4, 5, 6]
+def q66F : Bound := (q66M, q66W, 6, q66G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q66Bin : BinLower q66M q66W q66G 6 := dagShiftLowerBin (width := 256) [qS13, qS20, qS5, qS21, qS16, qS26, qS18, qS41] q46Bin (by decide +kernel)
+def q67M : Word := 0x30300000303000000000303000003030000000000000000
+abbrev q67G : Word := qGoal &&& q67M
+abbrev q67W : List Word := projectDAGStock q67M qBase [0, 3, 4, 5]
+def q67F : Bound := (q67M, q67W, 7, q67G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q67Bin : BinLower q67M q67W q67G 7 := dagShiftLowerBin (width := 256) [qS3, qS13, qS17, qS18, qS25] q45Bin (by decide +kernel)
+def q68M : Word := 0xf0f0f0f0f0f0f0f
+abbrev q68G : Word := qGoal &&& q68M
+abbrev q68W : List Word := projectDAGStock q68M qBase [0, 1, 3, 4, 5]
+def q68F : Bound := (q68M, q68W, 7, q68G)
+def q68E := unpackWitnesses q68W [25136, 287792, 553008, 799754, 1077272]
+abbrev q68N : List Word := normStock q68M q68W
+def q68C : List Bound := [q8F, q17F, q22F, q23F]
+def q68S : DagSample := (0xa030280884c140b05024060b0c06806090184c30190c024141a088642209040244021080480422100886012008241028100a01422008840412088c42221, 28)
+def q68L : DagLinkList := dagExtractLinks 0xe38e31341 0x405c3843a04f9043202f1023001f 6 3 12 3 1
+def q68D : Forest := fun i => decodeNode 3 15 0x2e2843205e408c80f8 i
+def q68T := dagTraceTagsBin q68M 28 (dagTagBases q68N 0xc210f74c96f0eb2081f1fdd276f93ffe984 0xda73f74e26fbeba58dfaf9d936fcfffecdf 28) 6 q68D
+def q68St := dagTraceBin q68M q68N 6 q68D
+def q68Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q68Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q68Mv := dagMoves ([([qS11], q68Mp0, q68Mi0)] : List (DagMoveRecord 256))
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q68A : DagMovesOK q68M q68G 256 q68Mv := dagMovesOfCheck (by decide +kernel)
+def q68NB : Nat → List Bound := dagNodeBounds q68C.toArray 0x4072a9084 0x9378 7 3 2
+def q68Ck := dagCheckNodeBin q68M q68G q68NB 5 q68St q68Mv q68L q68S q68T
+def q68RA (token : Nat) : Bool :=
+  let s := rootState q68N 6 token
+  !dagAllowedRootBin q68M q68E s.2.1 || dagLocalBin q68M q68G (dagKnownClosesBin q68G q68C) s ||
+  dagRefBin q68M 5 q68St q68Mv (fun p tok => dagFindLink (q68L p) tok) 0 token s
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q68RB0 : treeBlock 0 32 q68RA = true := by decide +kernel
+theorem q68R : dagCheckRootsBin q68M q68G (dagKnownClosesBin q68G q68C) q68E (dagRefBin q68M 5 q68St q68Mv (fun p tok => dagFindLink (q68L p) tok) 0) q68N 6 = true := q68RB0
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q68B0 : treeBlock 0 5 q68Ck = true := by decide +kernel
+theorem q68Bk : treeBlock 0 5 q68Ck = true := q68B0
+theorem q68K : KnownBin q68C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q23Bin) q22Bin) q17Bin) q8Bin)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q68Bin : BinLower q68M q68W q68G 7 := by
+  apply lowerDagBin _ _ _ _ q68A _ _ _ q68K _ (fun _ b hb => dagNodeBounds_mem b hb) q68R q68Bk
   · unfold Masked; decide +kernel
   · unfold Masked; decide +kernel
   · unfold properWord; decide +kernel
@@ -4362,123 +4008,57 @@ theorem q48Bin : BinLower q48M q48W q48G 11 := by
   · exact stockMaskedOfCheck (by decide +kernel)
   · decide +kernel
   · decide +kernel
-  · have h : q48C.all (fun b => q48M &&& b.1 == b.1) = true := by decide +kernel
+  · have h : q68C.all (fun b => q68M &&& b.1 == b.1) = true := by decide +kernel
     intro b hb
     exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
-def q49M : Word := 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-abbrev q49G : Word := qGoal &&& q49M
-abbrev q49W : List Word := projectDAGStock q49M qBase [0, 1, 2, 3, 4, 5, 6, 7]
-def q49E := unpackWitnesses q49W [74384, 337040, 600208, 864400, 1106016, 1400976, 1679504, 1949792]
-abbrev q49N : List Word := normStock q49M q49W
-def q49C : List Bound := [q44F, q12F, q1F, q10F, q45F, q41F, q23F, q42F, q31F, q48F, q11F, q43F, q47F, q29F, q27F, q25F, q46F, q30F, q32F, q28F]
-def q49S : DagSample := (0xe2300e0f1a21068b41a290026100300c0283008406220188c225148244068201a0c0a85120946031301841c1e008649058008c40a45031180c860a2500c260a8d4482c180e0142a060b03038301a0184c0c1609068181c1209805228188c0c26028840c22120b01229060b01828120d020b0490c83038022130502c140920914180d0602428160a048060b0c068060902834904c0282406130c064300903059209403048141a08864220910084042210088601202894c064028841028100a01422088c4c07008884064324124900920108144a2092482090814080500a1104864209848221040250081080480482402092012201100884402100a8100824108840220148201048229108a0402211028100a01221002810110880c0403012050, 128)
-def q49L : DagLinkList := dagExtractLinks 0xe101c2038407080e101c187820f021e003c0038007000e001c0038007000e001c0038007000e001c0038007000e001bf877f06fe0dfc1bf837f06fe0dfc1bf837f06fe0dfc1bf837f06fe0dfc1bf837f06fe0dfc1bf837f06fe0df45bd8b7a0ef21de41bc07770eec1dd81ba87721ee02db85b6876c0ed61dac1b507690ed01da01b30b6416c61d883b087600ebe1d783ad135626a82d447a8835106a20d441a8074f0e9e0d3c1a7834f069e0d3c1a7834f069e0d3c1a7834f069e0d3c1a7834a2e940d281a5034a06940d281a5034a06940d281a5034a06940d281a5034a06940d281a5034a06940d281a5034a06940d281a5034a06940d281a5034a06940d243a4074806900d147a10f410e7e2cf839e873d06781cf019d0b390e701cc4f970f2c16561cac195072a06521c9c5928b240e480c8c391832306441c88191032206440c881900b1e163a1c7038e031c06361c6838c87180e300c5c38b0716062c0c5818b03131e241c40587870c1e161c2c185070626063be937c0af235e02bb477682ec0dd61ba457482e905d01b9857302e50dc81b885700ade15b82b7016e02dc05b42b6056b86d705ae0b5c16b82d705ae0b507688ecf15983b1115e22b825684ac47570eac15561aa45538aa515481a74f4b9a922d186a18d40967e1cf449d0d38126e14d6399c933826704ce099c1328a6314c2297c52f825f04be097c12f825f04be097c12f825f04ba296492b0e5414a61944528824e1c9a1930326024b0c960910f1e9e363c5e78a8b1502290c4e289070cae13342608293021a04040047fc2fa2de95bc667882eca5d42b9e571d0df25b54b6056a10cfa595532056400c42184230426004bf85783ae275a8eb1216012ba35458a32d403264e49d6909919422a44296838d0131ecb3a9870a4d75198b30945c28b2315c42a8851209d292e622d8402c8000e1017e227443d8866a07e806c80160001 0x5c80dab91141728402e54805b4844b881b56f0362e006d5b80d8b8a181718302e049c5bc8a0b7b1416e0462da4505b00fab181f16d8402d606d5b6900b501b56902ead006d59c09ab3017565036ac805d5b2120b591416cc482d44505a4880b41141672182cc440594880b210c36b640ad6c515a1882b2a0c96ba412d50825a591cb432096743f2cc83e5960e7b221f9644272c6c8058e900ae014559020e8e03151c0429c004d620462c5483560881a310c1470202c2480d14880ae0201572182c0480558880aa91015f2402bc480574920aa1101532202a44405818a2af21455d419eb443ed18864ad00f9460192c3080581901a291015f6402bc880577120a880c1500182b908053c880a711015b0262b6431568100ad52015984026e4225669009b1089352112684224cc8409910c1312102604304bc8409710c35824029e450d1c100ab9103562402ac4505548a1aa12415423029c45054c8a0a91141586402acc50551063a3020158a402acc50d3c900abb1f9566392aa839549062a891f94f23969207ed140e4a1008d536202a4840552904a9b141524282a048e538904a60175514202a0421d3d900a7b1414e418a9a4605308c0a6a1654c418a9208052c8faa511f14944029009c521062a080894764028c48051e900a2920146a4028ac80d10118a181734404628805c50c108a121814003ea7807c50a0c09f81f53b03e27c07d4e80f8a092713d03ea7207cd02124a0418b3f44927e862cf893d9e92493e23727a462cf19049e314b3b241276452ce811d9c82093a02f2720524e21209b91412d03ea3a07c4e31209b11412c03ea3807c4d48809581b51b0362684504a80fa8d01f13321825205d4c888098910128036a6044049c0fa9790c126036a5c440cdd9029bb14534620a648404c10649281b515019a6f4824da1049ab2393464125c8304900da99a1f93243926283e4b906491817530839e5e87ecb90e497a1392e42124405dcb592296b1852a628a4e8324948808a00c92dc492590924ad93c9532492422825288e4a107c91910127a41e4c88e4990bc91110125839e48c7349188791a1c923421244832c751028fa1ad1d428a3484148611c9021251fa41e3c88e4790bc8ed2091c64123688e4691048c82391702723008e45807c8c91011803622e4504580f88aa1411424622b483c4c11c8981791101e229483c4811c8901791322022407c4448808801f50f03e221483c3811c8701790f839a1c07c434118863202e60409a40513140825a00c499010908013432901728204e5028988041a600624c008483009e0848142c8f28501e4e40209860312cc04241004cef210dc608138c0a2610104b20189240212040268491b0e20289820412c40628400650701720c09c4140d88231b2f14181de430bf907d78a0c8fe21f1e2432b84102708144c0020df80299940427e006465008a068793e08448101e4e002097e0312000227ba0c90121f1de432b7c1026f8144be0208fe021400032310044ff4471fc4823780a25e8104fd0148fc0113f11047b20c8fb0471f403e3e40f87ba140ef2285ba0913740c2688144bc0209600311f4042768064ea0098ac0113e111c7ba20af42475e24823700a25d8104af0189ec029190042760064550089eb08e3d0904798124ba01895c0211f0022791278f14411e048e3bc9046d8144b902095a0311ec042770064500089db483bb110476214aeb0471d605e3ab127740278e903e1d006e39c078733204e36289be8513750666d1200ac21919c03e264064736240e58301c6c60b64920559102972185a40902600804900c0e58411c8c8e38d9047120e4db4189b24822a88806a8238d20411c2c6037d0c16c1240650180c40203859046e3108e04471be88237909c6da108d82411524423771246e3180db4301ae4922a0880698278d10490c80301400406d5202d96409b2c51b611026c2144d7419d9643ea5c8646580f8970191ac8793550826a11e4d321194e022b49902693144d141994c43234007c4900c8cf0170c402233a90466a238cc2149960823281386481b0c824718e43e3180f962b204c5628984c412f90825e20cc7a21116c03f316904624208c3647184c823050725ca0c479211180c822ed8845fa238be44117a84e2e50843c10c0bca41d76c822ed8a55d223ab944117485e2e50a43b90c0b884716ec492da9075ab238b562f568c902d18c0593140b0418d584902b08c0531142990481320602800b8490140560111694822cd91c593208b141c95a831aac9045511429f0475300822940ba45008caf62015a8402a48c02a80c08c0160a00202c290757b208af62955c88eab5104572178ad4295504822a08a551823e9b04194605f26c0a64780f4aca41156c822a98a054a144a841894e48e2989054e023a9704114405d22404652b180a442c9468312888c04881808801114308e28210448c1749f44113c44b2748924611049c041136c412448d84390c89a04e1334822619044b92089604712a08d2501184982149204112205d24005c2800888f62011c85c13c06146923a8c24111a45e2308a44591344f216d1509222a0c544a2488943151049ea1c9244411b88723109e43c2180fa4281f284648908c612058a23fa1407d4190f44401d80fa3881f0620280bc03e16c0662b00c884c4910709220993c40b2487b4180f24501d40fa3701f05001810088e1fd1043f20f87b4190f04409ac11d328208740368b803e1540643ed20e7c4474f68821f10bc3da148772204d408e9901043981b46a02f0c80521ea0e73cb1cc79621cf08721e10843ba0ca690398e405d1a40862d00cc76a41ceac831d58a73a2208744290e68321c8881340208680290b20329c28fe38c1cc7082dcdc8731bd0b637210c6d8470d88491ac904351088694280d047c19c13c330138654410c883218c11c310208610368c006c17c07c2800c85ea41cba88e1750bd2e12085c2290b78931690a02c91f25804f0b006e15c0782b520e554410aa85294811f28823a500410a806d14c0d829017c5102f0a005213c05b2722044e4288968411088821e908e3604086c0510b40821400c42201182c01313a90426b2084c4470968829189062510a4492118724218d41061a01442702084203112005223808c1a01082a01311990622a2083c41908848e10c9062112084121f0804330e486519820c3202884c0410800660a00843f00c87c0130340221ed20e3c4410788528ec91d1d120e3924107645e0e88a61c914a310418620530940820f80c4130108700190dc02605004436a4106ac830d18a219a20c324288628330c09040f10c82f04705c0830b41041600f82b0198340320a805c14808c0d01105107389d8e613b10e2643984c84309506609108a2403f84804f08c07e11520e21641042c5288110610214c1f418c3c4820788a50e823e1c0474360838681040e817c1c02f0360530680a40c80bc1801702e0230280440b520e1564182ac538511040a21481341902444083c11d07020e0d04102206d0400d80781780e02981a05203007c0580cc0a01901307381d0e604214c07421c0c47301888602908e0403980804300c06201008c010098000ff 15 5 13 9 1
-def q49D : Forest := fun i => decodeNode 9 22 0x29016b8305009393e6284f01193aa404df1212da41496105256474959052543f49107d24839c8d09d23a40476906ea840369900da640365100d9c48362100d3218b46900cca40316900ac63f2ad8e4ab41caae904a96282a50a0a94202a0842a862829d062a742ca8d062a323ea7c8f89f4402750629ba40266900986402600b89304224a0c08a24e2220c48743121c8dc8723121d8a4862292180bc8602921b12084a411ea1047a6471e99047a43f1e50e47941f1e60e6784271e108478c491da1247664f1d9924764471d507c75a419d10bc748399cd886734211cd064738471c509271a419c10bc70a411bd9046f4471bd1046f2201a00d86822819c0f867a4196e9065a2201640f859220162906558399500f8530461469004e23c9340f24d23612c0324b017124138480361218d84743c9140f24521f10c03243447108904420149091044004710007c4003e0fd11c3d4410f40523d8470f09043c0248f093c3b4410e891c3a2410e80323aa418e50a43902f0e71263803e0e00dc3801e0e3120368410d591c356410d5072356410cd11c334410cd09c33c490c98c0324300ca900316288c50a2314198c50f2304208c08f2302118c18a22e4198b807c2e0170ba9042d4470b48522d0410b41382c0360b091c2b21f0ac0f82aa410a2104286470a19042841c8a19042744709d1042742709e906266290990bc2642909a11c256248969062462f092904226470899042241c88a906206290810bc204290829041f64107d8a01f42887d0621f24707c9041f6300790b21e4188788c01e8470761041d4410748961d2248741041d6208701381ca4106d9041b24106c11c1b04686c1181b04286c1041b02e86c05c1b6200690b81a22f0648a4192268660c4184310608dc182310600fa1803e0631241684905993c1664905911c1544105507c15a418510bc144290520e61362184d0841341904e906126298490a412419048880128398460b61142d84508611847041092102410408441042803c8f80f04f03c09c0f4410390640e0470381040e0368380d80e01f03a9060d42f0348a40dc498310a00c23e0300dc0c01e0329060b42902c0da0b03602c0be0b02f02c0a40b01682e9040864102111c0844102085208211820052080118219060744101c91c0724181c9040721f01c8660700c81c02607a418190a40622f0188a6062290180320600981a904056418158a2054418150a205419814904050470141060504101407c0501981405c050118160e6046218110860441981009e0401f8129060362900d0a60341880c8a40302f80c0bc0302980c0a40301780c05c0301180e906026298090a402419008880020368080d80202f0080a60202900807c02019808064028398050a6014218048860121180408601018804046010098041fe00 i
-def q49T := dagTraceTagsBin q49M 128 (dagTagBases q49N 0xbb4414f7ffffd81a43c75d0cf0fe78efbf99ef2eff7ff9e1ed38fbb3ff0fe7f707fe6e036fadff2f3cff3fffcff1ffdf3effe3f80217ec98138fe7c8fdff1fffefe7a1d5b4dabbe5e41efcff3f6ff3fee21f1de019f877fffff1007fe3fffe3ff9efda7fc1ff877fbfffbe9107f7fff045f0ff9ffe0007fffefffffffe988909 0xbb88f4f7ffffdb7a4fcf5d3cf3fe78efbf99ef2eff7ffcfaed3bfbbbffbfe7f707fe6e036fadff875d7f5fffcffaffdf7fffebfe2317ec9db3bfebcbfdffafff47e7bfd5b4c23be5f2cefd7f5f6ff9fec67f1ff9ddfc77fffff4b6ffefffff5ffe7fdbffdbffc77fbfffbec4b3f7fffbfff7fffffefbbffffefffffffecddfbc 128) 13 q49D
-def q49St := dagTraceBin q49M q49N 13 q49D
-def q49Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q49Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
-def q49Mv := dagMoves ([([qS1], q49Mp0, q49Mi0)] : List (DagMoveRecord 256))
+def q69M : Word := 0xf0f0000000000000f0f0000000000000f0f0000000000000f0f
+abbrev q69G : Word := qGoal &&& q69M
+abbrev q69W : List Word := projectDAGStock q69M qBase [0, 1, 3, 6, 7]
+def q69E := unpackWitnesses q69W [66176, 328832, 594048, 884864, 1151048]
+abbrev q69N : List Word := normStock q69M q69W
+def q69C : List Bound := [q14F, q10F, q36F, q25F, q27F]
+def q69S : DagSample := (0x30082c12432082430502c14090182c904a01824064324124900905128824920824100940204804201209008201a0402090422100880520802810110880c0403008281, 30)
+def q69L : DagLinkList := dagExtractLinks 0x1c0e070363b0d86c36165923543801 0x170b8980c430108701d1403224056422f474521087c1d0ca342906832880bc14130201f53c43270670d10c1a11e204fc2086480fc8819a202f420460807c08098001f 9 4 12 4 3
+def q69D : Forest := fun i => decodeNode 4 16 0x85c90194015443e34323832204c203e2423101f1013101f0 i
+def q69T := dagTraceTagsBin q69M 30 (dagTagBases q69N 0x28421ceee4b78f5f4103e3f0e93bfc47ffd108 0x2b4e7ceef137d75f4b1bf5f8ec9bfebfffdbbd 30) 7 q69D
+def q69St := dagTraceBin q69M q69N 7 q69D
+def q69Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 6, 2, 3, 4, 5, 1, 7] 0 i.val)
+def q69Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 6, 2, 3, 4, 5, 1, 7] 0 i.val)
+def q69Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [1, 0, 2, 6, 4, 5, 3, 7] 0 i.val)
+def q69Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [1, 0, 2, 6, 4, 5, 3, 7] 0 i.val)
+def q69Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 0, 2, 1, 4, 5, 3, 7] 0 i.val)
+def q69Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [1, 3, 2, 6, 4, 5, 0, 7] 0 i.val)
+def q69Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q69Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q69Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 6, 2, 0, 4, 5, 1, 7] 0 i.val)
+def q69Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 6, 2, 0, 4, 5, 1, 7] 0 i.val)
+def q69Mp5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [1, 3, 2, 6, 4, 5, 0, 7] 0 i.val)
+def q69Mi5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 0, 2, 1, 4, 5, 3, 7] 0 i.val)
+def q69Mp6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 3, 2, 1, 4, 5, 0, 7] 0 i.val)
+def q69Mi6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 3, 2, 1, 4, 5, 0, 7] 0 i.val)
+def q69Mv := dagMoves ([([qS14], q69Mp0, q69Mi0), ([qS0, qS16], q69Mp1, q69Mi1), ([qS44, qS14, qS16], q69Mp2, q69Mi2), ([qS11], q69Mp3, q69Mi3), ([qS11, qS14], q69Mp4, q69Mi4), ([qS0, qS5, qS16], q69Mp5, q69Mi5), ([qS44, qS5], q69Mp6, q69Mi6)] : List (DagMoveRecord 256))
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q49A : DagMovesOK q49M q49G 256 q49Mv := dagMovesOfCheck (by decide +kernel)
-def q49NB : Nat → List Bound := dagNodeBounds q49C.toArray 0x17a06f315e51bc47780aee9ddc1bb637686ec15d71baa574cae81dce2b96771d2e295c23b8056f8adcadb72b6876c8ad725ac2b509694ed11d9f3b3a566cacc95963b285644ec71d8b3b125618ec215813afc75ecebc95772aea55c52b6a56a3ace7594ab11d5f3ab69560eaa25513a9c752cea41d453a847500a9e9d376a6874c8a988d301a5c54b0a9515282a4a748ca8eb5158a247439286150a2a0e7414a811cff39f693e0e7b14f429e273bca75a4e839cc5390a7114df39b69364a6b94d259a0532d6641cc629885304e5f94bb497072d4e58a4af295872a4e531ca429445280a4f149b39307258a499c90391a7228e439c8439045200a3dac7928ee51c9637246b38d07194e31945e58b4915ce2a9452389e7130e23ac45288470ede1ba433485ad0a52131c22483ab068e0aac1238205034e051c0648067000dfe9bfa37ec8fccdf7a3eb47ccaf891ef9bdc37b44f609eb13d2479e6f349e593c9278e4f0d1e093bf2774aed91d99bad67564ea0dd29ba2373c8e5a1c9238c67126e18dc19b7f46f68de0dba236f56d86da4db22b6046b2ed58da99b5036988d211a2233e66766ce0d9b133426644cc09969b29464c6c8198d3314661ccc1657fb2fc35f26bd157822ed35d46b9cd6fc2db45b06b45d644ac4457aead9d56caaa354aaa8154bca92551aaa0ad3f9a7c34f269d5137b26964cc698cd301a5d34b469591299a50349a69215229a42347aa8e1519322f345868999119a1e5432a858d099a0f4418681d50129fd53f0a7d10f731ea43caa77d8ec39d2639aa7160e029bb536ca6c54d4c1a2733aa6650c8498b530ca5fdcbcb17182d8a5998add952929aa51d89f49386264c4b54942921722f4449485b9065202a3e607848eb51c7036a46a30cc818902e6c5aa0ae71458266447588680fd01e1839a86c70cea17e02bc0525096e10a41e3036605ee09e01038197026c03580338006 0xd2a040088406984d8b5410846119201185a01408340043008611860f1804010402009a03080250c02180451880110c23080400a802400451880311845008024004d009c010040100480804828048090a40bc4c0880512005114026002278051309a6104ca088ca30461298242c026108c11862d5044108c23240230910329a1150469290c608d8448c2308c8208c31009a0101411002250c2330461190a20904118461188820900110c2309160138613a820100ae1886100440100460a8015002030c230ac011814b0046118461185e00a0611854008c0a580221a9c30a801184612090008c23091058058440c43098626804011d43008e3008a310c23004e3080613406010c27185413ac1012820100430a82f1804908049008a6184ca0804800906004400886268040088a618540100221804202806188a00c406134c01014130801308a6134613046130490305a30982309826090460982011d43008e3008a311105038230806138c21009410090a091603880218488028614804800900120a31010311c02601422186013002300462854362802611c85804b009c01340272802504027002249c2b00801100220086210cc20804030c40188882840240ca1009e819402620a100989228281146c224402c80278046028223002278027185e00c085020c11184009c61220a311a1150469290461942640d842a4c440c408162a08d22010a508d852246c490a622167188058450508cac224713a8234ac850094009401181461002d430a11c5a8284621a8a11b46140c2a004a6184c309401580241140128023004882882c291234158448c4309862220a0105a30b0a448d84480a21856009623098625804c711601388b01dc5580ee3816e7a006704c03b9a07044078dc60be4058470620e00be4f80c327a0e05c0298802f73d0309dc00bda51bc3020d0702dc91bd00204910050f7206f21d2e42c01610e0430a440dab004f01282e6804e6a82049c526ac0a7b4e05852e69d0402d430c5aa0ace080969031b168201145a809d608092a5b80d639a0089c2581af281a19900931e114cd41380861260709923430873452134d2c21a6921cc170049505cb01c827a5600b124581071b5413ac092090b290024a98758082611cb680226248a734275804758049338eb0098921d412a00b1888b28d2031e1171c6a490a0585e5198e0205844140748d87490a6624802acec49005238012c5ed414811bdae29d600b08901507614891acac4910038c87481704b08b01d893ac0473d60624e6224ec22c08625ab01c8c490e0324ec201692b08b01d8922c07 15 4 5
-def q49Ck := dagCheckNodeBin q49M q49G q49NB 371 q49St q49Mv q49L q49S q49T
-def q49RA (token : Nat) : Bool :=
-  let s := rootState q49N 13 token
-  !dagAllowedRootBin q49M q49E s.2.1 || dagLocalBin q49M q49G (dagKnownClosesBin q49G q49C) s ||
-  dagRefBin q49M 371 q49St q49Mv (fun p tok => dagFindLink (q49L p) tok) 0 token s
+theorem q69A : DagMovesOK q69M q69G 256 q69Mv := dagMovesOfCheck (by decide +kernel)
+def q69NB : Nat → List Bound := dagNodeBounds q69C.toArray 0x90907469685a5858432b1302 0x2304028140a041 8 3 3
+def q69Ck := dagCheckNodeBin q69M q69G q69NB 12 q69St q69Mv q69L q69S q69T
+def q69RA (token : Nat) : Bool :=
+  let s := rootState q69N 7 token
+  !dagAllowedRootBin q69M q69E s.2.1 || dagLocalBin q69M q69G (dagKnownClosesBin q69G q69C) s ||
+  dagRefBin q69M 12 q69St q69Mv (fun p tok => dagFindLink (q69L p) tok) 0 token s
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q49RB0 : treeBlock 0 64 q49RA = true := by decide +kernel
+theorem q69RB0 : treeBlock 0 32 q69RA = true := by decide +kernel
+theorem q69R : dagCheckRootsBin q69M q69G (dagKnownClosesBin q69G q69C) q69E (dagRefBin q69M 12 q69St q69Mv (fun p tok => dagFindLink (q69L p) tok) 0) q69N 7 = true := q69RB0
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q49RB64 : treeBlock 64 64 q49RA = true := by decide +kernel
+theorem q69B0 : treeBlock 0 12 q69Ck = true := by decide +kernel
+theorem q69Bk : treeBlock 0 12 q69Ck = true := q69B0
+theorem q69K : KnownBin q69C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q27Bin) q25Bin) q36Bin) q10Bin) q14Bin)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem q49RB128 : treeBlock 128 64 q49RA = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49RB192 : treeBlock 192 64 q49RA = true := by decide +kernel
-theorem q49R : dagCheckRootsBin q49M q49G (dagKnownClosesBin q49G q49C) q49E (dagRefBin q49M 371 q49St q49Mv (fun p tok => dagFindLink (q49L p) tok) 0) q49N 13 = true := (@treeBlock_merge 0 128 128 q49RA (@treeBlock_merge 0 64 64 q49RA q49RB0 q49RB64) (@treeBlock_merge 128 64 64 q49RA q49RB128 q49RB192))
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B0 : treeBlock 0 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B16 : treeBlock 16 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B32 : treeBlock 32 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B48 : treeBlock 48 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B64 : treeBlock 64 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B80 : treeBlock 80 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B96 : treeBlock 96 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B112 : treeBlock 112 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B128 : treeBlock 128 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B144 : treeBlock 144 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B160 : treeBlock 160 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B176 : treeBlock 176 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B192 : treeBlock 192 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B208 : treeBlock 208 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B224 : treeBlock 224 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B240 : treeBlock 240 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B256 : treeBlock 256 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B272 : treeBlock 272 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B288 : treeBlock 288 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B304 : treeBlock 304 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B320 : treeBlock 320 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B336 : treeBlock 336 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B352 : treeBlock 352 16 q49Ck = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49B368 : treeBlock 368 3 q49Ck = true := by decide +kernel
-theorem q49Bk : treeBlock 0 371 q49Ck = true := (@treeBlock_merge 0 192 179 q49Ck (@treeBlock_merge 0 96 96 q49Ck (@treeBlock_merge 0 48 48 q49Ck (@treeBlock_merge 0 32 16 q49Ck (@treeBlock_merge 0 16 16 q49Ck q49B0 q49B16) q49B32) (@treeBlock_merge 48 32 16 q49Ck (@treeBlock_merge 48 16 16 q49Ck q49B48 q49B64) q49B80)) (@treeBlock_merge 96 48 48 q49Ck (@treeBlock_merge 96 32 16 q49Ck (@treeBlock_merge 96 16 16 q49Ck q49B96 q49B112) q49B128) (@treeBlock_merge 144 32 16 q49Ck (@treeBlock_merge 144 16 16 q49Ck q49B144 q49B160) q49B176))) (@treeBlock_merge 192 96 83 q49Ck (@treeBlock_merge 192 48 48 q49Ck (@treeBlock_merge 192 32 16 q49Ck (@treeBlock_merge 192 16 16 q49Ck q49B192 q49B208) q49B224) (@treeBlock_merge 240 32 16 q49Ck (@treeBlock_merge 240 16 16 q49Ck q49B240 q49B256) q49B272)) (@treeBlock_merge 288 48 35 q49Ck (@treeBlock_merge 288 32 16 q49Ck (@treeBlock_merge 288 16 16 q49Ck q49B288 q49B304) q49B320) (@treeBlock_merge 336 32 3 q49Ck (@treeBlock_merge 336 16 16 q49Ck q49B336 q49B352) q49B368))))
-theorem q49K : KnownBin q49C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q28Bin) q32Bin) q30Bin) q46Bin) q25Bin) q27Bin) q29Bin) q47Bin) q43Bin) q11Bin) q48Bin) q31Bin) q42Bin) q23Bin) q41Bin) q45Bin) q10Bin) q1Bin) q12Bin) q44Bin)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem q49Bin : BinLower q49M q49W q49G 14 := by
-  apply lowerDagBin _ _ _ _ q49A _ _ _ q49K _ (fun _ b hb => dagNodeBounds_mem b hb) q49R q49Bk
+theorem q69Bin : BinLower q69M q69W q69G 8 := by
+  apply lowerDagBin _ _ _ _ q69A _ _ _ q69K _ (fun _ b hb => dagNodeBounds_mem b hb) q69R q69Bk
   · unfold Masked; decide +kernel
   · unfold Masked; decide +kernel
   · unfold properWord; decide +kernel
@@ -4486,7 +4066,860 @@ theorem q49Bin : BinLower q49M q49W q49G 14 := by
   · exact stockMaskedOfCheck (by decide +kernel)
   · decide +kernel
   · decide +kernel
-  · have h : q49C.all (fun b => q49M &&& b.1 == b.1) = true := by decide +kernel
+  · have h : q69C.all (fun b => q69M &&& b.1 == b.1) = true := by decide +kernel
+    intro b hb
+    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
+def q70M : Word := 0xf000f000f000f0f000f000f000f00
+abbrev q70G : Word := qGoal &&& q70M
+abbrev q70W : List Word := projectDAGStock q70M qBase [0, 1, 3, 4, 5]
+def q70F : Bound := (q70M, q70W, 9, q70G)
+def q70E := unpackWitnesses q70W [49760, 312416, 544864, 843872, 1098305]
+abbrev q70N : List Word := normStock q70M q70W
+def q70C : List Bound := [q33F, q46F, q58F, q4F, q34F, q2F, q61F, q1F, q3F, q43F, q44F, q60F, q41F, q42F]
+def q70S : DagSample := (0x801a301081061201c08250040e080523014014520410830522082c30700510cc029208a48009300e010290414082190518880282090c140b0502482510c0643009050a8c062050a03038301c0302804024c0610c068804205108141a201403050040a0820920984c028, 47)
+def q70L : DagLinkList := dagExtractLinks 0x19a8335066a0cd419a8335066a0cd419a8335066a0cd419a8335066a0cd419a8335066a0cd419a07330e660ccc199833306660ccc199833306622cbc5968b2b16541ca4394072806500ca0194032806500ca0194032806500ca0194032806500ca0194032806500ca0194032806500c947910f2206440c8819103210e401c80190031f0e3c1c7818f031e063a1c7038d0b18162c2c5438a8315062a0c50389871306260c4c1888b100e1e1c3c187830f06164c2838313050e024c0417e92fc0df80bec37d06fa05f40be817c86f80dee1bd837a86f125da4bb417492e80dd00b9c37382e705cc1b9817302e225c21b8036f86dd15ba0b7036d86da0db40b6436c06d425a42b4056802ce15982b285640ac6158a1b1035e9eba1d6e3ad835a86b40d661ab0f548ea61d482a8c3508a9f153c1a7814f029e053c0a7054e029a15321a6034b0a94151c6a34346068b0d122a2414406870d064a0453f8a7d14f629e833c86780cec29d0539867304e609cc139067204e409c433882700cde19bc137066e04da19b4136066b0cd419a813296602cb65958b2a0a511c9e293072396422c8408f0d1e023254548890d0abe1314168820704020043eca7b90f511ea03c8678c2ef15d833a4671d6dfa1b7436076b08d1299e232c86314c3198032eab5b50b2a16122aea5582aa85502a9844f5e9c91298246646d0863d0c020c641807f20fb19dcd3a886dbcdb01aa6354065a8c9118282f865e84b73150f265e43c868f897d0bba07fc0170001 0x24a43ce4803c64804c24a01c64804ce4801c64803c24602c64803c24802c24804c24603424604ca420351e402124201524003d644029244019244840244c40242850242c501fc0101f80202408401f6020a3605c1e2020240c4023e04c9fe0509fa05023c04c23e44063c43823c4401f4430e3a44e63a42ea3a04e23a02e1f2020a1605c21602c20c01c1e00101f0020a0604e9ee04220601e1ee012a0204e9ec04220201e1ec0121ea02023a040a1c05c23ac401da02023604c23403c23203c62404022403022e02c20802062c43e62243222c42e22242262a03e62003222a02e22002222803c61e04023805ce38c49a3884963843e23842e2380502040301d801023645023405c23005c22e05c236c5023485022803c23284223043e22e43220442da2a05c22c01ca2a05c22a01c22805c1d801c20443c22604c22645c1d602022445c21e44c21c05c21604c21403c21204c22483221a03e21803d21003c20a03520803220402da2045c22242c20e04ca2045c22042c20c04c21e84021c45021a05c21845c21644221404e21204d21004c20e04520c0421d601d20a45c60604c20203c20845c60604c20603c20445c2020441fe43c2004501e40505f44401f643c5fc44c200c509de43c1fe4289e20501fa4201f84205f64401f64305f68401fc43c1fa84e1f883e1f68321e804e1e20425dc03e1d843c1d642c1f48401f4c401f244c1f24401ea42c1f04321e604e1e00421d601d5ee44c1ec43c5ee44c1ee43c1ec4441da42c1ea44c1da43c1e802c1e80201e603c1e4c501e243c9e2c501e24301e044c1de0501dc04c1dec501dc0401da02c1da43c1d843c1d843c1d644c1d485090a0519c003510a0211c00151d28405960411b203d1080211c80191d4c5096e05d1b003d0ce0211be0151d2c405ae04d1ae03d5c60291c601990c0511ac02d1aa03d1d00191ce0155b604d1060111040211cc0191ca0151c8c421c68421a843d1c405e1c204e1c0c521be8521bc4521ba4421020219b48521b442194405e8f405214401e0f4012db30529b2c529b885e5b24411b24311b842994205e8f205214201e0f20129b10601b08401aa4401a043894006c14002c13401c0cc0105b2c501ae8401a28381b644c59a05c0f00209a4c5e1b4c4e1b2c421b08521ae8421a683a1ac45e1aa45294805e8f805219a04e5940420fa0210ee0201a80191a684013e02c1a4c521a28421a045219e44e94605e8f605219804e59204219c46c14a44c0ec020d9b052d98c5e99a85299845e59a04159803919a02119801999705219684192a45e8e845219044118e44012a42e0e842297c05e17c02e92846c12843c11e42c0ca42097a06c18a05c17a03c17802c19705019445c0e643018c05c995052992c5e19444119243997405e17401e19105018ec40d7245e57242e97205e17202e98d05218c44191805e8e205211801e0e201291645e8e045211642e0e042298005e18002e988c4318a44318843392c04f91404e8ea0438de04212c01f11401e0ea0130de01291245e8dc45211242e0dc42297e05e58604c18203c17e02e91045e8da45211042e0da42298405e58604c18603c18402e90e45e8d845210e42e0d842297005e18204417002e0d643018005c17e05417004c17cc4217a85217845217644e91a05e8e405217404e17204217003d0ae02116e86016c46c8fe06014804c16846c55c45c15c44c15843c52a05012a04014203c11003056f05116ec5155684e15683e15205d15005c54004e52804214003e12803256cc5116c85153c03e52603213c02e12602256044e16043e53a04e52404213a03e12403256ac4316a84316883354c03f53803e52e03352203214c02f13802e12e02312202296245c55e44e15e43e16642c53604e52004213603e12003296245c56444e16443e16242c53404e51e04213403e11e03216046c15e4640aa42c13004c15cc4215a85e15884215645214e05e90005253204e51c04214a03d0aa01115445c152860d4ec4994e84915045054e03e14e02e14c46c14a44c10e0400a8020148c5214685e14484e14284210e83d14045213e42a13c05e13a05d13805c13605513405213204e13003d0a801d12e86c10e44c0a643012c05c12ac4212885212645e12445d12245c12045511e45211c44e0a642d11a05e11804e11604d11404c11204511004210e03d10a84010c8388fc4600f844c8ce0600c204c5088501088401048304e84500e84400f243c0da4300be03c10ac52108c4210684e1048420fe45e0fc4524f044e4e64420fa43d0ee43c1024250d405e0ce0524bc04e0c603d500c491008494fe4320fe4224ba03e0ba02ecfd0518fcc514fc8420fc832cb844e8b843e4b804e0b803e0fa8400d84400a842c0f8c520f685e0f484e0f28420d883d0f04420ee4300ec4220d205e0cc0524b604e0b20310a801d0d884c0a683c0ea45c0ae43c0e8c420e68420e445e0e244e0e044d0de44c0dc4450da4420d843d0d642d0d005e0ca0524b404e0c403d0a602d4d44320d44224d203e4d00320d202e0d0022ccf0518cec514ce8420ce8324cc44e4ca4420cc43e0ca4324c804e0c803e0c68400c44400c2c520c085e0be8420bc4420ba05e0b80520b604e0b40420b284c0b005c0ae03c0ac04c4aa84e0aa83e4a844e4a64420a843e0a6432ca10528a0c528948520a44534a04410a043109442185605f83405347604107603108802d06002105601f034013c9f05189ec510a4c4349e84209e83249844209843285405d48604f47404308603f07403305402d04a01d01a0110a2c520a0c4209e85209c84209a45e09845209644e09444285805f83605348404f47204308203d03202104401d092019090015012011885053882c5288085f87e85e87c85384485208e84f08c84e08a84308884205e83d08645308444308243108042b07e42907c42304442183e05f83c05e82805382605207a04f07804e47004346e04205e03103e01f03c01e028013026012873053076c4207485307284383a45f83845e82445382245207044f06e44e06c44306a44205e43d03a42f03842e02442302242285c05f85a05e81205206804e06604d06404c06204506004205e03d05c02f05a02e012022459053058c53056c4305485205245e05045d04e45c04c45504a45244844f44644e44444204843f04643e04443201042d04205f04005e83005382e05243e04f43c04e43a04343804203e03f03c03e03a033038032010021437053036c53034c4343284203283203045f02e45e02c45302a45242844f42644e42444342244202843f02643e02443302243201042d02005f01e05e01c05301a05241804f41604e41404341204201803f01603e01403301203201002dc0ac4380a84300e83300c44340a43300a42380404f80204340803f40603300802f00602300401f00201300001f 15 5 13 9 2
+def q70D : Forest := fun i => decodeNode 9 22 0xe42009904026409880e4628381880d8220338880cd6202e80a0a86282850a09f42127487c9d2192740389c00e26c0b89922e25d064922162448589042023c8a08e02e2348b88c22122c09c8b026a2c0988b022a2c0848b22e2288b88901e2248b8880222218a07f2141f4878794271e107c784191e1880742201c88647021e1b88886d2261b00406a01e1a58a06821819c898666281740805c21e160878552261518a05062013c0324d00a9340324b00a92d8844a4211280bc4a0271298a4494291248a4492211248524522610d89c426211090a4424211088bc42229108032424201058a4404211008a4402271008d83f0108f40323d8280e88823821c8e20a0376200d8882352218cc8663301e0c405c310220c00b82f02a0bd8842e4290b88a42e2270b809c2e0210b807a2e6288ad0a22a4218a10662821609c87c262160988d8252320958842442f091084242290908b8234300888a0210170848d8202260818a41f42f07d09c1f42107c8a41f21507c0bc1f02e87c0b81f02a87c0a41f02707c07a1f4360780b81e6210750a41d22f0748ba1d22e0748aa1d22907489c1d02f07409c1d0268740981d0228740841d01e8750701c6290698841a4270690841a21286909218211061064164200558a41442f05109c14421050884142180508441422e04d884124210488bc1222704889a1222604888a1222104887a12216848844100170400441041903887c0e21903807c0e4200348800d6290310bc0c4210308840c02f0300a40c0270300840c42602c0b80b01e02c0980a41f02487c0921902588607629019884064290190840622f0188a4062270188840600c81802a0642781509c054218150840522981488605218814856052148148460502781409c056210110a60442181089e042270108860422101009c04026810098040228100840401e81005e040170118a60362180d0a40322f00c8ba0322e00c8aa0322900c87e0321f00c8640302f80c0bc0301f80c07c0301980c06403629809886024190088be0222f0088a60222900887e0221f008866022190080be0202f0080a60202900807e0201f0080660201900805a024198048860121180405e0101180403e0100980403e00 i
+def q70T := dagTraceTagsBin q70M 47 (dagTagBases q70N 0x6ff42b03f3f93d0bfa79f87ec0af4f9e763f2fd267e05fa4209f56eda4d 0x7bf77b6ffff9ff7bfb3afe7fffafffceb7befbf6fff6dff12761a6edad8 47) 8 q70D
+def q70St := dagTraceBin q70M q70N 8 q70D
+def q70Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 4, 2, 3, 1, 5, 6, 7] 0 i.val)
+def q70Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 4, 2, 3, 1, 5, 6, 7] 0 i.val)
+def q70Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
+def q70Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
+def q70Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 4, 2, 3, 1, 0, 6, 7] 0 i.val)
+def q70Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 4, 2, 3, 1, 0, 6, 7] 0 i.val)
+def q70Mv := dagMoves ([([qS12], q70Mp0, q70Mi0), ([qS23], q70Mp1, q70Mi1), ([qS23, qS12], q70Mp2, q70Mi2)] : List (DagMoveRecord 256))
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70A : DagMovesOK q70M q70G 256 q70Mv := dagMovesOfCheck (by decide +kernel)
+def q70NB : Nat → List Bound := dagNodeBounds q70C.toArray 0x3f01f80fc07dc7ec3f51fa0fd03e81f40fa07d03e81f31f90fc83e41f20f907c83e41f20f907c83e41f20f907c83e41f20f907c83e41f20f907c83e41f11f887c43e21f10f887c43e21f10f887c43e21f10f80fbc7de1ee1f707b83dc1ee0f68fa8fce7e61f307983ca3e41f18f887c41e11f00f803be3df0ef0f783ba3dc1ed17683b23d81eb8f587aa3d41ea07503a63d30e81f38b9c1cc2e49f2078e3c70e3871c38c3c51e287107863c30e18704b821c10df1ef477a1bc1dd8eec3761ba1dd06e47721b90dc0edc76a5b23d906c47603b00d78eb87585ab1d586a87523a63d28e907445a20d08e807401a00d0068033e39f0cf867c33e19f0cf867873c19e0cf067473659a1cd06647303962ca164c7243911c80e3c71c38d1c51e20b0e3861c30610b063821bf9df86fa37d0be85f42f837b1bd0de46ee5770bb0dd82ea3750ba0dcc6e61730b90dc46de56f0b70db46da16c1b58d8e2c075d3ad1d5ceaa5523a81534e947473a1a4f5a72932796aca5248b2138db45d22690b88494152046fe47c33d4de46e99722b811b88d936b9350d9eacc364231897d0b955aa2c515c6ab3532a8193a69a34b224551c689542a2014f6a77438b1b50cb06052cb9550a0a4c4233109078c39319b0bd052c263112079030c1440730218088004 0x4044b206016305843044508073958909134548353594d94014140243587201405a0ca0205b20522b1200b7b62155a84a60570765b2b857671860116214066a117103333b00366281534070351432034833720537143037437db949350bdd924d92370413450b48595741391a258136137d924d928357449b150385d924d28794d944d9d628170946214961923549409943718153235862340acb2157a0b210ab2a1830a40a30225831a27013ca00ca6a02b8152b6728157608528034a8702c6a06a83c0ca10ca813570a9721b685721b94162581c6a0a8346cca10ca15703a2925813b2379147236a026141b20270413b612b926146a1b20b621b621 13 4 4
+def q70Ck := dagCheckNodeBin q70M q70G q70NB 294 q70St q70Mv q70L q70S q70T
+def q70RA (token : Nat) : Bool :=
+  let s := rootState q70N 8 token
+  !dagAllowedRootBin q70M q70E s.2.1 || dagLocalBin q70M q70G (dagKnownClosesBin q70G q70C) s ||
+  dagRefBin q70M 294 q70St q70Mv (fun p tok => dagFindLink (q70L p) tok) 0 token s
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70RB0 : treeBlock 0 32 q70RA = true := by decide +kernel
+theorem q70R : dagCheckRootsBin q70M q70G (dagKnownClosesBin q70G q70C) q70E (dagRefBin q70M 294 q70St q70Mv (fun p tok => dagFindLink (q70L p) tok) 0) q70N 8 = true := q70RB0
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B0 : treeBlock 0 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B16 : treeBlock 16 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B32 : treeBlock 32 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B48 : treeBlock 48 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B64 : treeBlock 64 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B80 : treeBlock 80 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B96 : treeBlock 96 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B112 : treeBlock 112 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B128 : treeBlock 128 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B144 : treeBlock 144 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B160 : treeBlock 160 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B176 : treeBlock 176 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B192 : treeBlock 192 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B208 : treeBlock 208 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B224 : treeBlock 224 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B240 : treeBlock 240 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B256 : treeBlock 256 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B272 : treeBlock 272 16 q70Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70B288 : treeBlock 288 6 q70Ck = true := by decide +kernel
+theorem q70Bk : treeBlock 0 294 q70Ck = true := (@treeBlock_merge 0 160 134 q70Ck (@treeBlock_merge 0 80 80 q70Ck (@treeBlock_merge 0 48 32 q70Ck (@treeBlock_merge 0 32 16 q70Ck (@treeBlock_merge 0 16 16 q70Ck q70B0 q70B16) q70B32) (@treeBlock_merge 48 16 16 q70Ck q70B48 q70B64)) (@treeBlock_merge 80 48 32 q70Ck (@treeBlock_merge 80 32 16 q70Ck (@treeBlock_merge 80 16 16 q70Ck q70B80 q70B96) q70B112) (@treeBlock_merge 128 16 16 q70Ck q70B128 q70B144))) (@treeBlock_merge 160 80 54 q70Ck (@treeBlock_merge 160 48 32 q70Ck (@treeBlock_merge 160 32 16 q70Ck (@treeBlock_merge 160 16 16 q70Ck q70B160 q70B176) q70B192) (@treeBlock_merge 208 16 16 q70Ck q70B208 q70B224)) (@treeBlock_merge 240 32 22 q70Ck (@treeBlock_merge 240 16 16 q70Ck q70B240 q70B256) (@treeBlock_merge 272 16 6 q70Ck q70B272 q70B288))))
+theorem q70K : KnownBin q70C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q42Bin) q41Bin) q60Bin) q44Bin) q43Bin) q3Bin) q1Bin) q61Bin) q2Bin) q34Bin) q4Bin) q58Bin) q46Bin) q33Bin)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q70Bin : BinLower q70M q70W q70G 9 := by
+  apply lowerDagBin _ _ _ _ q70A _ _ _ q70K _ (fun _ b hb => dagNodeBounds_mem b hb) q70R q70Bk
+  · unfold Masked; decide +kernel
+  · unfold Masked; decide +kernel
+  · unfold properWord; decide +kernel
+  · decide +kernel
+  · exact stockMaskedOfCheck (by decide +kernel)
+  · decide +kernel
+  · decide +kernel
+  · have h : q70C.all (fun b => q70M &&& b.1 == b.1) = true := by decide +kernel
+    intro b hb
+    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
+def q71M : Word := 0x30303030303030303030303030303030000000000000000
+abbrev q71G : Word := qGoal &&& q71M
+abbrev q71W : List Word := projectDAGStock q71M qBase [0, 3, 4, 5, 6]
+def q71F : Bound := (q71M, q71W, 9, q71G)
+def q71E := unpackWitnesses q71W [74384, 340112, 581728, 876688, 1130592]
+abbrev q71N : List Word := normStock q71M q71W
+def q71C : List Bound := [q63F, q18F, q65F, q66F, q5F, q64F, q7F, q36F, q6F, q67F, q38F]
+def q71S : DagSample := (0x2422500a120a8500a8401a100894814480684816080a0481c0825148244825024161209824140c061301a09068482c0c07030140904940204828120925008824220805020985205040280c0a0, 34)
+def q71L : DagLinkList := dagExtractLinks 0xc983260c983260c983203c7871e0c7071c0c7031a1c6831a0c683181c603180c587160c583160c583160c583141c503140c503140c503140c503140c503140c503140c487120c407100c403100c4030a3c10f021c006fe1bc1eec2bb02ea1ba06e80b90ae21b806d65b392c64b00ebe1ae0eb61ac8ab01ab86aa2a8929e2a706982a4128a3a0927c39d8e7419c0a6e19a0e5c69686543919e3878c8e3018c022c28a86281890a2408886201859610383860c1818e060808a0017ba5ec17a85e627791d647489c286e15b806b19a4466959245b4d58a52213e54e0d22b42b10243e90e893620bed2d90a49271082d19b848f0f1817300a8001 0x71644051643011642091444c91404c11844c114424114428516040116430116c4091404c31203c11202c91404c31403c11402c1140201120441120207100496cc04110e0315100294cc0211100190cc01110c4308ba05c10a0301110501084308ba05c10603010403010f0508e64502e64404c84300c84208fa45c10c4482e44300e44208e24502e24400e24300bc42030a44c10a43c10842c10842c10605c30404c10403c10202c2e0840100440100c402de4400fe05c0fc02c0ba4248f00502f00400fa0308f20500f80200f60200ba4380f40200fa8384f845c0f844c0f443c0f8c420f684e0f48424ee4506ca4400e64304cc0504f045c0ec4300e44204ea4500ea4400e24300f24500f2c5c0f044c0e88400ef0500ea840aca4500ec84e0ea8426da44e6ca4424da04e4ca0420e88400e8c400ce83c2ce04c4e68500e68400e28308c80502c80400d603c0bc0300e6c420e484e0e28420e04314d404e4c80420dc03d0e0c400de43c0d204c0dc4300dc8402b80400d80200d60200da0500d40200da4502ce4400d884e0d68422b883d0d44420d20312b844c0d005c0ce03c0d04300ce4300cd0500ca4500c84302cb0500ca8500c205c2c8c420c88420c604e0c404d0c004c0be0450bc0422b803d0b802d0c60200c44300c20210c00200be4308ba05c2b604c0b602c0bc4308ba05c2ba04c0ba02c0b84300b60540b50508800512800410a20314ac02944c0210ac01904c01188c05d0b204927e0310a002107e01187c05127c04109e03107c0210b001903a0112ae45c0ae43c0a842c09c0402ad0520ac85209a4310aa05e0a801e0984400a606c2a405c0a403c2a30520a2c520a085e09e85288445e86c45227044126a44007043106a43009c42e09a42909842204642104442029404109403109602908e021494c52094c4286885226884249245209244249005e48e05209004e08e04208c84848a46c08a45c08644c87806027805064a04008403008b052088c5e086c5287a052082020084c4348244e08243e48086008085007c84087446027445064844006c43084c06024c05005e04c03a04008105207e85e07c85247845e47445207644107244007043106a43045c05e44c05206604d07ac5e07845245a05e44a052076c5006e84004e43c24e05c27505207485207284065845e64845226442d45805e44805206404d470c52070c4246e85206e84245605e44605205604e04604206cc4346a84206a83246844306843346204f45404e45204344404206203f05403e052033044032066850064450062430238050060c5e05ec52238c4d05c45205a05e05805224e04105602105402005284023845c05006c04e03c24d05204c85204a45e04845204643104443004205e04005d03e05c03c05503a05223804d03802d23705203685203445e03245303045282405f81e05321c04102803101c02102e01f02c01902a01300a011628c4342884302883382044e81444381244222043e21443321243202042e01442301242282604322603302602302505342245e02244e81a05221a04202003001f05341c85201c84241a45e41845341645201a44e01844301644201443101243041005f40e05e40c05340a05201004f00e04e00c04300a042608c4340844300843380404f80204320403f20203300602100401f00201300001f 14 5 13 8 3
+def q71D : Forest := fun i => decodeNode 8 21 0x44c8262032808178040b905057828291121448789e42c4e02e2680f13405898c404a02e2400b12107086c4242427212109098b87a44c3d8281da138e908474c40386211b2138d90846cc403521e1aa100c88a05a84e2b421159108ac06256430292181441409d0a04a842230101110c08404240020202180f90c0780583c4301d02a0ec14070092360191921e0c21485c0bc2e01e170360b00f0598a42a85e154290a90b8548522a422150148ab108508842804e140210a21204e0a424c5e1262909310c4487c230520f42f07a1483d8bc1c4520e62806a1483108018c420b42105b10c29064144330a4280491402486012c5e08629041148200bc1005208010840080210800e06c0701e03a148188bc0c452062188310c0180bc0c05d0602e030154180a40c02d06429029178148a60a4520500f828064140260a8330401182414c0c89c06030038298121080889c04443022210110c4088600404f0202701010c08084044330101080807c040260201f00 i
+def q71T := dagTraceTagsBin q71M 34 (dagTagBases q71N 0x679ef877627ccec7ff501c7eb869f83fd02edbdc9c 0x37faffe777ffd6ef7ff55bdffbffff99ffa855bddb9 34) 8 q71D
+def q71St := dagTraceBin q71M q71N 8 q71D
+def q71Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
+def q71Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
+def q71Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q71Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q71Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
+def q71Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
+def q71Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
+def q71Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
+def q71Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
+def q71Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
+def q71Mv := dagMoves ([([qS22], q71Mp0, q71Mi0), ([qS11], q71Mp1, q71Mi1), ([qS23, qS22], q71Mp2, q71Mi2), ([qS11, qS22], q71Mp3, q71Mi3), ([qS23], q71Mp4, q71Mi4)] : List (DagMoveRecord 256))
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q71A : DagMovesOK q71M q71G 256 q71Mv := dagMovesOfCheck (by decide +kernel)
+def q71NB : Nat → List Bound := dagNodeBounds q71C.toArray 0xdb0db0db0db0db0d92d90d90d90d81d80d80d62d60d60d60d60d60d60d60d60d60d60d60d51d50d50d50d41d40d40d40d31d21d11d01d00d00cf1ce1ce0ce0ce0ce0ce0ce0ce0ce0ce0ce0ca4ca0c91c81c71c70c61c51c41c22c11c01bf1bf0bd2bd0ba3b82b62b51b50b41b40b40b13ae3ad1ad0ac1ac0ab1a83a80a44a22a119f29c39939819719529419319219119018f18b48a18a08918818628518418138108017f17f07f07e17957547146986546235e45955454f54b44744343e53953543142d42942632241f31a51460f5096045004 0x200010032313432505443043211001271017133201201618501125012020012a10411232343231203133443201351384523154608468312045970435430413712032701250163201321020160145292041512012503201321041230523242043531420535201935201325013205 12 4 4
+def q71Ck := dagCheckNodeBin q71M q71G q71NB 141 q71St q71Mv q71L q71S q71T
+def q71RA (token : Nat) : Bool :=
+  let s := rootState q71N 8 token
+  !dagAllowedRootBin q71M q71E s.2.1 || dagLocalBin q71M q71G (dagKnownClosesBin q71G q71C) s ||
+  dagRefBin q71M 141 q71St q71Mv (fun p tok => dagFindLink (q71L p) tok) 0 token s
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q71RB0 : treeBlock 0 32 q71RA = true := by decide +kernel
+theorem q71R : dagCheckRootsBin q71M q71G (dagKnownClosesBin q71G q71C) q71E (dagRefBin q71M 141 q71St q71Mv (fun p tok => dagFindLink (q71L p) tok) 0) q71N 8 = true := q71RB0
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q71B0 : treeBlock 0 16 q71Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q71B16 : treeBlock 16 16 q71Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q71B32 : treeBlock 32 16 q71Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q71B48 : treeBlock 48 16 q71Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q71B64 : treeBlock 64 16 q71Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q71B80 : treeBlock 80 16 q71Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q71B96 : treeBlock 96 16 q71Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q71B112 : treeBlock 112 16 q71Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q71B128 : treeBlock 128 13 q71Ck = true := by decide +kernel
+theorem q71Bk : treeBlock 0 141 q71Ck = true := (@treeBlock_merge 0 80 61 q71Ck (@treeBlock_merge 0 48 32 q71Ck (@treeBlock_merge 0 32 16 q71Ck (@treeBlock_merge 0 16 16 q71Ck q71B0 q71B16) q71B32) (@treeBlock_merge 48 16 16 q71Ck q71B48 q71B64)) (@treeBlock_merge 80 32 29 q71Ck (@treeBlock_merge 80 16 16 q71Ck q71B80 q71B96) (@treeBlock_merge 112 16 13 q71Ck q71B112 q71B128)))
+theorem q71K : KnownBin q71C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q38Bin) q67Bin) q6Bin) q36Bin) q7Bin) q64Bin) q5Bin) q66Bin) q65Bin) q18Bin) q63Bin)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q71Bin : BinLower q71M q71W q71G 9 := by
+  apply lowerDagBin _ _ _ _ q71A _ _ _ q71K _ (fun _ b hb => dagNodeBounds_mem b hb) q71R q71Bk
+  · unfold Masked; decide +kernel
+  · unfold Masked; decide +kernel
+  · unfold properWord; decide +kernel
+  · decide +kernel
+  · exact stockMaskedOfCheck (by decide +kernel)
+  · decide +kernel
+  · decide +kernel
+  · have h : q71C.all (fun b => q71M &&& b.1 == b.1) = true := by decide +kernel
+    intro b hb
+    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
+def q72M : Word := 0xf0f00000f0f00000f0f00000f0f
+abbrev q72G : Word := qGoal &&& q72M
+abbrev q72W : List Word := projectDAGStock q72M qBase [0, 1, 3, 5, 6]
+def q72F : Bound := (q72M, q72W, 7, q72G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q72Bin : BinLower q72M q72W q72G 7 := dagShiftLowerBin (width := 256) [qS17] q68Bin (by decide +kernel)
+def q73M : Word := 0xf000f000f000f000f000f000f000f
+abbrev q73G : Word := qGoal &&& q73M
+abbrev q73W : List Word := projectDAGStock q73M qBase [0, 1, 4, 5, 6]
+def q73F : Bound := (q73M, q73W, 7, q73G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q73Bin : BinLower q73M q73W q73G 7 := dagShiftLowerBin (width := 256) [qS20, qS45, qS16] q68Bin (by decide +kernel)
+def q74M : Word := 0x5050505050505050505050505050505
+abbrev q74G : Word := qGoal &&& q74M
+abbrev q74W : List Word := projectDAGStock q74M qBase [1, 3, 4, 5, 6]
+def q74F : Bound := (q74M, q74W, 7, q74G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q74Bin : BinLower q74M q74W q74G 7 := dagShiftLowerBin (width := 256) [qS20, qS45, qS21, qS16, qS17] q68Bin (by decide +kernel)
+def q75M : Word := 0xf0f0f0f0000000000000000000000000f0f0f0f
+abbrev q75G : Word := qGoal &&& q75M
+abbrev q75W : List Word := projectDAGStock q75M qBase [0, 1, 3, 4, 7]
+def q75F : Bound := (q75M, q75W, 7, q75G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q75Bin : BinLower q75M q75W q75G 7 := dagShiftLowerBin (width := 256) [qS24, qS25] q68Bin (by decide +kernel)
+def q76M : Word := 0x3333000000000000333300000000000033330000000000003333
+abbrev q76G : Word := qGoal &&& q76M
+abbrev q76W : List Word := projectDAGStock q76M qBase [0, 2, 3, 6, 7]
+def q76F : Bound := (q76M, q76W, 8, q76G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q76Bin : BinLower q76M q76W q76G 8 := dagShiftLowerBin (width := 256) [qS28] q69Bin (by decide +kernel)
+def q77M : Word := 0x3300000033000000330000003300000033000000330000003300000033
+abbrev q77G : Word := qGoal &&& q77M
+abbrev q77W : List Word := projectDAGStock q77M qBase [0, 2, 5, 6, 7]
+def q77F : Bound := (q77M, q77W, 8, q77G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q77Bin : BinLower q77M q77W q77G 8 := dagShiftLowerBin (width := 256) [qS28, qS22, qS26] q69Bin (by decide +kernel)
+def q78M : Word := 0x111100001111000011110000111100001111000011110000111100001111
+abbrev q78G : Word := qGoal &&& q78M
+abbrev q78W : List Word := projectDAGStock q78M qBase [2, 3, 5, 6, 7]
+def q78F : Bound := (q78M, q78W, 8, q78G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q78Bin : BinLower q78M q78W q78G 8 := dagShiftLowerBin (width := 256) [qS27, qS5, qS16, qS17, qS18] q69Bin (by decide +kernel)
+def q79M : Word := 0x3000300030003000300030003000300030003000300030003000300030003
+abbrev q79G : Word := qGoal &&& q79M
+abbrev q79W : List Word := projectDAGStock q79M qBase [0, 4, 5, 6, 7]
+def q79F : Bound := (q79M, q79W, 7, q79G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q79Bin : BinLower q79M q79W q79G 7 := dagShiftLowerBin (width := 256) [qS14, qS15, qS22, qS24] q68Bin (by decide +kernel)
+def q80M : Word := 0xf0f0f0f00000000000000000f0f0f0f
+abbrev q80G : Word := qGoal &&& q80M
+abbrev q80W : List Word := projectDAGStock q80M qBase [0, 1, 3, 4, 5]
+def q80F : Bound := (q80M, q80W, 8, q80G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q80Bin : BinLower q80M q80W q80G 8 := dagShiftLowerBin (width := 256) [qS3, qS17, qS24] q69Bin (by decide +kernel)
+def q81M : Word := 0xf0f000000000f0f0f0f000000000f0f
+abbrev q81G : Word := qGoal &&& q81M
+abbrev q81W : List Word := projectDAGStock q81M qBase [0, 1, 3, 4, 6]
+def q81F : Bound := (q81M, q81W, 8, q81G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q81Bin : BinLower q81M q81W q81G 8 := dagShiftLowerBin (width := 256) [qS10, qS26, qS24] q69Bin (by decide +kernel)
+def q82M : Word := 0xc030c030c030c030c030c030c030c03
+abbrev q82G : Word := qGoal &&& q82M
+abbrev q82W : List Word := projectDAGStock q82M qBase [0, 1, 4, 5, 6]
+def q82F : Bound := (q82M, q82W, 8, q82G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q82Bin : BinLower q82M q82W q82G 8 := dagShiftLowerBin (width := 256) [qS34, qS12, qS22, qS26, qS24] q69Bin (by decide +kernel)
+def q83M : Word := 0x9090909090909090909090909090909
+abbrev q83G : Word := qGoal &&& q83M
+abbrev q83W : List Word := projectDAGStock q83M qBase [0, 3, 4, 5, 6]
+def q83F : Bound := (q83M, q83W, 8, q83G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q83Bin : BinLower q83M q83W q83G 8 := dagShiftLowerBin (width := 256) [qS2, qS11, qS12, qS21, qS22, qS24] q69Bin (by decide +kernel)
+def q84M : Word := 0x5050505050505050a0a0a0a0a0a0a0a
+abbrev q84G : Word := qGoal &&& q84M
+abbrev q84W : List Word := projectDAGStock q84M qBase [0, 1, 3, 4, 5]
+def q84F : Bound := (q84M, q84W, 9, q84G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q84Bin : BinLower q84M q84W q84G 9 := dagShiftLowerBin (width := 256) [qS3, qS4, qS0, qS5, qS26, qS41] q70Bin (by decide +kernel)
+def q85M : Word := 0x30303030c0c0c0c030303030c0c0c0c
+abbrev q85G : Word := qGoal &&& q85M
+abbrev q85W : List Word := projectDAGStock q85M qBase [0, 1, 3, 4, 6]
+def q85F : Bound := (q85M, q85W, 9, q85G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q85Bin : BinLower q85M q85W q85G 9 := dagShiftLowerBin (width := 256) [qS10, qS43, qS12, qS1, qS17, qS18, qS41] q70Bin (by decide +kernel)
+def q86M : Word := 0xf0f00000f0f00000f0f00000f0f00
+abbrev q86G : Word := qGoal &&& q86M
+abbrev q86W : List Word := projectDAGStock q86M qBase [0, 1, 3, 5, 6]
+def q86F : Bound := (q86M, q86W, 9, q86G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q86Bin : BinLower q86M q86W q86G 9 := dagShiftLowerBin (width := 256) [qS9, qS17, qS41] q70Bin (by decide +kernel)
+def q87M : Word := 0x5050a0a05050a0a05050a0a05050a0a
+abbrev q87G : Word := qGoal &&& q87M
+abbrev q87W : List Word := projectDAGStock q87M qBase [0, 1, 3, 5, 6]
+def q87F : Bound := (q87M, q87W, 9, q87G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q87Bin : BinLower q87M q87W q87G 9 := dagShiftLowerBin (width := 256) [qS9, qS4, qS0, qS5, qS26, qS18, qS41] q70Bin (by decide +kernel)
+def q88M : Word := 0xf0f0000000000000f0f0000000000000f0f0000000000000f0f00
+abbrev q88G : Word := qGoal &&& q88M
+abbrev q88W : List Word := projectDAGStock q88M qBase [0, 1, 3, 6, 7]
+def q88F : Bound := (q88M, q88W, 9, q88G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q88Bin : BinLower q88M q88W q88G 9 := dagShiftLowerBin (width := 256) [qS9, qS17, qS24, qS41] q70Bin (by decide +kernel)
+def q89M : Word := 0x5050a0a0000000005050a0a0000000005050a0a0000000005050a0a
+abbrev q89G : Word := qGoal &&& q89M
+abbrev q89W : List Word := projectDAGStock q89M qBase [0, 1, 3, 6, 7]
+def q89F : Bound := (q89M, q89W, 9, q89G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q89Bin : BinLower q89M q89W q89G 9 := dagShiftLowerBin (width := 256) [qS9, qS4, qS0, qS5, qS46, qS18, qS25, qS41] q70Bin (by decide +kernel)
+def q90M : Word := 0x5000a0005000a0005000a0005000a0005000a0005000a0005000a0005000a
+abbrev q90G : Word := qGoal &&& q90M
+abbrev q90W : List Word := projectDAGStock q90M qBase [0, 1, 5, 6, 7]
+def q90F : Bound := (q90M, q90W, 9, q90G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q90Bin : BinLower q90M q90W q90G 9 := dagShiftLowerBin (width := 256) [qS9, qS4, qS0, qS45, qS22, qS46, qS18, qS41] q70Bin (by decide +kernel)
+def q91M : Word := 0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f
+abbrev q91G : Word := qGoal &&& q91M
+abbrev q91W : List Word := projectDAGStock q91M qBase [0, 1, 3, 4, 5, 6]
+def q91F : Bound := (q91M, q91W, 10, q91G)
+def q91E := unpackWitnesses q91W [49760, 312416, 577632, 843872, 1101896, 1368112]
+abbrev q91N : List Word := normStock q91M q91W
+def q91C : List Bound := [q8F, q74F, q68F, q73F, q70F, q72F, q18F, q85F, q19F, q20F, q9F, q57F, q80F, q81F, q82F, q83F, q84F, q86F, q87F]
+def q91S : DagSample := (0x50a8c068000a0603800108824324128c0623008882512416022510c1602050241a022130502c14090182c301a0182406130c0643009050682219088244021010884022180481028100a01422088c4c0700888410090190c9049240242012201080209051288249208240412201400442008846070209848221, 54)
+def q91L : DagLinkList := dagExtractLinks 0xa82a0a8291a42819c65281600801f1695463d4f007801 0x408d81e0440e01e46a1f03409918c534e22fa6914c3887e1a4330c43e43418d2d0df948630b427c5210e160c69486f4943185213c250861003c07831a321bd150c60c84f05421e0c14e098a702c432442591a10f108bf864538421fc190cc848460804b0302181008c040260003f 10 4 13 5 3
+def q91D : Forest := fun i => decodeNode 5 18 0x8d8e0223087e9219a50f864279509e44219007848318d09e34218c09610218404610098407e0 i
+def q91T := dagTraceTagsBin q91M 54 (dagTagBases q91N 0xfbae108fd069d1c1f92dc6f65af0dd5041e7a61ffbe0ba4f73ef9b0e7dffe207ffc2c207ffffb34c9 0xfbaed39fd5e9d1fffc4ddef7daf7dd52c7eba77ffbf8bb2775effbae7fffe96fffeee077ffffb965c 54) 9 q91D
+def q91St := dagTraceBin q91M q91N 9 q91D
+def q91Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 6, 5, 4, 7] 0 i.val)
+def q91Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 6, 5, 4, 7] 0 i.val)
+def q91Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q91Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q91Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 6, 5, 4, 7] 0 i.val)
+def q91Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 6, 5, 4, 7] 0 i.val)
+def q91Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 5, 2, 6, 0, 1, 3, 7] 0 i.val)
+def q91Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 5, 2, 6, 0, 1, 3, 7] 0 i.val)
+def q91Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 5, 2, 4, 0, 1, 3, 7] 0 i.val)
+def q91Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 5, 2, 6, 3, 1, 0, 7] 0 i.val)
+def q91Mp5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 5, 2, 6, 3, 1, 0, 7] 0 i.val)
+def q91Mi5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 5, 2, 4, 0, 1, 3, 7] 0 i.val)
+def q91Mp6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 5, 2, 4, 3, 1, 0, 7] 0 i.val)
+def q91Mi6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [6, 5, 2, 4, 3, 1, 0, 7] 0 i.val)
+def q91Mv := dagMoves ([([qS17], q91Mp0, q91Mi0), ([qS11], q91Mp1, q91Mi1), ([qS11, qS17], q91Mp2, q91Mi2), ([qS20, qS45, qS16], q91Mp3, q91Mi3), ([qS44, qS45, qS1, qS17], q91Mp4, q91Mi4), ([qS20, qS45, qS16, qS17], q91Mp5, q91Mi5), ([qS44, qS45, qS1], q91Mp6, q91Mi6)] : List (DagMoveRecord 256))
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q91A : DagMovesOK q91M q91G 256 q91Mv := dagMovesOfCheck (by decide +kernel)
+def q91NB : Nat → List Bound := dagNodeBounds q91C.toArray 0x3a0e83a0e4781dc743c12d3a5263891b7595153500d 0x22394042840708c021808201041011694046a0142330041198004a0d28c08f7358728823 10 4 5
+def q91Ck := dagCheckNodeBin q91M q91G q91NB 17 q91St q91Mv q91L q91S q91T
+def q91RA (token : Nat) : Bool :=
+  let s := rootState q91N 9 token
+  !dagAllowedRootBin q91M q91E s.2.1 || dagLocalBin q91M q91G (dagKnownClosesBin q91G q91C) s ||
+  dagRefBin q91M 17 q91St q91Mv (fun p tok => dagFindLink (q91L p) tok) 0 token s
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q91RB0 : treeBlock 0 64 q91RA = true := by decide +kernel
+theorem q91R : dagCheckRootsBin q91M q91G (dagKnownClosesBin q91G q91C) q91E (dagRefBin q91M 17 q91St q91Mv (fun p tok => dagFindLink (q91L p) tok) 0) q91N 9 = true := q91RB0
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q91B0 : treeBlock 0 16 q91Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q91B16 : treeBlock 16 1 q91Ck = true := by decide +kernel
+theorem q91Bk : treeBlock 0 17 q91Ck = true := (@treeBlock_merge 0 16 1 q91Ck q91B0 q91B16)
+theorem q91K : KnownBin q91C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q87Bin) q86Bin) q84Bin) q83Bin) q82Bin) q81Bin) q80Bin) q57Bin) q9Bin) q20Bin) q19Bin) q85Bin) q18Bin) q72Bin) q70Bin) q73Bin) q68Bin) q74Bin) q8Bin)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q91Bin : BinLower q91M q91W q91G 10 := by
+  apply lowerDagBin _ _ _ _ q91A _ _ _ q91K _ (fun _ b hb => dagNodeBounds_mem b hb) q91R q91Bk
+  · unfold Masked; decide +kernel
+  · unfold Masked; decide +kernel
+  · unfold properWord; decide +kernel
+  · decide +kernel
+  · exact stockMaskedOfCheck (by decide +kernel)
+  · decide +kernel
+  · decide +kernel
+  · have h : q91C.all (fun b => q91M &&& b.1 == b.1) = true := by decide +kernel
+    intro b hb
+    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
+def q92M : Word := 0xf0f0f0f0f0f0f0f00000000000000000f0f0f0f0f0f0f0f
+abbrev q92G : Word := qGoal &&& q92M
+abbrev q92W : List Word := projectDAGStock q92M qBase [0, 1, 3, 4, 5, 7]
+def q92F : Bound := (q92M, q92W, 10, q92G)
+def q92E := unpackWitnesses q92W [74384, 337040, 602256, 799754, 1138832, 1400880]
+abbrev q92N : List Word := normStock q92M q92W
+def q92C : List Bound := [q12F, q75F, q47F, q22F, q68F, q45F, q49F, q52F, q8F, q26F, q23F, q29F]
+def q92S : DagSample := (0x1029100a400280022006220c0e03028180e1209101a080683180c4142a48260148a0c2603088482c120a0182c060a00884c140b05024060b0c06806090184c30190c024141a088642209100840422100886012040a0402805088223108884100940204201201209008248048020904221008805208041208a44228100a0402214028040a0, 59)
+def q92L : DagLinkList := dagExtractLinks 0x9e09e09e09e09e09e09e09e09e09e09e09b39659339309219029008f18f08e18e08e08b38838268117f27f07f07f07e17e07c27a27a07a07a07827627516f66695f75875535505054d34b241a3983633152f22691f714b07d016001 0xe086168420740183d2106e485d68422390171a0088ed8c0f4860b32181b8080e98c06c430390301cc180e10c0ec840b40301c4181d90816c4607742f3b2148dc8bc6c452b502f598148dc8616c860364201a9181d10c0684603483019a182c80d86204cb2036190130c40c8608616b420979180908445202e1a0111851c1b98a0d6850ae2381190c26484156070590180a0081b98c4d886e6b431171188888605806e2b03117c182b90c25c841a72174c90889c05c320222d22c9610c484025568612b420901088a805c28022298311411b89c0c44c07c2502e7221c1910a0c0840a423812114080881340701a0280e8130500804906223431112100848dc404629c0374c81887c09abe8501f228098140798dc3ac6213626ae1188700c42645c1b03e0d4189650c432462180370b81b4580d82a06514031098137488c2a44414c218c90184480821803109009894188450c6208410f231041088380dc1a0630c0310580b8280460802209831e421892108510462082214381be180dd0a0638403103813c1809c0a0430402101b14f088a684433820298100cc040260003f 12 4 13 6 2
+def q92D : Forest := fun i => decodeNode 6 19 0x6305ec60b20c144182421844840848c0ec181a4303404c540c8a51c1283020841408b2790c4f4209a02e360c4611b8c0311807c2c0b85c188943112840248dc49188922810c6e1d8c438188703e0d062148c4281b850368a06c140ca2818850268b0620d0c61a10432310606e0c0c6181883017060230e0c61110820278404e080861010826298203304026080fc0 i
+def q92T := dagTraceTagsBin q92M 59 (dagTagBases q92N 0xfd3fe108fc3de1fbcafc96e37873f08f07c1079df1fff4d55749eeede7c439e1ffe20fffc778c03fffff4c44 0x3de7fed39fcfde1fbcafe26ef7df3f79f47cb1fadfafff0d40764ee6df3efbbf9ffe97ffff7fbdcffffff66fd 59) 9 q92D
+def q92St := dagTraceBin q92M q92N 9 q92D
+def q92Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 4, 7, 6, 5] 0 i.val)
+def q92Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 4, 7, 6, 5] 0 i.val)
+def q92Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q92Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q92Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 7, 6, 5] 0 i.val)
+def q92Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 7, 6, 5] 0 i.val)
+def q92Mv := dagMoves ([([qS24], q92Mp0, q92Mi0), ([qS11], q92Mp1, q92Mi1), ([qS11, qS24], q92Mp2, q92Mi2)] : List (DagMoveRecord 256))
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q92A : DagMovesOK q92M q92G 256 q92Mv := dagMovesOfCheck (by decide +kernel)
+def q92NB : Nat → List Bound := dagNodeBounds q92C.toArray 0x8410821041983104608409811022044017d6fa1f0bd97a2f25e0bc0780f01dcbb8762e35c0b796e2da5ad351676cc594b28642c4988310612bb16d2ae50a99125a1e3f878cde98e2ca4d87f8c713a19c1b006 0x310382011120031256411872674250002504320b3935014a32801230a30a143200153093162402385611245617265479462539630145164206231450271645721465 11 3 4
+def q92Ck := dagCheckNodeBin q92M q92G q92NB 60 q92St q92Mv q92L q92S q92T
+def q92RA (token : Nat) : Bool :=
+  let s := rootState q92N 9 token
+  !dagAllowedRootBin q92M q92E s.2.1 || dagLocalBin q92M q92G (dagKnownClosesBin q92G q92C) s ||
+  dagRefBin q92M 60 q92St q92Mv (fun p tok => dagFindLink (q92L p) tok) 0 token s
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q92RB0 : treeBlock 0 64 q92RA = true := by decide +kernel
+theorem q92R : dagCheckRootsBin q92M q92G (dagKnownClosesBin q92G q92C) q92E (dagRefBin q92M 60 q92St q92Mv (fun p tok => dagFindLink (q92L p) tok) 0) q92N 9 = true := q92RB0
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q92B0 : treeBlock 0 16 q92Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q92B16 : treeBlock 16 16 q92Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q92B32 : treeBlock 32 16 q92Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q92B48 : treeBlock 48 12 q92Ck = true := by decide +kernel
+theorem q92Bk : treeBlock 0 60 q92Ck = true := (@treeBlock_merge 0 32 28 q92Ck (@treeBlock_merge 0 16 16 q92Ck q92B0 q92B16) (@treeBlock_merge 32 16 12 q92Ck q92B32 q92B48))
+theorem q92K : KnownBin q92C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q29Bin) q23Bin) q26Bin) q8Bin) q52Bin) q49Bin) q45Bin) q68Bin) q22Bin) q47Bin) q75Bin) q12Bin)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q92Bin : BinLower q92M q92W q92G 10 := by
+  apply lowerDagBin _ _ _ _ q92A _ _ _ q92K _ (fun _ b hb => dagNodeBounds_mem b hb) q92R q92Bk
+  · unfold Masked; decide +kernel
+  · unfold Masked; decide +kernel
+  · unfold properWord; decide +kernel
+  · decide +kernel
+  · exact stockMaskedOfCheck (by decide +kernel)
+  · decide +kernel
+  · decide +kernel
+  · have h : q92C.all (fun b => q92M &&& b.1 == b.1) = true := by decide +kernel
+    intro b hb
+    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
+def q93M : Word := 0x333300003333000033330000333300003333000033330000333300003333
+abbrev q93G : Word := qGoal &&& q93M
+abbrev q93W : List Word := projectDAGStock q93M qBase [0, 2, 3, 5, 6, 7]
+def q93F : Bound := (q93M, q93W, 11, q93G)
+def q93E := unpackWitnesses q93W [66176, 329856, 594048, 868480, 1147008, 1425504]
+abbrev q93N : List Word := normStock q93M q93W
+def q93C : List Bound := [q15F, q18F, q8F, q45F, q76F, q77F, q39F, q10F, q16F, q78F, q37F, q35F, q11F, q64F, q13F, q28F, q30F, q48F, q51F, q59F]
+def q93S : DagSample := (0x4002400a8402a41029402250021400a440684028402a1402a10028201a0402900a249028042240a8402a140028041a010c824300908812094c0610022040a80623040e030300c0a0120b0182c301a090680028048a40030082c124320c0e020914180d060240a0d241300a09100840a25301900a21100a0102802914904924024184c20924820912190826120884100940204804402211008402a0402090422100880621002211028100a01221002810211080c0403008281, 82)
+def q93L : DagLinkList := dagExtractLinks 0xea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea40ea01ea00ea00ea00ea00ea00ea00e943e901e900e900e8c1e8c0e881e880e841e801e800e800e7c1e781e780e741e740e740e701e6c1e6c0e681e680e641e601e5c1e581e580e502e500e500e500e4c1e4c0e442e440e440e401e3c1e381e380e341e340e340e340e340e340e340e340e340e340e340e340e340e340e340e340e340e340e301e243e201e200e200e200e1c1e181e180e180e141e140e140e140e140e140e140e140e140e101e100e100e100e043df83df41df01df00df00dec1dec0dec0dec0dec0dec0dec0de81de80de80de41de01ddc1ddc0ddc0ddc0dd81dd41dd40dd01dd00db47da44da40da40d944d901d8c1d881d841d840d840d7c2d703d586d502d500d4c1d4c0d346d283d280d280d280d280d184d102d082cd4dcc83cc80cc41cc01cb82cb80cb41cb40cac2ca81ca80c945c7c6c6c4c642c5c2c503c404c3c1c303c243c201c143c101c0c1c0c0c003bf04bbcdbb81bac3b985b590b541b3c6b3c0b381b380b302b300b300b282b202b1c1b1c0b1c0b142b083b041af44af40ae83ae02adc1adc0ad42ac44ab83ab02a947a805a743a701a682a680a680a641a5c2a581a541a501a443a383a380a245a144a0449f839f419e839e419e019dc19d819cc39b07994798c2978596c39489938492c39242918391419101908290028f828f418f408f018f008ec18e428dc28d428d018c828a8888888880888088418609838a818881417f877c4d7b057a43774c75097482730672c1728171456d116b8669c7694268c2684263d25dd85c0759c95846568751d34c954a88465144873f553e443bca3b033ac13613340830cd30032d8a2a4d290526c9254624051d9a1a0e15530c25084f050d00530001 0x29f0604a6918029a4400a710e029ac480a611322940600a591702968384a3918068c4404a311812924600a52130294c5d0a4a1b02908600a4b1b02910602a3b14428e8510a3c1b028cc585a211b02880600a2817028a8600a211702808385a1117128444c0a110f22814608a021b02868604a131802850608a021b068284c0a0a0f228086c1a0213028083c0a0a1902804340a020e027e06c09f017027a05c09fc18027c44009f310027a06c27a817c9a4053583010520c03108300841ea01f069004ea65461899218625846d87f81b0278460193814024e04009c80c027685c193010427446c87f81b027242409b01f066a05c09a813026603c19c4188270c6209ba188a6c85209b108426602d09a81f026805c09981f224a061192810426403906880841b801d098805624806109100841a0011098b121260470098114025e440098418825e462097117c25a453495b1b4a52c5e26e3148256c4d58020d81fe83409490e41b843188f818623806018f810463804009600a4256c4809521f223c0705803120255070890018623a06007fa0e0252c4809411b0250c5348d918522c46058291056084404830181a4b061492a18523e46d48e11b023443108a90c123246148a118023244108a1100226450093909024cc5c089114024b05c48891c062045009231a061e44048601f02460641871141220470088114160644009131b921e46209080d4240c7009041f023ec5c48c11c023c87008ea18023cc6d08eb1b023884c08dd1c023305048ba1c260a47008d41b823306208c21b822e86226b217899e85208921381ac83e067a0c961646e582918921606e4828188230c4058bd1c122f07008bc14022d0603884148228c401882106608460288c14c22ac5e08a3148a26c43088a14c226833584917960845237d913c22443f17d90bd21205e48201489f604f08900fc1f602f088c140221062087a1b961046e581918821c425086813421a450286b14821a8310858184212060086117021007007d1170216c700850170a11461084a18021046108381f0a0ec52083a0c49f205e07c80b820d060082918420846008191c020407c08001f060b470082c1c0a074611824180208c60081a184a05061081118420006d27e81781fa02e280c14c202453080017c9a804f267010c1a801f067004e1fe06c27e01785fc04c07f00f01f802e87f81b05fe04c07f80f01fc06407e81f01f807407d91401aec4807d01701f705007d11701f207c47c11f01f045c07b11301f106207bb1b81ecc6207ad1c21d847c17611711c644c07190f21b847007a11905d644c07590f21d447c17511701d444c06f10f01e687c17921701e484c07810f05e245c07891301e043c07780901da45c17211701dcc7c076b1401c8c4817221711d8c7007631401d4c40871a1c05c6850073a1301bc84007641891ccc6e471b1881d2c4d075a1b81d486216c01041d2c5016ea1401d0c6e073b1885bac4d07321885ae04116eb1701ca87c07221305c7062071b1881c486e070a1b41c086c06fa1941bc86216ea1341ba83d06e31211b647c06d91701b244c06dc1881b4c6e06cb1881b085c06b11401b0c5006bb1201aa05c06b41401aa45c06a01f01a602406951c019a06c868a1c019805c06581b019406c068b1201a0c6e86281b819e85006481b019f05006401b018e06c06711f018c06c166c18819ac6206621b8196862164810419203106500a418c021464b188192c42464118819044246381b918c062063813818c04206291b818906084e81848bc05f223014c53a04143a80c40ea02102f007c08c013a59418616446185481b418605922e813c88a04314e00c413802102e807c08a01384d81848b805f222014c53604104d80c40d602102e007c088013061117053405104d010417203102180840b201d060806418001525ea1b88b286215fa17457c85c05fa13417c84c05a20f417883c05e90a40b242114c814413204105a00c48b045f221114c0b042f021108c17801e05da18097485005d1080972c6205ca0c416843d05c01f416e07c25981b856c05d15a817016c04d05a813016803d05980b8164c4884c01c453005153a010412a031020008409a01d056806415801555821b916046e058b1b816046284b818c15e03904a008407e01105711b815b063056418d15646245511801564420551100152c4845421f514887c25021b889a862054217414885c053213414484c05010a409a42184901c611c070149014451c05053981054e404005451c814f07e05341c814a87e03420f21220720524188146c6e051318913c06e849818e120062034008414286e847818814106304f917053cc6e04f11b913ac7024ab18813ac5004db10012a83184691c6112470146914451245004791314e244153811020ea07023081b84ea05004001300d604003080b993146304ec188138c6e04db188934c5344c218c13483344911bd11c46e446918d112462225917c87c453046110411044004c90fc09642f01f108d0fe06e43a81888cc05f042813413203f03300bc13107204ba1f910e47214311410fc07e43a01c812c02504ac18d12886e04a213910c462043110910806f43c018c10804f03c010c12707e04931c911647213391410f807e43981c8122c6f04831b811ec62133b13411c86243d81b90e4062146d1c811b072046414011687e04521c889286e21ea1884ce85c033a13009283e01ea0c94f447e53891c850644d03b11310f407e43881c810605d13b017090f463144c188d0d052044b18890cc52044310010e863143210410c83153c91b94e0462332117c4ce44d14110f44c842f43c81b90e0062232017c10404d03380f40c802f242318810ac5004220c410645104111408c606e13501400c602e23f518c102c6e04031888fac5313531340fe86203f118c0fa43303e01bc0f606e03d018c0f2062224017c87805313b010409001f01e004c8f106203c31048c446e13511700c443e03b81f00ec04c23a518c4eb06203ab1880e886303991bc0e446e038918c0e0462223917c87645302390bc07642303781b80dc06d03681b00d806503581888d205f13501340d403d03480bd0d0c6e03431390ce46203391090cd07203341490ca87e032a1790c847203211490c607e43101c80c605e03101480c306343011b80c044e02f81b04bd47202f41c80bac7e02e31ca0a647e82691c84ae45d12911700ae44d02911300b643e02a90f409c43c02d10d40b2432125814409604102c00e408e03142bc1c80af05242b31f90aac7202b31780aac5242a11f80a845e029c18d0a4c6202931090a286f42821b909e86342721880a284f028213809e843027210a094063125010c09b06342611b809844e425c1c809705242521f809485e42491c809245242401f908e072024017808e05212351c808d072022b1f8088c7282021c808683211f114407c44102110e407643181c01f807406c02080f808106341fa1b807e84e81b01b846c04e41f41c807d05241ea1c807a85241e11f907647201e117807645201c81b1474c5341d214c07483381c814c47203301c808c07106341ba1b806e84e41b118806c442a16518c46b06201ab18806886e019a18886485e218a14c852852816118c064429018908c05242181301be040063208017c81605310f810403e03101800bc04602d01780a405c025016808c02a021008007c016013016418d056862015a10905446e414918805444e014910a03c06310f010c03a031005008401a01d014006404e015013418d04a86f41221b9046862211217881a852012a13c04884e011a10802883d01110a401a42141081ba03806380d818804204e10e010c43604200a00c583d463010418c83d05340fb18883ac5200fb10903c86300f210c03a83140e11bd03646e40d118d032462206117c81245300e113c03644e00d110c03244200a10f401842f004908d03006f40b81b902c06340a818882605f209017882205300c013c02e04e00b010c02a04200a00f402602f00900b8022023508418d020c63008310e01e46f80711ba01a462107913c41c44e106910801e43f00710f801a432806018c41804300600cd417063405b18c016c43805218841484200520ca012463104910c01243380381b801005c103813800e03ea02c14d40cc53302b10d00c853202a10c00c833802914c40a433002908e00805f801814c80404f200810c40803f10180cc00802f001808c00401f000804c00003f 16 6 13 9 4
+def q93D : Forest := fun i => decodeNode 9 22 0x8304e4871326244c48992e41c4a58bb1d6364660c1188364498b11043042c8b9094303c20c0e4432379070da830339880c903631c8c0c142e3008d8be2122e98c4b84312e0842b803e2dc0b8b703e2d4072b36242b60c4ac2312b08beab229aac052aa6242a60e0a66242858a6a021226d8b89a82e2658d0980322618dc9501aa560f89362e24d8da8f63623d0988fa3823a0dc8d8312358808c82822e0c08a62f2258a489419a2407e898282220c48743721c84a87418a0c8b87f6381ec0b87b4301e88c27a4189e20c0768381c98c0714309c48c2702299b80be6e01e1b00c86b03e1a80e86a8281948b86403e18e0c4616371858c461a3817c8c85e43e1710985c2261688785a0121658f8566281560c45343714d0c4536281498dc516311450c45143e1410985063113d0dc4f43693d0d84f43293d0c44f41e93d8904e8311358dc4d6311358a04b62412e0a04a22e1240f8480121228e0476241058dc408280f88f83c6310ed0dc3b4310ec0523b6210e88843a0270e80843a2370de0c03602c8d48b83300c8c802a324268c5098312148c403c304300bc8402f4188b80fa2e03e0b809a2e0260b807a2e0170b98902d6370ac8c42b01c8ac8dc2a8318a60c6282210a08802862409e8e42683f09a0e42643f09a0c4256370958c4254370920c62322e08c8dc228310818dc206310810662001f8820e41f43f07c04a1f83187909c1e83f0758e41d6378718dc1c6310710c41c83906e0a01b43f06d0e41b6310698801a4318690621a628065062192288648a0196370618c4184310608c6182198600de180370600c6180310618821703e05c098176310590c6162378588dc162318588c4160370580da160360580ca1603105807a1601785989c152210560a41442f0508a41402f0500a41483184c89c1303604a0e41163f0458e41121f04486a11219044072118290418bc106290408bc1083183d8840f42783d09c0f42183d0840f83183889c0e8290350bc0d2290340bc0d0290360e40c63f0318e40c4190308720c01f0320c60b42702e0a40a4290288bc0a229029066090118260c6084270208840863101d0dc0743101c8520721181c05e0701481c04a0701181e0c60642101889c062210180320600a81a0c60542781509c05421014852050270160c6046210110860441881089e042270108860422101009e040270100860402101007a0401781005c040118118860321f80c87c0321900c06603621809064022198080b80201f0090660121180405e0101180403e0100980407e00 i
+def q93T := dagTraceTagsBin q93M 82 (dagTagBases q93N 0x41395f3ffec22c4873bbbfffe7ddcef2676de3dd704c062c70f60f20ef8ffe200b9ca80efc0fc7fe3ffef7f1b9cc1ddc93bffc65c746303c0fffffd1108 0xffbd9ffffedaadc9f3bbbfffe7ddcef8ab6df5dd7effe70f7af65fa3efd7fffbeffca16efd5fdfff5ffff6fcbcce1dde49bffe9453ffffffffffffdbbbd 82) 10 q93D
+def q93St := dagTraceBin q93M q93N 10 q93D
+def q93Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
+def q93Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 5, 4, 3, 6, 7] 0 i.val)
+def q93Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 6, 3, 4, 5, 2, 7] 0 i.val)
+def q93Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 6, 3, 4, 5, 2, 7] 0 i.val)
+def q93Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 6, 5, 4, 3, 2, 7] 0 i.val)
+def q93Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 6, 5, 4, 3, 2, 7] 0 i.val)
+def q93Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q93Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q93Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
+def q93Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
+def q93Mp5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 6, 0, 4, 5, 2, 7] 0 i.val)
+def q93Mi5 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 6, 0, 4, 5, 2, 7] 0 i.val)
+def q93Mp6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 6, 0, 4, 3, 2, 7] 0 i.val)
+def q93Mi6 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 6, 5, 4, 0, 2, 7] 0 i.val)
+def q93Mp7 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 5, 4, 0, 6, 7] 0 i.val)
+def q93Mi7 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 0, 4, 3, 6, 7] 0 i.val)
+def q93Mp8 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
+def q93Mi8 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 2, 3, 4, 0, 6, 7] 0 i.val)
+def q93Mp9 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 6, 5, 4, 0, 2, 7] 0 i.val)
+def q93Mi9 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 6, 0, 4, 3, 2, 7] 0 i.val)
+def q93Mp10 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 6, 3, 4, 0, 2, 7] 0 i.val)
+def q93Mi10 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [5, 1, 6, 3, 4, 0, 2, 7] 0 i.val)
+def q93Mv := dagMoves ([([qS22], q93Mp0, q93Mi0), ([qS15], q93Mp1, q93Mi1), ([qS15, qS22], q93Mp2, q93Mi2), ([qS11], q93Mp3, q93Mi3), ([qS23, qS22], q93Mp4, q93Mi4), ([qS11, qS15], q93Mp5, q93Mi5), ([qS23, qS15, qS22], q93Mp6, q93Mi6), ([qS11, qS22], q93Mp7, q93Mi7), ([qS23], q93Mp8, q93Mi8), ([qS11, qS15, qS22], q93Mp9, q93Mi9), ([qS23, qS15], q93Mp10, q93Mi10)] : List (DagMoveRecord 256))
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93A : DagMovesOK q93M q93G 256 q93Mv := dagMovesOfCheck (by decide +kernel)
+def q93NB : Nat → List Bound := dagNodeBounds q93C.toArray 0xe3078c0e3038c0e3038c0e3038c0e3038c0e3038c0e3038b1e2c38b0e24b881e203871e187851e107831e087820e047801e003800df8b7d1df077c0dec77a1de47772ddc3752dccb721dc83711dc07700dc036d3db076a2d9cf661d947641d88b602d78b5d1d617553d48f511d3cb4e1d3474c1d2c74a1d20b471d10f440d0c7412d0073e2cf473c1cf033c0cf033b1cec33b0ce4b381ce03371cdc3361cccf330cc87311cc072f1cb872d1cacb2a1ca83291ca07271c987251c943241c8c7230c887202c803200c7c71f0c7871e0c7831c2c6c7192c607180c603153c507131c3d30e1c30b0c0c3030c0c2c70a1c283091c243054c016fe2be1af26bc46ed4ba8ee55b8cae12b716da2b592d51b4cad12b38ecc2b1d6c43b08ac02af4eb85acd6b03abc6ac3aa4ea72a8d29e5a5de916a3ca8a5a192842a08a7e49ece7749d867429c126e29a1a65398165d3968e564950a4f5930e47590d23f48e963378c4a2d48aca274890e204865e11883520a3820a053808dfe47e91f557c8dee47b09e937a05e5378c9e037699d647455ce37255c727149c327049bf26f0dba26e09b626ccdaf46b49aa36a09a6268cda306885a2067919b3660d96264cd8e5630986661097f55ed17745d0d7135bc96d25b05693591561357155a255cd52554094c45211453508d3d54e513454c892f34ad126548551e345dd1254391086405cfb63dd0f343b94ea43918dd73650d273390c863110bd72d9caf72a94a6427dc98724988b720e07b81ce07031a9866418545a715544f612d04560f603850c982d50a50245075c16704180a60118004 0x30e72008f000008821080002014ef380405080050901000020080232cca404c04040c38001004210854002cc0198003000201c420098039000001a71004049522001a31004511c4260cf238c2710dcc61dc519008088060814409c067b082380082040408d01100c200806200232006620004010041840351847000273982f284f128ce0789253a447018405980602d42029060816830440520c1009425946708925208403010608101018ec0002060406184a309c02284eb518405080a5990608040520c1028c040c81028c202d46029013010418546004001942600c27100464182a4a901100cb2a901008c95180e098235a80b50169501693012a0806321901018c00b8cb5980b02cc05a02618083018a0190c301901008c600462308c511423384664b0a1014800982e6004010080111a0115a02b5c0610a70344719445694491912569480194e20148011ca211ca711cae70d8b180221844c20ce008d443145209c2760c22184e21844e08dc50888e61045504461296112465020611010308803081ac204e302081181011812520c409b4c220c05304e30106009420390670052509e22924a72a0c408c052004552024100a40092328482290022a08130c0820c25300a6610030a4e5184a4008c4404a200d0101444518a3201030944432506204650254820460324a809883008864948018525204671182d708a400da92904d124a41a4a41398401c4e0944020da9194817306408925204492904929060684e9290680a4a320a6d494836892520d252086d49483 14 4 5
+def q93Ck := dagCheckNodeBin q93M q93G q93NB 336 q93St q93Mv q93L q93S q93T
+def q93RA (token : Nat) : Bool :=
+  let s := rootState q93N 10 token
+  !dagAllowedRootBin q93M q93E s.2.1 || dagLocalBin q93M q93G (dagKnownClosesBin q93G q93C) s ||
+  dagRefBin q93M 336 q93St q93Mv (fun p tok => dagFindLink (q93L p) tok) 0 token s
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93RB0 : treeBlock 0 64 q93RA = true := by decide +kernel
+theorem q93R : dagCheckRootsBin q93M q93G (dagKnownClosesBin q93G q93C) q93E (dagRefBin q93M 336 q93St q93Mv (fun p tok => dagFindLink (q93L p) tok) 0) q93N 10 = true := q93RB0
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B0 : treeBlock 0 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B16 : treeBlock 16 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B32 : treeBlock 32 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B48 : treeBlock 48 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B64 : treeBlock 64 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B80 : treeBlock 80 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B96 : treeBlock 96 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B112 : treeBlock 112 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B128 : treeBlock 128 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B144 : treeBlock 144 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B160 : treeBlock 160 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B176 : treeBlock 176 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B192 : treeBlock 192 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B208 : treeBlock 208 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B224 : treeBlock 224 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B240 : treeBlock 240 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B256 : treeBlock 256 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B272 : treeBlock 272 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B288 : treeBlock 288 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B304 : treeBlock 304 16 q93Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93B320 : treeBlock 320 16 q93Ck = true := by decide +kernel
+theorem q93Bk : treeBlock 0 336 q93Ck = true := (@treeBlock_merge 0 176 160 q93Ck (@treeBlock_merge 0 96 80 q93Ck (@treeBlock_merge 0 48 48 q93Ck (@treeBlock_merge 0 32 16 q93Ck (@treeBlock_merge 0 16 16 q93Ck q93B0 q93B16) q93B32) (@treeBlock_merge 48 32 16 q93Ck (@treeBlock_merge 48 16 16 q93Ck q93B48 q93B64) q93B80)) (@treeBlock_merge 96 48 32 q93Ck (@treeBlock_merge 96 32 16 q93Ck (@treeBlock_merge 96 16 16 q93Ck q93B96 q93B112) q93B128) (@treeBlock_merge 144 16 16 q93Ck q93B144 q93B160))) (@treeBlock_merge 176 80 80 q93Ck (@treeBlock_merge 176 48 32 q93Ck (@treeBlock_merge 176 32 16 q93Ck (@treeBlock_merge 176 16 16 q93Ck q93B176 q93B192) q93B208) (@treeBlock_merge 224 16 16 q93Ck q93B224 q93B240)) (@treeBlock_merge 256 48 32 q93Ck (@treeBlock_merge 256 32 16 q93Ck (@treeBlock_merge 256 16 16 q93Ck q93B256 q93B272) q93B288) (@treeBlock_merge 304 16 16 q93Ck q93B304 q93B320))))
+theorem q93K : KnownBin q93C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q59Bin) q51Bin) q48Bin) q30Bin) q28Bin) q13Bin) q64Bin) q11Bin) q35Bin) q37Bin) q78Bin) q16Bin) q10Bin) q39Bin) q77Bin) q76Bin) q45Bin) q8Bin) q18Bin) q15Bin)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q93Bin : BinLower q93M q93W q93G 11 := by
+  apply lowerDagBin _ _ _ _ q93A _ _ _ q93K _ (fun _ b hb => dagNodeBounds_mem b hb) q93R q93Bk
+  · unfold Masked; decide +kernel
+  · unfold Masked; decide +kernel
+  · unfold properWord; decide +kernel
+  · decide +kernel
+  · exact stockMaskedOfCheck (by decide +kernel)
+  · decide +kernel
+  · decide +kernel
+  · have h : q93C.all (fun b => q93M &&& b.1 == b.1) = true := by decide +kernel
+    intro b hb
+    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
+def q94M : Word := 0xf000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f
+abbrev q94G : Word := qGoal &&& q94M
+abbrev q94W : List Word := projectDAGStock q94M qBase [0, 1, 4, 5, 6, 7]
+def q94F : Bound := (q94M, q94W, 10, q94G)
+def q94E := unpackWitnesses q94W [74384, 337040, 581728, 876688, 1155216, 1425504]
+abbrev q94N : List Word := normStock q94M q94W
+def q94C : List Bound := [q9F, q21F, q19F, q65F, q62F, q50F, q12F, q11F, q49F, q73F, q79F, q26F, q53F, q22F, q56F, q90F]
+def q94S : DagSample := (0x3020820a02090c023118088603220908c02230188062320944225148301209101a09209201a0d20b0182c060a03030120d020b04c0e00884c22120184c6031018480422100886012088c4c07008884064330184c021201088050181c0826120884402140204201201209008248048041208a4422810088500a01028002810110880c0403012050, 60)
+def q94L : DagLinkList := dagExtractLinks 0xbe0be0be0be0be0be0bc1ba1b81b80b80b80b61b60b60b60b60b60b03ac2a82a80a80a80a80a61a41a02a009e19649419028a38248017e17e07e07c162d5e24c94634413862c6263032001 0x6045060c4060c505e44cd0c60504405a02cd7870cec605c43e5a4325845044430590505643f4a07c54c40c885c524604807c4607c54c525045252851508314e43d4d0594ac434844346433444404483222033b5469ad4619ac52a0852c245ec04533c053340492c041200311a02142019400133f053a6853ab4609e8513c8332a4401e432ba03fb803e3a02f3802e37059b1051348333203e310592f0512c8332a442184222803f270532485322843208311e4521c06c1a832184401603e8b05989053870518ec43928538284394833144538444312433104230e0530c0430a039080330603104023020130003f 12 5 13 6 1
+def q94D : Forest := fun i => decodeNode 6 19 0x314292264a43e74864ec141621facc52450a2820c5021ea10593d8867910cf2199e832340324804c9829908331c05e380b8782c8c8331807c2c16448288883310884200fc4829868530d0861a0c432290606c0d06411100201f04453048660908c10298204304072080cc10188202304026080fc0 i
+def q94T := dagTraceTagsBin q94M 60 (dagTagBases q94N 0xcf8b7d4f4387c6f503c7f10edf83f7ebca9b063e7b1fea23f8ee9130ff1fdd47f0ffa43fff03ff000fffff4c89 0xcd8d7d174f9fc6fffbd7fd3effdbf7b3e28b2e5f7b4fe727fc6ecb36ffdf5c5ff4ffb09fffbfff2bbfffff67bc 60) 9 q94D
+def q94St := dagTraceBin q94M q94N 9 q94D
+def q94Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 7, 2, 3, 0, 6, 5, 1] 0 i.val)
+def q94Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [4, 7, 2, 3, 0, 6, 5, 1] 0 i.val)
+def q94Mv := dagMoves ([([qS20, qS47, qS18], q94Mp0, q94Mi0)] : List (DagMoveRecord 256))
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q94A : DagMovesOK q94M q94G 256 q94Mv := dagMovesOfCheck (by decide +kernel)
+def q94NB : Nat → List Bound := dagNodeBounds q94C.toArray 0xa50a50a32a30a129f29d29b29839719619609519509238d58948728257f37a57827627427227026e26a46826536055e25685154d44944634153f23b43292e42682061c41660d9076007 0x2021425643b422053011703bd3200fb4123301273017007101021104201106173564016b5621480431a2a58017303211703d26c916bc4358126a2609423a1079425702501945210ea4321580981263feca958 12 4 4
+def q94Ck := dagCheckNodeBin q94M q94G q94NB 49 q94St q94Mv q94L q94S q94T
+def q94RA (token : Nat) : Bool :=
+  let s := rootState q94N 9 token
+  !dagAllowedRootBin q94M q94E s.2.1 || dagLocalBin q94M q94G (dagKnownClosesBin q94G q94C) s ||
+  dagRefBin q94M 49 q94St q94Mv (fun p tok => dagFindLink (q94L p) tok) 0 token s
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q94RB0 : treeBlock 0 64 q94RA = true := by decide +kernel
+theorem q94R : dagCheckRootsBin q94M q94G (dagKnownClosesBin q94G q94C) q94E (dagRefBin q94M 49 q94St q94Mv (fun p tok => dagFindLink (q94L p) tok) 0) q94N 9 = true := q94RB0
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q94B0 : treeBlock 0 16 q94Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q94B16 : treeBlock 16 16 q94Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q94B32 : treeBlock 32 16 q94Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q94B48 : treeBlock 48 1 q94Ck = true := by decide +kernel
+theorem q94Bk : treeBlock 0 49 q94Ck = true := (@treeBlock_merge 0 32 17 q94Ck (@treeBlock_merge 0 16 16 q94Ck q94B0 q94B16) (@treeBlock_merge 32 16 1 q94Ck q94B32 q94B48))
+theorem q94K : KnownBin q94C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q90Bin) q56Bin) q22Bin) q53Bin) q26Bin) q79Bin) q73Bin) q49Bin) q11Bin) q12Bin) q50Bin) q62Bin) q65Bin) q19Bin) q21Bin) q9Bin)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q94Bin : BinLower q94M q94W q94G 10 := by
+  apply lowerDagBin _ _ _ _ q94A _ _ _ q94K _ (fun _ b hb => dagNodeBounds_mem b hb) q94R q94Bk
+  · unfold Masked; decide +kernel
+  · unfold Masked; decide +kernel
+  · unfold properWord; decide +kernel
+  · decide +kernel
+  · exact stockMaskedOfCheck (by decide +kernel)
+  · decide +kernel
+  · decide +kernel
+  · have h : q94C.all (fun b => q94M &&& b.1 == b.1) = true := by decide +kernel
+    intro b hb
+    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
+def q95M : Word := 0x55005500550055005500550055005500550055005500550055005500550055
+abbrev q95G : Word := qGoal &&& q95M
+abbrev q95W : List Word := projectDAGStock q95M qBase [1, 2, 4, 5, 6, 7]
+def q95F : Bound := (q95M, q95W, 9, q95G)
+def q95E := unpackWitnesses q95W [74896, 338064, 581728, 876688, 1155216, 1425504]
+abbrev q95N : List Word := normStock q95M q95W
+def q95C : List Bound := [q9F, q12F, q15F, q24F, q32F, q31F, q39F, q40F, q54F, q55F, q56F]
+def q95S : DagSample := (0xc022302806050480480c460321860a048340c0e00a058281203059209403048402203098c0640308920b0301c0c0502010820502014028441219048440804900822011100840104828940a21004221028100a01221004820110880c0403012050, 43)
+def q95L : DagLinkList := dagExtractLinks 0x4508a11062043186100e003d3782e11b8b52682d01a0304600a9939a163c66ccc917220e1e40b001 0x360401b6202cb141e48a0324301a4280ca0c1dc0a035050196210c01385c0842c03d182103bc1405d0602c8301582929b149cc8a4224309243019a0c2c88c0264408f030060172ca8c0288603241809c148490a4228301002f0781483809a19050302100800c23e8c05e8300f2201720c0388801b05e0c82935c149250a61683167229039089a80a61402309a311421889d06010462072200301b8140c40805d0302e414149048a644421610298100c4040260003f 11 4 13 5 3
+def q95D : Forest := fun i => decodeNode 5 18 0x620620a1362148841141841060f829310c09829210a4841820060722018880582f120a444188c0463a31088c42220080dc2031080ba202e0806210098407e0 i
+def q95T := dagTraceTagsBin q95M 43 (dagTagBases q95N 0x18e22ef9b73f9d33f8c9dfce83c4ee7fc7af81f7f8ff59fd806ff85c3beffa909 0x3cfaafffb73f9c55f8f9dfcc97dd6f3fc3afacf3fd7cfdfd8beffdf77beffafbc 43) 8 q95D
+def q95St := dagTraceBin q95M q95N 8 q95D
+def q95Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 5, 4, 7, 6] 0 i.val)
+def q95Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 1, 2, 3, 5, 4, 7, 6] 0 i.val)
+def q95Mp1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 7, 4, 3, 5, 2, 1, 6] 0 i.val)
+def q95Mi1 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 6, 5, 3, 2, 4, 7, 1] 0 i.val)
+def q95Mp2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 6, 5, 3, 4, 2, 1, 7] 0 i.val)
+def q95Mi2 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 6, 5, 3, 4, 2, 1, 7] 0 i.val)
+def q95Mp3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 7, 4, 3, 2, 5, 6, 1] 0 i.val)
+def q95Mi3 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 7, 4, 3, 2, 5, 6, 1] 0 i.val)
+def q95Mp4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 6, 5, 3, 2, 4, 7, 1] 0 i.val)
+def q95Mi4 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [0, 7, 4, 3, 5, 2, 1, 6] 0 i.val)
+def q95Mv := dagMoves ([([qS26, qS25], q95Mp0, q95Mi0), ([qS47, qS21, qS26, qS25], q95Mp1, q95Mi1), ([qS14, qS42], q95Mp2, q95Mi2), ([qS47, qS21], q95Mp3, q95Mi3), ([qS14, qS42, qS26, qS25], q95Mp4, q95Mi4)] : List (DagMoveRecord 256))
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q95A : DagMovesOK q95M q95G 256 q95Mv := dagMovesOfCheck (by decide +kernel)
+def q95NB : Nat → List Bound := dagNodeBounds q95C.toArray 0x80402010080402010080401f2f878bc1e0f07134992c155a850879351306606 0x1104151301074600103210210a98210 9 3 4
+def q95Ck := dagCheckNodeBin q95M q95G q95NB 28 q95St q95Mv q95L q95S q95T
+def q95RA (token : Nat) : Bool :=
+  let s := rootState q95N 8 token
+  !dagAllowedRootBin q95M q95E s.2.1 || dagLocalBin q95M q95G (dagKnownClosesBin q95G q95C) s ||
+  dagRefBin q95M 28 q95St q95Mv (fun p tok => dagFindLink (q95L p) tok) 0 token s
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q95RB0 : treeBlock 0 64 q95RA = true := by decide +kernel
+theorem q95R : dagCheckRootsBin q95M q95G (dagKnownClosesBin q95G q95C) q95E (dagRefBin q95M 28 q95St q95Mv (fun p tok => dagFindLink (q95L p) tok) 0) q95N 8 = true := q95RB0
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q95B0 : treeBlock 0 16 q95Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q95B16 : treeBlock 16 12 q95Ck = true := by decide +kernel
+theorem q95Bk : treeBlock 0 28 q95Ck = true := (@treeBlock_merge 0 16 12 q95Ck q95B0 q95B16)
+theorem q95K : KnownBin q95C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q56Bin) q55Bin) q54Bin) q40Bin) q39Bin) q31Bin) q32Bin) q24Bin) q15Bin) q12Bin) q9Bin)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q95Bin : BinLower q95M q95W q95G 9 := by
+  apply lowerDagBin _ _ _ _ q95A _ _ _ q95K _ (fun _ b hb => dagNodeBounds_mem b hb) q95R q95Bk
+  · unfold Masked; decide +kernel
+  · unfold Masked; decide +kernel
+  · unfold properWord; decide +kernel
+  · decide +kernel
+  · exact stockMaskedOfCheck (by decide +kernel)
+  · decide +kernel
+  · decide +kernel
+  · have h : q95C.all (fun b => q95M &&& b.1 == b.1) = true := by decide +kernel
+    intro b hb
+    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
+def q96M : Word := 0x505050505050505050505050505050505050505050505050505050505050505
+abbrev q96G : Word := qGoal &&& q96M
+abbrev q96W : List Word := projectDAGStock q96M qBase [1, 3, 4, 5, 6, 7]
+def q96F : Bound := (q96M, q96W, 10, q96G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q96Bin : BinLower q96M q96W q96G 10 := dagShiftLowerBin (width := 256) [qS11, qS6] q94Bin (by decide +kernel)
+def q97M : Word := 0xf0f00f0f00000000f0f00f0f00000000f0f00f0f00000000f0f00f0f
+abbrev q97G : Word := qGoal &&& q97M
+abbrev q97W : List Word := projectDAGStock q97M qBase [0, 1, 2, 3, 6, 7]
+def q97F : Bound := (q97M, q97W, 11, q97G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q97Bin : BinLower q97M q97W q97G 11 := dagShiftLowerBin (width := 256) [qS9, qS0, qS12, qS21, qS1, qS26, qS18] q93Bin (by decide +kernel)
+def q98M : Word := 0xf0f0f0f0f0f0f0ff0f0f0f0f0f0f0f0
+abbrev q98G : Word := qGoal &&& q98M
+abbrev q98W : List Word := projectDAGStock q98M qBase [0, 1, 2, 3, 4, 5]
+def q98F : Bound := (q98M, q98W, 10, q98G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q98Bin : BinLower q98M q98W q98G 10 := dagShiftLowerBin (width := 256) [qS3, qS35, qS15, qS17] q91Bin (by decide +kernel)
+def q99M : Word := 0xf0f0f0f0f0f0f0f0000000000000000f0f0f0f0f0f0f0f0
+abbrev q99G : Word := qGoal &&& q99M
+abbrev q99W : List Word := projectDAGStock q99M qBase [0, 1, 2, 3, 4, 5]
+def q99F : Bound := (q99M, q99W, 10, q99G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q99Bin : BinLower q99M q99W q99G 10 := dagShiftLowerBin (width := 256) [qS13, qS35, qS15, qS18, qS25] q92Bin (by decide +kernel)
+def q100M : Word := 0x333300003333333300003333000000003333000033333333000033330000
+abbrev q100G : Word := qGoal &&& q100M
+abbrev q100W : List Word := projectDAGStock q100M qBase [0, 2, 3, 4, 5, 7]
+def q100F : Bound := (q100M, q100W, 11, q100G)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q100Bin : BinLower q100M q100W q100G 11 := dagShiftLowerBin (width := 256) [qS3, qS19, qS17] q93Bin (by decide +kernel)
+def q101M : Word := 0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f
+abbrev q101G : Word := qGoal &&& q101M
+abbrev q101W : List Word := projectDAGStock q101M qBase [0, 1, 3, 4, 5, 6, 7]
+def q101F : Bound := (q101M, q101W, 12, q101G)
+def q101E := unpackWitnesses q101W [74384, 337040, 602256, 843872, 1138832, 1417360, 1687648]
+abbrev q101N : List Word := normStock q101M q101W
+def q101C : List Bound := [q45F, q47F, q85F, q88F, q91F, q92F, q94F, q96F]
+def q101S : DagSample := (0x884c140b05024060b0c06806090184c30190c024141a088642209100840422100886012040a04028050882231301c022210190c9049240248042051288249208248050181c0826120884100940204201201209008248048020904221008805208041208a4422810088500a01028002810110880c0403012050, 54)
+def q101L : DagLinkList := dagExtractLinks 0x9 0x7f 2 1 7 1 1
+def q101D : Forest := fun i => decodeNode 1 8 0xfe i
+def q101T := dagTraceTagsBin q101M 54 (dagTagBases q101N 0x211fa1987bc6f25b8dd9fe1cfde083cf91ef8fff749ee7f9ede7fbffc40ff1fff1ffffff488ffffc3ffffffff4c489 0x1a73fa799fbc6f89bbdddff7cfde58fd797efd7ff764eebfdedf3fbffd2dff7fffdffffff6227fffefffffffff66fbc 54) 11 q101D
+def q101St := dagTraceBin q101M q101N 11 q101D
+def q101Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q101Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q101Mv := dagMoves ([([qS11], q101Mp0, q101Mi0)] : List (DagMoveRecord 256))
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q101A : DagMovesOK q101M q101G 256 q101Mv := dagMovesOfCheck (by decide +kernel)
+def q101NB : Nat → List Bound := dagNodeBounds q101C.toArray 0x8 0x54bfa0 8 4 3
+def q101Ck := dagCheckNodeBin q101M q101G q101NB 1 q101St q101Mv q101L q101S q101T
+def q101RA (token : Nat) : Bool :=
+  let s := rootState q101N 11 token
+  !dagAllowedRootBin q101M q101E s.2.1 || dagLocalBin q101M q101G (dagKnownClosesBin q101G q101C) s ||
+  dagRefBin q101M 1 q101St q101Mv (fun p tok => dagFindLink (q101L p) tok) 0 token s
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q101RB0 : treeBlock 0 64 q101RA = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q101RB64 : treeBlock 64 64 q101RA = true := by decide +kernel
+theorem q101R : dagCheckRootsBin q101M q101G (dagKnownClosesBin q101G q101C) q101E (dagRefBin q101M 1 q101St q101Mv (fun p tok => dagFindLink (q101L p) tok) 0) q101N 11 = true := (@treeBlock_merge 0 64 64 q101RA q101RB0 q101RB64)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q101B0 : treeBlock 0 1 q101Ck = true := by decide +kernel
+theorem q101Bk : treeBlock 0 1 q101Ck = true := q101B0
+theorem q101K : KnownBin q101C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q96Bin) q94Bin) q92Bin) q91Bin) q88Bin) q85Bin) q47Bin) q45Bin)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q101Bin : BinLower q101M q101W q101G 12 := by
+  apply lowerDagBin _ _ _ _ q101A _ _ _ q101K _ (fun _ b hb => dagNodeBounds_mem b hb) q101R q101Bk
+  · unfold Masked; decide +kernel
+  · unfold Masked; decide +kernel
+  · unfold properWord; decide +kernel
+  · decide +kernel
+  · exact stockMaskedOfCheck (by decide +kernel)
+  · decide +kernel
+  · decide +kernel
+  · have h : q101C.all (fun b => q101M &&& b.1 == b.1) = true := by decide +kernel
+    intro b hb
+    exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
+def q102M : Word := 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+abbrev q102G : Word := qGoal &&& q102M
+abbrev q102W : List Word := projectDAGStock q102M qBase [0, 1, 2, 3, 4, 5, 6, 7]
+def q102E := unpackWitnesses q102W [74384, 337040, 600208, 864400, 1106016, 1400976, 1679504, 1949792]
+abbrev q102N : List Word := normStock q102M q102W
+def q102C : List Bound := [q93F, q9F, q20F, q94F, q54F, q47F, q70F, q92F, q19F, q91F, q97F, q95F, q71F, q18F, q75F, q84F, q96F, q73F, q49F, q68F, q98F, q39F, q72F, q80F, q74F, q99F, q88F, q89F, q90F, q100F, q101F]
+def q102S : DagSample := (0x30982a35201a04029000a00088240a090c024220c02830084225101888062348244068201a0c0a85120946031301841c1e008649058008c40a45031180c860a250482c180e0142a060b03038301a0184c0c1609068181c1209805228188c0c26028840c22120b01229060b01828120d020b0490c83038022130502c140920914180d0602428160a048060b0c068060902834904c0282406130c064300903059209403048141a08864220910084042210088601202894c064028841028100a01422088c4c07008884064324124900920108144a2092482090814080500a1104864209848221040250081080480482402092012201100884402100a8100824108840220148201048229108a0402211028100a01221002810110880c0403012050, 128)
+def q102L : DagLinkList := dagExtractLinks 0xe183860e183860e183860e183860e107840e103840e103840e103840e103840e103840e103840e103840e103840e103802df877c1df037c0df037a1de07780de036e5db836e0db836e0db836e0db836e0db836e0db836e0db836e0da0f623d8075c2d60b4c6d18f441d103421d0073c2ce0b361cd07340cd03321cc83320cc832e2ca8b281c987241c903240c78f1c1c60b123c293043bd9eee4ba8ae43b902e21b806e00b802de1b782dc1b686d62b48ace2b28aca0b282ca0b18ac22b006be1af06bc0ae86b43ab8eaa2a98aa41a712944a4868c3a112840a102840a1028409d9e687971a506940250094024c29286462908a3e28ba22a2898a24188861c3839dfc97b9de457521cc47301c066e11b426c85a66671598265859415fad6c9579d4aa50153464b111a946811a042a0fc73c18e843810da3350cce32ea89cf249476e17344c80ac418900ac001 0x1784225e11417607c5e4201794805db201774805b814568041d400c55002150804d66440d390c1500405d12034c4405b8201644305c9201624405c1241604405cb14570833da90fb4e4325a80f94e0325d420172c80d31101718905780c15c0305bc2015a4405611016c04c5b10c56a0805ad20169080501089694804f90893c4224e908938430d992015a450d4020164440d8920162450d812416046056114166c8058b14160831d382016748058b1435a4805931f962c725791f95a472d501fb4c07251808d61482571239584825581755e8405710875ac8056b1415883155918156831550201548805482715283151008950c80539201514805312014f4805332034a08c5201734a08c5281714808451a18147060511271430905011413607c50e2413e4504d01f13c4404c81b13a4504c01f138440d0320540c514eb105388325052093f0824f32393ac824e41cf368814da145308414dd20934c824ca239308824bb203100813e8144e60413600c4b002125804d2f480c382050e051390106ae0312b808494013c992052c079430104e203135808492013c282050a051380104d4031288084900134a82712806c49b1b32083e4810f9248794790892288e48120b08091420184f8051378104d20312380851601945004d1e88ec692391d08e4692091849e45d20d15893c482791206e4432050ac514220cd064803410c8f403e2c00c91189043c1810ac60c11240ce440ab10c2fa0902b8100a203043c2090cc8e42b20904482331100fe08e3e820909892409248ca4403f0278f809241d20304c8141314502833bb90faac4323b80f8ac0324021e4fe8413f108cc8022beb204fac513e20ccc64323d80f8a20323d5208f288e3c10a4ee0823b0270ea06c3a10fae6c8139b144e0c4137a0cc8c4223680fce7482394208e2c8e3832088a42237d20c88430373124db483b63240d8c60353140d2831b41240d0460319142b00902c0180bc05c288140d948235b238d4c82b39208cc450ae823aae0823101749e02334d20eca48232914ac208fad020cc205f2d014cd148233b208ccc5032a0c4c848e31920ab608eab0208c005d27008cc4c6030a0c4c04602801809a0222fc238bd082284174ba8822e112cb60822d3104a046c2610c8b209c2c5208aec822b1208aa08e2a0234a608c290214a20822801769f09227c18a9c89227218a9a49ea612489a46e26118a96c9125b18490c5123a0c88c4402181f07c03e25e2489509224b27890c922291408407c23d20c884409f82387e05e2341ce8ac7322b10c8883221c1ce8487321210c8308e2021247e4221f520e7a88e1ea17a788811e21447284118108e54081150144460410f80c43402307804c794821db2087488e1ca20a684831c10a46e42394820c500510f0104320311b00a46a0230980841c0131a320c6688217a0c86448e1890f86148397a2085e85297123a5a4831711785a45393820c4e0530e8104300310680845801915804c5548214b20c50c5113a0cc4c4820b90c84a08e12020c460821100f8420330980c84002e0fc1ce3cc730f310c3a83306108a3807f0e013c3603f0d520e32c820cb148308318b92082e4528b023e2a08e8a020e260820b017c2a05e0a014c260520900bc2202e08008c1f48387320c1cc5306a0c8184408502381606c0501781203e0441ce0e87303a10e0c47303110c0a4238201cc080430180c40402300804c000ff 14 5 13 8 1
+def q102D : Forest := fun i => decodeNode 8 21 0x1480a0a404dc2020d90107890828403f10c5f2900f148073a403431f99d8e4cf48266420329085958a0c883164418b0a20171062b548058a402bb2015c0b8a408451830279271371209748246841233239199048d07345a4121b2090d11c8688243a401e01e4ec1386c06c366361aa1e4cd11c6448232447184238bc9045e49e2ea4196e24cb00dc598902a84114b238a59045389228a4013b1449d0664e8792642093108c998a2488332401f1252088d11c4642923041118270880d84443e21a410fc2087d91c3ec821fa418f312476906394821a6470d32086a90633482186410c3140610623048e182410c31805d0622e460178470b4208591042c44b160410b3104541382b482146410a12085011c2808d140460a0214501042805d1483108a188448dc2246211c4907c2483d93c1ec920fa418741cc358861a8320d83986210c3211c168490b21105d20c290bc15482086410422382110410429082118400a42004610c83074410392381c87c0f48306429031178188a60c01906009835208159060ac51054198292081411c0a083050410280f8140660a02e0583982310c110660804f0401f82520c0d8a4068310322901817c0c0bc06053030290180bc0c05c0602303a4181314c0906404440020360101780807c050730142180910c04846020430101880808c04026020ff00 i
+def q102T := dagTraceTagsBin q102M 128 (dagTagBases q102N 0xafc9053fffffd81a43c75d0cf0fe78ef7ff27bceff7ff9e1ed38fbb3ff0fe7f73fff9b836fadff2f3cff3fffcff1ffdfc13ff8f80217ec98138fe7c8fdff1fffbfede875b4dabbe5e41efcff3f6ff3fe0593c77819f877fffff1007fe3fffe3fdeeff69fc1ff877fbfffbe9107f7fff0fa7c3fe7fe0007fffefffffffe988909 0xbfe23d3fffffdb7a4fcf5d3cf3fe78ef7ff27bceff7ffcfaed3bfbbbffbfe7f73fff9b836fadff875d7f5fffcffaffdffc7ffafe2317ec9db3bfebcbfdffafffbfedeff5b4c23be5f2cefd7f5f6ff9feef9fc7f9ddfc77fffff4b6ffefffff5fdc1ff6ffdbffc77fbfffbec4b3f7fffbfffdfffffefbbffffefffffffecddfbc 128) 13 q102D
+def q102St := dagTraceBin q102M q102N 13 q102D
+def q102Mp0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q102Mi0 (i : Fin 256) : Fin 256 := Fin.ofNat 256 (permuteAxes [3, 1, 2, 0, 4, 5, 6, 7] 0 i.val)
+def q102Mv := dagMoves ([([qS11], q102Mp0, q102Mi0)] : List (DagMoveRecord 256))
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102A : DagMovesOK q102M q102G 256 q102Mv := dagMovesOfCheck (by decide +kernel)
+def q102NB : Nat → List Bound := dagNodeBounds q102C.toArray 0x3ae4eacfa92e98fa15e7cb9c3e68b964e50b913e38f8b3e24b863e10b813df8f7c2de4f763dccf712dbcb6d2da17653d8535d4d653554d48f4c6d24f463d0933f3ce97355cc8f302cb13293c98f233c80f1d3c68f173c4970c6c24f063c10b004bf4ef85bc5eed4b9dae34b80edc4b64ed45b44ece3b2cec74b10ec13af8eba4ad92b24ab92aa4a992a42a8129e2a692973a45a8e3a2928289ede7839d4e7239b926b399d262597ce5b495d2507934e4a391ce4348fd23b48d5a3238bce2d289da207871217584d20f482d20748095fc67d21eb97869d89754dd237391c95718dc156f15b666c19ac469d5a25675597664d18f462958195e617455c1169758d95b855594c9503136a4c192a648291a645190e641a0fca3ce4ed6399cde83564cba30e0bd62d24ac8286c9c5252086e1eec6fc19685e715dc516129c4370ee03560aac219066010901e4007 0x24c286400802d00572680200940100620284017802d00402080201200170020684017002400480080200803470aa1a54326002c594326142c4144c2886b608a158032004081040208ce1011281002200401004a240044009a0448024004d0202d40c2e00b239d562089a4004014bc01300255b401484c702d0810028149a00a8400a80128102200242880110024004400d0ad120011002d004056856028620284022a0022846b288a2184a20052f004c008dd301042005020048830ce9004ce00d0d1280120024005ae004c00c10008cad006000d0b50c1000c06e21c013802400480091000a040090400a92238022004400803470c550d1d368aa1a4aa1a40550ad800c9800b0081302010cac5886e331655990a1b0457c0ca1b5c560dcc3a5a19816b4a0ca1cc0140047008a10086198047008e1800833840478ce9010663a404a00c493880130a049224008207c8851180b790c0910c014963638c901c8f1b4ae200c43080e911cd79a03481d985c6e6c4c71240b0a2222002689102524015448672408195a27e226389205a1e750171c456010711610293ac02520e4045712004179027046c3301454ad763014940ca27b8cd540692f16ab08bbd406ab1543618a400548310e34802f81ae3724076a1463c403110c71802a440c93806180e27208015a86c8a5043805d3dc01798a438417a406e99c0a424ad1307331c0d524ac5acc01cda9520a263e061b9255358f819436160a1a4e063d841026f3406a04cca19d205acca3a48018d47580cf719901a40a395eb899474806f819430152f332033a80979a0a1a4e067a0a19d20 14 4 5
+def q102Ck := dagCheckNodeBin q102M q102G q102NB 189 q102St q102Mv q102L q102S q102T
+def q102RA (token : Nat) : Bool :=
+  let s := rootState q102N 13 token
+  !dagAllowedRootBin q102M q102E s.2.1 || dagLocalBin q102M q102G (dagKnownClosesBin q102G q102C) s ||
+  dagRefBin q102M 189 q102St q102Mv (fun p tok => dagFindLink (q102L p) tok) 0 token s
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102RB0 : treeBlock 0 64 q102RA = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102RB64 : treeBlock 64 64 q102RA = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102RB128 : treeBlock 128 64 q102RA = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102RB192 : treeBlock 192 64 q102RA = true := by decide +kernel
+theorem q102R : dagCheckRootsBin q102M q102G (dagKnownClosesBin q102G q102C) q102E (dagRefBin q102M 189 q102St q102Mv (fun p tok => dagFindLink (q102L p) tok) 0) q102N 13 = true := (@treeBlock_merge 0 128 128 q102RA (@treeBlock_merge 0 64 64 q102RA q102RB0 q102RB64) (@treeBlock_merge 128 64 64 q102RA q102RB128 q102RB192))
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102B0 : treeBlock 0 16 q102Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102B16 : treeBlock 16 16 q102Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102B32 : treeBlock 32 16 q102Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102B48 : treeBlock 48 16 q102Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102B64 : treeBlock 64 16 q102Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102B80 : treeBlock 80 16 q102Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102B96 : treeBlock 96 16 q102Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102B112 : treeBlock 112 16 q102Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102B128 : treeBlock 128 16 q102Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102B144 : treeBlock 144 16 q102Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102B160 : treeBlock 160 16 q102Ck = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102B176 : treeBlock 176 13 q102Ck = true := by decide +kernel
+theorem q102Bk : treeBlock 0 189 q102Ck = true := (@treeBlock_merge 0 96 93 q102Ck (@treeBlock_merge 0 48 48 q102Ck (@treeBlock_merge 0 32 16 q102Ck (@treeBlock_merge 0 16 16 q102Ck q102B0 q102B16) q102B32) (@treeBlock_merge 48 32 16 q102Ck (@treeBlock_merge 48 16 16 q102Ck q102B48 q102B64) q102B80)) (@treeBlock_merge 96 48 45 q102Ck (@treeBlock_merge 96 32 16 q102Ck (@treeBlock_merge 96 16 16 q102Ck q102B96 q102B112) q102B128) (@treeBlock_merge 144 32 13 q102Ck (@treeBlock_merge 144 16 16 q102Ck q102B144 q102B160) q102B176)))
+theorem q102K : KnownBin q102C := (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (extendKnownBin (show KnownBin [] from fun _ h => False.elim (List.not_mem_nil h)) q101Bin) q100Bin) q90Bin) q89Bin) q88Bin) q99Bin) q74Bin) q80Bin) q72Bin) q39Bin) q98Bin) q68Bin) q49Bin) q73Bin) q96Bin) q84Bin) q75Bin) q18Bin) q71Bin) q95Bin) q97Bin) q91Bin) q19Bin) q92Bin) q70Bin) q47Bin) q54Bin) q94Bin) q20Bin) q9Bin) q93Bin)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem q102Bin : BinLower q102M q102W q102G 14 := by
+  apply lowerDagBin _ _ _ _ q102A _ _ _ q102K _ (fun _ b hb => dagNodeBounds_mem b hb) q102R q102Bk
+  · unfold Masked; decide +kernel
+  · unfold Masked; decide +kernel
+  · unfold properWord; decide +kernel
+  · decide +kernel
+  · exact stockMaskedOfCheck (by decide +kernel)
+  · decide +kernel
+  · decide +kernel
+  · have h : q102C.all (fun b => q102M &&& b.1 == b.1) = true := by decide +kernel
     intro b hb
     exact beq_iff_eq.mp (List.all_eq_true.mp h b hb)
 theorem binLowerEq {m m2 : Word} {s s2 : List Word} {t t2 : Word} {k : Nat}
@@ -4495,7 +4928,7 @@ theorem binLowerEq {m m2 : Word} {s s2 : List Word} {t t2 : Word} {k : Nat}
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem rootLower : BinLower (fullMask 256) qBase qGoal 14 :=
-  binLowerEq (by decide +kernel) (by decide +kernel) (by decide +kernel) q49Bin
+  binLowerEq (by decide +kernel) (by decide +kernel) (by decide +kernel) q102Bin
 
 end PEqualNP.Outside.L_meta_34788.Cert
 
