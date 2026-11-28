@@ -3120,7 +3120,7 @@ def anySub (d : Bool) (l : ℕ) (v : List W) : ℕ → (List W → Bool) → Boo
   (fun w t ih c h => Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (ih c h) (Nat.beq (Nat.lor c (cov d l t)) l)) true
     (st (Nat.lor c (sp d l w.s)) fun c => ih c fun r => h (w :: r))) v
 def sumc (v : List W) : ℕ := List.rec (motive := fun _ => ℕ) 0 (fun w _ ih => Nat.add w.c ih) v
-def MM : ℕ := 214
+def MM : ℕ := 35
 def hb (H x : ℕ) : Bool := Nat.beq (Nat.land (Nat.shiftRight H (Nat.mod x MM)) 1) 1
 def pairsC (H : ℕ) (h : X → X → Bool) (xs : List X) : Bool :=
   List.rec (motive := fun _ => Bool) false (fun a r ih => Bool.rec (motive := fun _ => Bool) ih true
@@ -3771,44 +3771,52 @@ set_option maxHeartbeats 0 in
 theorem root_p : pOk 0 rt = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_0_0 : chk [] rt 0 11 0 0x3fffffffffffff 1 = false := by decide +kernel
+theorem root_0_0 : chk [] rt 0 11 0 0x1ff 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_0_1 : chk [] rt 0 11 0 0xfffffffffffffc0000000000000 0 = false := by decide +kernel
+theorem root_0_1 : chk [] rt 0 11 0 0x3fe00 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_0_2 : chk [] rt 0 11 0 0x3fffffffffffff000000000000000000000000000 0 = false := by decide +kernel
+theorem root_0_2 : chk [] rt 0 11 0 0x7fc0000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_0_3 : chk [] rt 0 11 0 0x3ffffffffffffc0000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem root_0_3 : chk [] rt 0 11 0 0x7f8000000 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem root_0_4 : chk [] rt 0 11 0 0x0 1 = false := by decide +kernel
 lemma root_0_m : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 11 0 p.1 p.2 = false := by
-  refine ⟨[(0x3fffffffffffff, 1), (0xfffffffffffffc0000000000000, 0), (0x3fffffffffffff000000000000000000000000000, 0), (0x3ffffffffffffc0000000000000000000000000000000000000000, 0)], by decide +kernel, fun p hp => ?_⟩
+  refine ⟨[(0x1ff, 0), (0x3fe00, 0), (0x7fc0000, 0), (0x7f8000000, 0), (0x0, 1)], by decide +kernel, fun p hp => ?_⟩
   simp only [List.mem_cons, List.not_mem_nil, or_false] at hp
-  rcases hp with rfl | rfl | rfl | rfl
+  rcases hp with rfl | rfl | rfl | rfl | rfl
   · exact root_0_0
   · exact root_0_1
   · exact root_0_2
   · exact root_0_3
+  · exact root_0_4
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_1_0 : chk [] rt 0 11 1 0x3fffffffffffff 1 = false := by decide +kernel
+theorem root_1_0 : chk [] rt 0 11 1 0x1ff 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_1_1 : chk [] rt 0 11 1 0xfffffffffffffc0000000000000 0 = false := by decide +kernel
+theorem root_1_1 : chk [] rt 0 11 1 0x3fe00 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_1_2 : chk [] rt 0 11 1 0x3fffffffffffff000000000000000000000000000 0 = false := by decide +kernel
+theorem root_1_2 : chk [] rt 0 11 1 0x7fc0000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_1_3 : chk [] rt 0 11 1 0x3ffffffffffffc0000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem root_1_3 : chk [] rt 0 11 1 0x7f8000000 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem root_1_4 : chk [] rt 0 11 1 0x0 1 = false := by decide +kernel
 lemma root_1_m : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 11 1 p.1 p.2 = false := by
-  refine ⟨[(0x3fffffffffffff, 1), (0xfffffffffffffc0000000000000, 0), (0x3fffffffffffff000000000000000000000000000, 0), (0x3ffffffffffffc0000000000000000000000000000000000000000, 0)], by decide +kernel, fun p hp => ?_⟩
+  refine ⟨[(0x1ff, 0), (0x3fe00, 0), (0x7fc0000, 0), (0x7f8000000, 0), (0x0, 1)], by decide +kernel, fun p hp => ?_⟩
   simp only [List.mem_cons, List.not_mem_nil, or_false] at hp
-  rcases hp with rfl | rfl | rfl | rfl
+  rcases hp with rfl | rfl | rfl | rfl | rfl
   · exact root_1_0
   · exact root_1_1
   · exact root_1_2
   · exact root_1_3
+  · exact root_1_4
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem root_2 : chk [] rt 0 11 2 FF 1 = false := by decide +kernel
@@ -3855,29 +3863,32 @@ lemma iroot : Imp [] 0 12 := imp_ts (Or.inl rfl) root_p (by norm_num) ir (fun t 
   · exact one root_11)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_0 : chk [] rt 0 12 1 0xffffffff 1 = false := by decide +kernel
+theorem proot_1_0 : chk [] rt 0 12 1 0x1f 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_1 : chk [] rt 0 12 1 0xffffffff00000000 0 = false := by decide +kernel
+theorem proot_1_1 : chk [] rt 0 12 1 0x3e0 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_2 : chk [] rt 0 12 1 0xffffffff0000000000000000 0 = false := by decide +kernel
+theorem proot_1_2 : chk [] rt 0 12 1 0x7c00 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_3 : chk [] rt 0 12 1 0xffffffff000000000000000000000000 0 = false := by decide +kernel
+theorem proot_1_3 : chk [] rt 0 12 1 0xf8000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_4 : chk [] rt 0 12 1 0xffffffff00000000000000000000000000000000 0 = false := by decide +kernel
+theorem proot_1_4 : chk [] rt 0 12 1 0x1f00000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_5 : chk [] rt 0 12 1 0xffffffff0000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem proot_1_5 : chk [] rt 0 12 1 0x3e000000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_6 : chk [] rt 0 12 1 0x3fffff000000000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem proot_1_6 : chk [] rt 0 12 1 0x7c0000000 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_1_7 : chk [] rt 0 12 1 0x0 1 = false := by decide +kernel
 lemma proot_1_m : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 12 1 p.1 p.2 = false := by
-  refine ⟨[(0xffffffff, 1), (0xffffffff00000000, 0), (0xffffffff0000000000000000, 0), (0xffffffff000000000000000000000000, 0), (0xffffffff00000000000000000000000000000000, 0), (0xffffffff0000000000000000000000000000000000000000, 0), (0x3fffff000000000000000000000000000000000000000000000000, 0)], by decide +kernel, fun p hp => ?_⟩
+  refine ⟨[(0x1f, 0), (0x3e0, 0), (0x7c00, 0), (0xf8000, 0), (0x1f00000, 0), (0x3e000000, 0), (0x7c0000000, 0), (0x0, 1)], by decide +kernel, fun p hp => ?_⟩
   simp only [List.mem_cons, List.not_mem_nil, or_false] at hp
-  rcases hp with rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  rcases hp with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
   · exact proot_1_0
   · exact proot_1_1
   · exact proot_1_2
@@ -3885,26 +3896,31 @@ lemma proot_1_m : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk
   · exact proot_1_4
   · exact proot_1_5
   · exact proot_1_6
+  · exact proot_1_7
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_2_0 : chk [] rt 0 12 2 0x3fffffffffffff 1 = false := by decide +kernel
+theorem proot_2_0 : chk [] rt 0 12 2 0x1ff 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_2_1 : chk [] rt 0 12 2 0xfffffffffffffc0000000000000 0 = false := by decide +kernel
+theorem proot_2_1 : chk [] rt 0 12 2 0x3fe00 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_2_2 : chk [] rt 0 12 2 0x3fffffffffffff000000000000000000000000000 0 = false := by decide +kernel
+theorem proot_2_2 : chk [] rt 0 12 2 0x7fc0000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_2_3 : chk [] rt 0 12 2 0x3ffffffffffffc0000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem proot_2_3 : chk [] rt 0 12 2 0x7f8000000 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_2_4 : chk [] rt 0 12 2 0x0 1 = false := by decide +kernel
 lemma proot_2_m : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 12 2 p.1 p.2 = false := by
-  refine ⟨[(0x3fffffffffffff, 1), (0xfffffffffffffc0000000000000, 0), (0x3fffffffffffff000000000000000000000000000, 0), (0x3ffffffffffffc0000000000000000000000000000000000000000, 0)], by decide +kernel, fun p hp => ?_⟩
+  refine ⟨[(0x1ff, 0), (0x3fe00, 0), (0x7fc0000, 0), (0x7f8000000, 0), (0x0, 1)], by decide +kernel, fun p hp => ?_⟩
   simp only [List.mem_cons, List.not_mem_nil, or_false] at hp
-  rcases hp with rfl | rfl | rfl | rfl
+  rcases hp with rfl | rfl | rfl | rfl | rfl
   · exact proot_2_0
   · exact proot_2_1
   · exact proot_2_2
   · exact proot_2_3
+  · exact proot_2_4
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem proot_3 : chk [] rt 0 12 3 FF 1 = false := by decide +kernel
