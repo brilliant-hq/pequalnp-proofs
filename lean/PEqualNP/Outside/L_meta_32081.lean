@@ -1,18 +1,20 @@
 import PEqualNP.Defs
 
 namespace PEqualNP.Outside.L_meta_32081
-def bigNat_0 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7fff) 64) 0xeffffdf7fffdf7ff) 64) 0xfdefbbfffef7fffd) 64) 0xefbbfffef7fffdef) 64) 0x6ffffbdedffff7bd) 64) 0xdf777ffad6d5aad7) 64) 0xffd6abffeb6aafff) 64) 0xafffbffed5ad6d5b) 64) 0x6aaafffab7ffdbff) 64) 0xedab6db55afffb7f) 64) 0xfdb6db6fffb6dfff) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0
-def bigNat_1 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x5292a5528) 64) 0x29540014955000) 64) 0x500040012a5292a4) 64) 0x9555000548002400) 64) 0x1254924aa5000480) 64) 0x249249000492000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0
-def bigNat_2 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x8000) 64) 0x1000020800020800) 64) 0x210440001080002) 64) 0x1044000108000210) 64) 0x9000042120000842) 64) 0x2088800000000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0
-def bigNat_3 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7fffc0f) 64) 0x8000000000000000) 64) 0x7fffc0f0000) 64) 0x1ffff03c1f07) 64) 0x100080004280) 64) 0x88224002208a208a) 64) 0x22c008004430802) 64) 0x1092308518428008) 64) 0x4004210a1085810) 64) 0x5861121242260000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x210) 64) 0xa01214102214143e) 64) 0x140f80102a102054) 64) 0x2088102a1231740f) 64) 0x40984244a5b03c) 64) 0x1f07042810018000) 64) 0x8800000a2000) 64) 0x20003ffe01800c43) 64) 0x802000230001800) 64) 0x280c054200037f) 64) 0xfc30d8600036dfff) 64) 0xaaaaaaaaaaaaaaaa) 64) 0xaaaaaaaaaaaaaaaa) 64) 0xaaaaaaaaaaaaaaaa) 64) 0xaaaaaaaaaaaaaaaa
-def bigNat_4 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7fffc0f80) 64) 0xfff) 64) 0xf81e1ffff7801f70) 64) 0x2101180) 64) 0x8c82280262027) 64) 0x98002020000088) 64) 0x25280130809c080) 64) 0x2184580463023082) 64) 0x9204730c0940000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x422) 64) 0x4024482044482042) 64) 0x48208821442453c8) 64) 0xf80211420421821) 64) 0x22a6701e052ce780) 64) 0x1f70089000040210) 64) 0x8628000) 64) 0x2fff800004206000) 64) 0xa88000280001bff) 64) 0xe180618458000300) 64) 0x1861b6fffb0c000) 64) 0xcccccccccccccccc) 64) 0xcccccccccccccccc) 64) 0xcccccccccccccccc) 64) 0xcccccccccccccccc
-def bigNat_5 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3) 64) 0xfffe07fffde00fff) 64) 0xfbc01ffff7bdc000) 64) 0x790) 64) 0xa006c902a01f001e) 64) 0x780000010120a0) 64) 0x1d2900f80078409) 64) 0x904a01f000f1b0) 64) 0x1b00363600740000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x845) 64) 0x48a04088a04084) 64) 0xa0411042904084a0) 64) 0x41114ad80295b1e0) 64) 0x32b53c00636a7bd) 64) 0xc000114000100000) 64) 0x10a0000b02afff) 64) 0x8000000010010103) 64) 0x60a00002b7ffc000) 64) 0xc0b01b05afff800) 64) 0x1b01b0000360000) 64) 0xf0f0f0f0f0f0f0f0) 64) 0xf0f0f0f0f0f0f0f0) 64) 0xf0f0f0f0f0f0f0f0) 64) 0xf0f0f0f0f0f0f0f0
-def bigNat_6 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xfff) 64) 0xfc00000000000000) 64) 0x3fffe07fffde003) 64) 0xfffef00000000fff) 64) 0xfbdec00000000000) 64) 0x4022c23516) 64) 0x11c8b6804740474) 64) 0x11d04024010800a8) 64) 0x4760023a011d0da0) 64) 0x1b5004d4026a1a6) 64) 0x8004e42489d80000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x1008) 64) 0x2d71040011048009) 64) 0x482220ce20419c5) 64) 0xe0010c9af0082402) 64) 0x2325bdec0403004) 64) 0x101020800c022c0) 64) 0x1600000b680000) 64) 0xc02c0158) 64) 0xaafff800000000) 64) 0xda001b500000000) 64) 0x1b6c0000036dfff) 64) 0xff00ff00ff00ff00) 64) 0xff00ff00ff00ff00) 64) 0xff00ff00ff00ff00) 64) 0xff00ff00ff00ff00
-def bigNat_7 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7fffc07fffde0) 64) 0x3fffef000000003) 64) 0xfffef7fffdef6000) 64) 0x0) 64) 0x212002800e612) 64) 0xa877000001d801d8) 64) 0x760d580015b6a00) 64) 0x358001ac00d60d2b) 64) 0x4c000039801cc134) 64) 0xd243b80007600000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x2080) 64) 0x418008851e08051e) 64) 0x9e00288e4f10108) 64) 0x201889cf31139ef) 64) 0x640060040800c080) 64) 0x210201216002800) 64) 0x16abffe0000000) 64) 0xd580015b) 64) 0x6a00000000000000) 64) 0xdab6c0000000000) 64) 0x1b6db6fff800000) 64) 0xffff0000ffff0000) 64) 0xffff0000ffff0000) 64) 0xffff0000ffff0000) 64) 0xffff0000ffff0000
-def bigNat_8 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7fffdf0000000) 64) 0x3fffef7fffdefb8) 64) 0x0) 64) 0x0) 64) 0x240002a50b800) 64) 0x58000001600160) 64) 0x580d52d68000000) 64) 0x26000130009809a2) 64) 0x6925102e02170000) 64) 0x2c00005800000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x4101) 64) 0x860031061e31f210) 64) 0x30040308f8f611f1) 64) 0xefba00e00401c044) 64) 0x803808010070108) 64) 0x44024062c0002ad7) 64) 0xffc0000000000000) 64) 0xd5ad6c00) 64) 0x0) 64) 0xdab6db55afffb7f) 64) 0xfc00000000000000) 64) 0xffffffff00000000) 64) 0xffffffff00000000) 64) 0xffffffff00000000) 64) 0xffffffff00000000
-def bigNat_9 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7fffe000) 64) 0x7fffdf7fffdef) 64) 0xb800000000000000) 64) 0x0) 64) 0x0) 64) 0x2d6958004c000) 64) 0x260000009800980) 64) 0x260095894c524a02) 64) 0xb80025c012e00000) 64) 0xb000580000) 64) 0xb000016000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x7e0e) 64) 0x801c0041fc1f41f) 64) 0xc1efb80f00001e00) 64) 0x84000f00401e0080) 64) 0x3c010880780210) 64) 0x88200382d6d58000) 64) 0x0) 64) 0xd5ad6d5b) 64) 0x6aaafffab7ffdbff) 64) 0xe000000000000000) 64) 0x0) 64) 0xffffffffffffffff) 64) 0x0) 64) 0xffffffffffffffff) 64) 0x0
-def bigNat_10 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7fffefff) 64) 0xfdf0000000000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x84d500870004) 64) 0x38002480e000e00) 64) 0x3800000000000000) 64) 0xc000060003000000) 64) 0xc000600000) 64) 0xc000018000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x7ff0) 64) 0xffe01f7e00107e0) 64) 0x10803f00087e001) 64) 0x823f00087e00108) 64) 0x4fc002101f800421) 64) 0x10447c02d6d5aad7) 64) 0xffd6abffeb6aafff) 64) 0xafffbffe00000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0xffffffffffffffff) 64) 0xffffffffffffffff) 64) 0x0) 64) 0x0
-def bigNat_11 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7fff) 64) 0xeffffdf7fffdf7ff) 64) 0xfdefbbfffef7fffd) 64) 0xefbbfffef7fffdef) 64) 0x6ffffbdedffff7bd) 64) 0xdf777ffad6d5aad7) 64) 0xffd6abffeb6aafff) 64) 0xafffbffed5ad6d5b) 64) 0x6aaafffab7ffdbff) 64) 0xedab6db55afffb7f) 64) 0xfdb6db6fffb6dfff) 64) 0xfffffffffffffffe) 64) 0xfffffffffffffefe) 64) 0xfffefffefffcfffc) 64) 0xfefefafaeeccaa00
+def packedMask (digits : List Nat) : Nat := digits.foldl (fun x d => (x <<< 64) ||| d) 0
+
+def bigNat_0 : Nat := (packedMask [0x3fffffffe, 0xffffffffbffffff7, 0xfffffffffbffffff, 0x7fffffffffbfffff, 0xdffffffbfffff7ff, 0xfffffff7fffffbff, 0xfffffffdfffffeff, 0xffffdfffff7fffff, 0xffff7fffff7fffff, 0xffff7fffffbfffff, 0xdffffbfffffffffb, 0xfffffdfffffeffff, 0xeffffffffff7ffff, 0xfdffffff7ffffbff, 0xffff7ffffdfffff7, 0xffb56faf6eefd5ed, 0xd6fbfaeeefaddeef, 0x7edafadb7edd7dbf, 0xad76fbbfffedbeee, 0xfedbdfb77effffdb, 0xeefeefef7bf7efff, 0xfbeffffbfffeeeef, 0xebbedf7f6ebeeff5, 0xddf7bfbfb77d77df, 0xf777f7fdf7edeefd, 0xdfbefffff7dfbfdf, 0xfffefefffff7bbfb, 0x7f7dbdf7fdeff7fd, 0xdfddff7dfbeff7ef, 0xffffbfbffffef7f7, 0xf7bfeffbfbfeff7f, 0xfffefeffbfdfffff, 0x0])
+def bigNat_1 : Nat := (packedMask [0x4a905091102a12, 0x2904051110522110, 0x8125052481228240, 0x5289044000124111, 0x124204881000024, 0x1101101084081000, 0x410000400011110, 0x144120809141100a, 0x2208404048828820, 0x888080208121102, 0x2041000008204020, 0x1010000084404, 0x8082420802100802, 0x2022008204100810, 0x404000010808, 0x840100404010080, 0x1010040200000, 0x0])
+def bigNat_2 : Nat := (packedMask [0x400000001, 0x40000008, 0x4000000, 0x8000000000400000, 0x2000000400000800, 0x800000400, 0x200000100, 0x200000800000, 0x800000800000, 0x800000400000, 0x2000040000000004, 0x20000010000, 0x1000000000080000, 0x200000080000400, 0x800002000008, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0])
+def bigNat_3 : Nat := (packedMask [0x3ffffffff, 0xfc000000ffffffc0, 0x0, 0x0, 0x0, 0x0, 0x3fffffffff80000, 0x1fffffe00000000, 0x0, 0x7fffffff, 0xff8000000ffffff8, 0x1ffffff80000, 0xfffff8000010000, 0x100206082c20001, 0x1060300d0001008, 0x108100408, 0xa04001006162181, 0xd040a4401001000a, 0xc41d04450d042501, 0x8de002000c0200a8, 0x2002060140064, 0x28082a40382d910b, 0x9020500a01905021, 0x3621ba0a1146d050, 0x4a004000002c0581, 0x30011a200200020, 0x4b041d0404503418, 0xde2800a94004656, 0xc88768405140b234, 0x1a1830f000000000, 0x2112a10a, 0x8422a4281084550, 0x80495100a82092a1, 0x7d47fdaaae820928, 0x1ffffb581104a080, 0x480a955040955040, 0x24024ccc1042b608, 0x10998084ab040480, 0x43530410b56ea7c9, 0xdbeb0408463f7fff, 0x4081501024021878, 0x20823c10414e0425, 0xed6af55d7af04082, 0x25fbf7bf02084bf7, 0xeff7020895fffff0, 0x4280600000e0040c, 0x10f80000e021c0e0, 0x7e02020300010180, 0x210603800001800e, 0xc3c0307e000018, 0xe00e00f7807e000, 0x3e00003fffe00e0, 0x380c07f0080e004, 0x1c07803f870107c0, 0x707f001f00c0e01, 0xc03e000007c03fc0, 0xfe0000003803, 0x7d81f001e007fd, 0xc01c007dfbe007e0, 0x3fbffffef007, 0xf7800ffbf800ff00, 0xfeffbfdfffff, 0x8242a14a412b18d2])
+def bigNat_4 : Nat := (packedMask [0x1fffffffffe0, 0x7fffffe0000, 0x0, 0x0, 0x1fff, 0xffffffc000000fff, 0xfff000007fffffff, 0xffbfffffe0000000, 0x1ffffffbffff, 0xe000000000000100, 0x1000000000001010, 0x120010800400040, 0x609602160334001, 0x4620010002400088, 0x40ccb00831d03, 0x4e8801160e019f80, 0x2340100000000803, 0x4b00426000c3400, 0x8000800008800000, 0x816b010674000215, 0x1a7410004580e003, 0x3f140008a804a000, 0x50c800eb60442e4, 0x1d6e8800a161b801, 0x434185800c8d0003, 0x41d0700607e5d121, 0xdc020aa000000000, 0x4224c224, 0x10844c8902108a61, 0x926225104124c4, 0x8088930c304124c, 0xc104526022293100, 0x903320a081298be9, 0x5ecfeab8208520fd, 0xfffd410912080901, 0x81ac08215a040882, 0x813c08108b82048b, 0x810abb5b5eaf4fd0, 0x410451ffeffc0842, 0x4d73767e5fa7efdf, 0x7c10210c041093fb, 0xff7e7ffffc0844a0, 0x890100200e000000, 0x1600020e002c00ef, 0x18001800c17c00, 0x2c06f800000c00e0, 0xd800370000001b, 0xe000efe07bf00000, 0x3effff800000e00, 0x800df0060be0005, 0xc007bf8030017000, 0x7700001f7ede001, 0xdf80000007df8000, 0xfefffff78003, 0x7f01bc0001eff001, 0xdfc0007c03eff000, 0x3f800000f7f0, 0x7bfe003fbfeff7f, 0xfffefe003fc00000, 0x8088c19090522d14])
+def bigNat_5 : Nat := (packedMask [0x3fffffffff80000, 0x3fffffffffbffff, 0xfc00000000001fff, 0xffffffdfffffe000, 0x7fffffff, 0xffbfffffeffffffb, 0xffffc00000000000, 0x0, 0x802200001100, 0x122100002001200, 0x220000128800000, 0x1e6cb00086da7400, 0x8002cccd31d00803, 0x8f1e00ff88007600, 0x1b81000004100001, 0x1000002220800001, 0x99600004198683a0, 0x6d33a0200000b9, 0x1c783c003fe08000, 0xec0cc2c0000c6683, 0xa00001061a60e800, 0xe0f1e000ff82000, 0x1b87aead8048141b, 0x9de240016586e7b8, 0x9000acc000000000, 0x84470450, 0x2108711404211382, 0x123844a4082470a, 0x101111c310082471, 0x208a3804451c201, 0x205c4a01024e2080, 0x881473004109c810, 0x212e02125c6eb3da, 0xfdca1042606f33ed, 0xedb27effff040912, 0x214235d9f37ed63, 0xffdff82082881088, 0x8d7c779f9cc7f7ef, 0xf5fdffde7ffff820, 0x4224041120108841, 0x140400006000100d, 0xc00002e0002dde00, 0xc002c000dc0000, 0x2d700000000dbe00, 0xdbdf800000001b, 0xeefe00007bf7efff, 0xf80000000000e000, 0xbbe00006e000005, 0xddf00000377c0000, 0x777f7fc000deefc, 0x7dfbfdf, 0xfffe00000007bbf8, 0x1bdf7fc000001, 0xdfddff0003eff7ef, 0xffff80000000f7f7, 0xf0000003fbfe0000, 0xfeff80000000, 0xa4130224e29c5198])
+def bigNat_6 : Nat := (packedMask [0x7fffffffc, 0x0, 0x0, 0x0, 0x3fffffffff80, 0x1fffffffffef, 0xfffff00000000000, 0x3fffffffffbffff, 0xf800000000000000, 0x1fff, 0xffffffdfffffefff, 0xfff7ffff00000000, 0x0, 0x0, 0x800128, 0x850000001332, 0x2400000006d6c000, 0x86ebad7400020085, 0x9469d765d0004000, 0x217089e65e65e50, 0x800239800235808, 0x7203310b00000003, 0x34d10e8000002001, 0x91a1840e80000200, 0x4e23c4782207de, 0x400040e6000206, 0xb03d975adac00012, 0x28080cdccef34e, 0x80480022c9810085, 0x9205373129ee3880, 0x11000115860705c1, 0xe047cf0000000000, 0x108780082, 0xffef7e2088421c04, 0x3c089009047810, 0x20021e0c04904782, 0x4113c08889e07d4, 0x3f9f8cd2047003f1, 0x1f677c2dfbfff220, 0x42300420606f23ec, 0xe9f37efffd080111, 0x1c310210c08121c, 0x4420c35e1fc78e7b, 0xf7ef7dfbf7eeffff, 0xe040180810f08104, 0x4420421708210840, 0x8447082044211170, 0x20b0002f000015e0, 0x2eeef800000, 0xdaf80000dd7dbf, 0x80000000000dbeee, 0xfe0000000000001b, 0xeefeefef00000000, 0xeeef, 0xe00000006ebeeff0, 0x377d77df, 0xf0000000000deefd, 0xdfbefffff0000000, 0x7bbfb, 0x7f7c000000000001, 0xdfddff7df8000000, 0xf7f7, 0xf7bfeff800000000, 0xfeffbfdfffff, 0x881c040704e061e0])
+def bigNat_7 : Nat := (packedMask [0x3fffffffff, 0xc0000003ffffffff, 0xfdfffffe00000000, 0x3fffffffffbf, 0xffffc00000000000, 0x0, 0x3fffffffffbffff, 0xfbfffffffffbffff, 0xfdfffffeffffc000, 0x0, 0x0, 0x0, 0x0, 0x1ab2c00, 0x10a36693474000, 0x86935699, 0xd00000400000002e, 0x184ce231e49c7911, 0xe0fbf00001000000, 0x100ee0000e6003, 0x5c07675d5d76b2d8, 0x480008010141, 0x3bcb36ef33373bcd, 0x3a000200010164e0, 0x1202cb8040164, 0xc029db9313694f3b, 0xca713dc000088008, 0x10170e000056, 0x1c06383e31707f1c, 0x1e0780f9f8000600, 0x34f00000000000, 0x20f800804, 0x420f80011083e007, 0xda3ff0e392078000, 0x7e63dff0273ffffc, 0x4821c00100e007e6, 0x3d1ff0e7efffc902, 0x10078030820e0040, 0x83c04803806fc3f0, 0xf1fc7ffbfe6fc3e1, 0xf1fc7f7defbfbfdf, 0x9ffff86008040f80, 0x8208604104f02103, 0x18020101f010208, 0x7840841810421081, 0x878104278402182, 0x1356f80000015ed, 0xd6fbf80000000000, 0xdafadb7e000000, 0xdbeee, 0xfedbdfb77effffc0, 0x0, 0xeeef, 0xebbedf7f00000000, 0x377d77df, 0xf777f7fdf7e00000, 0x0, 0x7bbfb, 0x7f7dbdf7fdeff7fc, 0x0, 0xf7f7, 0xf7bfeffbfbfeff7f, 0xfffe000000000000, 0x80e0083807007e00])
+def bigNat_8 : Nat := (packedMask [0x3fffffffff, 0xdffffff800000000, 0x0, 0x3fffffffffbf, 0xffffdfffffffffef, 0xfffff7fffffeffff, 0xf800000000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x1aa3519, 0x321a000000040000, 0x4d384d1, 0xe449c47841238837, 0xe000000100000000, 0x9c000000001000, 0xb00000b8002, 0x6006756e51a4db12, 0x65e56f0c8d29b988, 0x8800002000, 0x2000000040018700, 0x30c0000187, 0x311c1be381883c, 0xc7e2e08e08f038f, 0x1070201bf001c067, 0xe000000001802000, 0x9e00000001, 0x27000000000000, 0x3f0001018, 0x83f0000620fc0007, 0xec3fff03e3ffffe3, 0x4083e00038207800, 0x103e00120f0007f8, 0x3e1fff07f7fff3fc, 0x1f87ffc1ffeffcfe, 0xfbff9fffff300200, 0xfe00208380300201, 0xfe002041f01023e0, 0x80701801007f001, 0x40f80820700420c, 0x600401fe002040f, 0x808107e02083e102, 0xf80208380823e04, 0x6356faf6eefc000, 0x0, 0xdafadb7edd7dbf, 0xad76fbbfffe00000, 0x0, 0x0, 0xeeef, 0xebbedf7f6ebeeff5, 0xddf7bfbf80000000, 0x0, 0x0, 0x7bbfb, 0x7f7dbdf7fdeff7fd, 0xdfddff7dfbeff7ef, 0xffffbfbffffe0000, 0x0, 0x0, 0xcf000fc007ff8000])
+def bigNat_9 : Nat := (packedMask [0x1f, 0xfffffff000000000, 0x3fffffffff, 0xdffffffbffffffff, 0xfdfffffeffffffdf, 0xffff800000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x12b7853, 0x675c2a4cb7978445, 0x484ca652e0000001, 0x138, 0x1, 0x4e0000000000000, 0x4c00004c0013, 0x8004467059c6e3e0, 0x41067008ce31c1f0, 0x220a38f022383c0e, 0x3c00440881c5f800, 0x2081c0bf000705f8, 0x20, 0x40300000000000, 0x5c00000178, 0x4000, 0x402e000000000, 0xb8000000000000, 0x3ffffe0e0, 0xfc0000383f000007, 0xf03ffffc03f7fffc, 0x7f03ffffc03f7fff, 0x9fbfffe3fffff400, 0x3fe0000407800200, 0x1ff8000103f00080, 0xfc00103c004003ff, 0x40fc004003fe, 0x407e00203c00, 0x103802001ff80002, 0x7f00103f80083f0, 0x8007fe0000407f0, 0x101f80040fc0203, 0xf00040fc0103c000, 0x38356faf6eefd5ed, 0xd6fbfaeeefaddeef, 0x7e00000000000000, 0x0, 0x0, 0x0, 0xeeef, 0xebbedf7f6ebeeff5, 0xddf7bfbfb77d77df, 0xf777f7fdf7edeefd, 0xdfbefffff7dfbfdf, 0xfffefefffff00000, 0x0, 0x0, 0x0, 0x0, 0x0, 0xf0000ffff8000000])
+def bigNat_10 : Nat := (packedMask [0x1f, 0xfffffff7fffffffd, 0xffffff8000000000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x4062, 0x44600c0824180666, 0x7048c46300040002, 0x820980020411c0, 0x1044600008022, 0x700001046046060, 0x102070001070001c, 0x0, 0x0, 0x0, 0x60000, 0xc000000600, 0x0, 0x0, 0x6000000180, 0x0, 0x30000000000, 0xc0000000000000, 0x3ffffff00, 0xffffffc03ffffff7, 0xffc0000003f80000, 0x7ffc0000003f8000, 0x1fc00003f00007ff, 0xc0000007f80003ff, 0xe0000001fc0000ff, 0x1fc0007ffc00, 0x7f00007ffc00, 0x7f80003fc000, 0x1fc003ffe0000003, 0xf80001fc0000fc00, 0xfff80000007f800, 0x1fe00007f0003fc, 0x7f0001fc0007, 0xc0356faf6eefd5ed, 0xd6fbfaeeefaddeef, 0x7edafadb7edd7dbf, 0xad76fbbfffedbeee, 0xfedbdfb77effffdb, 0xeefeefef7bf7efff, 0xfbeffffbfffe0000, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xfffff00000000000])
+def bigNat_11 : Nat := (packedMask [0x3fffffffe, 0xffffffffbffffff7, 0xfffffffffbffffff, 0x7fffffffffbfffff, 0xdffffffbfffff7ff, 0xfffffff7fffffbff, 0xfffffffdfffffeff, 0xffffdfffff7fffff, 0xffff7fffff7fffff, 0xffff7fffffbfffff, 0xdffffbfffffffffb, 0xfffffdfffffeffff, 0xeffffffffff7ffff, 0xfdffffff7ffffbff, 0xffff7ffffdfffff7, 0xffb56faf6eefd5ed, 0xd6fbfaeeefaddeef, 0x7edafadb7edd7dbf, 0xad76fbbfffedbeee, 0xfedbdfb77effffdb, 0xeefeefef7bf7efff, 0xfbeffffbfffeeeef, 0xebbedf7f6ebeeff5, 0xddf7bfbfb77d77df, 0xf777f7fdf7edeefd, 0xdfbefffff7dfbfdf, 0xfffefefffff7bbfb, 0x7f7dbdf7fdeff7fd, 0xdfddff7dfbeff7ef, 0xffffbfbffffef7f7, 0xf7bfeffbfbfeff7f, 0xfffefeffbfdfffff, 0xeffbe7f7f3bf2cc0])
 variable {R : ℕ → ℕ}
 def op (d : Bool) (a b : ℕ) : ℕ := bif d then a ||| b else a &&& b
 lemma op_comm (d : Bool) (a b : ℕ) : op d a b = op d b a := by
@@ -418,6 +420,109 @@ lemma Min.const (hT0 : T &&& n ≠ 0) (hT1 : T &&& n ≠ n) {k t : ℕ} {S : Fin
       · refine ⟨q + 1, ?_, hu.im hs⟩
         rw [ite_eq_right hcb]; omega
 end proj
+inductive BSol (m T : ℕ) : ℕ → ℕ → Set ℕ → Prop
+  | done {q u : ℕ} {S : Set ℕ} : T ∈ S → BSol m T q u S
+  | un {q u : ℕ} {S : Set ℕ} {a : ℕ} :
+      a ∈ S → BSol m T q u (insert (a ^^^ m) S) → BSol m T q (u + 1) S
+  | bi {q u : ℕ} {S : Set ℕ} {d : Bool} {a b : ℕ} :
+      a ∈ S → b ∈ S → BSol m T q u (insert (op d a b) S) → BSol m T (q + 1) u S
+
+lemma BSol.mono {m T q u : ℕ} {S : Set ℕ} (h : BSol m T q u S) :
+    ∀ {q' u' : ℕ} {S' : Set ℕ}, q ≤ q' → u ≤ u' → S ⊆ S' → BSol m T q' u' S' := by
+  induction h with
+  | done h => intro q' u' S' _ _ hs; exact .done (hs h)
+  | un h _ ih =>
+    intro q' u' S' hq hu hs
+    obtain ⟨v, rfl⟩ : ∃ v, u' = v + 1 := ⟨u' - 1, by omega⟩
+    exact .un (hs h) (ih hq (by omega) (Set.insert_subset_insert hs))
+  | bi h1 h2 _ ih =>
+    intro q' u' S' hq hu hs
+    obtain ⟨r, rfl⟩ : ∃ r, q' = r + 1 := ⟨q' - 1, by omega⟩
+    exact .bi (hs h1) (hs h2) (ih (by omega) hu (Set.insert_subset_insert hs))
+
+section BinaryProjection
+variable {m T n : ℕ} (hn : n &&& m = n)
+include hn
+
+lemma Un.bim {a q u : ℕ} {S S' : Finset ℕ} (h : Un m a S S')
+    (hs : BSol n (T &&& n) q u (C n (Im n S'))) :
+    BSol n (T &&& n) q (u + 1) (C n (Im n S)) := by
+  obtain ⟨ha, hsub⟩ := h.sub
+  refine .un (Im_mem ha) (hs.mono le_rfl le_rfl (C_Im_sub hsub ?_ (Set.subset_insert _ _)))
+  rw [and_neg hn]
+  exact Or.inl rfl
+
+omit hn in
+lemma Bi.bim {R : ℕ → ℕ} {a b q u : ℕ} {d : Bool} {S S' : Finset ℕ}
+    (h : Bi R d a b S S') (hs : BSol n (T &&& n) q u (C n (Im n S'))) :
+    BSol n (T &&& n) (q + 1) u (C n (Im n S)) := by
+  obtain ⟨ha, hb, hsub⟩ := h.sub
+  refine .bi (d := d) (Im_mem ha) (Im_mem hb) (hs.mono le_rfl le_rfl (C_Im_sub hsub ?_ (Set.subset_insert _ _)))
+  rw [and_op]
+  exact Or.inl rfl
+
+lemma Un.bkill {a q u : ℕ} {S S' : Finset ℕ} (h : Un m a S S') (hc : Cst n a)
+    (hs : BSol n (T &&& n) q u (C n (Im n S'))) :
+    BSol n (T &&& n) q u (C n (Im n S)) :=
+  hs.mono le_rfl le_rfl (C_Im_sub h.sub.2 (Cst_mem ((Cst_neg hn).2 hc)) subset_rfl)
+
+omit hn in
+lemma Bi.bkill {R : ℕ → ℕ} {a b q u : ℕ} {d : Bool} {S S' : Finset ℕ}
+    (h : Bi R d a b S S') (hc : Cst n a ∨ Cst n b)
+    (hs : BSol n (T &&& n) q u (C n (Im n S'))) :
+    BSol n (T &&& n) q u (C n (Im n S)) :=
+  hs.mono le_rfl le_rfl (C_Im_sub h.sub.2.2 (op_cst_mem d hc h.sub.1 h.sub.2.1) subset_rfl)
+
+lemma Min.binaryConst {R : ℕ → ℕ} (hT0 : T &&& n ≠ 0) (hT1 : T &&& n ≠ n)
+    {k t : ℕ} {S : Finset ℕ} (h : Min R m T k t S) :
+    ∃ q, q + (S.filter (Cst n)).card ≤ k - t ∧ BSol n (T &&& n) q t (C n (Im n S)) := by
+  obtain ⟨hl, hm⟩ := h
+  induction hl with
+  | stop =>
+    refine ⟨0, ?_, .done (Im_mem (by simp))⟩
+    rw [Finset.filter_eq_empty_iff.2]; · simp
+    intro x hx; simp at hx; subst hx
+    rintro (h | h); exacts [hT0 h, hT1 h]
+  | @un k t a U hl ih =>
+    have hu : Un m a (insert a U) (insert (a ^^^ m) U) := ⟨U, rfl, rfl⟩
+    obtain ⟨q, hq, hs⟩ := ih (hu.min hl hm).2
+    refine ⟨q, ?_, hu.bim hn hs⟩
+    by_cases hc : Cst n a
+    · have hf : a ^^^ m ∉ U := fun h => hu.fresh hl hm (sub_C _ _ (by simp [h]))
+      rw [Finset.filter_insert, ite_eq_left ((Cst_neg hn).2 hc),
+        Finset.card_insert_of_notMem (by simp [hf])] at hq
+      rw [Finset.filter_insert, ite_eq_left hc]
+      have ca := Finset.card_insert_le a (U.filter (Cst n))
+      omega
+    · rw [Finset.filter_insert, ite_eq_right hc]
+      have hu0 := Finset.card_le_card (Finset.filter_subset_filter (Cst n) (Finset.subset_insert (a ^^^ m) U))
+      omega
+  | @bi k t d a b U hab hal hl ih =>
+    have hu : Bi R d a b (insert a (insert b U)) (insert (op d a b) U) := ⟨hab, U, rfl, rfl, hal⟩
+    have htk := (hu.min hl hm).size.2
+    obtain ⟨q, hq, hs⟩ := ih (hu.min hl hm).2
+    have hf : op d a b ∉ U := fun h => hu.fresh hl hm (sub_C _ _ (by simp [h]))
+    have h1 : (U.filter (Cst n)).card ≤ ((insert (op d a b) U).filter (Cst n)).card :=
+      Finset.card_le_card (Finset.filter_subset_filter _ (Finset.subset_insert _ _))
+    have ca := Finset.card_insert_le a (U.filter (Cst n))
+    have cb := Finset.card_insert_le b (U.filter (Cst n))
+    by_cases hca : Cst n a
+    · refine ⟨q, ?_, hu.bkill (Or.inl hca) hs⟩
+      rw [Finset.filter_insert, ite_eq_left hca, Finset.filter_insert]
+      by_cases hcb : Cst n b
+      · rw [ite_eq_left hcb]
+        rw [Finset.filter_insert, ite_eq_left (op_cst2 d hca hcb), Finset.card_insert_of_notMem (by simp [hf])] at hq
+        have := Finset.card_insert_le a (insert b (U.filter (Cst n))); omega
+      · rw [ite_eq_right hcb]; omega
+    · rw [Finset.filter_insert, ite_eq_right hca, Finset.filter_insert]
+      by_cases hcb : Cst n b
+      · refine ⟨q, ?_, hu.bkill (Or.inr hcb) hs⟩
+        rw [ite_eq_left hcb]; omega
+      · refine ⟨q + 1, ?_, hu.bim hs⟩
+        rw [ite_eq_right hcb]; omega
+
+end BinaryProjection
+
 lemma Min.proper {m T k t : ℕ} (hT : T &&& m = T) (hT0 : T ≠ 0) (hT1 : T ≠ m) {S : Finset ℕ} (hS : ∀ x ∈ S, x &&& m = x)
     (h : Min R m T k t S) : 0 ∉ S ∧ m ∉ S := by
   obtain ⟨q, hq, hs⟩ := h.const (n := m) (by simp) (by rwa [hT]) (by rwa [hT])
@@ -1017,7 +1122,7 @@ structure X where
 structure Cm where
   a : List Nat
   b : List Nat
-def NN : Nat := 912
+def NN : Nat := 2083
 def AA : Nat := bigNat_0
 def HX : Nat := bigNat_1
 def HY : Nat := bigNat_2
@@ -1029,6 +1134,23 @@ def cov (d : Bool) (l : Nat) (v : List W) : Nat :=
   List.rec (motive := fun _ => Nat) 0 (fun w _ ih => Nat.lor (sp d l w.s) ih) v
 def twice (d : Bool) (l : Nat) (v : List W) : Nat :=
   List.rec (motive := fun _ => Nat) 0 (fun w t ih => Nat.lor (Nat.land (sp d l w.s) (cov d l t)) ih) v
+noncomputable def covTwice (d : Bool) (l : Nat) : List W → Nat × Nat :=
+  List.rec (0, 0) (fun w _ rest =>
+    match rest with
+    | (covered, repeated) =>
+      let bits := sp d l w.s
+      (Nat.lor bits covered, Nat.lor (Nat.land bits covered) repeated))
+
+theorem covTwice_eq (d : Bool) (l : Nat) (v : List W) :
+    covTwice d l v = (cov d l v, twice d l v) := by
+  induction v with
+  | nil => rfl
+  | cons w v ih =>
+    change (match covTwice d l v with
+      | (c, r) => (Nat.lor (sp d l w.s) c, Nat.lor (Nat.land (sp d l w.s) c) r)) = _
+    rw [ih]
+    rfl
+
 def hit (f e : Nat) : Bool := (Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) (true) (false) (Nat.beq (Nat.land (Nat.land f e) HY) 0))) (false) (Nat.beq (Nat.land (Nat.land f e) HX) 0))
 def hits (f : Nat) (m : List Nat) : Bool := (List.rec (motive := fun _ => Bool) (false) (fun e _ ih => (Bool.rec (motive := fun _ => Bool) (ih) (true) (hit f e))) (m))
 def flag (d : Bool) (l o : Nat) (w : W) : Nat := Nat.add (Nat.land (sp d l w.s) o) AA
@@ -1065,10 +1187,22 @@ def kids (c : ((List W → Bool) → Bool) → Nat → Bool) (e n z x y a c' : N
   (Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) (false) (c mk (Nat.sub (Nat.sub z x) y)) (Nat.ble (Nat.succ (Nat.succ n)) e))) (true) ((Bool.rec (motive := fun _ => Bool) (false) ((Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) (false) (c (fun h => mk (fun r => rm a a r h)) (Nat.sub z y)) (oa))) (true) ((Bool.rec (motive := fun _ => Bool) (false) (c (fun h => mk (fun r => rm c' c' r h)) (Nat.sub z x)) (oc))))) (Nat.ble (Nat.succ n) e))))) (true) ((Bool.rec (motive := fun _ => Bool) (false) ((Bool.rec (motive := fun _ => Bool) (false) (c (fun h => mk (fun r => rm a c' r h)) z) (oc))) (oa))))
 def mid (f : Nat → List W → Bool) (m g e n z : Nat) (v : List W) (a c : W) (da dc s x y : Nat) : Bool :=
   (Bool.rec (motive := fun _ => Bool) (false) ((st (Nat.sub (Nat.add z (Nat.land a.c c.c)) (Nat.lor x y)) (fun z => kids (child f g) e n z a.c c.c a.s c.s (Nat.beq da 0) (Nat.beq dc 0) (put m s x y v)))) (Nat.beq (Nat.land (Nat.sub (Nat.add z (Nat.land a.c c.c)) (Nat.lor x y)) g) g))
+theorem maskBothZero (a b : Nat) :
+    (Nat.beq a 0 && Nat.beq b 0) = Nat.beq (Nat.lor a b) 0 := by
+  apply Bool.eq_iff_iff.mpr
+  change ((a == 0 && b == 0) = true) ↔ (a ||| b == 0) = true
+  simp [Nat.or_eq_zero_iff]
+
+theorem maskEitherZero (a b : Nat) :
+    (Nat.beq a 0 || Nat.beq b 0) = Nat.beq (Nat.mul a b) 0 := by
+  apply Bool.eq_iff_iff.mpr
+  change ((a == 0 || b == 0) = true) ↔ (a * b == 0) = true
+  simp [Nat.mul_eq_zero]
+
 def f0 (h : W → W → Nat → Nat → Nat → Nat → Nat → Bool) (a c : W) (da dc s x y : Nat) : Bool :=
-  (Bool.rec (motive := fun _ => Bool) (false) (h a c da dc s x y) (Nat.beq (Nat.lor da dc) 0))
+  (Bool.rec (motive := fun _ => Bool) (false) (h a c da dc s x y) ((Nat.beq da 0) && (Nat.beq dc 0)))
 def f1 (h : W → W → Nat → Nat → Nat → Nat → Nat → Bool) (a c : W) (da dc s x y : Nat) : Bool :=
-  (Bool.rec (motive := fun _ => Bool) (false) (h a c da dc s x y) (Nat.beq (Nat.mul da dc) 0))
+  (Bool.rec (motive := fun _ => Bool) (false) (h a c da dc s x y) ((Nat.beq da 0) || (Nat.beq dc 0)))
 def f2 (h : W → W → Nat → Nat → Nat → Nat → Nat → Bool) (a c : W) (da dc s x y : Nat) : Bool := h a c da dc s x y
 def pair (h : W → W → Nat → Nat → Nat → Nat → Nat → Bool) (a c : X) : Bool :=
   X.rec (motive := fun _ => Bool) (fun a s q u => X.rec (motive := fun _ => Bool) (fun c s' q' u' => (Bool.rec (motive := fun _ => Bool) (h a c (Nat.land u q') (Nat.land u' q) (Nat.lor s s') (Nat.land a.a c.a) (Nat.lor a.b c.b)) (true) (h a c (Nat.xor (Nat.land u s') u) (Nat.xor (Nat.land u' s) u') (Nat.land s s') (Nat.lor a.a c.a) (Nat.land a.b c.b)))) c) a
@@ -1085,9 +1219,9 @@ def pairsN (h : X → X → Bool) (xs : List X) : Bool :=
   Bool.rec (motive := fun _ => Bool) (scan (fun a => scan (h a) (fs xs)) (fr xs)) true (pairs h (fr xs))
 def pairsS (h : X → X → Bool) (xs : List X) : Bool := pairs h (fs xs)
 def nots (f : Nat → Nat → List W → Bool) (m g e n z q : Nat) (v r : List W) : Bool :=
-  (List.rec (motive := fun _ => Bool) (false) (fun a _ ih => (Bool.rec (motive := fun _ => Bool) (ih) (true) ((Bool.rec (motive := fun _ => Bool) ((st (Nat.xor a.s m) (fun s => (st (Nat.sub z a.c) (fun z => ins ⟨s, a.b, a.a, a.c, 0⟩ v (fun v => (Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) (false) (child (f s) g (fun h => h v) (Nat.sub z a.c)) (Nat.ble (Nat.succ n) e))) (true) ((Bool.rec (motive := fun _ => Bool) (false) (child (f s) g (rm a.s a.s v) z) (Nat.ble n e)))))))))) (false) (Nat.beq (Nat.succ a.s) q))))) (r))
+  (List.rec (motive := fun _ => Bool) (false) (fun a _ ih => (Bool.rec (motive := fun _ => Bool) (ih) (true) ((Bool.rec (motive := fun _ => Bool) ((st (Nat.xor a.s m) (fun s => (st z (fun z => ins ⟨s, a.b, a.a, a.c, 0⟩ v (fun v => (Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) (false) (child (f s) g (fun h => h v) (Nat.sub z a.c)) (Nat.ble (Nat.succ n) e))) (true) ((Bool.rec (motive := fun _ => Bool) (false) (child (f s) g (rm a.s a.s v) z) (Nat.ble n e)))))))))) (false) (Nat.beq (Nat.succ a.s) q))))) (r))
 def pos (t : Nat) : Bool := Nat.rec (motive := fun _ => Bool) false (fun _ _ => true) t
-def wst (d : Bool) (l : Nat) (v : List W) : Nat := Nat.xor l (twice d l v)
+def wst (d : Bool) (l : Nat) (v : List W) : Nat := Nat.xor l (covTwice d l v).2
 def node (f : Nat → List W → Bool) (d : Bool) (l m g e n z : Nat) (v : List W) (go : (X → X → Bool) → List X → Bool) : Bool :=
   (fun h => (fun xs => Bool.rec (motive := fun _ => Bool) (go (pair (f0 h)) xs)
     (Bool.rec (motive := fun _ => Bool) (go (pair (f1 h)) xs) (go (pair (f2 h)) xs) (Nat.ble (Nat.succ n) e)) (Nat.ble n e))
@@ -1152,7 +1286,7 @@ lemma Rep.card {v : List W} {S : Finset ℕ} (h : Rep v S) : S.card = v.length :
   rw [← h.2, List.toFinset_card_of_nodup h.1, List.length_map]
 lemma uq_of {d : Bool} {l i : ℕ} {v : List W} {S : Finset ℕ} (h : Rep v S) {w : W} (hw : w ∈ v)
     (hu : (Nat.land (sp d l w.s) (wst d l v)).testBit i = true) : l.testBit i = true ∧ Uq NN d S w.s i := by
-  simp only [nl, wst, nx, Nat.testBit_and, Nat.testBit_xor, Bool.and_eq_true, sp_bit] at hu
+  simp only [nl, wst, covTwice_eq, nx, Nat.testBit_and, Nat.testBit_xor, Bool.and_eq_true, sp_bit] at hu
   obtain ⟨⟨hl, hs⟩, ht⟩ := hu
   have ht : (twice d l v).testBit i = false := by simpa [hl] using ht
   refine ⟨hl, hs, fun c hc hne => ?_⟩
@@ -1163,8 +1297,8 @@ lemma uq_of {d : Bool} {l i : ℕ} {v : List W} {S : Finset ℕ} (h : Rep v S) {
   have := hp.forall hw hw' (fun e => hne (by rw [e]))
   simp only [sp_bit, hl, hs, Bool.true_and, true_and] at this
   simpa using this
-def segsX : List (ℕ × ℕ) := [(255, 269), (269, 272), (272, 275), (275, 278), (278, 292), (292, 295), (295, 298), (298, 301), (301, 304), (304, 307), (307, 310), (310, 313), (313, 327), (327, 330), (330, 344), (344, 346), (346, 349), (349, 351), (351, 353), (353, 355), (355, 358), (358, 361), (361, 364), (364, 367), (367, 370), (370, 372), (372, 374), (374, 377), (377, 380), (380, 394), (394, 397), (397, 411), (411, 414), (414, 416), (416, 418), (418, 432), (432, 434), (434, 436), (436, 438), (438, 440), (440, 442), (442, 444), (444, 447), (447, 450), (450, 453), (453, 455), (455, 457), (457, 460), (460, 463), (463, 465), (465, 468), (468, 470), (470, 473), (473, 475), (475, 477), (477, 480), (480, 494), (494, 508), (508, 510), (510, 524), (524, 526), (526, 528), (528, 530), (530, 532), (532, 535), (535, 538), (538, 540), (540, 554), (554, 556), (556, 558), (558, 560), (560, 563), (563, 565), (565, 579), (579, 581), (581, 584), (584, 586), (586, 588), (588, 590), (590, 593), (593, 595), (595, 597), (597, 600), (600, 603), (603, 605), (605, 608), (608, 610)]
-def segsY : List (ℕ × ℕ) := [(610, 623), (623, 627), (627, 631), (631, 637), (637, 641), (641, 646), (646, 651), (651, 669), (669, 672), (672, 677), (677, 682), (682, 700), (700, 703), (703, 708), (708, 713), (713, 731), (731, 736), (736, 754), (754, 758), (758, 764), (764, 769), (769, 787), (787, 792), (792, 810), (810, 814), (814, 820), (820, 825), (825, 843), (843, 849), (849, 867), (867, 873), (873, 892), (892, 911)]
+def segsX : List (ℕ × ℕ) := [(63, 85), (85, 94), (94, 104), (104, 112), (112, 135), (135, 144), (144, 154), (154, 162), (162, 172), (172, 182), (182, 187), (187, 195), (195, 203), (203, 208), (208, 230), (230, 238), (238, 260), (260, 267), (267, 276), (276, 282), (282, 289), (289, 295), (295, 305), (305, 309), (309, 317), (317, 321), (321, 331), (331, 340), (340, 345), (345, 355), (355, 361), (361, 366), (366, 369), (369, 375), (375, 383), (383, 386), (386, 394), (394, 398), (398, 403), (403, 424), (424, 432), (432, 453), (453, 462), (462, 469), (469, 475), (475, 496), (496, 502), (502, 509), (509, 513), (513, 520), (520, 524), (524, 529), (529, 532), (532, 539), (539, 545), (545, 555), (555, 563), (563, 567), (567, 571), (571, 581), (581, 587), (587, 591), (591, 593), (593, 599), (599, 603), (603, 606), (606, 614), (614, 622), (622, 627), (627, 633), (633, 637), (637, 641), (641, 643), (643, 652), (652, 656), (656, 662), (662, 664), (664, 668), (668, 671), (671, 679), (679, 685), (685, 688), (688, 694), (694, 698), (698, 700), (700, 708), (708, 712), (712, 716), (716, 720), (720, 738), (738, 756), (756, 762), (762, 780), (780, 787), (787, 794), (794, 799), (799, 804), (804, 812), (812, 816), (816, 824), (824, 828), (828, 834), (834, 837), (837, 856), (856, 863), (863, 867), (867, 870), (870, 877), (877, 882), (882, 885), (885, 888), (888, 896), (896, 900), (900, 904), (904, 910), (910, 913), (913, 916), (916, 934), (934, 938), (938, 944), (944, 947), (947, 951), (951, 953), (953, 956), (956, 958), (958, 966), (966, 969), (969, 975), (975, 977), (977, 981), (981, 984), (984, 991), (991, 994), (994, 997), (997, 1000), (1000, 1002), (1002, 1008), (1008, 1010), (1010, 1013), (1013, 1016), (1016, 1023), (1023, 1028), (1028, 1032), (1032, 1037), (1037, 1041), (1041, 1044), (1044, 1046), (1046, 1052), (1052, 1056), (1056, 1060), (1060, 1064), (1064, 1066), (1066, 1074), (1074, 1080), (1080, 1083), (1083, 1085), (1085, 1089), (1089, 1092), (1092, 1097), (1097, 1099), (1099, 1101), (1101, 1108), (1108, 1112), (1112, 1116), (1116, 1119), (1119, 1124), (1124, 1126), (1126, 1132), (1132, 1135), (1135, 1137), (1137, 1139), (1139, 1142)]
+def segsY : List (ℕ × ℕ) := [(1142, 1155), (1155, 1177), (1177, 1199), (1199, 1226), (1226, 1247), (1247, 1273), (1273, 1299), (1299, 1340), (1340, 1360), (1360, 1385), (1385, 1410), (1410, 1450), (1450, 1469), (1469, 1494), (1494, 1519), (1519, 1559), (1559, 1583), (1583, 1623), (1623, 1645), (1645, 1672), (1672, 1697), (1697, 1738), (1738, 1763), (1763, 1803), (1803, 1826), (1826, 1853), (1853, 1878), (1878, 1919), (1919, 1946), (1946, 1987), (1987, 2014), (2014, 2048), (2048, 2082)]
 def segOk (s : ℕ × ℕ) : Bool := decide (s.1 < s.2) && decide (AA % 2 ^ s.2 + 2 ^ (s.1 + 1) = 2 ^ s.2 + AA % 2 ^ s.1) &&
   !AA.testBit s.1 && !AA.testBit s.2
 set_option maxRecDepth 100000 in
@@ -1363,8 +1497,8 @@ lemma WOk.cst {P : List ℕ} {w : W} (h : WOk P w) {j : ℕ} (hj : j < P.length)
     Cst (P.getD j 0) w.s := by
   rw [h.ec, Nat.testBit_or, Bool.or_eq_true] at hf
   exact hf.elim (fun h1 => Or.inl (h.ca j hj h1)) (fun h1 => Or.inr (h.cb j hj h1))
-def Cl (P : List ℕ) (T k u : ℕ) (b : ℕ → ℕ) (S : Finset ℕ) : Prop := ∀ j < P.length, ∀ q, q + b j < k →
-  ¬ Sol Z0 (P.getD j 0) (T &&& P.getD j 0) q u (C (P.getD j 0) (Im (P.getD j 0) S))
+def Cl (P : List ℕ) (T k u : ℕ) (b : ℕ → ℕ) (S : Finset ℕ) : Prop := ∀ j < P.length, ∀ q, q + b j < k - u →
+  ¬ BSol (P.getD j 0) (T &&& P.getD j 0) q u (C (P.getD j 0) (Im (P.getD j 0) S))
 structure StOk (P : List ℕ) (T l k t z : ℕ) (v : List W) (S : Finset ℕ) : Prop where
   rep : Rep v S
   wok : ∀ w ∈ v, WOk P w
@@ -1381,8 +1515,8 @@ lemma cnt_le {k k' t : ℕ} {v : List W} {S : Finset ℕ} {b : ℕ → ℕ} (hr 
     (hc : Cl P T k t b S) (hm : Min R m T k' t S) (hk : k' ≤ k) : ∀ j < P.length, cnt v j ≤ b j := by
   intro j hj
   obtain ⟨p1, p2, p3⟩ := X.hP j hj
-  obtain ⟨q, hq, hs⟩ := hm.const p1 p2 p3
-  have hqb : ¬ q + b j < k := fun h => hc j hj q h hs
+  obtain ⟨q, hq, hs⟩ := hm.binaryConst p1 p2 p3
+  have hqb : ¬ q + b j < k - t := fun h => hc j hj q h hs
   have : cnt v j ≤ (S.filter (Cst (P.getD j 0))).card := by
     have e : cnt v j = (v.filter (fun w => w.c.testBit (5 * j))).length := by
       clear hr hw
@@ -1668,18 +1802,19 @@ lemma bi_st {k k' t z : ℕ} {v r : List W} {S S' : Finset ℕ} {d' : Bool} {a c
     · rw [opW_s]; exact op_good _ (hs.good a ha) (hs.good c hc)
     · exact hs.good w h
   let b' : ℕ → ℕ := fun j => b j - max (fl a j) (fl c j)
+  have htk := (hb.min hl hm.2).size.2
   have hcl' : Cl P T k t b' S' := by
     intro j hj q hq hsol
     have hl1 := hle j hj
     have h2 := cnt_two ha hc hs.rep.1 hab j
     simp only [b'] at hq
     by_cases hkill : a.c.testBit (5 * j) = true ∨ c.c.testBit (5 * j) = true
-    · refine hcl j hj q ?_ (hb.kill (hkill.imp (wa.cst hj) (wc.cst hj)) hsol)
+    · refine hcl j hj q ?_ (hb.bkill (hkill.imp (wa.cst hj) (wc.cst hj)) hsol)
       have : 1 ≤ max (fl a j) (fl c j) := by
         rcases hkill with h | h <;> simp [fl, h]
       have := fl_le a j; have := fl_le c j; omega
     · push Not at hkill
-      refine hcl j hj (q + 1) ?_ (hb.im hsol)
+      refine hcl j hj (q + 1) ?_ (hb.bim hsol)
       have e1 : fl a j = 0 := by simp [fl, hkill.1]
       have e2 : fl c j = 0 := by simp [fl, hkill.2]
       rw [e1, e2] at hq; simp at hq; omega
@@ -1765,7 +1900,7 @@ lemma modeF_false {n e : ℕ} {h : W → W → ℕ → ℕ → ℕ → ℕ → �
         change Nat.beq (da * dc) 0 = true
         rcases this with h | h <;> simp [h]
       rw [b1, b2] at hf
-      simp only [Bool.cond_true, Bool.cond_false, f1, h3] at hf
+      simp only [Bool.cond_true, Bool.cond_false, f1, maskEitherZero, h3] at hf
       exact hf
     | true => rw [b1, b2] at hf; exact hf
 def dfc (d d' : Bool) (l o : ℕ) (a c : W) : ℕ := bif d' then Nat.land (Nat.land (sp d l a.s) o) (Nat.shiftRight c.s NN)
@@ -2364,7 +2499,7 @@ lemma un_st {k k' t z : ℕ} {v r : List W} {S S' : Finset ℕ} {a : W} {ka : Bo
     (hs : StOk P T l (k + 1) (t + 1) z v S) (hm : Min R m T (k' + 1) (t + 1) S) (hk : k' ≤ k) (hb : Un m a.s S S')
     (hl : Live R m T k' t S') (ha : a ∈ v) (hka : ka = decide (a.s ∈ S'))
     (hsh : bif ka then r.Perm (notW m a :: v) else (a :: r).Perm (notW m a :: v)) :
-    StOk P T l k t (z - a.c - (bif ka then a.c else 0)) r S' := by
+    StOk P T l k t (z - (bif ka then a.c else 0)) r S' := by
   obtain ⟨b, hb15, hcl, hz⟩ := hs.bud
   have hle := cnt_le X hs.rep hs.wok hcl hm (by omega)
   have hfr := hb.fresh hl hm.2
@@ -2445,47 +2580,37 @@ lemma un_st {k k' t z : ℕ} {v r : List W} {S S' : Finset ℕ} {a : W} {ka : Bo
       · change (a.s ^^^ m).testBit (NN + i) = (a.s ^^^ m).testBit (NN + j)
         rw [Nat.testBit_xor, Nat.testBit_xor, hg.2 i j h h1 h2, (X.lg i h1).1.2.1, (X.lg j h2).1.2.1]
     · exact hs.good w h
-  let b' : ℕ → ℕ := fun j => b j - fl a j
-  have hcl' : Cl P T k t b' S' := by
+  have hcl' : Cl P T k t b S' := by
     intro j hj q hq hsol
-    have hl1 := hle j hj
-    have h2 := cnt_one ha hs.rep.1 j
-    simp only [b'] at hq
-    by_cases hkill : a.c.testBit (5 * j) = true
-    · refine hcl j hj q ?_ (hb.kill (X.hP j hj).1 (wa.cst hj hkill) hsol)
-      have : fl a j = 1 := by simp [fl, hkill]
-      omega
-    · refine hcl j hj (q + 1) ?_ (hb.im (X.hP j hj).1 hsol)
-      have e1 : fl a j = 0 := by simp [fl, hkill]
-      omega
+    exact hcl j hj q (by omega) (hb.bim (X.hP j hj).1 hsol)
   have hle' := cnt_le X hrep hwok hcl' (hb.min hl hm.2) hk
-  refine ⟨hrep, hwok, hgood, b', fun j hj => ?_, hcl', ?_⟩
-  · have := hb15 j hj; simp only [b']; omega
-  · have ea : (bif ka then a.c else 0) = pk P.length (fun j => bif ka then fl a j else 0) := by
-      cases ka
-      · simp [pk]
-      · exact fl_pk wa
-    have le1 : ∀ j, (bif ka then fl a j else 0) ≤ 1 := fun j => by cases ka <;> simp [fl_le]
-    rw [ea, hz]
-    conv_lhs => rw [fl_pk wa]
-    rw [pk_sub, pk_sub]
-    · refine pk_congr fun j hj => ?_
-      have q1 := hle j hj; have q2 := hle' j hj; have q3 := cnt_one ha hs.rep.1 j; have q4 := hb15 j hj
-      have q5 := hcnt j; have q6 := fl_le a j
-      simp only [b'] at q2 ⊢
-      cases ka <;> simp at q5 ⊢ <;> omega
-    · intro j hj; have := hle j hj; have := le1 j; have := fl_le a j; omega
-    · intro j hj; have := hle j hj; have := fl_le a j; omega
+  refine ⟨hrep, hwok, hgood, b, hb15, hcl', ?_⟩
+  have ea : (bif ka then a.c else 0) = pk P.length (fun j => bif ka then fl a j else 0) := by
+    cases ka
+    · simp [pk]
+    · exact fl_pk wa
+  have le1 : ∀ j, (bif ka then fl a j else 0) ≤ 1 := fun j => by cases ka <;> simp [fl_le]
+  rw [ea, hz, pk_sub]
+  · refine pk_congr fun j hj => ?_
+    have q1 := hle j hj
+    have q2 := hle' j hj
+    have q3 := hcnt j
+    have q4 := fl_le a j
+    cases ka <;> simp at q3 ⊢ <;> omega
+  · intro j hj
+    have := hle j hj
+    have := le1 j
+    omega
 end sound
 lemma nots_false {f : ℕ → ℕ → List W → Bool} {m g e n z q : ℕ} {v r : List W} (h : nots f m g e n z q v r = false)
     {a : W} (ha : a ∈ r) (hq : a.s + 1 ≠ q) : ins (notW m a) v (fun v =>
-      (bif (bif Nat.ble n e then child (f (a.s ^^^ m)) g (rm a.s a.s v) (z - a.c) else false) then true else
-      (bif Nat.ble (n + 1) e then child (f (a.s ^^^ m)) g (fun h => h v) (z - a.c - a.c) else false))) = false := by
+      (bif (bif Nat.ble n e then child (f (a.s ^^^ m)) g (rm a.s a.s v) z else false) then true else
+      (bif Nat.ble (n + 1) e then child (f (a.s ^^^ m)) g (fun h => h v) (z - a.c) else false))) = false := by
   induction r with
   | nil => simp at ha
   | cons w r ih =>
     change (Bool.rec (motive := fun _ => Bool) (nots f m g e n z q v r) true (Bool.rec (motive := fun _ => Bool)
-      (st (Nat.xor w.s m) (fun s => st (Nat.sub z w.c) (fun z => ins ⟨s, w.b, w.a, w.c, 0⟩ v (fun v =>
+      (st (Nat.xor w.s m) (fun s => st z (fun z => ins ⟨s, w.b, w.a, w.c, 0⟩ v (fun v =>
         Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false
           (child (f s) g (fun h => h v) (Nat.sub z w.c)) (Nat.ble (Nat.succ n) e)) true
           (Bool.rec (motive := fun _ => Bool) false (child (f s) g (rm w.s w.s v) z) (Nat.ble n e)))))) false (Nat.beq (Nat.succ w.s) q)) : Bool) = false at h
@@ -2495,13 +2620,13 @@ lemma nots_false {f : ℕ → ℕ → List W → Bool} {m g e n z q : ℕ} {v r 
     rcases ha with rfl | ha
     · rw [Bool.eq_false_iff.2 fun h => hq (Nat.eq_of_beq_eq_true h), Bool.cond_false] at h
       cases hh : ins (notW m a) v (fun v =>
-        (bif (bif Nat.ble n e then child (f (a.s ^^^ m)) g (rm a.s a.s v) (z - a.c) else false) then true else
-        (bif Nat.ble (n + 1) e then child (f (a.s ^^^ m)) g (fun h => h v) (z - a.c - a.c) else false))) with
+        (bif (bif Nat.ble n e then child (f (a.s ^^^ m)) g (rm a.s a.s v) z else false) then true else
+        (bif Nat.ble (n + 1) e then child (f (a.s ^^^ m)) g (fun h => h v) (z - a.c) else false))) with
       | false => rfl
       | true =>
         have h : (bif ins (notW m a) v (fun v =>
-          (bif (bif Nat.ble n e then child (f (a.s ^^^ m)) g (rm a.s a.s v) (z - a.c) else false) then true else
-          (bif Nat.ble (n + 1) e then child (f (a.s ^^^ m)) g (fun h => h v) (z - a.c - a.c) else false))) then true
+          (bif (bif Nat.ble n e then child (f (a.s ^^^ m)) g (rm a.s a.s v) z else false) then true else
+          (bif Nat.ble (n + 1) e then child (f (a.s ^^^ m)) g (fun h => h v) (z - a.c) else false))) then true
           else nots f m g e n z q v r) = false := h
         rw [hh] at h; simp at h
     · refine ih ?_ ha
@@ -2536,9 +2661,9 @@ lemma nots_sound {f : ℕ → ℕ → List W → Bool} {e n z q t k k' : ℕ} {v
     have hc := hst.rep.card
     have hb1 : Nat.ble (v.length + 1) e = true := Nat.ble_eq_true_of_le (by omega)
     rw [hb1] at h
-    have h : child (f (a.s ^^^ m)) g (fun h => h r0) (z - a.c - a.c) = false := by
+    have h : child (f (a.s ^^^ m)) g (fun h => h r0) (z - a.c) = false := by
       revert h; simp only [Bool.cond_true]
-      cases child (f (a.s ^^^ m)) g (fun h => h r0) (z - a.c - a.c) <;> simp
+      cases child (f (a.s ^^^ m)) g (fun h => h r0) (z - a.c) <;> simp
     exact ⟨_, _, child_sound X (fun h => rfl) hst hmin hk h, hst, hmem⟩
   · have hperm : (a :: r0.filter (fun w => !(Nat.beq w.s a.s || Nat.beq w.s a.s))).Perm (notW m a :: v) := by
       rw [filter1]; exact (filter_perm hnd har).trans hr0
@@ -2549,9 +2674,9 @@ lemma nots_sound {f : ℕ → ℕ → List W → Bool} {e n z q t k k' : ℕ} {v
     simp only [List.length_cons] at hlen
     have hb1 : Nat.ble v.length e = true := Nat.ble_eq_true_of_le (by omega)
     rw [hb1] at h
-    have h : child (f (a.s ^^^ m)) g (rm a.s a.s r0) (z - a.c) = false := by
+    have h : child (f (a.s ^^^ m)) g (rm a.s a.s r0) z = false := by
       revert h; simp only [Bool.cond_true]
-      cases child (f (a.s ^^^ m)) g (rm a.s a.s r0) (z - a.c) <;> simp
+      cases child (f (a.s ^^^ m)) g (rm a.s a.s r0) z <;> simp
     exact ⟨_, _, child_sound X (rm_eq _ _ _) hst hmin hk h, hst, fun w hw => hmem w (List.mem_of_mem_filter hw)⟩
 end sound
 lemma scan_false {p : X → Bool} {xs : List X} (h : scan p xs = false) : ∀ c ∈ xs, p c = false := by
@@ -2991,7 +3116,7 @@ def xw (e : ℕ × ℕ) : ℕ := rawP.getD e.1 0 ||| rawP.getD e.2 0
 def rawL (E : List (ℕ × ℕ)) : List ℕ := rawP ++ E.map xw
 def six : List (ℕ × ℕ) := []
 def rawG : List ℕ := rawL six
-def FPM : ℕ := 2 ^ 256 - 1
+def FPM : ℕ := 2 ^ 64 - 1
 def FULL : ℕ := 2 ^ NN - 1
 def TG : ℕ := bigNat_11
 def kz (Z : ℕ) : ℕ := (List.range 8).foldr (fun i x => bif Nat.testBit Z i then Nat.lor x (Nat.land (Nat.lor (rawP.getD i 0) (Nat.shiftRight (rawP.getD i 0) NN)) FULL) else x) 0
@@ -3340,6 +3465,8 @@ lemma topC_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d 
 end sound
 def WZ (E : List (ℕ × ℕ)) (Z : ℕ) : Set ℕ := {x | ∃ w ∈ rawL E, x = w &&& mz Z}
 def Imp (E : List (ℕ × ℕ)) (Z L : ℕ) : Prop := ∀ q < L, ¬ Sol Z0 (mz Z) (tz Z) q 1 (C (mz Z) (WZ E Z))
+def BImp (E : List (ℕ × ℕ)) (Z L : ℕ) : Prop := ∀ q < L, ¬ BSol (mz Z) (tz Z) q 1 (C (mz Z) (WZ E Z))
+
 def PZ (Q : List (ℕ × ℕ)) : List ℕ := Q.map (fun e => mz e.1)
 def pOk (Z : ℕ) (Q : List (ℕ × ℕ)) : Bool := !Nat.beq (tz Z) 0 && !Nat.beq (tz Z) (mz Z) && Q.all (fun e => Nat.beq (Nat.land (mz e.1) (mz Z)) (mz e.1) &&
   !Nat.beq (tz e.1) 0 && !Nat.beq (tz e.1) (mz e.1))
@@ -3348,7 +3475,7 @@ noncomputable def chk (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) : Bool :=
   (fun l => (fun m => (fun P => (fun g => (fun B => (fun p =>
     frc (avl P m (rawL E)) (fun v => st l fun l => st m fun m => st g fun g => st B fun B => st p fun p =>
       anySub (pos t) l v 0 (fun r => startv l m g B K t p H ph r)))
-    (pwr E Z)) (pL (Q.map fun e => 16 + (K - e.2)))) (pL (Q.map fun _ => 16))) (PZ Q)) (mz Z)) (lz Z)
+    (pwr E Z)) (pL (Q.map fun e => 16 + (K - t - e.2)))) (pL (Q.map fun _ => 16))) (PZ Q)) (mz Z)) (lz Z)
 lemma tz_sub {Z Z' : ℕ} (h : mz Z' &&& mz Z = mz Z') : tz Z &&& mz Z' = tz Z' := by
   simp only [tz, nl, Nat.and_assoc]; rw [Nat.and_comm (mz Z), h]
 lemma Im_WZ {E : List (ℕ × ℕ)} {Z Z' : ℕ} (h : mz Z' &&& mz Z = mz Z') {S : Finset ℕ} (hS : (S : Set ℕ) ⊆ WZ E Z) : Im (mz Z') S ⊆ WZ E Z' := by
@@ -3405,19 +3532,16 @@ lemma rawL_sub {E : List (ℕ × ℕ)} (hE : ∀ e ∈ E, e ∈ six) {w : ℕ} (
   · exact Or.inl h
   · exact Or.inr ⟨e, hE e he, rfl⟩
 theorem imp_of_live {E Q : List (ℕ × ℕ)} {Z L k t : ℕ} {S : Finset ℕ}
-    (hE : E = [] ∨ ∃ e ∈ six, E = [e] ∧ Imp [] Z L) (hp : pOk Z Q = true) (hL : L ≤ 15)
-    (hI : ∀ e ∈ Q, Imp E e.1 e.2)
+    (hE : E = []) (hp : pOk Z Q = true) (hL : L ≤ 15)
+    (hI : ∀ e ∈ Q, BImp E e.1 e.2)
     (hk : k < L) (ht1 : t ≤ 1) (hS : (S : Set ℕ) ⊆ C (mz Z) (WZ E Z)) (hl : Live Z0 (mz Z) (tz Z) k t S)
     (hmin : ∀ q < k, ¬ Sol Z0 (mz Z) (tz Z) q 1 (C (mz Z) (WZ E Z)))
-    (hb : (∃ e ∈ Q, L ≤ e.2) ∨ ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk E Q Z (L - 1) t p.1 p.2 = false) : False := by
+    (hb : (∃ e ∈ Q, L - 1 - t < e.2) ∨ ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk E Q Z (L - 1) t p.1 p.2 = false) : False := by
   simp only [pOk, Bool.and_eq_true, Bool.not_eq_true', List.all_eq_true] at hp
   obtain ⟨⟨hp0, hp1⟩, hp2⟩ := hp
   have nb : ∀ {x y : ℕ}, Nat.beq x y = false → x ≠ y := fun h e => by rw [e, Nat.beq_refl] at h; simp at h
   have hT : tz Z &&& mz Z = tz Z := by simp only [tz, nl, Nat.and_assoc, Nat.and_self]
-  have hE6 : ∀ e ∈ E, e ∈ six := by
-    rcases hE with rfl | ⟨e, he, rfl, _⟩
-    · simp
-    · intro e' he'; simp only [List.mem_singleton] at he'; rw [he']; exact he
+  have hE6 : ∀ e ∈ E, e ∈ six := by simp [hE]
   classical
   have hCS : C (mz Z) (S : Set ℕ) ⊆ C (mz Z) (WZ E Z) := by
     rintro x (hx | hx)
@@ -3441,7 +3565,7 @@ theorem imp_of_live {E Q : List (ℕ × ℕ)} {Z L k t : ℕ} {S : Finset ℕ}
     intro e he
     obtain ⟨⟨a, b⟩, c⟩ := hp2 e he
     exact ⟨Nat.eq_of_beq_eq_true a, nb b, nb c⟩
-  have hno : ∀ e ∈ Q, ∀ q < e.2, ¬ Sol Z0 (mz e.1) (tz Z &&& mz e.1) q t (C (mz e.1) (Im (mz e.1) S)) := by
+  have hno : ∀ e ∈ Q, ∀ q < e.2, ¬ BSol (mz e.1) (tz Z &&& mz e.1) q t (C (mz e.1) (Im (mz e.1) S)) := by
     intro e he q hq hs
     have h3 := (hproj e he).1
     rw [tz_sub h3] at hs
@@ -3449,21 +3573,9 @@ theorem imp_of_live {E Q : List (ℕ × ℕ)} {Z L k t : ℕ} {S : Finset ℕ}
   have htk := hm.size.2
   rcases hb with ⟨e, he, hle⟩ | hb
   · have h3 := hproj e he
-    obtain ⟨q', hq', hs'⟩ := hm.const h3.1 (by rw [tz_sub h3.1]; exact h3.2.1) (by rw [tz_sub h3.1]; exact h3.2.2)
+    obtain ⟨q', hq', hs'⟩ := hm.binaryConst h3.1 (by rw [tz_sub h3.1]; exact h3.2.1) (by rw [tz_sub h3.1]; exact h3.2.2)
     exact hno e he q' (by omega) hs'
-  have hpw : pwr E Z = 0 ∨ pwr E Z ∈ S := by
-    rcases hE with rfl | ⟨e, he, rfl, hraw⟩
-    · exact Or.inl rfl
-    · by_contra hc
-      push Not at hc
-      refine hraw k (by omega) (hl.sol.mono le_rfl ht1 ?_)
-      intro x hx
-      obtain ⟨w, hw, rfl⟩ := hSW hx
-      simp only [rawL, List.mem_append, List.map_cons, List.map_nil, List.mem_singleton] at hw
-      rcases hw with hw | rfl
-      · exact Or.inl ⟨w, by simp [rawL, hw], rfl⟩
-      · have hx : xw e &&& mz Z ∈ S := by simpa using hx
-        exact absurd (show pwr [e] Z ∈ S from hx) hc.2
+  have hpw : pwr E Z = 0 ∨ pwr E Z ∈ S := Or.inl (by subst E; rfl)
   obtain ⟨M, hMf, hchk⟩ := hb
   obtain ⟨a1, a2, a3⟩ := avl_spec (PZ Q) (mz Z) (rawL E)
   set v := (avl (PZ Q) (mz Z) (rawL E)).filter (fun w => decide (w.s ∈ S)) with hv
@@ -3494,7 +3606,7 @@ theorem imp_of_live {E Q : List (ℕ × ℕ)} {Z L k t : ℕ} {S : Finset ℕ}
     intro w hw
     obtain ⟨x, hx, rfl⟩ := a2 w (hsub.subset hw); exact wire_good (rawL_sub hE6 hx) Z
   have hPlen : (PZ Q).length = Q.length := by simp [PZ]
-  have hPget : ∀ j < (PZ Q).length, (PZ Q).getD j 0 = mz (Q.getD j (0, L - 1)).1 ∧ Q.getD j (0, L - 1) ∈ Q := by
+  have hPget : ∀ j < (PZ Q).length, (PZ Q).getD j 0 = mz (Q.getD j (0, L - 1 - t)).1 ∧ Q.getD j (0, L - 1 - t) ∈ Q := by
     intro j hj
     rw [hPlen] at hj
     simp [PZ, List.getD_eq_getElem?_getD, List.getElem?_map, List.getElem?_eq_getElem hj]
@@ -3506,13 +3618,13 @@ theorem imp_of_live {E Q : List (ℕ × ℕ)} {Z L k t : ℕ} {S : Finset ℕ}
     · rw [pL_pk, List.length_map, hPlen]
       refine pk_congr fun j hj => ?_
       rw [List.getD_eq_getElem?_getD, List.getElem?_map, List.getElem?_eq_getElem hj]; rfl
-  have hcl : Cl (PZ Q) (tz Z) (L - 1) t (fun j => L - 1 - (Q.getD j (0, L - 1)).2) S := by
+  have hcl : Cl (PZ Q) (tz Z) (L - 1) t (fun j => L - 1 - t - (Q.getD j (0, L - 1 - t)).2) S := by
     intro j hj q hq
     obtain ⟨e1, e2⟩ := hPget j hj
-    have hq' : q + (L - 1 - (Q.getD j (0, L - 1)).2) < L - 1 := hq
+    have hq' : q + (L - 1 - t - (Q.getD j (0, L - 1 - t)).2) < L - 1 - t := hq
     rw [e1]; exact hno _ e2 q (by omega)
   have hle := cnt_le X hrep hwok hcl hm (by omega)
-  have hst : StOk (PZ Q) (tz Z) (lz Z) (L - 1) t (pL (Q.map fun e => 16 + (L - 1 - e.2)) - sumc v) v S := by
+  have hst : StOk (PZ Q) (tz Z) (lz Z) (L - 1) t (pL (Q.map fun e => 16 + (L - 1 - t - e.2)) - sumc v) v S := by
     refine ⟨hrep, hwok, hgood, _, fun j _ => by omega, hcl, ?_⟩
     rw [sumc_eq hwok, pk16, pk_sub]
     intro j hj; have := hle j hj; omega
@@ -3529,7 +3641,7 @@ theorem imp_of_live {E Q : List (ℕ × ℕ)} {Z L k t : ℕ} {S : Finset ℕ}
   have hble : Nat.ble v.length (Nat.sub (Nat.succ (L - 1)) t) = true := Nat.ble_eq_true_of_le (by
     change v.length ≤ L - 1 + 1 - t; omega)
   have hhas : hasP (pwr E Z) v = true := hasP_ok (hpw.imp id fun h => hrep.mem.1 h)
-  have all : ∀ p ∈ M, topC (lz Z) (mz Z) (pL (Q.map fun _ => 16)) (L - 1) p.1 p.2 (L - 1) t (pL (Q.map fun e => 16 + (L - 1 - e.2)) - sumc v) v = false := by
+  have all : ∀ p ∈ M, topC (lz Z) (mz Z) (pL (Q.map fun _ => 16)) (L - 1) p.1 p.2 (L - 1) t (pL (Q.map fun e => 16 + (L - 1 - t - e.2)) - sumc v) v = false := by
     intro p hpM
     have h2 := hchk p hpM
     simp only [chk, frc_eq, st_eq] at h2
@@ -3544,541 +3656,479 @@ theorem imp_of_live {E Q : List (ℕ × ℕ)} {Z L k t : ℕ} {S : Finset ℕ}
   · exact Or.inl hx
   · exact Or.inl (hSW hx)
   · exact Or.inr hx
-theorem imp_of {E Q : List (ℕ × ℕ)} {Z L : ℕ} (hE : E = [] ∨ ∃ e ∈ six, E = [e] ∧ Imp [] Z L) (hp : pOk Z Q = true) (hL : L ≤ 15) (hI : ∀ e ∈ Q, Imp E e.1 e.2)
-    (hb : (∃ e ∈ Q, L ≤ e.2) ∨ ∀ t < min L 2, ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk E Q Z (L - 1) t p.1 p.2 = false) : Imp E Z L := by
-  intro q hq hsol
+lemma BSol.live_cost {m T b t : ℕ} {S : Set ℕ} (h : BSol m T b t S) :
+    ∃ k u, ∃ S0 : Finset ℕ, k ≤ b + u ∧ u ≤ t ∧ (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T k u S0 := by
+  induction h with
+  | @done b t S h =>
+    exact ⟨0, 0, {T}, by omega, by omega, by simpa using h, .stop⟩
+  | @un b t S a ha _ ih =>
+    obtain ⟨k, u, S1, hk, hu, hs, hl⟩ := ih
+    by_cases hg : a ^^^ m ∈ S1
+    · refine ⟨k+1, u+1, insert a (S1.erase (a ^^^ m)), by omega, by omega, ?_,
+        .un (by rwa [Finset.insert_erase hg])⟩
+      intro x hx
+      simp at hx
+      rcases hx with rfl | ⟨h1, h2⟩
+      · exact ha
+      · exact (hs h1).resolve_left h2
+    · exact ⟨k, u, S1, hk, by omega, fun x hx => (hs hx).resolve_left (fun e => hg (e ▸ hx)), hl⟩
+  | @bi q t S d a b ha hb _ ih =>
+    obtain ⟨k, u, S1, hk, hu, hs, hl⟩ := ih
+    by_cases hg : op d a b ∈ S1
+    · by_cases hab : a = b
+      · subst hab
+        rw [op_self] at hs
+        exact ⟨k, u, S1, by omega, hu, fun x hx => (hs hx).elim (fun e => e ▸ ha) id, hl⟩
+      refine ⟨k+1, u, insert a (insert b (S1.erase (op d a b))), by omega, hu, ?_,
+        .bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hg])⟩
+      intro x hx
+      simp at hx
+      rcases hx with rfl | rfl | ⟨h1, h2⟩
+      · exact ha
+      · exact hb
+      · exact (hs h1).resolve_left h2
+    · exact ⟨k, u, S1, by omega, hu, fun x hx => (hs hx).resolve_left (fun e => hg (e ▸ hx)), hl⟩
+
+lemma BSol.minLive {m T b L : ℕ} {roots : Set ℕ} (hb : b < L) (h : BSol m T b 1 roots) :
+    ∃ k u, ∃ S : Finset ℕ, u ≤ 1 ∧ (S : Set ℕ) ⊆ roots ∧ Live Z0 m T k u S ∧
+      k < L + u ∧ (∀ q < k, ¬ Sol Z0 m T q 1 roots) := by
   classical
-  have hex : ∃ q, Sol Z0 (mz Z) (tz Z) q 1 (C (mz Z) (WZ E Z)) := ⟨q, hsol⟩
-  have hqL : Nat.find hex < L := lt_of_le_of_lt (Nat.find_min' hex hsol) hq
-  obtain ⟨k, hk, t, ht1, S, hS, hl⟩ := (Nat.find_spec hex).live
-  have hkeq : k = Nat.find hex := le_antisymm hk (Nat.find_min' hex (hl.sol.mono le_rfl ht1 hS))
-  have hmin : ∀ q' < k, ¬ Sol Z0 (mz Z) (tz Z) q' 1 (C (mz Z) (WZ E Z)) := fun q' hq' => Nat.find_min hex (by omega)
-  have htk : t ≤ k := by
-    have hm : Min Z0 (mz Z) (tz Z) k t S := ⟨hl, fun q' hq' hs => hmin q' hq' (hs.mono le_rfl ht1 (by rintro x (hx | hx); exact hS hx; exact Or.inr hx))⟩
-    exact hm.size.2
-  exact imp_of_live hE hp hL hI (by omega) ht1 hS hl hmin (hb.imp id fun h => h t (by omega))
+  let P (k : ℕ) := ∃ u, ∃ S : Finset ℕ, u ≤ 1 ∧ (S : Set ℕ) ⊆ roots ∧
+    Live Z0 m T k u S ∧ k < L + u
+  have hex : ∃ k, P k := by
+    obtain ⟨k, u, S, hk, hu, hs, hl⟩ := h.live_cost
+    exact ⟨k, u, S, hu, hs, hl, by omega⟩
+  obtain ⟨u, S, hu, hs, hl, hk⟩ := Nat.find_spec hex
+  refine ⟨Nat.find hex, u, S, hu, hs, hl, hk, ?_⟩
+  intro q hq hsol
+  obtain ⟨k', hk', u', hu', S', hs', hl'⟩ := hsol.live
+  exact Nat.find_min hex (show k' < Nat.find hex by omega)
+    ⟨u', S', hu', hs', hl', by omega⟩
+
+lemma Live.unary_le_total {R : ℕ → ℕ} {m T k u : ℕ} {S : Finset ℕ}
+    (hl : Live R m T k u S) : u ≤ k := by
+  induction hl with
+  | stop => exact le_rfl
+  | un _ ih => omega
+  | bi _ _ _ ih => omega
+
+lemma Live.toBSol {R : ℕ → ℕ} {m T k u : ℕ} {S : Finset ℕ} (hl : Live R m T k u S) :
+    BSol m T (k - u) u (S : Set ℕ) := by
+  induction hl with
+  | stop => exact .done (by simp)
+  | @un k u a U _ ih =>
+    rw [Nat.add_sub_add_right]
+    refine .un (a := a) (by simp) (ih.mono le_rfl le_rfl ?_)
+    intro x hx
+    simp at hx ⊢
+    tauto
+  | @bi k u d a b U _ _ hl ih =>
+    have hle := hl.unary_le_total
+    rw [show k + 1 - u = (k - u) + 1 by omega]
+    refine .bi (d := d) (a := a) (b := b) (by simp) (by simp) (ih.mono le_rfl le_rfl ?_)
+    intro x hx
+    simp at hx ⊢
+    tauto
+
 def FF : ℕ := 2 ^ MM - 1
 lemma ffull : mFull [(FF, 1)] = true := by decide +kernel
-noncomputable def okT (E Q : List (ℕ × ℕ)) (Z L : ℕ) (ts : List ℕ) : Bool := ts.all (fun t => !chk E Q Z (L - 1) t FF 1)
-noncomputable def okE (E Q : List (ℕ × ℕ)) (e : ℕ × ℕ) : Bool := pOk e.1 Q && Nat.ble e.2 15 && (Q.any (fun x => Nat.ble e.2 x.2) || okT E Q e.1 e.2 (List.range (min e.2 2)))
-lemma imp_okE {E Q : List (ℕ × ℕ)} {e : ℕ × ℕ} (hE : E = [] ∨ ∃ e' ∈ six, E = [e'] ∧ Imp [] e.1 e.2) (h : okE E Q e = true) (hI : ∀ e' ∈ Q, Imp E e'.1 e'.2) : Imp E e.1 e.2 := by
-  simp only [okE, okT, Bool.and_eq_true, Bool.or_eq_true, List.any_eq_true, List.all_eq_true, List.mem_range, Bool.not_eq_true'] at h
-  refine imp_of hE h.1.1 (Nat.le_of_ble_eq_true h.1.2) hI (h.2.imp (fun ⟨x, hx, hx2⟩ => ⟨x, hx, Nat.le_of_ble_eq_true hx2⟩) fun h t ht =>
-    ⟨[(FF, 1)], ffull, fun p hp => ?_⟩)
-  simp only [List.mem_singleton] at hp; subst hp; exact h t ht
+noncomputable def okE (E Q : List (ℕ × ℕ)) (e : ℕ × ℕ) : Bool :=
+  pOk e.1 Q && Nat.ble e.2 14 &&
+    (Q.any (fun x => Nat.ble e.2 x.2) ||
+      [0, 1].all (fun t => !chk E Q e.1 (e.2 - 1 + t) t FF 1))
+
+lemma imp_okE {Q : List (ℕ × ℕ)} {e : ℕ × ℕ}
+    (h : okE [] Q e = true) (hI : ∀ x ∈ Q, BImp [] x.1 x.2) : BImp [] e.1 e.2 := by
+  intro b hb hs
+  obtain ⟨k, t, S, ht, hS, hl, hk, hm⟩ := hs.minLive hb
+  have hpos : 0 < e.2 := by omega
+  simp only [okE, Bool.and_eq_true, Bool.or_eq_true, List.any_eq_true,
+    List.all_eq_true, Bool.not_eq_true'] at h
+  have he := Nat.le_of_ble_eq_true h.1.2
+  apply imp_of_live (L := e.2 + t) rfl h.1.1 (by omega) hI hk ht hS hl hm
+  rcases h.2 with ⟨x, hx, hx'⟩ | hc
+  · left
+    have := Nat.le_of_ble_eq_true hx'
+    exact ⟨x, hx, by omega⟩
+  · right
+    refine ⟨[(FF, 1)], ffull, ?_⟩
+    intro p hp
+    simp only [List.mem_singleton] at hp
+    subst p
+    have htmem : t ∈ ([0, 1] : List ℕ) := by
+      simp only [List.mem_cons, List.not_mem_nil, or_false]
+      omega
+    have hK : e.2 + t - 1 = e.2 - 1 + t := by omega
+    simpa only [hK] using hc t htmem
+
 def rt3 : List (ℕ × ℕ) := [(7, 4), (11, 6), (13, 6), (14, 5), (19, 7), (21, 5), (22, 7), (25, 6), (26, 7), (28, 7), (35, 5), (37, 7), (38, 5), (41, 6), (42, 5), (44, 6), (49, 5), (50, 7), (52, 7), (56, 5), (67, 5), (69, 5), (70, 6), (73, 8), (74, 6), (76, 8), (81, 5), (82, 7), (84, 6), (88, 6), (97, 5), (98, 5), (100, 7), (104, 6), (112, 5), (131, 4), (133, 4), (134, 4), (137, 5), (138, 4), (140, 4), (145, 5), (146, 7), (148, 5), (152, 5), (161, 5), (162, 4), (164, 5), (168, 4), (176, 5), (193, 3), (194, 4), (196, 4), (200, 4), (208, 4), (224, 3)]
 def rt2 : List (ℕ × ℕ) := [(3, 8), (5, 8), (6, 8), (9, 9), (10, 8), (12, 9), (17, 8), (18, 10), (20, 9), (24, 9), (33, 8), (34, 8), (36, 9), (40, 8), (48, 8), (65, 8), (66, 8), (68, 9), (72, 9), (80, 8), (96, 8), (129, 7), (130, 7), (132, 7), (136, 7), (144, 8), (160, 7), (192, 6)]
 def rt1 : List (ℕ × ℕ) := [(1, 11), (2, 11), (4, 12), (8, 12), (16, 12), (32, 11), (64, 11), (128, 10)]
 def pr (T : List (ℕ × ℕ)) (Z : ℕ) : List (ℕ × ℕ) := T.filter (fun e => Nat.beq (Nat.land Z e.1) Z && !Nat.beq Z e.1)
 def rt : List (ℕ × ℕ) := rt1 ++ rt2 ++ rt3
 lemma okAll {T U : List (ℕ × ℕ)} (h : U.all (fun e => okE [] (pr T e.1) e) = true)
-    (hT : ∀ e ∈ T, Imp [] e.1 e.2) : ∀ e ∈ U, Imp [] e.1 e.2 := fun e he => imp_okE
-  (Or.inl rfl) (List.all_eq_true.1 h e he) (fun e' h' => hT e' (List.mem_of_mem_filter h'))
-lemma apI {E A B : List (ℕ × ℕ)} (ha : ∀ e ∈ A, Imp E e.1 e.2) (hb : ∀ e ∈ B, Imp E e.1 e.2) : ∀ e ∈ A ++ B, Imp E e.1 e.2 := fun e he =>
+    (hT : ∀ e ∈ T, BImp [] e.1 e.2) : ∀ e ∈ U, BImp [] e.1 e.2 := fun e he =>
+  imp_okE (List.all_eq_true.1 h e he) (fun e' h' => hT e' (List.mem_of_mem_filter h'))
+
+lemma apI {E A B : List (ℕ × ℕ)} (ha : ∀ e ∈ A, BImp E e.1 e.2) (hb : ∀ e ∈ B, BImp E e.1 e.2) : ∀ e ∈ A ++ B, BImp E e.1 e.2 := fun e he =>
   (List.mem_append.1 he).elim (ha e) (hb e)
-lemma imp_ts {E Q : List (ℕ × ℕ)} {L : ℕ} (hE : E = [] ∨ ∃ p ∈ six, E = [p] ∧ Imp [] 0 L) (hp : pOk 0 Q = true) (hL : L ≤ 15) (hI : ∀ e ∈ Q, Imp E e.1 e.2)
-    (h : ∀ t < min L 2, ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk E Q 0 (L - 1) t p.1 p.2 = false) : Imp E 0 L :=
-  imp_of hE hp hL hI (Or.inr h)
-lemma one {E Q : List (ℕ × ℕ)} {K t : ℕ} (h : chk E Q 0 K t FF 1 = false) : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk E Q 0 K t p.1 p.2 = false :=
-  ⟨[(FF, 1)], ffull, fun q hq => by simp only [List.mem_singleton] at hq; subst hq; exact h⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem r3 : rt3.all (fun e => okE [] (pr [] e.1) e) = true := by decide +kernel
-lemma i3 : ∀ e ∈ rt3, Imp [] e.1 e.2 := okAll (T := []) r3 (by simp)
+lemma i3 : ∀ e ∈ rt3, BImp [] e.1 e.2 := okAll (T := []) r3 (by simp)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem r2 : rt2.all (fun e => okE [] (pr rt3 e.1) e) = true := by decide +kernel
-lemma i2 : ∀ e ∈ rt2, Imp [] e.1 e.2 := okAll r2 i3
+lemma i2 : ∀ e ∈ rt2, BImp [] e.1 e.2 := okAll r2 i3
+lemma binarySliceBound {Z L : ℕ} {Q M : List (ℕ × ℕ)}
+    (hL : L ≤ 14) (hp : pOk Z Q = true) (hQ : ∀ e ∈ Q, BImp [] e.1 e.2)
+    (h0 : chk [] Q Z (L - 1) 0 FF 1 = false) (hM : mFull M = true)
+    (h1 : ∀ p ∈ M, chk [] Q Z L 1 p.1 p.2 = false) : BImp [] Z L := by
+  intro b hb hs
+  obtain ⟨k, t, S, ht, hS, hl, hk, hm⟩ := hs.minLive hb
+  apply imp_of_live (L := L+t) rfl hp (by omega) hQ hk ht hS hl hm
+  right
+  rcases (show t = 0 ∨ t = 1 by omega) with rfl | rfl
+  · refine ⟨[(FF,1)], ffull, ?_⟩
+    intro p hp
+    simp only [List.mem_singleton] at hp
+    subst p
+    exact h0
+  · exact ⟨M, hM, by simpa only [Nat.add_sub_cancel] using h1⟩
+
+def sliceQ (z : ℕ) : List (ℕ × ℕ) := pr (rt2 ++ rt3) z
+
+lemma sliceQBounds (z : ℕ) : ∀ e ∈ sliceQ z, BImp [] e.1 e.2 := by
+  intro e he
+  unfold sliceQ pr at he
+  exact apI i2 i3 e (List.mem_of_mem_filter he)
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem r1 : rt1.all (fun e => okE [] (pr (rt2 ++ rt3) e.1) e) = true := by decide +kernel
-lemma i1 : ∀ e ∈ rt1, Imp [] e.1 e.2 := okAll r1 (apI i2 i3)
-lemma ir : ∀ e ∈ rt, Imp [] e.1 e.2 := apI (apI i1 i2) i3
+lemma sliceSimple1 : okE [] (sliceQ 1) (1,11) = true := by decide +kernel
+
+lemma sliceFace1 : BImp [] 1 11 := imp_okE (e := (1,11)) sliceSimple1 (sliceQBounds 1)
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_p : pOk 0 rt = true := by decide +kernel
+lemma sliceSimple2 : okE [] (sliceQ 2) (2,11) = true := by decide +kernel
+
+lemma sliceFace2 : BImp [] 2 11 := imp_okE (e := (2,11)) sliceSimple2 (sliceQBounds 2)
+
+def sliceArgs4 : List (ℕ × ℕ) := [
+  (0, 1),
+  (packedMask [0x400000000, 0x1000000000010000, 0x1], 0),
+  (packedMask [0x100, 0x40000, 0x100000000, 0x40000000], 0),
+  (packedMask [0x4000000000000400, 0x40000000, 0x4], 0),
+  (packedMask [0x3ffeff, 0xbffffffbfffbfbff, 0xeffffffebffeffff, 0xffffffffbffffffa], 0)]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_0 : chk [] rt 0 13 0 FF 1 = false := by decide +kernel
+lemma sliceCover4 : mFull sliceArgs4 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_1 : chk [] rt 0 13 1 FF 1 = false := by decide +kernel
-lemma iroot : Imp [] 0 14 := imp_ts (Or.inl rfl) root_p (by norm_num) ir (fun t ht => by
-  have : t < 2 := by omega
-  interval_cases t
-  · exact one root_0
-  · exact one root_1)
-namespace PrefixCut
-noncomputable def topCut (F : ℕ → List W → Bool) (l m g K H ph k t z : ℕ) (v : List W) : Bool :=
-  Bool.rec (motive := fun _ => Bool) (tst (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
-    Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (mv (look l m g K) l m g k t z v y) (Nat.beq ph 1)) true
-      (node F (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v (fun h xs => pairsC H h (fs xs))))) true (Nat.ble v.length 1)
-noncomputable def startCut (F : ℕ → List W → Bool) (l m g B K t p H ph : ℕ) (v : List W) : Bool :=
-  Bool.rec (motive := fun _ => Bool) false (Bool.rec (motive := fun _ => Bool) false
-    (child (fun z r => topCut F l m g K H ph K t z r) g (fun h => h v) (Nat.sub B (sumc v)))
-    (Nat.ble v.length (Nat.sub (Nat.succ K) t))) (hasP p v)
+lemma sliceReady4 : pOk 4 (sliceQ 4) = true := by decide +kernel
 
-def Cg : Nat := pL (rt.map fun _ => 16)
-def Cb : Nat := pL (rt.map fun e => 16 + (14-e.2))
-noncomputable def next : Nat → List W → Bool := look1 (lz 0) (mz 0) Cg 14 14 13 1
-noncomputable def first (F : Nat → List W → Bool) (H : Nat) : Bool :=
-  anySub (pos 1) (lz 0) (avl (PZ rt) (mz 0) (rawL [])) 0
-    (fun r => startCut F (lz 0) (mz 0) Cg Cb 14 1 (pwr [] 0) H 0 r)
-
-theorem first_eq (H : Nat) : first next H = chk [] rt 0 14 1 H 0 := by
-  unfold chk
-  simp only [frc_eq, st_eq]
-  rfl
-
-abbrev S := Nat × List W
-deriving instance DecidableEq for W
-
-noncomputable def guarded (states : List S) (f : Nat → List W → Bool) (z : Nat) (v : List W) : Bool :=
-  if (z,v) ∈ states then false else f z v
-
-theorem guarded_eq {states : List S} {f : Nat → List W → Bool}
-    (h : ∀ x ∈ states, f x.1 x.2 = false) : guarded states f = f := by
-  funext z v
-  by_cases hm : (z,v) ∈ states
-  · simp only [guarded, if_pos hm]; exact (h (z,v) hm).symm
-  · simp [guarded, hm]
-
-def num0 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 17592151441408) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 8705280) 44) 9277133568000) 44) 2508495785472) 44) 3848290697216) 44) 12582918) 44) 805306368) 44) 12583008) 44) 49152) 44) 103079215104) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2146439166) 44) 135257919614) 44) 4429443072) 44) 9337259983423) 44) 2279604488) 44) 5480380432888) 44) 17734583420) 44) 195108187519) 44) 17414683093866) 44) 12094544018431) 44) 15393162788864) 44) 0) 44) 0) 44) 0) 44) 0) 44) 68719476735) 44) 17592186044415) 44) 17592186044415) 44) 16492674416640) 44) 0) 44) 0
-def num1 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (33825) 44) 567489872400) 44) 9079837958408) 44) 0) 44) 0) 44) 0) 44) 0) 44) 9079837958144) 44) 0) 44) 0) 44) 34359738368
-def num2 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 524285) 44) 17042428066688) 44) 0) 44) 0) 44) 0) 44) 0) 44) 47617408) 44) 326417524224) 44) 159385984) 44) 2611496916165) 44) 2516896448549) 44) 13199206252544) 44) 11534424) 44) 45056) 44) 94489280512) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2114848769) 44) 13195246575425) 44) 17325624921856) 44) 8053604352) 44) 16493750124672) 44) 16107210759) 44) 8804960313347) 44) 8991201034240) 44) 0) 44) 0) 44) 917737659242) 44) 11751024984061) 44) 13193602662400) 44) 0) 44) 0) 44) 68719476735) 44) 17592185978880) 44) 0) 44) 1099511627775) 44) 17592184995840) 44) 0
-def num3 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (33825) 44) 566935683072) 44) 0) 44) 4539918979204) 44) 2269959487488) 44) 0) 44) 0) 44) 8796093022472) 44) 4539914649600) 44) 0) 44) 1073741824
-def num4 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 8688896) 44) 274877915136) 44) 134219776) 44) 2199023255552) 44) 8388612) 44) 536870912) 44) 8388672) 44) 32768) 44) 68719476736) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2113931264) 44) 1073745984) 44) 4429185024) 44) 0) 44) 0) 44) 0) 44) 0) 44) 195108012032) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 68719476735) 44) 17592185978880) 44) 0) 44) 0) 44) 0) 44) 0
-def num5 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (33825) 44) 567489872400) 44) 9079837958408) 44) 4539918979204) 44) 2269959487488) 44) 0) 44) 0) 44) 9079837958408) 44) 4539914649600) 44) 0) 44) 35433480192
-def num6 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (17592118935552) 44) 63) 44) 17583730327008) 44) 274876792832) 44) 268434398) 44) 13194139533312) 44) 16418) 44) 13345828639176) 44) 12541379216500) 44) 1224132935696) 44) 8798916272130) 44) 3986028550656) 44) 1876905771046) 44) 11108530277954) 44) 4990080909312) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 268971377) 44) 274895751168) 44) 9914967788770) 44) 281796280336) 44) 13859591562242) 44) 150957059076) 44) 206225604866) 44) 549957282816) 44) 94489283432) 44) 0) 44) 825372006400) 44) 11751022133248) 44) 228590005) 44) 27) 44) 7421703501535) 44) 17591918653455) 44) 16496952672000) 44) 17523733958640) 44) 1095233372415) 44) 68452085775) 44) 16496952672000
-def num7 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (32) 44) 16777232) 44) 277086208) 44) 137439084544) 44) 2269890217984) 44) 35467034657) 44) 549756355072) 44) 268435456) 44) 4398046642176) 44) 2199025420288) 44) 32768
-def num8 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524285) 44) 16492674416703) 44) 17587756858863) 44) 12644383719424) 44) 0) 44) 0) 44) 37748778) 44) 5546950264192) 44) 23069024) 44) 378180654720) 44) 2490369) 44) 3298694306342) 44) 10054789890583) 44) 11264) 44) 23622320128) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 1090618880) 44) 3368896634657) 44) 206225737976) 44) 16909808368544) 44) 962139897924) 44) 550695862528) 44) 7701015036480) 44) 6786048503167) 44) 17317308137472) 44) 0) 44) 917737570304) 44) 0) 44) 229338549) 44) 6253467664320) 44) 0) 44) 68719476720) 44) 65535) 44) 17591917608960) 44) 1099511627520) 44) 1048575) 44) 17587891077120
-def num9 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (32768) 44) 554189312) 44) 0) 44) 4539918843904) 44) 2114) 44) 1134979744768) 44) 0) 44) 274877907200) 44) 4329604) 44) 0) 44) 33554432
-def num10 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524284) 44) 549753585727) 44) 17587622641664) 44) 274876825599) 44) 15321758957568) 44) 0) 44) 34734120) 44) 61759719280) 44) 30933464) 44) 507030011925) 44) 12549897945089) 44) 11819974447796) 44) 13194143301660) 44) 13277038132096) 44) 31675383808) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 545276288) 44) 585489219665) 44) 15435575757028) 44) 16561670725656) 44) 9470185912815) 44) 6872048353408) 44) 826781339680) 44) 1242856325120) 44) 97374953472) 44) 0) 44) 916975606634) 44) 0) 44) 229338112) 44) 27) 44) 7539546619904) 44) 68718428175) 44) 17587891142655) 44) 268431360) 44) 1099494850815) 44) 17523467616240) 44) 4294901760
-def num11 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (1024) 44) 536870928) 44) 9079560863744) 44) 4398046646404) 44) 2114) 44) 1099511627809) 44) 567489331200) 44) 8589934600) 44) 4194304) 44) 2269957324800) 44) 1048576
-def num12 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (549751683072) 44) 0) 44) 32767) 44) 13258564042752) 44) 2199006724592) 44) 7696582443136) 44) 17851515428) 44) 9135857802) 44) 149250637892) 44) 3332929262128) 44) 9146202587264) 44) 4399154897160) 44) 6051701592353) 44) 2483128631296) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 34643986) 44) 1378720235843) 44) 15479322185770) 44) 1108189776001) 44) 180693857295) 44) 17339524170) 44) 6254481049348) 44) 2753075609600) 44) 2281701386) 44) 2199056811007) 44) 15399606043400) 44) 137441247233) 44) 8796095646725) 44) 4535489134531) 44) 929323562719) 44) 17569279552170) 44) 11728124029610) 44) 11728124029610) 44) 11728124029610) 44) 11728124029610) 44) 11728124029610
-def num13 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (17179869696) 44) 8590197000) 44) 4194308) 44) 2149646336) 44) 1099545216000) 44) 550309478928) 44) 8192) 44) 134217732) 44) 67110914) 44) 1099511627777
-def num14 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (134216719) 44) 8796093022208) 44) 268433438) 44) 2199014343159) 44) 2) 44) 1104209248396) 44) 8944271892519) 44) 40802320896) 44) 2281853568) 44) 1307827767298) 44) 1667923993346) 44) 3333441062003) 44) 827116748800) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 69353508) 44) 4956463858180) 44) 2508806693188) 44) 2496391084034) 44) 1185952176161) 44) 2381140058194) 44) 14188426522632) 44) 9895608852736) 44) 2146) 44) 8796143351808) 44) 17723031562) 44) 9345851457537) 44) 13193627853188) 44) 6047317098520) 44) 6714912911552) 44) 54975581388) 44) 14073748835532) 44) 14073748835532) 44) 14073748835532) 44) 14073748835532) 44) 14073748835532
-def num15 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (549755830272) 44) 274886303752) 44) 134217856) 44) 68786651138) 44) 1074791425) 44) 17197171216) 44) 262144) 44) 4294967424) 44) 2147549248) 44) 1099511627808
-def num16 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (274875842559) 44) 15255992269760) 44) 2199014595584) 44) 0) 44) 2030698604) 44) 9906880970782) 44) 32212254736) 44) 1239635055248) 44) 1065159770256) 44) 619716931584) 44) 16608666846051) 44) 6599015923712) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 138739784) 44) 11012439409672) 44) 5086332863120) 44) 4433648029972) 44) 11922872578528) 44) 217788973155) 44) 7317512781841) 44) 4398063288320) 44) 71403834114) 44) 12094493687808) 44) 68736320352) 44) 10995119128572) 44) 202047920) 44) 6253463994395) 44) 115964130816) 44) 64677154575) 44) 1034834473200) 44) 16557351571215) 44) 1034834473200) 44) 16557351571215) 44) 1034834473200
-def num17 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (1) 44) 524288) 44) 8796361466112) 44) 4294971392) 44) 2199092461632) 44) 34360819744) 44) 17717280784) 44) 8388608) 44) 137438957568) 44) 68721573954) 44) 1024
-def num18 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 17592151965693) 44) 17042428066688) 44) 0) 44) 0) 44) 0) 44) 0) 44) 47633792) 44) 9328673177088) 44) 2508520951680) 44) 4260764357829) 44) 2516900642855) 44) 13199474688000) 44) 15728760) 44) 61440) 44) 128849018880) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2147356671) 44) 13329430749055) 44) 17325625179904) 44) 9345313587775) 44) 16496029729160) 44) 5496487643647) 44) 8822694896767) 44) 8991201209727) 44) 17414683093866) 44) 12094544018431) 44) 16310900448106) 44) 11751024984061) 44) 13193602662400) 44) 0) 44) 0) 44) 68719476735) 44) 17592186044415) 44) 17592186044415) 44) 17592186044415) 44) 17592184995840) 44) 0
-def num19 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (33825) 44) 566935683072) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 8796093022208) 44) 0) 44) 0) 44) 0
-def num20 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 17592151441408) 44) 63) 44) 17583730327008) 44) 274876792832) 44) 268434398) 44) 13194139533312) 44) 8705314) 44) 13689426033096) 44) 12541546991220) 44) 3972912005136) 44) 8798924660742) 44) 3986565421568) 44) 1876914159718) 44) 11108530310722) 44) 5058800386048) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2146971647) 44) 410153670782) 44) 9919397100770) 44) 9344177308223) 44) 13859723683082) 44) 5493896375804) 44) 223960188286) 44) 744864001407) 44) 17414683093866) 44) 12094544018431) 44) 16218534795264) 44) 11751022133248) 44) 228590005) 44) 27) 44) 7421703501535) 44) 17592186044415) 44) 17592186044415) 44) 17592186044415) 44) 17587907789055) 44) 68452085775) 44) 16496952672000
-def num21 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (32) 44) 16777232) 44) 277086208) 44) 0) 44) 0) 44) 0) 44) 0) 44) 268435456) 44) 0) 44) 0) 44) 0
-def num22 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (1090520576) 44) 70330093600) 44) 196608) 44) 9208410964512) 44) 67108864) 44) 549755814144) 44) 64) 44) 188978736511) 44) 17317308137472) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 68719476720) 44) 65535) 44) 17591917608960) 44) 0) 44) 0) 44) 0
-def num23 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (33825) 44) 567489872400) 44) 9079837958408) 44) 4539918843904) 44) 2114) 44) 1134979744768) 44) 0) 44) 9079837958400) 44) 4329604) 44) 0) 44) 34393292800
-def num24 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 17592151965693) 44) 16492674416703) 44) 17587756858863) 44) 12644383719424) 44) 0) 44) 0) 44) 46454058) 44) 14824083832192) 44) 2508518854496) 44) 4226471351936) 44) 15073287) 44) 3299499612710) 44) 10054802473591) 44) 60416) 44) 126701535232) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2146537470) 44) 3433824460671) 44) 210654984440) 44) 17038657387455) 44) 964352393548) 44) 5481320481272) 44) 7718749619836) 44) 6792177954175) 44) 17414683093866) 44) 12094544018431) 44) 16310900359168) 44) 0) 44) 229338549) 44) 6253467664320) 44) 0) 44) 68719476735) 44) 17592186044415) 44) 17592186044415) 44) 17592186044160) 44) 1048575) 44) 17587891077120
-def num25 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (32768) 44) 554189312) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 274877906944) 44) 0) 44) 0) 44) 0
-def num26 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 17592151965692) 44) 549753585727) 44) 17587622641664) 44) 274876825599) 44) 15321758957568) 44) 0) 44) 43439400) 44) 9338893287280) 44) 2508526718936) 44) 4355320709141) 44) 12549910528007) 44) 11820779754164) 44) 13194155884668) 44) 13277038181248) 44) 134754598912) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2146455550) 44) 685045223551) 44) 15435710068964) 44) 17034118210111) 44) 9470267701743) 44) 7679504368120) 44) 844515923068) 44) 1294619815295) 44) 17414683093866) 44) 12094544018431) 44) 16310138395498) 44) 0) 44) 229338112) 44) 27) 44) 7539546619904) 44) 68719476735) 44) 17592186044415) 44) 17592186044415) 44) 17592169267455) 44) 17523467616240) 44) 4294901760
-def num27 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (1024) 44) 536870928) 44) 9079560863744) 44) 0) 44) 0) 44) 0) 44) 0) 44) 8589934592) 44) 0) 44) 0) 44) 0
-def num28 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (34603026) 44) 4328521794) 44) 134221824) 44) 8589934593) 44) 35651592) 44) 17179869256) 44) 537920516) 44) 4296540160) 44) 2281701386) 44) 2199056811007) 44) 15393162788864) 44) 0) 44) 0) 44) 0) 44) 0) 44) 45812984490) 44) 11728124029610) 44) 11728124029610) 44) 10995116277760) 44) 0) 44) 0
-def num29 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (33825) 44) 567489872400) 44) 9079837958408) 44) 4194308) 44) 2149646336) 44) 1099545216000) 44) 550309478928) 44) 9079837958144) 44) 134217732) 44) 67110914) 44) 1133871366145
-def num30 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 17592151441408) 44) 549751683072) 44) 0) 44) 32767) 44) 13258564042752) 44) 2199006724592) 44) 7696591148416) 44) 9294985083428) 44) 2517631643274) 44) 3997541335108) 44) 3332941845046) 44) 9147007893632) 44) 4399167480168) 44) 6051701641505) 44) 2586207846400) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2146480126) 44) 1509649633663) 44) 15483617407018) 44) 10436859824831) 44) 182937810191) 44) 5480540087802) 44) 6271677712252) 44) 2943887256959) 44) 17414683093866) 44) 12094544018431) 44) 15399606043400) 44) 137441247233) 44) 8796095646725) 44) 4535489134531) 44) 929323562719) 44) 17592186044415) 44) 17592186044415) 44) 17592186044415) 44) 17225682168490) 44) 11728124029610) 44) 11728124029610
-def num31 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (17179869696) 44) 8590197000) 44) 0) 44) 0) 44) 0) 44) 0) 44) 8192) 44) 0) 44) 0) 44) 0
-def num32 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (69206052) 44) 8657043460) 44) 8192) 44) 292057808898) 44) 4194304) 44) 171798757456) 44) 17180934152) 44) 4202752) 44) 2146) 44) 8796143351808) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 54975581388) 44) 14073748835532) 44) 14073748835532) 44) 13194139533312) 44) 0) 44) 0
-def num33 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (33825) 44) 567489872400) 44) 9079837958408) 44) 134217856) 44) 68786651138) 44) 1074791425) 44) 17197171216) 44) 9079837958144) 44) 4294967424) 44) 2147549248) 44) 1133871366176
-def num34 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 17592151441408) 44) 0) 44) 134216719) 44) 8796093022208) 44) 268433438) 44) 2199014343159) 44) 8705282) 44) 10381342816396) 44) 11452767677991) 44) 3889093018112) 44) 2294436486) 44) 1308633073666) 44) 1667936576354) 44) 3333441111155) 44) 930195963904) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2146586622) 44) 5083064734334) 44) 2513236128068) 44) 11541593258559) 44) 1188227586345) 44) 7689721733626) 44) 14188980171900) 44) 10090712837503) 44) 17414683093866) 44) 12094544018431) 44) 15410885820426) 44) 9345851457537) 44) 13193627853188) 44) 6047317098520) 44) 6714912911552) 44) 68719476735) 44) 17592186044415) 44) 17592186044415) 44) 17372283718860) 44) 14073748835532) 44) 14073748835532
-def num35 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (549755830272) 44) 274886303752) 44) 0) 44) 0) 44) 0) 44) 0) 44) 262144) 44) 0) 44) 0) 44) 0
-def num36 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 17592151441408) 44) 0) 44) 0) 44) 274875842559) 44) 15255992269760) 44) 2199014595584) 44) 8705280) 44) 9279164266604) 44) 12415376756254) 44) 3880502951952) 44) 1239647638166) 44) 1065965076624) 44) 619729514592) 44) 16608666895203) 44) 6702095138816) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2146766846) 44) 11130383242366) 44) 5090762289808) 44) 13736548275007) 44) 11925110239720) 44) 5492008878587) 44) 7317513847933) 44) 4593154698623) 44) 17414683093866) 44) 12094544018431) 44) 15461899109216) 44) 10995119128572) 44) 202047920) 44) 6253463994395) 44) 115964130816) 44) 68719476735) 44) 17592186044415) 44) 17592186044415) 44) 17527508889840) 44) 16557351571215) 44) 1034834473200
-def num37 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (1) 44) 524288) 44) 8796361466112) 44) 0) 44) 0) 44) 0) 44) 0) 44) 8388608) 44) 0) 44) 0) 44) 0
-def num38 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 17592119459837) 44) 17042428066751) 44) 17583730327008) 44) 274876792832) 44) 268434398) 44) 13194139533312) 44) 47633826) 44) 13672246163400) 44) 12541538602484) 44) 3835629851861) 44) 11315812720679) 44) 17185234803200) 44) 1876917305470) 44) 11108530323010) 44) 5084570189824) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2114858353) 44) 13470124498753) 44) 17342804922338) 44) 283406909456) 44) 17158127887490) 44) 154178284551) 44) 9011185918211) 44) 9540956990464) 44) 94489283432) 44) 0) 44) 917737659242) 44) 11751024984061) 44) 13193831252405) 44) 27) 44) 7421703501535) 44) 17592186044415) 44) 17592186044160) 44) 17523733958640) 44) 1099511627775) 44) 17592186040335) 44) 16496952672000
-def num39 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (32) 44) 0) 44) 0) 44) 137439084544) 44) 2269890215936) 44) 0) 44) 0) 44) 0) 44) 4398046511104) 44) 0) 44) 0
-def num40 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524285) 44) 16492674416640) 44) 0) 44) 0) 44) 0) 44) 0) 44) 37748736) 44) 34359739392) 44) 16777472) 44) 275034182784) 44) 2097153) 44) 134217728) 44) 2097168) 44) 8192) 44) 17179869184) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 1073741824) 44) 1105207041) 44) 67110912) 44) 4295507968) 44) 0) 44) 0) 44) 0) 44) 188978561024) 44) 0) 44) 0) 44) 917737570304) 44) 0) 44) 0) 44) 0) 44) 0) 44) 68719476720) 44) 0) 44) 0) 44) 1099511627520) 44) 0) 44) 0
-def num41 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (33825) 44) 567489872384) 44) 0) 44) 4539918979204) 44) 2269959489602) 44) 1134979744768) 44) 0) 44) 9070970929416) 44) 4539918979204) 44) 0) 44) 1107296256
-def num42 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 524285) 44) 17042428066751) 44) 17587756858863) 44) 12644383719424) 44) 0) 44) 0) 44) 47617450) 44) 5839008049024) 44) 165677536) 44) 2714643388101) 44) 2516896841765) 44) 16497766341158) 44) 10054799327839) 44) 48128) 44) 100931731456) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2131725825) 44) 16563038003041) 44) 17531783548920) 44) 16913566464928) 44) 17455890022596) 44) 566803073287) 44) 16505975349827) 44) 15588270976383) 44) 17317308137472) 44) 0) 44) 917737659242) 44) 11751024984061) 44) 13193832000949) 44) 6253467664320) 44) 0) 44) 68719476735) 44) 17592186044415) 44) 17591917608960) 44) 1099511627775) 44) 17592186044415) 44) 17587891077120
-def num43 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (32768) 44) 0) 44) 0) 44) 4539918843904) 44) 0) 44) 0) 44) 0) 44) 256) 44) 0) 44) 0) 44) 0
-def num44 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 524285) 44) 17042428066751) 44) 17587622641664) 44) 274876825599) 44) 15321758957568) 44) 0) 44) 47617448) 44) 336637634416) 44) 165153240) 44) 2706053305557) 44) 12549940412453) 44) 16222886351540) 44) 13194151690332) 44) 13277038164864) 44) 100394860544) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2123254145) 44) 13779630595921) 44) 17359984824292) 44) 16569724330008) 44) 17166768224751) 44) 6888155564167) 44) 9631741653027) 44) 10090712825856) 44) 97374953472) 44) 0) 44) 917737659242) 44) 11751024984061) 44) 13193832000512) 44) 27) 44) 7539546619904) 44) 68719476735) 44) 17592186044415) 44) 268431360) 44) 1099511627775) 44) 17592186044400) 44) 4294901760
-def num45 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (1024) 44) 0) 44) 0) 44) 4398046646404) 44) 0) 44) 0) 44) 0) 44) 8) 44) 0) 44) 0) 44) 0
-def num46 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (549751683072) 44) 0) 44) 0) 44) 0) 44) 0) 44) 1048704) 44) 17179869696) 44) 8388736) 44) 137439477828) 44) 2233417596960) 44) 8800455098368) 44) 1048584) 44) 4096) 44) 8589934592) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 33554432) 44) 2097473) 44) 15393422835712) 44) 0) 44) 1048576) 44) 2) 44) 268959744) 44) 4296540160) 44) 0) 44) 0) 44) 6443254536) 44) 137441247233) 44) 8796093022208) 44) 0) 44) 0) 44) 45812984490) 44) 11728123985920) 44) 0) 44) 733007751850) 44) 11728123330560) 44) 0
-def num47 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (33825) 44) 566935683584) 44) 8590197000) 44) 4539918979204) 44) 2269959487488) 44) 1099545216000) 44) 550309478928) 44) 8796093030664) 44) 4539914649604) 44) 67110914) 44) 1100585369601
-def num48 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 524285) 44) 17042428066688) 44) 0) 44) 32767) 44) 13258564042752) 44) 2199006724592) 44) 7696629011840) 44) 327089169956) 44) 9286855050) 44) 2623308076229) 44) 3616408113717) 44) 13544953741440) 44) 4399165383000) 44) 6051701633313) 44) 2569027977216) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2115938323) 44) 14573964713795) 44) 17411524271914) 44) 1116243380353) 44) 16674442933391) 44) 33446734927) 44) 15059172402951) 44) 11739980103680) 44) 2281701386) 44) 2199056811007) 44) 16310900448106) 44) 11751024984061) 44) 13193605286917) 44) 4535489134531) 44) 929323562719) 44) 17592186044415) 44) 17592186022570) 44) 11728124029610) 44) 12094627905535) 44) 17592185694890) 44) 11728124029610
-def num49 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (17179869184) 44) 0) 44) 4194308) 44) 2149646336) 44) 0) 44) 0) 44) 0) 44) 134217728) 44) 0) 44) 0
-def num50 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (67239936) 44) 4398050968064) 44) 2474446946560) 44) 4831854592) 44) 1099511758848) 44) 9663709186) 44) 8804683489280) 44) 8796097216512) 44) 0) 44) 0) 44) 17723031562) 44) 9345851457537) 44) 13193602662400) 44) 0) 44) 0) 44) 54975581388) 44) 14073748783104) 44) 0) 44) 879609302220) 44) 14073747996672) 44) 0
-def num51 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (33825) 44) 566935699456) 44) 274886303752) 44) 4539918979204) 44) 2269959487490) 44) 1074791425) 44) 17197171216) 44) 8796093284616) 44) 4539914649728) 44) 2147549248) 44) 1100585369632
-def num52 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 524285) 44) 17042428066688) 44) 134216719) 44) 8796093022208) 44) 268433438) 44) 2199014343159) 44) 47617410) 44) 1430626772620) 44) 8944431278503) 44) 2652299237061) 44) 2519178302117) 44) 14507034019842) 44) 1667935527770) 44) 3333441107059) 44) 921606029312) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2116962341) 44) 13753659465541) 44) 17359984668484) 44) 2499612833794) 44) 16580190541985) 44) 2387583559767) 44) 14188703346699) 44) 10090712670464) 44) 2146) 44) 8796143351808) 44) 917737659242) 44) 11751024984061) 44) 13193627853188) 44) 6047317098520) 44) 6714912911552) 44) 68719476735) 44) 17592186031308) 44) 14073748835532) 44) 14293651161087) 44) 17592185834700) 44) 14073748835532
-def num53 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (549755813888) 44) 0) 44) 134217856) 44) 68786651136) 44) 0) 44) 0) 44) 0) 44) 4294967296) 44) 0) 44) 0
-def num54 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524286) 44) 524285) 44) 17042428066688) 44) 0) 44) 274875842559) 44) 15255992269760) 44) 2199014595584) 44) 47617408) 44) 328448222828) 44) 9907040356766) 44) 2643709170901) 44) 3756531503797) 44) 14264366022800) 44) 619728466008) 44) 16608666891107) 44) 6693505204224) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2119108681) 44) 15411584048969) 44) 17463063891856) 44) 4440627892500) 44) 17421505114592) 44) 223157717095) 44) 16113606336531) 44) 13389247545344) 44) 71403834114) 44) 12094493687808) 44) 917737659242) 44) 11751024984061) 44) 13193804710320) 44) 6253463994395) 44) 115964130816) 44) 68719476735) 44) 17592186040560) 44) 16557351571215) 44) 1099511627775) 44) 17592185982735) 44) 1034834473200
-def num55 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (1) 44) 0) 44) 0) 44) 4294971392) 44) 2199092461568) 44) 0) 44) 0) 44) 0) 44) 137438953472) 44) 0) 44) 0
-def num56 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (17592119459837) 44) 16492674416703) 44) 17587756858863) 44) 12919260512256) 44) 268434398) 44) 13194139533312) 44) 37765162) 44) 14481847489992) 44) 12541395993972) 44) 1499167118992) 44) 8798918369283) 44) 3986162768422) 44) 10673269457463) 44) 11108530286146) 44) 5007260778496) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 1359589233) 44) 3643775606561) 44) 10121193393402) 44) 16911960046512) 44) 14271975646278) 44) 701115526404) 44) 7907240641346) 44) 7336005643647) 44) 17411797420904) 44) 0) 44) 917737658368) 44) 11751022133248) 44) 229338549) 44) 6253467664347) 44) 7421703501535) 44) 17592186044415) 44) 16496952672255) 44) 17592184999920) 44) 1099511627775) 44) 68452089855) 44) 17592169332480
-def num57 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (16777216) 44) 0) 44) 137438953472) 44) 2048) 44) 35467034624) 44) 0) 44) 0) 44) 131072) 44) 0) 44) 0
-def num58 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (17592119459836) 44) 549753585727) 44) 17587756858848) 44) 274876825599) 44) 15322027391966) 44) 13194139533312) 44) 34750506) 44) 13397905807352) 44) 12541404907004) 44) 1645196492821) 44) 12552720867331) 44) 13057202903732) 44) 15071048482878) 44) 15510958014402) 44) 5016387584000) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 814247409) 44) 860368193617) 44) 16552302906598) 44) 16843198570520) 44) 13876822883823) 44) 7022938287236) 44) 1033006944546) 44) 1792813476864) 44) 97374956392) 44) 0) 44) 917713804138) 44) 11751022133248) 44) 229338549) 44) 27) 44) 7539546633951) 44) 17592186040335) 44) 17592169332735) 44) 17523735003120) 44) 1099511562495) 44) 17591918657535) 44) 16496969383680
-def num59 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (16) 44) 0) 44) 131072) 44) 2048) 44) 33) 44) 549755813888) 44) 0) 44) 0) 44) 2199023255552) 44) 0
-def num60 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (17592118935552) 44) 549751683135) 44) 17583730327008) 44) 274876825599) 44) 13258832477150) 44) 15393146257904) 44) 7696582459554) 44) 13363680154604) 44) 12550515074302) 44) 1373383573588) 44) 12131845534258) 44) 13132231137920) 44) 6276060668206) 44) 17160231870307) 44) 7473209540608) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 303607155) 44) 1378738063683) 44) 16580983528682) 44) 1389914622097) 44) 13997067301903) 44) 168271146062) 44) 6254481049350) 44) 2753277078528) 44) 96770984810) 44) 2199056811007) 44) 16224978033416) 44) 11751024427009) 44) 8796322139573) 44) 4535489134555) 44) 7526393329375) 44) 17592096914095) 44) 17227108253610) 44) 17569368682490) 44) 12093201820415) 44) 11750941391535) 44) 17227108253610
-def num61 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (262144) 44) 0) 44) 2147483648) 44) 33554432) 44) 549755830784) 44) 0) 44) 0) 44) 2048) 44) 0
-def num62 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (17592118935552) 44) 63) 44) 17583730327023) 44) 9070969815040) 44) 268434398) 44) 15393153876471) 44) 16418) 44) 14445474484684) 44) 12552116774007) 44) 1226280419856) 44) 8798916276866) 44) 4056896297474) 44) 1878382175014) 44) 12208051474035) 44) 5265025925120) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 338324853) 44) 5231359609348) 44) 12423774481894) 44) 2498544728082) 44) 14976287390755) 44) 2385447349334) 44) 14257213108490) 44) 10445566127360) 44) 94489283434) 44) 8796143351808) 44) 842558167050) 44) 11751024754689) 44) 13193831276981) 44) 6047317098523) 44) 7539546633951) 44) 17592132566223) 44) 17373139369932) 44) 17578495627260) 44) 14292795510015) 44) 14087439252687) 44) 17373139369932
-def num63 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (8388608) 44) 0) 44) 68719476736) 44) 1073741825) 44) 524800) 44) 0) 44) 0) 44) 65536) 44) 0
-def num64 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (17592118935552) 44) 63) 44) 17583730327008) 44) 274876825599) 44) 15255992269790) 44) 15393154128896) 44) 16418) 44) 13346500383212) 44) 12552654226558) 44) 1234870353936) 44) 10035866890898) 44) 4363988294288) 44) 1878147330086) 44) 16610411695971) 44) 7189708144640) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 407711097) 44) 11287335160840) 44) 15001300651762) 44) 4715309830420) 44) 16333536081378) 44) 222092455015) 44) 7386232324371) 44) 4948020571136) 44) 97173637994) 44) 12094493687808) 44) 894108261216) 44) 11751024984060) 44) 229310901) 44) 6253463994395) 44) 7537667618527) 44) 17592170315535) 44) 17527760551920) 44) 17588159451135) 44) 1099259965695) 44) 16561378164495) 44) 17527760551920
-def num65 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (268435456) 44) 0) 44) 2199023255552) 44) 34359738400) 44) 540672) 44) 0) 44) 0) 44) 2097152) 44) 0
-def num66 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524285) 44) 17042428002367) 44) 17587756858863) 44) 12919260545023) 44) 15321758957568) 44) 0) 44) 38928426) 44) 5565760309232) 44) 33030648) 44) 541389936277) 44) 12549898076161) 44) 12919494466230) 44) 14452837548575) 44) 13277038133120) 44) 33822867456) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 1635895168) 44) 3953280655217) 44) 15641801361660) 44) 16978536233912) 44) 9882569931247) 44) 7422744215936) 44) 8527796376160) 44) 7891465710975) 44) 17414683090944) 44) 0) 44) 917737659242) 44) 0) 44) 229338549) 44) 6253467664347) 44) 7539546619904) 44) 68719476735) 44) 17587891142655) 44) 17592186040320) 44) 1099511627775) 44) 17523467616255) 44) 17592185978880
-def num67 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (536870912) 44) 0) 44) 4398046511104) 44) 2114) 44) 1099511627776) 44) 0) 44) 0) 44) 4194304) 44) 0) 44) 0
-def num68 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (32768) 44) 1099513790721) 44) 68786585640) 44) 1099595647104) 44) 137439035396) 44) 134217728) 44) 5497692619264) 44) 2199023255552) 44) 0) 44) 0) 44) 6443237376) 44) 0) 44) 2624517) 44) 4535489134528) 44) 0) 44) 45812984480) 44) 43690) 44) 11727945072640) 44) 733007751680) 44) 699050) 44) 11725260718080
-def num69 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (32768) 44) 17734058496) 44) 8590197000) 44) 4539918843908) 44) 2149648450) 44) 1134979744768) 44) 550309478928) 44) 274877915392) 44) 138547332) 44) 67110914) 44) 1099545182209
-def num70 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524285) 44) 17042426099775) 44) 17587756858863) 44) 12644383752191) 44) 13258564042752) 44) 2199006724592) 44) 7696620191914) 44) 5564801779620) 44) 9158926826) 44) 527431292612) 44) 3332931752497) 44) 12444896893606) 44) 14453944787743) 44) 6051701603617) 44) 2506750951424) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 1125230098) 44) 3648103079779) 44) 15616761338106) 44) 16918402497441) 44) 1005394719823) 44) 567901168970) 44) 8457803466564) 44) 7340100857215) 44) 17319589838858) 44) 2199056811007) 44) 16310900376328) 44) 137441247233) 44) 8796322360757) 44) 6253467664323) 44) 929323562719) 44) 17592186044410) 44) 11728124051455) 44) 17592096565930) 44) 12094627905450) 44) 11728124379135) 44) 17590754388650
-def num71 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (512) 44) 0) 44) 4194304) 44) 0) 44) 1099545216000) 44) 0) 44) 0) 44) 4) 44) 0) 44) 0
-def num72 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (134216719) 44) 8796093022208) 44) 0) 44) 0) 44) 2) 44) 1103806595200) 44) 2097184) 44) 34359869952) 44) 131072) 44) 1099520018434) 44) 1116960195074) 44) 1024) 44) 2147483648) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 4194816) 44) 64) 44) 2478665955328) 44) 0) 44) 536870912) 44) 4402341740544) 44) 8448) 44) 0) 44) 0) 44) 17723031552) 44) 0) 44) 25190788) 44) 6047317098496) 44) 0) 44) 54975581376) 44) 52428) 44) 14073534087168) 44) 879609302016) 44) 838860) 44) 14070312861696
-def num73 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (32768) 44) 550310003200) 44) 274886303752) 44) 4539918844032) 44) 68786653250) 44) 1134979744769) 44) 17197171216) 44) 274878169344) 44) 4299296900) 44) 2147549248) 44) 1099545182240
-def num74 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524285) 44) 16492674416703) 44) 17587756858863) 44) 12644383719424) 44) 268433438) 44) 2199014343159) 44) 37748778) 44) 5547352917388) 44) 8944292864359) 44) 384623105664) 44) 2284212865) 44) 3507002055206) 44) 10605753688855) 44) 3333441072243) 44) 848591585280) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 1159972388) 44) 8325356298021) 44) 2715032431100) 44) 16927533497250) 44) 2148092074085) 44) 2931299049810) 44) 17487099818568) 44) 16681657347455) 44) 17317308139618) 44) 8796143351808) 44) 917737570314) 44) 9345851457537) 44) 13193832000949) 44) 6253467664344) 44) 6714912911552) 44) 68719476732) 44) 14073748848639) 44) 17592132357324) 44) 14293651161036) 44) 14073749045247) 44) 17591327050956
-def num75 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (16384) 44) 0) 44) 134217728) 44) 2) 44) 1074791424) 44) 0) 44) 0) 44) 128) 44) 0) 44) 0
-def num76 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524285) 44) 16492674416703) 44) 17587756858863) 44) 12919259561983) 44) 15255992269760) 44) 2199014595584) 44) 37748778) 44) 5548980962796) 44) 9906904039806) 44) 410392909456) 44) 1239637545617) 44) 4363854076598) 44) 10674506822167) 44) 16608666857315) 44) 6622638243840) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 1229293128) 44) 12182304268073) 44) 5155119647480) 44) 16945241848756) 44) 12060378657252) 44) 767679005027) 44) 8417024672337) 44) 6786065280383) 44) 17388711971586) 44) 12094493687808) 44) 917737636704) 44) 10995119128572) 44) 229338549) 44) 6253467664347) 44) 115964130816) 44) 68719476735) 44) 1034834477055) 44) 17592170254095) 44) 1099511627760) 44) 16557351632895) 44) 17591933399280
-def num77 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524288) 44) 0) 44) 4294967296) 44) 64) 44) 34360819712) 44) 0) 44) 0) 44) 4096) 44) 0) 44) 0
-def num78 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524284) 44) 549753649215) 44) 17587622641664) 44) 274876825599) 44) 15321758957568) 44) 2199006724592) 44) 7696616128680) 44) 61893937012) 44) 9157878234) 44) 510251237461) 44) 12549931504177) 44) 11895136899764) 44) 13195250606364) 44) 14926314093473) 44) 2505677209600) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 579920274) 44) 1964207358291) 44) 15521735153902) 44) 16570348873881) 44) 9616216915439) 44) 6889387877578) 44) 6531506444068) 44) 3991636967424) 44) 97374953482) 44) 2199056811007) 44) 16310139181930) 44) 137441247233) 44) 8796322360325) 44) 4535489134555) 44) 7539546633951) 44) 17592185694895) 44) 17590754410495) 44) 11728213506730) 44) 12094622313215) 44) 17569279901690) 44) 11729555663530
-def num79 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (8589934592) 44) 4) 44) 0) 44) 1099511627776) 44) 550309462016) 44) 0) 44) 0) 44) 67108864) 44) 0
-def num80 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524284) 44) 549753585727) 44) 17587756858383) 44) 9070969847807) 44) 15322027391006) 44) 2199014343159) 44) 34734122) 44) 1165968967676) 44) 8944302825983) 44) 547832332821) 44) 12552179798657) 44) 13127802215094) 44) 14862067295006) 44) 16610479194099) 44) 858792132608) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 614613412) 44) 4992193036885) 44) 15710462585316) 44) 16858761721882) 44) 10569701865967) 44) 7054064476370) 44) 14188426522664) 44) 10038953550080) 44) 97374955618) 44) 8796143351808) 44) 917518769002) 44) 9345851457537) 44) 13193832000900) 44) 6047317098523) 44) 7539546632384) 44) 68719267023) 44) 17591327064063) 44) 14073802521804) 44) 14293647805695) 44) 17578442358780) 44) 14074607815884
-def num81 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (274877906944) 44) 128) 44) 2) 44) 1) 44) 17196646400) 44) 0) 44) 0) 44) 2147483648) 44) 0
-def num82 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (524284) 44) 549753585727) 44) 17587622641664) 44) 274876825599) 44) 15322027391936) 44) 2199014595584) 44) 34734120) 44) 62162372476) 44) 9906910331358) 44) 513472462869) 44) 12552582320785) 44) 12060494189236) 44) 13813860134940) 44) 16609942191075) 44) 6629080694784) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 684016072) 44) 11597920240729) 44) 16122788367092) 44) 16597272244508) 44) 11944095758831) 44) 7089770217699) 44) 7592390823985) 44) 5640919613440) 44) 97374956290) 44) 12094493687808) 44) 916992383850) 44) 10995119128572) 44) 229338544) 44) 6253463994395) 44) 7539546633728) 44) 68719415055) 44) 17591933403135) 44) 16557367361295) 44) 1099510640895) 44) 17588143783935) 44) 1035087114480
-def num83 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (8796093022208) 44) 4096) 44) 64) 44) 32) 44) 17716740096) 44) 0) 44) 0) 44) 68719476736) 44) 0
-def num84 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (2199006478832) 44) 0) 44) 134217732) 44) 8590073858) 44) 2147483648) 44) 4608) 44) 70867484672) 44) 1073750272) 44) 1099520147489) 44) 274945015808) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 2199031644160) 44) 67110912) 44) 4097) 44) 16785474) 44) 5085243310080) 44) 0) 44) 2) 44) 33554432) 44) 8) 44) 2097153) 44) 8796093022212) 44) 4398049656832) 44) 104689840320) 44) 36650387592) 44) 9382499223688) 44) 9382499223688) 44) 9382499223688) 44) 9382499223688) 44) 9382499223688
-def num85 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (566935699968) 44) 283476500744) 44) 138412164) 44) 70936231938) 44) 1100620006401) 44) 567489872400) 44) 270336) 44) 4429185156) 44) 2214660162) 44) 1099511627809
-def num86 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (549751683072) 44) 134216719) 44) 8796093054975) 44) 13258832476190) 44) 2199014588919) 44) 7696582443138) 44) 1121926546092) 44) 8944817676463) 44) 187905475140) 44) 3335211111088) 44) 10383162869890) 44) 6066005140234) 44) 8285622506867) 44) 3035300364288) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 103997494) 44) 6335184094023) 44) 15789097234798) 44) 3604513749123) 44) 1366646029359) 44) 2398462796890) 44) 15357664261900) 44) 12648684462336) 44) 2281703530) 44) 10995166608383) 44) 15417329074954) 44) 9483290607617) 44) 13193630477701) 44) 6184756576219) 44) 7539546633951) 44) 17587604745966) 44) 16419373641454) 44) 16419373641454) 44) 16419373641454) 44) 16419373641454) 44) 16419373641454
-def num87 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (8) 44) 0) 44) 65536) 44) 1024) 44) 16777744) 44) 0) 44) 0) 44) 0) 44) 1099511627776
-def num88 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (549751683072) 44) 0) 44) 274875842559) 44) 15320416779200) 44) 2199014596080) 44) 7696582443136) 44) 19210601068) 44) 9906889367710) 44) 170725474388) 44) 3473052652208) 44) 9867762352272) 44) 5017764491528) 44) 17158490166115) 44) 6882517319680) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 173383770) 44) 12391159645515) 44) 16167591760570) 44) 5541837805973) 44) 12069172016623) 44) 235111457899) 44) 8485745919765) 44) 7151138897920) 44) 71538051850) 44) 12094527243263) 44) 15468342362984) 44) 11132558082045) 44) 8796297170357) 44) 6253467664347) 44) 942208464607) 44) 17590838603695) 44) 12073068854010) 44) 17247241220015) 44) 12073068854010) 44) 17247241220015) 44) 12073068854010
-def num89 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (256) 44) 0) 44) 2097152) 44) 32768) 44) 536887312) 44) 0) 44) 0) 44) 2) 44) 0
-def num90 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (134216719) 44) 9070968864767) 44) 15255992269790) 44) 2199014596087) 44) 2) 44) 1105837293804) 44) 10044322029631) 44) 66572124688) 44) 1239769404048) 44) 2166827534482) 44) 1736677126914) 44) 16609203849075) 44) 7425797128192) 44) 0) 44) 0) 44) 0) 44) 0) 44) 0) 44) 208093292) 44) 15968903267852) 44) 7595139556308) 44) 6929904892182) 44) 13040105273825) 44) 2452279386227) 44) 16388485771289) 44) 14293672141056) 44) 71403834210) 44) 12094544017408) 44) 86459351914) 44) 11544874942461) 44) 13193829900724) 44) 6253467140123) 44) 6714912913088) 44) 67911012303) 44) 14280715730172) 44) 17385219149775) 44) 14280715730172) 44) 17385219149775) 44) 14280715730172
-def num91 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (8192) 44) 0) 44) 67108864) 44) 1048576) 44) 17180393488) 44) 0) 44) 0) 44) 64) 44) 0
-def num92 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (743093) 44) 11933929793866) 44) 5125419742637) 44) 2691420338514) 44) 3542518904105) 44) 7342974982804) 44) 11900628069242) 44) 5382563852948) 44) 6814320638546) 44) 7942777904425) 44) 4999964313170
-def num93 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (743093) 44) 11934483983194) 44) 14205257701045) 44) 7231339317718) 44) 5812478391593) 44) 7342974982804) 44) 11900628069242) 44) 5666308789148) 44) 11354235288146) 44) 7942777904425) 44) 5035397793362
-def num94 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (776886) 44) 12501402889034) 44) 14204980614837) 44) 11633819212378) 44) 5812547661097) 44) 7307507948147) 44) 11350871714170) 44) 14462133376164) 44) 11496103295570) 44) 5743752484137) 44) 5036471502418
-def num95 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (743093) 44) 11933929793866) 44) 5125419742637) 44) 2691420609114) 44) 8082437874853) 44) 5073015493268) 44) 11900628069242) 44) 5382563852964) 44) 15894141278538) 44) 7942777904425) 44) 5002044687954
-def num96 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (744150) 44) 12500865476954) 44) 14205257701045) 44) 7231339453018) 44) 8082437876967) 44) 6207995238036) 44) 11900628069242) 44) 14187523904420) 44) 15894145608142) 44) 7942777904425) 44) 5036437980754
-def num97 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (775894) 44) 12500882795338) 44) 5125696837301) 44) 7373211650518) 44) 8082437876967) 44) 6243463354995) 44) 11333138738042) 44) 14453811877020) 44) 15894145743442) 44) 5672820579625) 44) 5036470486610
-def num98 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (743093) 44) 11933929793866) 44) 5125419742637) 44) 11771249908306) 44) 8078138586409) 44) 5143884550804) 44) 10800009111386) 44) 5382563853476) 44) 15893881502282) 44) 7942643682597) 44) 2803088541264
-def num99 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (776918) 44) 12484239796570) 44) 14196667504045) 44) 11771254102614) 44) 8080288232745) 44) 6243429766804) 44) 11350318590314) 44) 14462401803428) 44) 15894015720014) 44) 7942710793511) 44) 3936959907409
-def num100 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (743093) 44) 11933929793866) 44) 5125419742637) 44) 11770989861210) 44) 7944864576805) 44) 7340825399954) 44) 11866233726810) 44) 5382563853476) 44) 15885560002898) 44) 7938482805929) 44) 2803088541202
-def num101 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (776918) 44) 11951663835994) 44) 13930371397293) 44) 11771124079066) 44) 8013651227943) 44) 7341900191379) 44) 11883430898026) 44) 14462401549476) 44) 15889854970322) 44) 7940630355177) 44) 3936959907378
-def num102 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (776917) 44) 12501419141978) 44) 5408896234933) 44) 11766963325530) 44) 5883345417449) 44) 7308614163060) 44) 11882910788458) 44) 14462393423012) 44) 15756710980178) 44) 7874056330471) 44) 5036471534162
-def num103 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (776886) 44) 12501957078363) 44) 5692632528829) 44) 7093900233174) 44) 3542588173609) 44) 7307507948147) 44) 11350871714170) 44) 14745878311836) 44) 6956188645970) 44) 5743752484137) 44) 5069757498962
-def num104 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (743093) 44) 11933929793899) 44) 5692909615037) 44) 2691420338514) 44) 3542518899877) 44) 5073015493268) 44) 11900628069242) 44) 5400297910932) 44) 6814311979338) 44) 7942777904425) 44) 5068616681042
-def num105 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (744150) 44) 12501419666283) 44) 5692909615037) 44) 2691420473814) 44) 5812478389479) 44) 6207995238036) 44) 11900628069242) 44) 14471268840092) 44) 11354230958542) 44) 7942777904425) 44) 5069723977298
-def num106 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (775894) 44) 12501436984666) 44) 14205534795709) 44) 2833292671314) 44) 5812478389479) 44) 6243463354995) 44) 11333138738042) 44) 14737556812692) 44) 11354231093842) 44) 5672820579625) 44) 5069756483154
-def num107 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (743093) 44) 11935038171499) 44) 5675729221037) 44) 2691420338514) 44) 3542518904105) 44) 5143884550804) 44) 10800009111386) 44) 5950053708436) 44) 6814320638538) 44) 7942643682597) 44) 2869660534352
-def num108 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (776918) 44) 12484793985899) 44) 5684319418037) 44) 7231335123410) 44) 5810328745257) 44) 6243429766804) 44) 11350318590314) 44) 14746146739100) 44) 11354101070414) 44) 7942710793511) 44) 3970245903953
-def num109 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (743093) 44) 11935038139755) 44) 5143137007533) 44) 2691420338514) 44) 3542518904101) 44) 7340825399954) 44) 11866233726810) 44) 5950053200532) 44) 6814320638290) 44) 7938482805929) 44) 2869660534290
-def num110 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (776918) 44) 11952218025323) 44) 5418023311285) 44) 7231205099862) 44) 5743691740455) 44) 7341900191379) 44) 11883430898026) 44) 14746146485148) 44) 11349940320722) 44) 7940630355177) 44) 3970245903922
-def num111 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (776917) 44) 12501973331306) 44) 14488734193341) 44) 7227044346326) 44) 3613385929961) 44) 7308614163060) 44) 11882910788458) 44) 14746138358684) 44) 11216796330578) 44) 7874056330471) 44) 5069757530706
-def num112 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (777943) 44) 13068338572123) 44) 5692632528829) 44) 7093900368474) 44) 5812547658983) 44) 6172528203379) 44) 11350871714171) 44) 5674907382692) 44) 11496098965966) 44) 5743752484137) 44) 5070797686354
-def num113 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (809687) 44) 13068355890506) 44) 14205257709501) 44) 7235772565974) 44) 5812547658983) 44) 6207996320338) 44) 10783382382971) 44) 5941195355292) 44) 11496099101266) 44) 3473795159337) 44) 5070830192210
-def num114 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (810711) 44) 13051712891739) 44) 5684042331829) 44) 11633815018070) 44) 5810398014761) 44) 6207962732147) 44) 10800562235243) 44) 5949785281700) 44) 11495969077838) 44) 5743685373223) 44) 3971319613009
-def num115 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (810711) 44) 12519136931163) 44) 5417746225077) 44) 11633684994522) 44) 5743761009959) 44) 7306433156722) 44) 11333674542955) 44) 5949785027748) 44) 11491808328146) 44) 5741604934889) 44) 3971319612978
-def num116 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (810710) 44) 13068892237146) 44) 14488457107133) 44) 11629524240986) 44) 3613455199465) 44) 7273147128403) 44) 11333154433387) 44) 5949776901284) 44) 11358664338002) 44) 5675030910183) 44) 5070831239762
-def num117 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (776951) 44) 13067818478426) 44) 14205534795709) 44) 2833292806614) 44) 8082437874853) 44) 5108483610227) 44) 11333138738043) 44) 5666585883548) 44) 15894141413838) 44) 5672820579625) 44) 5070796670546
-def num118 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (745207) 44) 13033441421675) 44) 5675729221037) 44) 2691420609106) 44) 8078138582181) 44) 5073015493268) 44) 10800009111387) 44) 5400297894564) 44) 15893872843082) 44) 7942643682597) 44) 2871740909136
-def num119 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (777975) 44) 13051175479659) 44) 5684319418037) 44) 7231335258710) 44) 8080288230631) 44) 5108450022036) 44) 11350318590315) 44) 5675175809956) 44) 15894011390410) 44) 7942710793511) 44) 3971286091345
-def num120 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (745207) 44) 11968289532267) 44) 5143137007533) 44) 2691420608858) 44) 7944864572581) 44) 5073015493266) 44) 11866233726811) 44) 5400297386660) 44) 15885551343946) 44) 7938482805929) 44) 2871740909074
-def num121 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (777975) 44) 12518599519083) 44) 5418023311285) 44) 7231205235162) 44) 8013651225829) 44) 6206920446611) 44) 11883430898027) 44) 5675175556004) 44) 15889850640718) 44) 7940630355177) 44) 3971286091314
-def num122 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (777974) 44) 13068354825066) 44) 14488734193341) 44) 7227044481626) 44) 5883345415335) 44) 6173634418292) 44) 11882910788459) 44) 5675167429540) 44) 15756706650574) 44) 7874056330471) 44) 5070797718098
-def num123 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (809719) 44) 13051192798042) 44) 14196944598709) 44) 7373207456210) 44) 8080288230631) 44) 5143918138995) 44) 10782829259115) 44) 5941463782556) 44) 15894011525710) 44) 5672753468711) 44) 3971318597201
-def num124 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (809719) 44) 12518616837466) 44) 13930648491957) 44) 7373077432662) 44) 8013651225829) 44) 6242388563570) 44) 11315941566827) 44) 5941463528604) 44) 15889850776018) 44) 5670673030377) 44) 3971318597170
-def num125 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (809718) 44) 13068372143450) 44) 5409173329597) 44) 7368916679126) 44) 5883345415335) 44) 6209102535251) 44) 11315421457259) 44) 5941455402140) 44) 15756706785874) 44) 5604099005671) 44) 5070830223954
-def num126 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (810743) 44) 11935038138731) 44) 5125956613549) 44) 11770981472594) 44) 7940565415205) 44) 5141734970002) 44) 10765648324443) 44) 5950053184676) 44) 15885291567434) 44) 7938348584101) 44) 2871808017936
-def num127 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (810743) 44) 12501973838699) 44) 5409433114285) 44) 11771119884758) 44) 8011501581607) 44) 6242354975379) 44) 11333121419099) 44) 5950053455012) 44) 15889720752590) 44) 7940563244263) 44) 2871808017969
-def num128 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (810742) 44) 13051729144682) 44) 14480143996341) 44) 11766959131222) 44) 5881195771113) 44) 6209068947060) 44) 11332601309531) 44) 5950045328548) 44) 15756576762446) 44) 7873989219557) 44) 3971319644753
-def num129 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (810742) 44) 12519153184106) 44) 14213847889589) 44) 11766829107674) 44) 5814558766311) 44) 7307539371635) 44) 11865713617243) 44) 5950045074596) 44) 15752416012754) 44) 7871908781223) 44) 3971319644722
-def x0 : W := ⟨num0, num1, 0, num1, 3⟩
-def x1 : W := ⟨num2, num3, 0, num3, 3⟩
-def x2 : W := ⟨num4, num5, 0, num5, 0⟩
-def x3 : W := ⟨num6, num7, 0, num7, 3⟩
-def x4 : W := ⟨num8, num9, 0, num9, 3⟩
-def x5 : W := ⟨num10, num11, 0, num11, 3⟩
-def x6 : W := ⟨num12, num13, 0, num13, 3⟩
-def x7 : W := ⟨num14, num15, 0, num15, 3⟩
-def x8 : W := ⟨num16, num17, 0, num17, 3⟩
-def x9 : W := ⟨num18, num19, 0, num19, 0⟩
-def x10 : W := ⟨num20, num21, 0, num21, 0⟩
-def x11 : W := ⟨num22, num23, 0, num23, 0⟩
-def x12 : W := ⟨num24, num25, 0, num25, 0⟩
-def x13 : W := ⟨num26, num27, 0, num27, 0⟩
-def x14 : W := ⟨num28, num29, 0, num29, 0⟩
-def x15 : W := ⟨num30, num31, 0, num31, 0⟩
-def x16 : W := ⟨num32, num33, 0, num33, 0⟩
-def x17 : W := ⟨num34, num35, 0, num35, 0⟩
-def x18 : W := ⟨num36, num37, 0, num37, 0⟩
-def x19 : W := ⟨num38, num39, 0, num39, 0⟩
-def x20 : W := ⟨num40, num41, 0, num41, 0⟩
-def x21 : W := ⟨num42, num43, 0, num43, 0⟩
-def x22 : W := ⟨num44, num45, 0, num45, 0⟩
-def x23 : W := ⟨num46, num47, 0, num47, 0⟩
-def x24 : W := ⟨num48, num49, 0, num49, 0⟩
-def x25 : W := ⟨num50, num51, 0, num51, 0⟩
-def x26 : W := ⟨num52, num53, 0, num53, 0⟩
-def x27 : W := ⟨num54, num55, 0, num55, 0⟩
-def x28 : W := ⟨num56, num57, 0, num57, 0⟩
-def x29 : W := ⟨num58, num59, 0, num59, 0⟩
-def x30 : W := ⟨num60, num61, 0, num61, 0⟩
-def x31 : W := ⟨num62, num63, 0, num63, 0⟩
-def x32 : W := ⟨num64, num65, 0, num65, 0⟩
-def x33 : W := ⟨num66, num67, 0, num67, 0⟩
-def x34 : W := ⟨num68, num69, 0, num69, 0⟩
-def x35 : W := ⟨num70, num71, 0, num71, 0⟩
-def x36 : W := ⟨num72, num73, 0, num73, 0⟩
-def x37 : W := ⟨num74, num75, 0, num75, 0⟩
-def x38 : W := ⟨num76, num77, 0, num77, 0⟩
-def x39 : W := ⟨num78, num79, 0, num79, 0⟩
-def x40 : W := ⟨num80, num81, 0, num81, 0⟩
-def x41 : W := ⟨num82, num83, 0, num83, 0⟩
-def x42 : W := ⟨num84, num85, 0, num85, 0⟩
-def x43 : W := ⟨num86, num87, 0, num87, 0⟩
-def x44 : W := ⟨num88, num89, 0, num89, 0⟩
-def x45 : W := ⟨num90, num91, 0, num91, 0⟩
-def s0 : S := (num92, [x0, x1, x2, x3, x4, x5, x6, x7, x8])
-def s1 : S := (num93, [x9, x0, x1, x3, x4, x5, x6, x7, x8])
-def s2 : S := (num94, [x10, x0, x1, x3, x4, x5, x6, x7, x8])
-def s3 : S := (num95, [x0, x1, x3, x4, x5, x6, x7, x8, x11])
-def s4 : S := (num96, [x12, x0, x1, x3, x4, x5, x6, x7, x8])
-def s5 : S := (num97, [x13, x0, x1, x3, x4, x5, x6, x7, x8])
-def s6 : S := (num98, [x0, x1, x3, x4, x5, x6, x7, x8, x14])
-def s7 : S := (num99, [x15, x0, x1, x3, x4, x5, x6, x7, x8])
-def s8 : S := (num100, [x0, x1, x3, x4, x5, x6, x7, x8, x16])
-def s9 : S := (num101, [x17, x0, x1, x3, x4, x5, x6, x7, x8])
-def s10 : S := (num102, [x18, x0, x1, x3, x4, x5, x6, x7, x8])
-def s11 : S := (num103, [x0, x19, x1, x3, x4, x5, x6, x7, x8])
-def s12 : S := (num104, [x0, x1, x3, x4, x20, x5, x6, x7, x8])
-def s13 : S := (num105, [x0, x21, x1, x3, x4, x5, x6, x7, x8])
-def s14 : S := (num106, [x0, x22, x1, x3, x4, x5, x6, x7, x8])
-def s15 : S := (num107, [x0, x1, x3, x4, x5, x6, x23, x7, x8])
-def s16 : S := (num108, [x0, x24, x1, x3, x4, x5, x6, x7, x8])
-def s17 : S := (num109, [x0, x1, x3, x4, x5, x6, x7, x8, x25])
-def s18 : S := (num110, [x0, x26, x1, x3, x4, x5, x6, x7, x8])
-def s19 : S := (num111, [x0, x27, x1, x3, x4, x5, x6, x7, x8])
-def s20 : S := (num112, [x0, x1, x28, x3, x4, x5, x6, x7, x8])
-def s21 : S := (num113, [x0, x1, x29, x3, x4, x5, x6, x7, x8])
-def s22 : S := (num114, [x0, x1, x30, x3, x4, x5, x6, x7, x8])
-def s23 : S := (num115, [x0, x1, x31, x3, x4, x5, x6, x7, x8])
-def s24 : S := (num116, [x0, x1, x32, x3, x4, x5, x6, x7, x8])
-def s25 : S := (num117, [x0, x1, x3, x33, x4, x5, x6, x7, x8])
-def s26 : S := (num118, [x0, x1, x3, x4, x5, x6, x7, x8, x34])
-def s27 : S := (num119, [x0, x1, x3, x35, x4, x5, x6, x7, x8])
-def s28 : S := (num120, [x0, x1, x3, x4, x5, x6, x7, x36, x8])
-def s29 : S := (num121, [x0, x1, x3, x37, x4, x5, x6, x7, x8])
-def s30 : S := (num122, [x0, x1, x3, x38, x4, x5, x6, x7, x8])
-def s31 : S := (num123, [x0, x1, x3, x4, x39, x5, x6, x7, x8])
-def s32 : S := (num124, [x0, x1, x3, x4, x40, x5, x6, x7, x8])
-def s33 : S := (num125, [x0, x1, x3, x4, x41, x5, x6, x7, x8])
-def s34 : S := (num126, [x0, x1, x3, x4, x5, x6, x7, x8, x42])
-def s35 : S := (num127, [x0, x1, x3, x4, x5, x43, x6, x7, x8])
-def s36 : S := (num128, [x0, x1, x3, x4, x5, x44, x6, x7, x8])
-def s37 : S := (num129, [x0, x1, x3, x4, x5, x6, x45, x7, x8])
-def states : List S := [s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21, s22, s23, s24, s25, s26, s27, s28, s29, s30, s31, s32, s33, s34, s35, s36, s37]
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem guardFalse (F : Nat → List W → Bool) : first (guarded states F) FF = false := by
-  rfl
+lemma sliceZero4 : chk [] (sliceQ 4) 4 11 0 FF 1 = false := by decide +kernel
 
-theorem reduceRoot (h : ∀ x ∈ states, next x.1 x.2 = false) : chk [] rt 0 14 1 FF 0 = false := by
-  rw [← first_eq, ← guarded_eq h]
-  exact guardFalse next
-
-set_option maxHeartbeats 0 in
 set_option maxRecDepth 100000 in
-theorem cert0 : next s0.1 s0.2 = false := by decide +kernel
-
 set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert1 : next s1.1 s1.2 = false := by decide +kernel
+lemma sliceCheck4_0 : chk [] (sliceQ 4) 4 12 1 (0) 1 = false := by decide +kernel
 
+set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert2 : next s2.1 s2.2 = false := by decide +kernel
+lemma sliceCheck4_1 : chk [] (sliceQ 4) 4 12 1 (packedMask [0x400000000, 0x1000000000010000, 0x1]) 0 = false := by decide +kernel
 
+set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert3 : next s3.1 s3.2 = false := by decide +kernel
+lemma sliceCheck4_2 : chk [] (sliceQ 4) 4 12 1 (packedMask [0x100, 0x40000, 0x100000000, 0x40000000]) 0 = false := by decide +kernel
 
+set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert4 : next s4.1 s4.2 = false := by decide +kernel
+lemma sliceCheck4_3 : chk [] (sliceQ 4) 4 12 1 (packedMask [0x4000000000000400, 0x40000000, 0x4]) 0 = false := by decide +kernel
 
+set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert5 : next s5.1 s5.2 = false := by decide +kernel
+lemma sliceCheck4_4 : chk [] (sliceQ 4) 4 12 1 (packedMask [0x3ffeff, 0xbffffffbfffbfbff, 0xeffffffebffeffff, 0xffffffffbffffffa]) 0 = false := by decide +kernel
 
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert6 : next s6.1 s6.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert7 : next s7.1 s7.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert8 : next s8.1 s8.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert9 : next s9.1 s9.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert10 : next s10.1 s10.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert11 : next s11.1 s11.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert12 : next s12.1 s12.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert13 : next s13.1 s13.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert14 : next s14.1 s14.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert15 : next s15.1 s15.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert16 : next s16.1 s16.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert17 : next s17.1 s17.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert18 : next s18.1 s18.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert19 : next s19.1 s19.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert20 : next s20.1 s20.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert21 : next s21.1 s21.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert22 : next s22.1 s22.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert23 : next s23.1 s23.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert24 : next s24.1 s24.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert25 : next s25.1 s25.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert26 : next s26.1 s26.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert27 : next s27.1 s27.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert28 : next s28.1 s28.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert29 : next s29.1 s29.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert30 : next s30.1 s30.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert31 : next s31.1 s31.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert32 : next s32.1 s32.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert33 : next s33.1 s33.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert34 : next s34.1 s34.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert35 : next s35.1 s35.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert36 : next s36.1 s36.2 = false := by decide +kernel
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem cert37 : next s37.1 s37.2 = false := by decide +kernel
-theorem allStates : ∀ x ∈ states, next x.1 x.2 = false := by
-  intro x hx
-  simp only [states, List.mem_cons, List.not_mem_nil, or_false] at hx
-  rcases hx with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact cert0
-  · exact cert1
-  · exact cert2
-  · exact cert3
-  · exact cert4
-  · exact cert5
-  · exact cert6
-  · exact cert7
-  · exact cert8
-  · exact cert9
-  · exact cert10
-  · exact cert11
-  · exact cert12
-  · exact cert13
-  · exact cert14
-  · exact cert15
-  · exact cert16
-  · exact cert17
-  · exact cert18
-  · exact cert19
-  · exact cert20
-  · exact cert21
-  · exact cert22
-  · exact cert23
-  · exact cert24
-  · exact cert25
-  · exact cert26
-  · exact cert27
-  · exact cert28
-  · exact cert29
-  · exact cert30
-  · exact cert31
-  · exact cert32
-  · exact cert33
-  · exact cert34
-  · exact cert35
-  · exact cert36
-  · exact cert37
-
-theorem binaryRoot : chk [] rt 0 14 1 FF 0 = false := reduceRoot allStates
-
-set_option maxHeartbeats 0 in
-set_option maxRecDepth 100000 in
-theorem unaryRoot : chk [] rt 0 14 1 0 1 = false := by decide +kernel
-
-lemma allRoot : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 14 1 p.1 p.2 = false := by
-  refine ⟨[(FF,0),(0,1)], by decide +kernel, ?_⟩
+lemma sliceFace4 : BImp [] 4 12 := by
+  apply binarySliceBound (Z := 4) (L := 12) (Q := (sliceQ 4)) (M := sliceArgs4) (by decide) sliceReady4 (sliceQBounds 4) sliceZero4 sliceCover4
   intro p hp
-  simp only [List.mem_cons, List.not_mem_nil, or_false] at hp
-  rcases hp with rfl | rfl
-  · exact binaryRoot
-  · exact unaryRoot
+  simp only [sliceArgs4, List.mem_cons, List.not_mem_nil, or_false] at hp
+  rcases hp with rfl | rfl | rfl | rfl | rfl
+  · exact sliceCheck4_0
+  · exact sliceCheck4_1
+  · exact sliceCheck4_2
+  · exact sliceCheck4_3
+  · exact sliceCheck4_4
 
-end PrefixCut
+def sliceArgs8 : List (ℕ × ℕ) := [
+  (0, 1),
+  (packedMask [0x1000, 0x10000000000, 0x4000000000, 0x100], 0),
+  (packedMask [0x40000000000040, 0x0, 0x40000000000], 0),
+  (packedMask [0x1000000000000, 0x4000000000000, 0x100000], 0),
+  (packedMask [0x10, 0x0], 0),
+  (packedMask [0x4000000000000000, 0x0, 0x0], 0),
+  (packedMask [0x10000, 0x0, 0x0], 0),
+  (packedMask [0x40000000000, 0x400000000000, 0x400], 0),
+  (packedMask [0x100000000000000], 0),
+  (packedMask [0x1000000000000000, 0x0, 0x0], 0),
+  (packedMask [0x100, 0x0, 0x0], 0),
+  (packedMask [0x3fefff, 0xafbefafffffefebf, 0xfffbbfbfffffffef, 0xfefffbffffeffaff], 0)]
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCover8 : mFull sliceArgs8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceReady8 : pOk 8 (sliceQ 8) = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceZero8 : chk [] (sliceQ 8) 8 11 0 FF 1 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck8_0 : chk [] (sliceQ 8) 8 12 1 (0) 1 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck8_1 : chk [] (sliceQ 8) 8 12 1 (packedMask [0x1000, 0x10000000000, 0x4000000000, 0x100]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck8_2 : chk [] (sliceQ 8) 8 12 1 (packedMask [0x40000000000040, 0x0, 0x40000000000]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck8_3 : chk [] (sliceQ 8) 8 12 1 (packedMask [0x1000000000000, 0x4000000000000, 0x100000]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck8_4 : chk [] (sliceQ 8) 8 12 1 (packedMask [0x10, 0x0]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck8_5 : chk [] (sliceQ 8) 8 12 1 (packedMask [0x4000000000000000, 0x0, 0x0]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck8_6 : chk [] (sliceQ 8) 8 12 1 (packedMask [0x10000, 0x0, 0x0]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck8_7 : chk [] (sliceQ 8) 8 12 1 (packedMask [0x40000000000, 0x400000000000, 0x400]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck8_8 : chk [] (sliceQ 8) 8 12 1 (packedMask [0x100000000000000]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck8_9 : chk [] (sliceQ 8) 8 12 1 (packedMask [0x1000000000000000, 0x0, 0x0]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck8_10 : chk [] (sliceQ 8) 8 12 1 (packedMask [0x100, 0x0, 0x0]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck8_11 : chk [] (sliceQ 8) 8 12 1 (packedMask [0x3fefff, 0xafbefafffffefebf, 0xfffbbfbfffffffef, 0xfefffbffffeffaff]) 0 = false := by decide +kernel
+
+lemma sliceFace8 : BImp [] 8 12 := by
+  apply binarySliceBound (Z := 8) (L := 12) (Q := (sliceQ 8)) (M := sliceArgs8) (by decide) sliceReady8 (sliceQBounds 8) sliceZero8 sliceCover8
+  intro p hp
+  simp only [sliceArgs8, List.mem_cons, List.not_mem_nil, or_false] at hp
+  rcases hp with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  · exact sliceCheck8_0
+  · exact sliceCheck8_1
+  · exact sliceCheck8_2
+  · exact sliceCheck8_3
+  · exact sliceCheck8_4
+  · exact sliceCheck8_5
+  · exact sliceCheck8_6
+  · exact sliceCheck8_7
+  · exact sliceCheck8_8
+  · exact sliceCheck8_9
+  · exact sliceCheck8_10
+  · exact sliceCheck8_11
+
+def sliceArgs16 : List (ℕ × ℕ) := [
+  (0, 1),
+  (packedMask [0x1, 0x400000000, 0x100040000000040, 0x100100000], 0),
+  (packedMask [0x400000004000000, 0x1000000010000, 0x400000004000000], 0),
+  (packedMask [0x40, 0x400, 0x400, 0x400000], 0),
+  (packedMask [0x100000000000, 0x100000000000, 0x4000000000], 0),
+  (packedMask [0x3fffbe, 0xfbffeffbfbfffbff, 0xfefeebfffffefbbf, 0xfbffffbefbafffff], 0)]
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCover16 : mFull sliceArgs16 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceReady16 : pOk 16 (sliceQ 16) = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceZero16 : chk [] (sliceQ 16) 16 11 0 FF 1 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck16_0 : chk [] (sliceQ 16) 16 12 1 (0) 1 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck16_1 : chk [] (sliceQ 16) 16 12 1 (packedMask [0x1, 0x400000000, 0x100040000000040, 0x100100000]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck16_2 : chk [] (sliceQ 16) 16 12 1 (packedMask [0x400000004000000, 0x1000000010000, 0x400000004000000]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck16_3 : chk [] (sliceQ 16) 16 12 1 (packedMask [0x40, 0x400, 0x400, 0x400000]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck16_4 : chk [] (sliceQ 16) 16 12 1 (packedMask [0x100000000000, 0x100000000000, 0x4000000000]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck16_5 : chk [] (sliceQ 16) 16 12 1 (packedMask [0x3fffbe, 0xfbffeffbfbfffbff, 0xfefeebfffffefbbf, 0xfbffffbefbafffff]) 0 = false := by decide +kernel
+
+lemma sliceFace16 : BImp [] 16 12 := by
+  apply binarySliceBound (Z := 16) (L := 12) (Q := (sliceQ 16)) (M := sliceArgs16) (by decide) sliceReady16 (sliceQBounds 16) sliceZero16 sliceCover16
+  intro p hp
+  simp only [sliceArgs16, List.mem_cons, List.not_mem_nil, or_false] at hp
+  rcases hp with rfl | rfl | rfl | rfl | rfl | rfl
+  · exact sliceCheck16_0
+  · exact sliceCheck16_1
+  · exact sliceCheck16_2
+  · exact sliceCheck16_3
+  · exact sliceCheck16_4
+  · exact sliceCheck16_5
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceSimple32 : okE [] (sliceQ 32) (32,11) = true := by decide +kernel
+
+lemma sliceFace32 : BImp [] 32 11 := imp_okE (e := (32,11)) sliceSimple32 (sliceQBounds 32)
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceSimple64 : okE [] (sliceQ 64) (64,11) = true := by decide +kernel
+
+lemma sliceFace64 : BImp [] 64 11 := imp_okE (e := (64,11)) sliceSimple64 (sliceQBounds 64)
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceSimple128 : okE [] (sliceQ 128) (128,10) = true := by decide +kernel
+
+lemma sliceFace128 : BImp [] 128 10 := imp_okE (e := (128,10)) sliceSimple128 (sliceQBounds 128)
+
+lemma sliceFirst : ∀ e ∈ rt1, BImp [] e.1 e.2 := by
+  intro e he
+  simp only [rt1, List.mem_cons, List.not_mem_nil, or_false] at he
+  rcases he with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  · exact sliceFace1
+  · exact sliceFace2
+  · exact sliceFace4
+  · exact sliceFace8
+  · exact sliceFace16
+  · exact sliceFace32
+  · exact sliceFace64
+  · exact sliceFace128
+
+lemma sliceAll : ∀ e ∈ rt, BImp [] e.1 e.2 := apI (apI sliceFirst i2) i3
+
+def sliceArgs0 : List (ℕ × ℕ) := [
+  (0, 1),
+  (packedMask [0x40000000, 0x400000000, 0x400000100], 0),
+  (packedMask [0x10, 0x1000, 0x100000], 0),
+  (packedMask [0x100000000000000, 0x10000], 0),
+  (packedMask [0x1000000000000000, 0x0, 0x4000000000000], 0),
+  (packedMask [0x4000000, 0x1000000, 0x1000000], 0),
+  (packedMask [0x4000000000, 0x1000000000, 0x40000000400], 0),
+  (packedMask [0x1000000, 0x100000, 0x400000], 0),
+  (packedMask [0x3fffff, 0xefffffbfbaffffef, 0xfeffffebfeefefff, 0xfffbfbfbfeaefaff], 0)]
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCover0 : mFull sliceArgs0 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceReady0 : pOk 0 rt = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceZero0 : chk [] rt 0 13 0 FF 1 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck0_0 : chk [] rt 0 14 1 (0) 1 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck0_1 : chk [] rt 0 14 1 (packedMask [0x40000000, 0x400000000, 0x400000100]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck0_2 : chk [] rt 0 14 1 (packedMask [0x10, 0x1000, 0x100000]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck0_3 : chk [] rt 0 14 1 (packedMask [0x100000000000000, 0x10000]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck0_4 : chk [] rt 0 14 1 (packedMask [0x1000000000000000, 0x0, 0x4000000000000]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck0_5 : chk [] rt 0 14 1 (packedMask [0x4000000, 0x1000000, 0x1000000]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck0_6 : chk [] rt 0 14 1 (packedMask [0x4000000000, 0x1000000000, 0x40000000400]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck0_7 : chk [] rt 0 14 1 (packedMask [0x1000000, 0x100000, 0x400000]) 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma sliceCheck0_8 : chk [] rt 0 14 1 (packedMask [0x3fffff, 0xefffffbfbaffffef, 0xfeffffebfeefefff, 0xfffbfbfbfeaefaff]) 0 = false := by decide +kernel
+
+lemma binaryRoot : BImp [] 0 14 := by
+  apply binarySliceBound (Z := 0) (L := 14) (Q := rt) (M := sliceArgs0) (by decide) sliceReady0 sliceAll sliceZero0 sliceCover0
+  intro p hp
+  simp only [sliceArgs0, List.mem_cons, List.not_mem_nil, or_false] at hp
+  rcases hp with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  · exact sliceCheck0_0
+  · exact sliceCheck0_1
+  · exact sliceCheck0_2
+  · exact sliceCheck0_3
+  · exact sliceCheck0_4
+  · exact sliceCheck0_5
+  · exact sliceCheck0_6
+  · exact sliceCheck0_7
+  · exact sliceCheck0_8
+
+lemma iroot : Imp [] 0 14 := by
+  intro q hq hs
+  obtain ⟨k, hk, u, hu, S, hS, hl⟩ := hs.live
+  exact binaryRoot (k-u) (by omega) (hl.toBSol.mono le_rfl hu hS)
+
 lemma iroot_pos {S : Finset ℕ} (hS : (S : Set ℕ) ⊆ C (mz 0) (WZ [] 0))
     (hl : Live Z0 (mz 0) (tz 0) 14 1 S) : False :=
-  imp_of_live (L := 15) (Or.inl rfl) root_p (by norm_num) ir (by omega) le_rfl hS hl iroot (Or.inr PrefixCut.allRoot)
+  binaryRoot 13 (by decide) (hl.toBSol.mono le_rfl le_rfl hS)
+
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
 section circuit
 variable (m : ℕ)
