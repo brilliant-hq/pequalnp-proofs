@@ -4151,8 +4151,11 @@ theorem solve (s : ℕ) (h : HasCircuitSize 6 target s) :
 end sixin
 end PEqualNP.Outside.L_meta_41748
 
-theorem PEqualNP.Outside.L_meta_41748.dual_case : ∀ s : ℕ, PEqualNP.MetaComplexity.HasCircuitSize 6 (fun x : Fin 6 → Bool => Nat.testBit (4210751624 * 2 ^ 32 + 3936938112) (∑ i : Fin 6, if x i then 2 ^ (i : ℕ) else 0)) s → ∃ C : PEqualNP.CircuitLowerBounds.Circuit, PEqualNP.MetaComplexity.Monotone2 C ∧ C.size ≤ s ∧ ∀ x : Fin 6 → Bool, C.eval (List.ofFn x) = Nat.testBit (4210751624 * 2 ^ 32 + 3936938112) (∑ i : Fin 6, if x i then 2 ^ (i : ℕ) else 0) := by
+namespace PEqualNP.Outside.L_meta_41748
+theorem dual_case : ∀ s : ℕ, PEqualNP.MetaComplexity.HasCircuitSize 6 (fun x : Fin 6 → Bool => Nat.testBit (4210751624 * 2 ^ 32 + 3936938112) (∑ i : Fin 6, if x i then 2 ^ (i : ℕ) else 0)) s → ∃ C : PEqualNP.CircuitLowerBounds.Circuit, PEqualNP.MetaComplexity.Monotone2 C ∧ C.size ≤ s ∧ ∀ x : Fin 6 → Bool, C.eval (List.ofFn x) = Nat.testBit (4210751624 * 2 ^ 32 + 3936938112) (∑ i : Fin 6, if x i then 2 ^ (i : ℕ) else 0) := by
   exact PEqualNP.Outside.L_meta_41748.solve
+end PEqualNP.Outside.L_meta_41748
+
 
 namespace PEqualNP.Outside.L_meta_41748.DualTransfer
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
