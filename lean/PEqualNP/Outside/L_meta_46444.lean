@@ -3123,9 +3123,13 @@ def anySub (d : Bool) (l : ℕ) (v : List W) : ℕ → (List W → Bool) → Boo
 def sumc (v : List W) : ℕ := List.rec (motive := fun _ => ℕ) 0 (fun w _ ih => Nat.add w.c ih) v
 def MM : ℕ := 214
 def hb (H x : ℕ) : Bool := Nat.beq (Nat.land (Nat.shiftRight H (Nat.mod x MM)) 1) 1
-def pairsC (H : ℕ) (h : X → X → Bool) (xs : List X) : Bool :=
+def pairsMasked (H : ℕ) (h : X → X → Bool) (xs : List X) : Bool :=
   List.rec (motive := fun _ => Bool) false (fun a r ih => Bool.rec (motive := fun _ => Bool) ih true
     (scan (fun x => Bool.rec (motive := fun _ => Bool) false (h a x) (hb H (Nat.add a.s x.s))) r)) xs
+def pairsAll (h : X → X → Bool) (xs : List X) : Bool :=
+  List.rec (motive := fun _ => Bool) false (fun a r ih => Bool.rec (motive := fun _ => Bool) ih true (scan (h a) r)) xs
+def pairsC (H : ℕ) (h : X → X → Bool) (xs : List X) : Bool :=
+  if H = 2 ^ MM - 1 then pairsAll h xs else pairsMasked H h xs
 def topC (l m g K H ph k t z : ℕ) (v : List W) : Bool :=
   Bool.rec (motive := fun _ => Bool) (tst (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
     Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false (mv (look l m g K) l m g k t z v y) (Nat.beq ph 1)) true
@@ -3275,12 +3279,12 @@ lemma avl_spec (P : List ℕ) (m : ℕ) (L : List ℕ) : Srt (avl P m L) ∧ (�
           rcases hx with rfl | hx
           · exact j3
           · obtain ⟨w, hw, e⟩ := i3 x hx h2 h3; exact ⟨w, j4 w hw, e⟩
-lemma pairsC_false {H : ℕ} {h : X → X → Bool} {xs : List X} (hp : pairsC H h xs = false) :
+lemma pairsMasked_false {H : ℕ} {h : X → X → Bool} {xs : List X} (hp : pairsMasked H h xs = false) :
     xs.Pairwise (fun a b => hb H (a.s + b.s) = true → h a b = false) := by
   induction xs with
   | nil => simp
   | cons a r ih =>
-    change (Bool.rec (motive := fun _ => Bool) (pairsC H h r) true
+    change (Bool.rec (motive := fun _ => Bool) (pairsMasked H h r) true
       (scan (fun x => Bool.rec (motive := fun _ => Bool) false (h a x) (hb H (Nat.add a.s x.s))) r) : Bool) = false at hp
     rw [bR] at hp
     rw [List.pairwise_cons]
@@ -3294,7 +3298,25 @@ lemma pairsC_false {H : ℕ} {h : X → X → Bool} {xs : List X} (hp : pairsC H
       rw [bR] at h2
       have h3 : hb H (Nat.add a.s b.s) = true := hi
       rwa [h3, Bool.cond_true] at h2
-    · apply ih; revert hp; cases pairsC H h r <;> simp
+    · apply ih; revert hp; cases pairsMasked H h r <;> simp
+lemma pairsAll_false {h : X → X → Bool} {xs : List X} (hp : pairsAll h xs = false) :
+    xs.Pairwise (fun a b => h a b = false) := by
+  induction xs with
+  | nil => simp
+  | cons a r ih =>
+    change (Bool.rec (motive := fun _ => Bool) (pairsAll h r) true (scan (h a) r) : Bool) = false at hp
+    cases hscan : scan (h a) r with
+    | true => simp [hscan] at hp
+    | false =>
+      rw [List.pairwise_cons]
+      exact ⟨scan_false hscan, ih (by simpa [hscan] using hp)⟩
+lemma pairsC_false {H : ℕ} {h : X → X → Bool} {xs : List X} (hp : pairsC H h xs = false) :
+    xs.Pairwise (fun a b => hb H (a.s + b.s) = true → h a b = false) := by
+  by_cases hfull : H = 2 ^ MM - 1
+  · have hall : pairsAll h xs = false := by simpa [pairsC, hfull] using hp
+    have weaken {a b : X} (p : h a b = false) (_ : hb H (a.s + b.s) = true) : h a b = false := p
+    exact (pairsAll_false hall).imp (fun {a b} => @weaken a b)
+  · exact pairsMasked_false (by simpa [pairsC, hfull] using hp)
 def mFull (M : List (ℕ × ℕ)) : Bool := (List.range MM).all (fun r => M.any (fun p => hb p.1 r)) && M.any (fun p => Nat.beq p.2 1)
 lemma hb_mod (H x : ℕ) : hb H x = hb H (x % MM) := by
   unfold hb
