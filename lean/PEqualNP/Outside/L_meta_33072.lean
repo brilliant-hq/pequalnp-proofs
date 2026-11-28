@@ -48,6 +48,27 @@ lemma Sol.rel {R' : ℕ → ℕ} {m T q : ℕ} {S : Set ℕ} (h : Sol R m T q S)
   | un h _ ih => exact .un h ih
   | bi h1 h2 ha _ ih => exact .bi h1 h2 (hR _ _ _ ha) ih
 lemma Sol.to0 {m T q : ℕ} {S : Set ℕ} (h : Sol R m T q S) : Sol Z0 m T q S := h.rel fun d a b _ => al0 d a b
+inductive SolB (m T : ℕ) : ℕ → ℕ → Set ℕ → Prop
+  | done {q u : ℕ} {S : Set ℕ} : T ∈ S → SolB m T q u S
+  | un {q u : ℕ} {S : Set ℕ} {a : ℕ} : a ∈ S → SolB m T q u (insert (a ^^^ m) S) → SolB m T q (u + 1) S
+  | bi {q u : ℕ} {S : Set ℕ} {d : Bool} {a b : ℕ} : a ∈ S → b ∈ S → SolB m T q u (insert (op d a b) S) → SolB m T (q + 1) u S
+lemma SolB.mono {m T q u : ℕ} {S : Set ℕ} (h : SolB m T q u S) :
+    ∀ {q' u' : ℕ} {S' : Set ℕ}, q ≤ q' → u ≤ u' → S ⊆ S' → SolB m T q' u' S' := by
+  induction h with
+  | done h => intro q' u' S' _ _ hs; exact .done (hs h)
+  | un h _ ih =>
+    intro q' u' S' hq hu hs
+    obtain ⟨r, rfl⟩ : ∃ r, u' = r + 1 := ⟨u' - 1, by omega⟩
+    exact .un (hs h) (ih hq (by omega) (Set.insert_subset_insert hs))
+  | bi h1 h2 _ ih =>
+    intro q' u' S' hq hu hs
+    obtain ⟨r, rfl⟩ : ∃ r, q' = r + 1 := ⟨q' - 1, by omega⟩
+    exact .bi (hs h1) (hs h2) (ih (by omega) hu (Set.insert_subset_insert hs))
+lemma SolB.sol {m T q u : ℕ} {S : Set ℕ} (h : SolB m T q u S) : Sol Z0 m T (q + u) S := by
+  induction h with
+  | done h => exact .done h
+  | un h _ ih => exact .un h ih
+  | bi h1 h2 _ ih => rw [Nat.add_right_comm]; exact .bi h1 h2 (al0 _ _ _) ih
 inductive Live (R : ℕ → ℕ) (m T : ℕ) : ℕ → ℕ → Finset ℕ → Prop
   | stop : Live R m T 0 0 {T}
   | un {k t : ℕ} {a : ℕ} {U : Finset ℕ} : Live R m T k t (insert (a ^^^ m) U) →
@@ -91,6 +112,35 @@ lemma Sol.live {m T q : ℕ} {S : Set ℕ} (h : Sol R m T q S) :
       · exact hb
       · exact (hs h1).resolve_left h2
     · exact ⟨k, by omega, t, S1, fun x hx => (hs hx).resolve_left (fun e => hg (e ▸ hx)), hl⟩
+lemma SolB.live {m T q u : ℕ} {S : Set ℕ} (h : SolB m T q u S) :
+    ∃ k ≤ q, ∃ t ≤ u, ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T (k + t) t S0 := by
+  induction h with
+  | @done q u S h => exact ⟨0, by omega, 0, by omega, {T}, by simpa using h, .stop⟩
+  | @un q u S a ha _ ih =>
+    obtain ⟨k, hk, t, ht, S1, hs, hl⟩ := ih
+    by_cases hg : a ^^^ m ∈ S1
+    · refine ⟨k, hk, t + 1, by omega, insert a (S1.erase (a ^^^ m)), ?_, .un (by rwa [Finset.insert_erase hg])⟩
+      intro x hx
+      simp at hx
+      rcases hx with rfl | ⟨h1, h2⟩
+      · exact ha
+      · exact (hs h1).resolve_left h2
+    · exact ⟨k, hk, t, by omega, S1, fun x hx => (hs hx).resolve_left (fun e => hg (e ▸ hx)), hl⟩
+  | @bi q u S d a b ha hb _ ih =>
+    obtain ⟨k, hk, t, ht, S1, hs, hl⟩ := ih
+    by_cases hg : op d a b ∈ S1
+    · by_cases hab : a = b
+      · subst hab; rw [op_self] at hs
+        exact ⟨k, by omega, t, ht, S1, fun x hx => (hs hx).elim (fun e => e ▸ ha) id, hl⟩
+      refine ⟨k + 1, by omega, t, ht, insert a (insert b (S1.erase (op d a b))), ?_, ?_⟩
+      · intro x hx
+        simp at hx
+        rcases hx with rfl | rfl | ⟨h1, h2⟩
+        · exact ha
+        · exact hb
+        · exact (hs h1).resolve_left h2
+      · rw [Nat.add_right_comm]; exact .bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hg])
+    · exact ⟨k, by omega, t, ht, S1, fun x hx => (hs hx).resolve_left (fun e => hg (e ▸ hx)), hl⟩
 def C (m : ℕ) (S : Set ℕ) : Set ℕ := S ∪ {0, m}
 lemma C_mono {m : ℕ} {S S' : Set ℕ} (h : S ⊆ S') : C m S ⊆ C m S' := Set.union_subset_union_left _ h
 lemma sub_C (m : ℕ) (S : Set ℕ) : S ⊆ C m S := Set.subset_union_left
@@ -415,6 +465,64 @@ lemma Min.const (hT0 : T &&& n ≠ 0) (hT1 : T &&& n ≠ n) {k t : ℕ} {S : Fin
       · refine ⟨q, ?_, hu.kill (Or.inr hcb) hs⟩
         rw [ite_eq_left hcb]; omega
       · refine ⟨q + 1, ?_, hu.im hs⟩
+        rw [ite_eq_right hcb]; omega
+lemma Un.imB {a q u : ℕ} {S S' : Finset ℕ} (h : Un m a S S') (hs : SolB n (T &&& n) q u (C n (Im n S'))) :
+    SolB n (T &&& n) q (u + 1) (C n (Im n S)) := by
+  obtain ⟨ha, hsub⟩ := h.sub
+  refine .un (Im_mem ha) (hs.mono le_rfl le_rfl (C_Im_sub hsub ?_ (Set.subset_insert _ _)))
+  rw [and_neg hn]; exact Or.inl rfl
+omit hn in
+lemma Bi.imB {a b q u : ℕ} {d : Bool} {S S' : Finset ℕ} (h : Bi R d a b S S') (hs : SolB n (T &&& n) q u (C n (Im n S'))) :
+    SolB n (T &&& n) (q + 1) u (C n (Im n S)) := by
+  obtain ⟨ha, hb, hsub⟩ := h.sub
+  refine .bi (d := d) (Im_mem ha) (Im_mem hb) (hs.mono le_rfl le_rfl (C_Im_sub hsub ?_ (Set.subset_insert _ _)))
+  rw [and_op]; exact Or.inl rfl
+omit hn in
+lemma Bi.killB {a b q u : ℕ} {d : Bool} {S S' : Finset ℕ} (h : Bi R d a b S S') (hc : Cst n a ∨ Cst n b)
+    (hs : SolB n (T &&& n) q u (C n (Im n S'))) : SolB n (T &&& n) q u (C n (Im n S)) :=
+  hs.mono le_rfl le_rfl (C_Im_sub h.sub.2.2 (op_cst_mem d hc h.sub.1 h.sub.2.1) subset_rfl)
+lemma Min.constB (hT0 : T &&& n ≠ 0) (hT1 : T &&& n ≠ n) {k t : ℕ} {S : Finset ℕ} (h : Min R m T k t S) :
+    ∃ q, q + t + (S.filter (Cst n)).card ≤ k ∧ SolB n (T &&& n) q t (C n (Im n S)) := by
+  obtain ⟨hl, hm⟩ := h
+  induction hl with
+  | stop =>
+    refine ⟨0, ?_, .done (Im_mem (by simp))⟩
+    rw [Finset.filter_eq_empty_iff.2]; · simp
+    intro x hx; simp at hx; subst hx
+    rintro (h | h); exacts [hT0 h, hT1 h]
+  | @un k t a U hl ih =>
+    have hu : Un m a (insert a U) (insert (a ^^^ m) U) := ⟨U, rfl, rfl⟩
+    obtain ⟨q, hq, hs⟩ := ih (hu.min hl hm).2
+    have hf : a ^^^ m ∉ U := fun h => hu.fresh hl hm (sub_C _ _ (by simp [h]))
+    refine ⟨q, ?_, hu.imB hn hs⟩
+    by_cases hc : Cst n a
+    · rw [Finset.filter_insert, ite_eq_left ((Cst_neg hn).2 hc), Finset.card_insert_of_notMem (by simp [hf])] at hq
+      rw [Finset.filter_insert, ite_eq_left hc]
+      have := Finset.card_insert_le a (U.filter (Cst n)); omega
+    · have h1 : (U.filter (Cst n)).card ≤ ((insert (a ^^^ m) U).filter (Cst n)).card :=
+        Finset.card_le_card (Finset.filter_subset_filter _ (Finset.subset_insert _ _))
+      rw [Finset.filter_insert, ite_eq_right hc]; omega
+  | @bi k t d a b U hab hal hl ih =>
+    have hu : Bi R d a b (insert a (insert b U)) (insert (op d a b) U) := ⟨hab, U, rfl, rfl, hal⟩
+    obtain ⟨q, hq, hs⟩ := ih (hu.min hl hm).2
+    have hf : op d a b ∉ U := fun h => hu.fresh hl hm (sub_C _ _ (by simp [h]))
+    have h1 : (U.filter (Cst n)).card ≤ ((insert (op d a b) U).filter (Cst n)).card :=
+      Finset.card_le_card (Finset.filter_subset_filter _ (Finset.subset_insert _ _))
+    have ca := Finset.card_insert_le a (U.filter (Cst n))
+    have cb := Finset.card_insert_le b (U.filter (Cst n))
+    by_cases hca : Cst n a
+    · refine ⟨q, ?_, hu.killB (Or.inl hca) hs⟩
+      rw [Finset.filter_insert, ite_eq_left hca, Finset.filter_insert]
+      by_cases hcb : Cst n b
+      · rw [ite_eq_left hcb]
+        rw [Finset.filter_insert, ite_eq_left (op_cst2 d hca hcb), Finset.card_insert_of_notMem (by simp [hf])] at hq
+        have := Finset.card_insert_le a (insert b (U.filter (Cst n))); omega
+      · rw [ite_eq_right hcb]; omega
+    · rw [Finset.filter_insert, ite_eq_right hca, Finset.filter_insert]
+      by_cases hcb : Cst n b
+      · refine ⟨q, ?_, hu.killB (Or.inr hcb) hs⟩
+        rw [ite_eq_left hcb]; omega
+      · refine ⟨q + 1, ?_, hu.imB hs⟩
         rw [ite_eq_right hcb]; omega
 end proj
 lemma Min.proper {m T k t : ℕ} (hT : T &&& m = T) (hT0 : T ≠ 0) (hT1 : T ≠ m) {S : Finset ℕ} (hS : ∀ x ∈ S, x &&& m = x)
@@ -1084,7 +1192,7 @@ def pairsN (h : X → X → Bool) (xs : List X) : Bool :=
   Bool.rec (motive := fun _ => Bool) (scan (fun a => scan (h a) (fs xs)) (fr xs)) true (pairs h (fr xs))
 def pairsS (h : X → X → Bool) (xs : List X) : Bool := pairs h (fs xs)
 def nots (f : Nat → Nat → List W → Bool) (m g e n z q : Nat) (v r : List W) : Bool :=
-  (List.rec (motive := fun _ => Bool) (false) (fun a _ ih => (Bool.rec (motive := fun _ => Bool) (ih) (true) ((Bool.rec (motive := fun _ => Bool) ((st (Nat.xor a.s m) (fun s => (st (Nat.sub z a.c) (fun z => ins ⟨s, a.b, a.a, a.c, 0⟩ v (fun v => (Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) (false) (child (f s) g (fun h => h v) (Nat.sub z a.c)) (Nat.ble (Nat.succ n) e))) (true) ((Bool.rec (motive := fun _ => Bool) (false) (child (f s) g (rm a.s a.s v) z) (Nat.ble n e)))))))))) (false) (Nat.beq (Nat.succ a.s) q))))) (r))
+  (List.rec (motive := fun _ => Bool) (false) (fun a _ ih => (Bool.rec (motive := fun _ => Bool) (ih) (true) ((Bool.rec (motive := fun _ => Bool) ((st (Nat.xor a.s m) (fun s => (st z (fun z => ins ⟨s, a.b, a.a, a.c, 0⟩ v (fun v => (Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) (false) (child (f s) g (fun h => h v) (Nat.sub z a.c)) (Nat.ble (Nat.succ n) e))) (true) ((Bool.rec (motive := fun _ => Bool) (false) (child (f s) g (rm a.s a.s v) z) (Nat.ble n e)))))))))) (false) (Nat.beq (Nat.succ a.s) q))))) (r))
 def pos (t : Nat) : Bool := Nat.rec (motive := fun _ => Bool) false (fun _ _ => true) t
 def wst (d : Bool) (l : Nat) (v : List W) : Nat := Nat.xor l (twice d l v)
 def node (f : Nat → List W → Bool) (d : Bool) (l m g e n z : Nat) (v : List W) (go : (X → X → Bool) → List X → Bool) : Bool :=
@@ -1362,13 +1470,13 @@ lemma WOk.cst {P : List ℕ} {w : W} (h : WOk P w) {j : ℕ} (hj : j < P.length)
     Cst (P.getD j 0) w.s := by
   rw [h.ec, Nat.testBit_or, Bool.or_eq_true] at hf
   exact hf.elim (fun h1 => Or.inl (h.ca j hj h1)) (fun h1 => Or.inr (h.cb j hj h1))
-def Cl (P : List ℕ) (T k : ℕ) (b : ℕ → ℕ) (S : Finset ℕ) : Prop := ∀ j < P.length, ∀ q, q + b j < k →
-  ¬ Sol Z0 (P.getD j 0) (T &&& P.getD j 0) q (C (P.getD j 0) (Im (P.getD j 0) S))
-structure StOk (P : List ℕ) (T l k z : ℕ) (v : List W) (S : Finset ℕ) : Prop where
+def Cl (P : List ℕ) (T k t : ℕ) (b : ℕ → ℕ) (S : Finset ℕ) : Prop := ∀ j < P.length, ∀ q, q + t + b j < k →
+  ¬ SolB (P.getD j 0) (T &&& P.getD j 0) q t (C (P.getD j 0) (Im (P.getD j 0) S))
+structure StOk (P : List ℕ) (T l k t z : ℕ) (v : List W) (S : Finset ℕ) : Prop where
   rep : Rep v S
   wok : ∀ w ∈ v, WOk P w
   good : ∀ w ∈ v, Good l w.s
-  bud : ∃ b : ℕ → ℕ, (∀ j < P.length, b j ≤ 15) ∧ Cl P T k b S ∧ z = pk P.length (fun j => 16 + b j - cnt v j)
+  bud : ∃ b : ℕ → ℕ, (∀ j < P.length, b j ≤ 15) ∧ Cl P T k t b S ∧ z = pk P.length (fun j => 16 + b j - cnt v j)
 structure Ctx (P : List ℕ) (l m g T : ℕ) : Prop where
   lg : ∀ i, l.testBit i = true → Lg NN m T i ∧ AA.testBit i = true
   hP : ∀ j < P.length, P.getD j 0 &&& m = P.getD j 0 ∧ T &&& P.getD j 0 ≠ 0 ∧ T &&& P.getD j 0 ≠ P.getD j 0
@@ -1377,11 +1485,11 @@ section sound
 variable {P : List ℕ} {l m g T : ℕ} (X : Ctx P l m g T)
 include X
 lemma cnt_le {k k' t : ℕ} {v : List W} {S : Finset ℕ} {b : ℕ → ℕ} (hr : Rep v S) (hw : ∀ w ∈ v, WOk P w)
-    (hc : Cl P T k b S) (hm : Min R m T k' t S) (hk : k' ≤ k) : ∀ j < P.length, cnt v j ≤ b j := by
+    (hc : Cl P T k t b S) (hm : Min R m T k' t S) (hk : k' ≤ k) : ∀ j < P.length, cnt v j ≤ b j := by
   intro j hj
   obtain ⟨p1, p2, p3⟩ := X.hP j hj
-  obtain ⟨q, hq, hs⟩ := hm.const p1 p2 p3
-  have hqb : ¬ q + b j < k := fun h => hc j hj q h hs
+  obtain ⟨q, hq, hs⟩ := hm.constB p1 p2 p3
+  have hqb : ¬ q + t + b j < k := fun h => hc j hj q h hs
   have : cnt v j ≤ (S.filter (Cst (P.getD j 0))).card := by
     have e : cnt v j = (v.filter (fun w => w.c.testBit (5 * j))).length := by
       clear hr hw
@@ -1398,7 +1506,7 @@ lemma cnt_le {k k' t : ℕ} {v : List W} {S : Finset ℕ} {b : ℕ → ℕ} (hr 
     rw [Finset.mem_filter]
     exact ⟨hr.mem.2 ⟨w, h1, rfl⟩, (hw w h1).cst hj h2⟩
   omega
-lemma guard_ok {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hr : StOk P T l k z v S) (hm : Min R m T k' t S) (hk : k' ≤ k) :
+lemma guard_ok {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hr : StOk P T l k t z v S) (hm : Min R m T k' t S) (hk : k' ≤ k) :
     Nat.beq (Nat.land z g) g = true := by
   obtain ⟨b, hb, hc, hz⟩ := hr.bud
   have hle := cnt_le X hr.rep hr.wok hc hm hk
@@ -1407,7 +1515,7 @@ lemma guard_ok {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hr : StOk P T l k
   have := hb j hj; have := hle j hj; omega
 lemma child_sound {f : ℕ → List W → Bool} {z t k k' : ℕ} {r : List W} {S : Finset ℕ}
     {mk : (List W → Bool) → Bool} (hmk : ∀ h, mk h = h r)
-    (hr : StOk P T l k z r S) (hm : Min R m T k' t S) (hk : k' ≤ k) (h : child f g mk z = false) : f z r = false := by
+    (hr : StOk P T l k t z r S) (hm : Min R m T k' t S) (hk : k' ≤ k) (h : child f g mk z = false) : f z r = false := by
   simp only [child, bR, st_eq, guard_ok X hr hm hk, cond_true, hmk] at h
   exact h
 end sound
@@ -1631,10 +1739,10 @@ section sound
 variable {P : List ℕ} {l m g T : ℕ} (X : Ctx P l m g T)
 include X
 lemma bi_st {k k' t z : ℕ} {v r : List W} {S S' : Finset ℕ} {d' : Bool} {a c : W} {ka kc : Bool}
-    (hs : StOk P T l (k + 1) z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hb : Bi R d' a.s c.s S S')
+    (hs : StOk P T l (k + 1) t z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hb : Bi R d' a.s c.s S S')
     (hl : Live R m T k' t S') (ha : a ∈ v) (hc : c ∈ v) (hka : ka = decide (a.s ∈ S')) (hkc : kc = decide (c.s ∈ S'))
     (hsh : Shape (opW d' a c) a c v ka kc r) :
-    StOk P T l k (z + (a.c &&& c.c) - (opW d' a c).c - (bif ka then a.c else 0) - (bif kc then c.c else 0)) r S' ∧
+    StOk P T l k t (z + (a.c &&& c.c) - (opW d' a c).c - (bif ka then a.c else 0) - (bif kc then c.c else 0)) r S' ∧
     Nat.beq (Nat.land (z + (a.c &&& c.c) - (opW d' a c).c) g) g = true := by
   obtain ⟨b, hb15, hcl, hz⟩ := hs.bud
   have hle := cnt_le X hs.rep hs.wok hcl hm (by omega)
@@ -1667,18 +1775,18 @@ lemma bi_st {k k' t z : ℕ} {v r : List W} {S S' : Finset ℕ} {d' : Bool} {a c
     · rw [opW_s]; exact op_good _ (hs.good a ha) (hs.good c hc)
     · exact hs.good w h
   let b' : ℕ → ℕ := fun j => b j - max (fl a j) (fl c j)
-  have hcl' : Cl P T k b' S' := by
+  have hcl' : Cl P T k t b' S' := by
     intro j hj q hq hsol
     have hl1 := hle j hj
     have h2 := cnt_two ha hc hs.rep.1 hab j
     simp only [b'] at hq
     by_cases hkill : a.c.testBit (5 * j) = true ∨ c.c.testBit (5 * j) = true
-    · refine hcl j hj q ?_ (hb.kill (hkill.imp (wa.cst hj) (wc.cst hj)) hsol)
+    · refine hcl j hj q ?_ (hb.killB (hkill.imp (wa.cst hj) (wc.cst hj)) hsol)
       have : 1 ≤ max (fl a j) (fl c j) := by
         rcases hkill with h | h <;> simp [fl, h]
       have := fl_le a j; have := fl_le c j; omega
     · push Not at hkill
-      refine hcl j hj (q + 1) ?_ (hb.im hsol)
+      refine hcl j hj (q + 1) ?_ (hb.imB hsol)
       have e1 : fl a j = 0 := by simp [fl, hkill.1]
       have e2 : fl c j = 0 := by simp [fl, hkill.2]
       rw [e1, e2] at hq; simp at hq; omega
@@ -1828,7 +1936,7 @@ lemma Bi.rel {R' : ℕ → ℕ} {a b : ℕ} {d : Bool} {S S' : Finset ℕ} (h : 
 section sound
 variable {P : List ℕ} {l m g T : ℕ} (X : Ctx P l m g T)
 include X
-lemma rect_ok {t k k' z : ℕ} {r : List W} {S : Finset ℕ} (hr : StOk P T l k z r S) (hm : Min R m T k' t S) (hk : k' ≤ k)
+lemma rect_ok {t k k' z : ℕ} {r : List W} {S : Finset ℕ} (hr : StOk P T l k t z r S) (hm : Min R m T k' t S) (hk : k' ≤ k)
     (hn : r.length + t = k + 1) : rect (pos' t) l (wst (pos' t) l r) r [] = false := by
   cases hrect : rect (pos' t) l (wst (pos' t) l r) r [] with
   | false => rfl
@@ -1874,7 +1982,7 @@ lemma rect_ok {t k k' z : ℕ} {r : List W} {S : Finset ℕ} (hr : StOk P T l k 
           exact rect1 hm.1 hm.2 htight (X.lg _ l1).1 (X.lg _ l2).1 (X.lg _ l3).1 (X.lg _ l4).1
             ma mb hab g1 g2 u1 u2 u3 u4
       · simp
-lemma hit_ht {k z : ℕ} {r : List W} {S : Finset ℕ} {d : Bool} (hr : StOk P T l k z r S) {a b : W} (ha : a ∈ r) (hb : b ∈ r)
+lemma hit_ht {k t z : ℕ} {r : List W} {S : Finset ℕ} {d : Bool} (hr : StOk P T l k t z r S) {a b : W} (ha : a ∈ r) (hb : b ∈ r)
     (h : hit (flag false l (wst d l r) a) (flag false l (wst d l r) b) = true) : Ht NN m T d S a.s b.s := by
   obtain ⟨⟨s, hs1, x1, x2⟩, ⟨s', hs2, y1, y2⟩⟩ := hit_spec h
   have hu : ∀ w, ∀ i, (Nat.land (sp false l w) (wst d l r)).testBit i = true → AA.testBit i = true := by
@@ -2130,7 +2238,7 @@ lemma Rep.nodup {v : List W} {S : Finset ℕ} (h : Rep v S) : v.Nodup := List.No
 section sound
 variable {P : List ℕ} {l m g T : ℕ} (X : Ctx P l m g T)
 include X
-lemma nk_ok {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k z v S) (hm : Min R m T k' t S)
+lemma nk_ok {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k t z v S) (hm : Min R m T k' t S)
     (hx : k' ≤ S.card + t) (hst : flk l (wst (pos' t) l v) v star = false) : NK R m T k' t S := by
   rw [flk_eq] at hst
   have hsz := hm.size
@@ -2217,7 +2325,7 @@ lemma nk_ok {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k z 
     have k1 := h3 _ m1 _ m2 hpq this
     have c1 := h2 _ m1; have c2 := h2 _ m2
     omega
-lemma tst_sound {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k z v S) (hm : Min R m T k' t S) (hk : k' ≤ k) :
+lemma tst_sound {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k t z v S) (hm : Min R m T k' t S) (hk : k' ≤ k) :
     ∃ y, (∀ F : ℕ → Bool, tst (pos' t) l (k + 1 - t) v F = F y) ∧ (y = 0 ∨ (y = 1 ∧ v.length + t = k ∧ NK R m T k' t S)) := by
   have hsz := hm.size
   have hcard := hs.rep.card
@@ -2254,7 +2362,7 @@ lemma tst_sound {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l 
       cases h3 : flk l (wst (pos' t) l v) v star with
       | true => exact ⟨0, fun F => by rw [e, h1, h2, hbip, h3]; rfl, Or.inl rfl⟩
       | false => exact ⟨1, fun F => by rw [e, h1, h2, hbip, h3]; rfl, Or.inr ⟨rfl, by omega, nk_ok X hs hm (by omega) h3⟩⟩
-lemma cv_ok {t k k' z : ℕ} {v : List W} {S : Finset ℕ} {b : Bool} (hs : StOk P T l k z v S) (hl : Live R m T k' t S)
+lemma cv_ok {t k k' z : ℕ} {v : List W} {S : Finset ℕ} {b : Bool} (hs : StOk P T l k t z v S) (hl : Live R m T k' t S)
     (h : cv (pos' t) l v b = false) : b = false := by
   have hcov : Nat.beq (cov (pos' t) l v) l = true := by
     rw [Nat.beq_eq]
@@ -2277,10 +2385,10 @@ section sound
 variable {P : List ℕ} {l m g T : ℕ} (X : Ctx P l m g T)
 include X
 lemma gate_sound {f : ℕ → List W → Bool} {d : Bool} {e n z t k k' : ℕ} {v : List W} {S S' : Finset ℕ} {a c : W} {d' : Bool}
-    (hs : StOk P T l (k + 1) z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hd : d = pos' t) (hn : n = v.length)
+    (hs : StOk P T l (k + 1) t z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hd : d = pos' t) (hn : n = v.length)
     (hSe : S'.card ≤ e) (hb : Bi R d' a.s c.s S S') (hl : Live R m T k' t S') (ha : a ∈ v) (hc : c ∈ v)
     (hp : pair (modeF n e (mid f m g e (Nat.pred n) z v)) (mkx d l (wst d l v) a) (mkx d l (wst d l v) c) = false) :
-    ∃ z' r, f z' r = false ∧ StOk P T l k z' r S' ∧ ∀ w ∈ r, w = opW d' a c ∨ w ∈ v := by
+    ∃ z' r, f z' r = false ∧ StOk P T l k t z' r S' ∧ ∀ w ∈ r, w = opW d' a c ∨ w ∈ v := by
   subst hd hn
   have hmin := hb.min hl hm.2
   have hpos := hl.pos
@@ -2323,7 +2431,7 @@ lemma gate_sound {f : ℕ → List W → Bool} {d : Bool} {e n z t k k' : ℕ} {
     rwa [Finset.card_pair hb.1] at h2
   have hpr : Nat.pred v.length + 1 = v.length := by simp [Nat.pred_eq_sub_one]; omega
   have main : ∀ {ka kc : Bool} {r : List W}, ka = decide (a.s ∈ S') → kc = decide (c.s ∈ S') → Shape (opW d' a c) a c v ka kc r →
-      r.length = S'.card ∧ StOk P T l k (z + (a.c &&& c.c) - (opW d' a c).c - (bif ka then a.c else 0) - (bif kc then c.c else 0)) r S' ∧
+      r.length = S'.card ∧ StOk P T l k t (z + (a.c &&& c.c) - (opW d' a c).c - (bif ka then a.c else 0) - (bif kc then c.c else 0)) r S' ∧
       ∀ w ∈ r, w = opW d' a c ∨ w ∈ v := by
     intro ka kc r h1 h2 h3
     have := (bi_st X hs hm hk hb hl ha hc h1 h2 h3).1
@@ -2334,8 +2442,8 @@ lemma gate_sound {f : ℕ → List W → Bool} {d : Bool} {e n z t k k' : ℕ} {
     · exact (bi_st X hs hm hk hb hl ha hc (by simp [q1]) (by simp [q2]) s2).2
     · exact (bi_st X hs hm hk hb hl ha hc (by simp [q1]) (by simp [q2]) s3).2
     · exact (bi_st X hs hm hk hb hl ha hc (by simp [q1]) (by simp [q2]) s1).2
-  have fin : ∀ {z' : ℕ} {r : List W} {mk : (List W → Bool) → Bool}, (∀ h, mk h = h r) → StOk P T l k z' r S' → (∀ w ∈ r, w = opW d' a c ∨ w ∈ v) →
-      child f g mk z' = false → ∃ z' r, f z' r = false ∧ StOk P T l k z' r S' ∧ ∀ w ∈ r, w = opW d' a c ∨ w ∈ v :=
+  have fin : ∀ {z' : ℕ} {r : List W} {mk : (List W → Bool) → Bool}, (∀ h, mk h = h r) → StOk P T l k t z' r S' → (∀ w ∈ r, w = opW d' a c ∨ w ∈ v) →
+      child f g mk z' = false → ∃ z' r, f z' r = false ∧ StOk P T l k t z' r S' ∧ ∀ w ∈ r, w = opW d' a c ∨ w ∈ v :=
     fun {z' r mk} h1 h2 h3 h4 => ⟨z', r, child_sound X h1 h2 hmin hk h4, h2, h3⟩
   by_cases q1 : a.s ∈ S' <;> by_cases q2 : c.s ∈ S'
   · obtain ⟨c1, c3, c4⟩ := main (by simp [q1]) (by simp [q2]) s4
@@ -2360,10 +2468,10 @@ section sound
 variable {P : List ℕ} {l m g T : ℕ} (X : Ctx P l m g T)
 include X
 lemma un_st {k k' t z : ℕ} {v r : List W} {S S' : Finset ℕ} {a : W} {ka : Bool}
-    (hs : StOk P T l (k + 1) z v S) (hm : Min R m T (k' + 1) (t + 1) S) (hk : k' ≤ k) (hb : Un m a.s S S')
+    (hs : StOk P T l (k + 1) (t + 1) z v S) (hm : Min R m T (k' + 1) (t + 1) S) (hk : k' ≤ k) (hb : Un m a.s S S')
     (hl : Live R m T k' t S') (ha : a ∈ v) (hka : ka = decide (a.s ∈ S'))
     (hsh : bif ka then r.Perm (notW m a :: v) else (a :: r).Perm (notW m a :: v)) :
-    StOk P T l k (z - a.c - (bif ka then a.c else 0)) r S' := by
+    StOk P T l k t (z - (bif ka then a.c else 0)) r S' := by
   obtain ⟨b, hb15, hcl, hz⟩ := hs.bud
   have hle := cnt_le X hs.rep hs.wok hcl hm (by omega)
   have hfr := hb.fresh hl hm.2
@@ -2444,47 +2552,31 @@ lemma un_st {k k' t z : ℕ} {v r : List W} {S S' : Finset ℕ} {a : W} {ka : Bo
       · change (a.s ^^^ m).testBit (NN + i) = (a.s ^^^ m).testBit (NN + j)
         rw [Nat.testBit_xor, Nat.testBit_xor, hg.2 i j h h1 h2, (X.lg i h1).1.2.1, (X.lg j h2).1.2.1]
     · exact hs.good w h
-  let b' : ℕ → ℕ := fun j => b j - fl a j
-  have hcl' : Cl P T k b' S' := by
-    intro j hj q hq hsol
-    have hl1 := hle j hj
-    have h2 := cnt_one ha hs.rep.1 j
-    simp only [b'] at hq
-    by_cases hkill : a.c.testBit (5 * j) = true
-    · refine hcl j hj q ?_ (hb.kill (X.hP j hj).1 (wa.cst hj hkill) hsol)
-      have : fl a j = 1 := by simp [fl, hkill]
-      omega
-    · refine hcl j hj (q + 1) ?_ (hb.im (X.hP j hj).1 hsol)
-      have e1 : fl a j = 0 := by simp [fl, hkill]
-      omega
+  have hcl' : Cl P T k t b S' := fun j hj q hq hsol =>
+    hcl j hj q (by omega) (hb.imB (X.hP j hj).1 hsol)
   have hle' := cnt_le X hrep hwok hcl' (hb.min hl hm.2) hk
-  refine ⟨hrep, hwok, hgood, b', fun j hj => ?_, hcl', ?_⟩
-  · have := hb15 j hj; simp only [b']; omega
-  · have ea : (bif ka then a.c else 0) = pk P.length (fun j => bif ka then fl a j else 0) := by
-      cases ka
-      · simp [pk]
-      · exact fl_pk wa
-    have le1 : ∀ j, (bif ka then fl a j else 0) ≤ 1 := fun j => by cases ka <;> simp [fl_le]
-    rw [ea, hz]
-    conv_lhs => rw [fl_pk wa]
-    rw [pk_sub, pk_sub]
-    · refine pk_congr fun j hj => ?_
-      have q1 := hle j hj; have q2 := hle' j hj; have q3 := cnt_one ha hs.rep.1 j; have q4 := hb15 j hj
-      have q5 := hcnt j; have q6 := fl_le a j
-      simp only [b'] at q2 ⊢
-      cases ka <;> simp at q5 ⊢ <;> omega
-    · intro j hj; have := hle j hj; have := le1 j; have := fl_le a j; omega
-    · intro j hj; have := hle j hj; have := fl_le a j; omega
+  refine ⟨hrep, hwok, hgood, b, hb15, hcl', ?_⟩
+  have ea : (bif ka then a.c else 0) = pk P.length (fun j => bif ka then fl a j else 0) := by
+    cases ka
+    · simp [pk]
+    · exact fl_pk wa
+  rw [ea, hz, pk_sub]
+  · refine pk_congr fun j hj => ?_
+    have q2 := hle' j hj; have q5 := hcnt j
+    cases ka <;> simp at q5 ⊢ <;> omega
+  · intro j hj
+    have q1 := hle j hj; have q6 := fl_le a j
+    cases ka <;> simp <;> omega
 end sound
 lemma nots_false {f : ℕ → ℕ → List W → Bool} {m g e n z q : ℕ} {v r : List W} (h : nots f m g e n z q v r = false)
     {a : W} (ha : a ∈ r) (hq : a.s + 1 ≠ q) : ins (notW m a) v (fun v =>
-      (bif (bif Nat.ble n e then child (f (a.s ^^^ m)) g (rm a.s a.s v) (z - a.c) else false) then true else
-      (bif Nat.ble (n + 1) e then child (f (a.s ^^^ m)) g (fun h => h v) (z - a.c - a.c) else false))) = false := by
+      (bif (bif Nat.ble n e then child (f (a.s ^^^ m)) g (rm a.s a.s v) z else false) then true else
+      (bif Nat.ble (n + 1) e then child (f (a.s ^^^ m)) g (fun h => h v) (z - a.c) else false))) = false := by
   induction r with
   | nil => simp at ha
   | cons w r ih =>
     change (Bool.rec (motive := fun _ => Bool) (nots f m g e n z q v r) true (Bool.rec (motive := fun _ => Bool)
-      (st (Nat.xor w.s m) (fun s => st (Nat.sub z w.c) (fun z => ins ⟨s, w.b, w.a, w.c, 0⟩ v (fun v =>
+      (st (Nat.xor w.s m) (fun s => st z (fun z => ins ⟨s, w.b, w.a, w.c, 0⟩ v (fun v =>
         Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false
           (child (f s) g (fun h => h v) (Nat.sub z w.c)) (Nat.ble (Nat.succ n) e)) true
           (Bool.rec (motive := fun _ => Bool) false (child (f s) g (rm w.s w.s v) z) (Nat.ble n e)))))) false (Nat.beq (Nat.succ w.s) q)) : Bool) = false at h
@@ -2494,13 +2586,13 @@ lemma nots_false {f : ℕ → ℕ → List W → Bool} {m g e n z q : ℕ} {v r 
     rcases ha with rfl | ha
     · rw [Bool.eq_false_iff.2 fun h => hq (Nat.eq_of_beq_eq_true h), Bool.cond_false] at h
       cases hh : ins (notW m a) v (fun v =>
-        (bif (bif Nat.ble n e then child (f (a.s ^^^ m)) g (rm a.s a.s v) (z - a.c) else false) then true else
-        (bif Nat.ble (n + 1) e then child (f (a.s ^^^ m)) g (fun h => h v) (z - a.c - a.c) else false))) with
+        (bif (bif Nat.ble n e then child (f (a.s ^^^ m)) g (rm a.s a.s v) z else false) then true else
+        (bif Nat.ble (n + 1) e then child (f (a.s ^^^ m)) g (fun h => h v) (z - a.c) else false))) with
       | false => rfl
       | true =>
         have h : (bif ins (notW m a) v (fun v =>
-          (bif (bif Nat.ble n e then child (f (a.s ^^^ m)) g (rm a.s a.s v) (z - a.c) else false) then true else
-          (bif Nat.ble (n + 1) e then child (f (a.s ^^^ m)) g (fun h => h v) (z - a.c - a.c) else false))) then true
+          (bif (bif Nat.ble n e then child (f (a.s ^^^ m)) g (rm a.s a.s v) z else false) then true else
+          (bif Nat.ble (n + 1) e then child (f (a.s ^^^ m)) g (fun h => h v) (z - a.c) else false))) then true
           else nots f m g e n z q v r) = false := h
         rw [hh] at h; simp at h
     · refine ih ?_ ha
@@ -2510,9 +2602,9 @@ section sound
 variable {P : List ℕ} {l m g T : ℕ} (X : Ctx P l m g T)
 include X
 lemma nots_sound {f : ℕ → ℕ → List W → Bool} {e n z q t k k' : ℕ} {v : List W} {S S' : Finset ℕ} {a : W}
-    (hs : StOk P T l (k + 1) z v S) (hm : Min R m T (k' + 1) (t + 1) S) (hk : k' ≤ k) (hn : n = v.length)
+    (hs : StOk P T l (k + 1) (t + 1) z v S) (hm : Min R m T (k' + 1) (t + 1) S) (hk : k' ≤ k) (hn : n = v.length)
     (hSe : S'.card ≤ e) (hb : Un m a.s S S') (hl : Live R m T k' t S') (ha : a ∈ v) (hq : a.s + 1 ≠ q) {rr : List W} (har' : a ∈ rr)
-    (hp : nots f m g e n z q v rr = false) : ∃ z' r, f (a.s ^^^ m) z' r = false ∧ StOk P T l k z' r S' ∧ ∀ w ∈ r, w = notW m a ∨ w ∈ v := by
+    (hp : nots f m g e n z q v rr = false) : ∃ z' r, f (a.s ^^^ m) z' r = false ∧ StOk P T l k t z' r S' ∧ ∀ w ∈ r, w = notW m a ∨ w ∈ v := by
   subst hn
   have hmin := hb.min hl hm.2
   have hfr := hb.fresh hl hm.2
@@ -2535,9 +2627,9 @@ lemma nots_sound {f : ℕ → ℕ → List W → Bool} {e n z q t k k' : ℕ} {v
     have hc := hst.rep.card
     have hb1 : Nat.ble (v.length + 1) e = true := Nat.ble_eq_true_of_le (by omega)
     rw [hb1] at h
-    have h : child (f (a.s ^^^ m)) g (fun h => h r0) (z - a.c - a.c) = false := by
+    have h : child (f (a.s ^^^ m)) g (fun h => h r0) (z - a.c) = false := by
       revert h; simp only [Bool.cond_true]
-      cases child (f (a.s ^^^ m)) g (fun h => h r0) (z - a.c - a.c) <;> simp
+      cases child (f (a.s ^^^ m)) g (fun h => h r0) (z - a.c) <;> simp
     exact ⟨_, _, child_sound X (fun h => rfl) hst hmin hk h, hst, hmem⟩
   · have hperm : (a :: r0.filter (fun w => !(Nat.beq w.s a.s || Nat.beq w.s a.s))).Perm (notW m a :: v) := by
       rw [filter1]; exact (filter_perm hnd har).trans hr0
@@ -2548,9 +2640,9 @@ lemma nots_sound {f : ℕ → ℕ → List W → Bool} {e n z q t k k' : ℕ} {v
     simp only [List.length_cons] at hlen
     have hb1 : Nat.ble v.length e = true := Nat.ble_eq_true_of_le (by omega)
     rw [hb1] at h
-    have h : child (f (a.s ^^^ m)) g (rm a.s a.s r0) (z - a.c) = false := by
+    have h : child (f (a.s ^^^ m)) g (rm a.s a.s r0) z = false := by
       revert h; simp only [Bool.cond_true]
-      cases child (f (a.s ^^^ m)) g (rm a.s a.s r0) (z - a.c) <;> simp
+      cases child (f (a.s ^^^ m)) g (rm a.s a.s r0) z <;> simp
     exact ⟨_, _, child_sound X (rm_eq _ _ _) hst hmin hk h, hst, fun w hw => hmem w (List.mem_of_mem_filter hw)⟩
 end sound
 lemma scan_false {p : X → Bool} {xs : List X} (h : scan p xs = false) : ∀ c ∈ xs, p c = false := by
@@ -2674,11 +2766,11 @@ variable {P : List ℕ} {l m g T : ℕ} (X : Ctx P l m g T)
 include X
 lemma node_bi {f : ℕ → List W → Bool} {d : Bool} {e n z t k k' : ℕ} {v : List W} {S S' : Finset ℕ} {x y : ℕ} {d' : Bool}
     {go : (L_meta_33072.X → L_meta_33072.X → Bool) → List L_meta_33072.X → Bool}
-    (hs : StOk P T l (k + 1) z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hd : d = pos' t) (hn : n = v.length)
+    (hs : StOk P T l (k + 1) t z v S) (hm : Min R m T (k' + 1) t S) (hk : k' ≤ k) (hd : d = pos' t) (hn : n = v.length)
     (hSe : S'.card ≤ e) (hb : Bi R d' x y S S') (hl : Live R m T k' t S')
     (hgo : ∀ h xs, go h xs = false → ∀ a c : W, a ∈ v → c ∈ v → a.s = x → c.s = y → xs = v.map (mkx d l (wst d l v)) →
       h (mkx d l (wst d l v) a) (mkx d l (wst d l v) c) = false ∨ h (mkx d l (wst d l v) c) (mkx d l (wst d l v) a) = false)
-    (hp : node f d l m g e n z v go = false) : ∃ z' r, f z' r = false ∧ StOk P T l k z' r S' ∧ ∀ w ∈ r, (w.s = op d' x y ∧ w.r = 0) ∨ w ∈ v := by
+    (hp : node f d l m g e n z v go = false) : ∃ z' r, f z' r = false ∧ StOk P T l k t z' r S' ∧ ∀ w ∈ r, (w.s = op d' x y ∧ w.r = 0) ∨ w ∈ v := by
   rw [node_eq] at hp
   obtain ⟨a, ha, rfl⟩ := hs.rep.mem.1 hb.sub.1
   obtain ⟨c, hc, rfl⟩ := hs.rep.mem.1 hb.sub.2.1
@@ -2688,8 +2780,8 @@ lemma node_bi {f : ℕ → List W → Bool} {d : Bool} {e n z t k k' : ℕ} {v :
   · obtain ⟨z', r, h1, h2, h3⟩ := gate_sound X hs hm hk hd hn hSe hb.symm hl hc ha h
     exact ⟨z', r, h1, h2, fun w hw => (h3 w hw).imp (fun e => ⟨by rw [e, opW_s, op_comm], by rw [e, opW_r]⟩) id⟩
 lemma mv_sound (hR : RR R) {F : ℕ → ℕ → ℕ → List W → Bool}
-    (hF : ∀ (k t z : ℕ) (v : List W) (S : Finset ℕ), F k t z v = false → StOk P T l k z v S → Cod R v → ∀ k' ≤ k, ¬ Min R m T k' t S)
-    {k t z y : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k z v S) (hcod : Cod R v) (hlen : 2 ≤ v.length)
+    (hF : ∀ (k t z : ℕ) (v : List W) (S : Finset ℕ), F k t z v = false → StOk P T l k t z v S → Cod R v → ∀ k' ≤ k, ¬ Min R m T k' t S)
+    {k t z y : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k t z v S) (hcod : Cod R v) (hlen : 2 ≤ v.length)
     (h : mv F l m g k t z v y = false) : ∀ k' ≤ k, Min R m T k' t S → (y = 0 ∨ (y = 1 ∧ v.length + t = k ∧ NK R m T k' t S)) → False := by
   intro k' hk hm hy
   obtain ⟨hA, hN⟩ := mv_false F l m g k t z v y h
@@ -2765,7 +2857,7 @@ lemma mv_sound (hR : RR R) {F : ℕ → ℕ → ℕ → List W → Bool}
       subst hxs
       exact Or.inl (pairsQ_false hp (List.mem_map_of_mem ha) hax (List.mem_map_of_mem hc) hcy)) hf3
     exact hF _ _ _ _ _ hf hst (codB (codU (codU hcod hmem1) hmem2) hmem) k0 (by simpa using hk) (hb.min hl hm2.2)
-theorem look_sound (hR : RR R) : ∀ (fuel k t z : ℕ) (v : List W) (S : Finset ℕ), look l m g fuel k t z v = false → StOk P T l k z v S → Cod R v →
+theorem look_sound (hR : RR R) : ∀ (fuel k t z : ℕ) (v : List W) (S : Finset ℕ), look l m g fuel k t z v = false → StOk P T l k t z v S → Cod R v →
     ∀ k' ≤ k, ¬ Min R m T k' t S := by
   intro fuel
   induction fuel with
@@ -2910,9 +3002,9 @@ section sound
 variable {P : List ℕ} {l m g T : ℕ} (X : Ctx P l m g T)
 include X
 lemma one_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {K : ℕ} {f : ℕ → ℕ → ℕ → List W → Bool}
-    (hF : ∀ (k t z : ℕ) (v : List W) (S : Finset ℕ), f k t z v = false → StOk P T l k z v S → (∀ w ∈ v, w.r = R w.s) →
+    (hF : ∀ (k t z : ℕ) (v : List W) (S : Finset ℕ), f k t z v = false → StOk P T l k t z v S → (∀ w ∈ v, w.r = R w.s) →
       ∀ k' ≤ k, Live Z0 m T k' t S → (∀ q < k', ¬ Sol Z0 m T q (C m ({x | R x ≠ 0} ∪ (S : Set ℕ)))) → False)
-    {k t z y : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k z v S) (hcod : ∀ w ∈ v, w.r = R w.s) (hlen : 2 ≤ v.length)
+    {k t z y : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k t z v S) (hcod : ∀ w ∈ v, w.r = R w.s) (hlen : 2 ≤ v.length)
     {k' : ℕ} (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : ∀ q < k', ¬ Sol Z0 m T q (C m ({x | R x ≠ 0} ∪ (S : Set ℕ))))
     (hy : y = 0 ∨ (y = 1 ∧ v.length + t = k ∧ NK Z0 m T k' t S))
     (h2 : mv (look l m g K) l m g k t z v y = false)
@@ -2960,7 +3052,7 @@ lemma or_false' {a b : Bool} (h : (Bool.rec (motive := fun _ => Bool) b true a :
   clear X
   cases a <;> simp_all
 theorem look1_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {K : ℕ} : ∀ (fuel k t z : ℕ) (v : List W) (S : Finset ℕ),
-    look1 l m g K fuel k t z v = false → StOk P T l k z v S → (∀ w ∈ v, w.r = R w.s) →
+    look1 l m g K fuel k t z v = false → StOk P T l k t z v S → (∀ w ∈ v, w.r = R w.s) →
       ∀ k' ≤ k, Live Z0 m T k' t S → (∀ q < k', ¬ Sol Z0 m T q (C m ({x | R x ≠ 0} ∪ (S : Set ℕ)))) → False := by
   intro fuel
   induction fuel with
@@ -3301,7 +3393,7 @@ section sound
 variable {P : List ℕ} {l m g T : ℕ} (X : Ctx P l m g T)
 include X
 lemma topC_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {K k t z : ℕ} {v : List W} {S : Finset ℕ} {M : List (ℕ × ℕ)}
-    (hM : mFull M = true) (h : ∀ p ∈ M, topC l m g K p.1 p.2 k t z v = false) (hs : StOk P T l k z v S) (hcod : ∀ w ∈ v, w.r = R w.s)
+    (hM : mFull M = true) (h : ∀ p ∈ M, topC l m g K p.1 p.2 k t z v = false) (hs : StOk P T l k t z v S) (hcod : ∀ w ∈ v, w.r = R w.s)
     {k' : ℕ} (hk : k' ≤ k) (hl : Live Z0 m T k' t S) (hmW : ∀ q < k', ¬ Sol Z0 m T q (C m ({x | R x ≠ 0} ∪ (S : Set ℕ)))) : False := by
   simp only [mFull, Bool.and_eq_true, List.all_eq_true, List.mem_range, List.any_eq_true] at hM
   obtain ⟨hM1, p0, hp0, hp1⟩ := hM
@@ -3339,6 +3431,8 @@ lemma topC_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d 
 end sound
 def WZ (E : List (ℕ × ℕ)) (Z : ℕ) : Set ℕ := {x | ∃ w ∈ rawL E, x = w &&& mz Z}
 def Imp (E : List (ℕ × ℕ)) (Z L : ℕ) : Prop := ∀ q < L, ¬ Sol Z0 (mz Z) (tz Z) q (C (mz Z) (WZ E Z))
+def ImpB (E : List (ℕ × ℕ)) (Z L t : ℕ) : Prop := ∀ q, q + t < L → ¬ SolB (mz Z) (tz Z) q t (C (mz Z) (WZ E Z))
+lemma Imp.toB {E : List (ℕ × ℕ)} {Z L : ℕ} (h : Imp E Z L) (t : ℕ) : ImpB E Z L t := fun q hq hs => h (q + t) hq hs.sol
 def PZ (Q : List (ℕ × ℕ)) : List ℕ := Q.map (fun e => mz e.1)
 def pOk (Z : ℕ) (Q : List (ℕ × ℕ)) : Bool := !Nat.beq (tz Z) 0 && !Nat.beq (tz Z) (mz Z) && Q.all (fun e => Nat.beq (Nat.land (mz e.1) (mz Z)) (mz e.1) &&
   !Nat.beq (tz e.1) 0 && !Nat.beq (tz e.1) (mz e.1))
@@ -3405,7 +3499,7 @@ lemma rawL_sub {E : List (ℕ × ℕ)} (hE : ∀ e ∈ E, e ∈ six) {w : ℕ} (
   · exact Or.inr ⟨e, hE e he, rfl⟩
 theorem imp_of_live {E Q : List (ℕ × ℕ)} {Z L k t : ℕ} {S : Finset ℕ}
     (hE : E = [] ∨ ∃ e ∈ six, E = [e] ∧ Imp [] Z L) (hp : pOk Z Q = true) (hL : L ≤ 15)
-    (hI : ∀ e ∈ Q, Imp E e.1 e.2)
+    (hI : ∀ e ∈ Q, ImpB E e.1 e.2 t)
     (hk : k < L) (hS : (S : Set ℕ) ⊆ C (mz Z) (WZ E Z)) (hl : Live Z0 (mz Z) (tz Z) k t S)
     (hmin : ∀ q < k, ¬ Sol Z0 (mz Z) (tz Z) q (C (mz Z) (WZ E Z)))
     (hb : (∃ e ∈ Q, L ≤ e.2) ∨ ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk E Q Z (L - 1) t p.1 p.2 = false) : False := by
@@ -3440,15 +3534,15 @@ theorem imp_of_live {E Q : List (ℕ × ℕ)} {Z L k t : ℕ} {S : Finset ℕ}
     intro e he
     obtain ⟨⟨a, b⟩, c⟩ := hp2 e he
     exact ⟨Nat.eq_of_beq_eq_true a, nb b, nb c⟩
-  have hno : ∀ e ∈ Q, ∀ q < e.2, ¬ Sol Z0 (mz e.1) (tz Z &&& mz e.1) q (C (mz e.1) (Im (mz e.1) S)) := by
+  have hno : ∀ e ∈ Q, ∀ q, q + t < e.2 → ¬ SolB (mz e.1) (tz Z &&& mz e.1) q t (C (mz e.1) (Im (mz e.1) S)) := by
     intro e he q hq hs
     have h3 := (hproj e he).1
     rw [tz_sub h3] at hs
-    exact hI e he q hq (hs.mono le_rfl (C_mono (Im_WZ h3 hSW)))
+    exact hI e he q hq (hs.mono le_rfl le_rfl (C_mono (Im_WZ h3 hSW)))
   have htk := hm.size.2
   rcases hb with ⟨e, he, hle⟩ | hb
   · have h3 := hproj e he
-    obtain ⟨q', hq', hs'⟩ := hm.const h3.1 (by rw [tz_sub h3.1]; exact h3.2.1) (by rw [tz_sub h3.1]; exact h3.2.2)
+    obtain ⟨q', hq', hs'⟩ := hm.constB h3.1 (by rw [tz_sub h3.1]; exact h3.2.1) (by rw [tz_sub h3.1]; exact h3.2.2)
     exact hno e he q' (by omega) hs'
   have hpw : pwr E Z = 0 ∨ pwr E Z ∈ S := by
     rcases hE with rfl | ⟨e, he, rfl, hraw⟩
@@ -3505,13 +3599,13 @@ theorem imp_of_live {E Q : List (ℕ × ℕ)} {Z L k t : ℕ} {S : Finset ℕ}
     · rw [pL_pk, List.length_map, hPlen]
       refine pk_congr fun j hj => ?_
       rw [List.getD_eq_getElem?_getD, List.getElem?_map, List.getElem?_eq_getElem hj]; rfl
-  have hcl : Cl (PZ Q) (tz Z) (L - 1) (fun j => L - 1 - (Q.getD j (0, L - 1)).2) S := by
+  have hcl : Cl (PZ Q) (tz Z) (L - 1) t (fun j => L - 1 - (Q.getD j (0, L - 1)).2) S := by
     intro j hj q hq
     obtain ⟨e1, e2⟩ := hPget j hj
-    have hq' : q + (L - 1 - (Q.getD j (0, L - 1)).2) < L - 1 := hq
+    have hq' : q + t + (L - 1 - (Q.getD j (0, L - 1)).2) < L - 1 := hq
     rw [e1]; exact hno _ e2 q (by omega)
   have hle := cnt_le X hrep hwok hcl hm (by omega)
-  have hst : StOk (PZ Q) (tz Z) (lz Z) (L - 1) (pL (Q.map fun e => 16 + (L - 1 - e.2)) - sumc v) v S := by
+  have hst : StOk (PZ Q) (tz Z) (lz Z) (L - 1) t (pL (Q.map fun e => 16 + (L - 1 - e.2)) - sumc v) v S := by
     refine ⟨hrep, hwok, hgood, _, fun j _ => by omega, hcl, ?_⟩
     rw [sumc_eq hwok, pk16, pk_sub]
     intro j hj; have := hle j hj; omega
@@ -3581,15 +3675,15 @@ theorem imp_of {E Q : List (ℕ × ℕ)} {Z L : ℕ} (hE : E = [] ∨ ∃ e ∈ 
     intro e he
     obtain ⟨⟨a, b⟩, c⟩ := hp2 e he
     exact ⟨Nat.eq_of_beq_eq_true a, nb b, nb c⟩
-  have hno : ∀ e ∈ Q, ∀ q < e.2, ¬ Sol Z0 (mz e.1) (tz Z &&& mz e.1) q (C (mz e.1) (Im (mz e.1) S)) := by
+  have hno : ∀ e ∈ Q, ∀ q, q + t < e.2 → ¬ SolB (mz e.1) (tz Z &&& mz e.1) q t (C (mz e.1) (Im (mz e.1) S)) := by
     intro e he q hq hs
     have h3 := (hproj e he).1
     rw [tz_sub h3] at hs
-    exact hI e he q hq (hs.mono le_rfl (C_mono (Im_WZ h3 hSW)))
+    exact (hI e he).toB t q hq (hs.mono le_rfl le_rfl (C_mono (Im_WZ h3 hSW)))
   have htk := hm.size.2
   rcases hb with ⟨e, he, hle⟩ | hb
   · have h3 := hproj e he
-    obtain ⟨q', hq', hs'⟩ := hm.const h3.1 (by rw [tz_sub h3.1]; exact h3.2.1) (by rw [tz_sub h3.1]; exact h3.2.2)
+    obtain ⟨q', hq', hs'⟩ := hm.constB h3.1 (by rw [tz_sub h3.1]; exact h3.2.1) (by rw [tz_sub h3.1]; exact h3.2.2)
     exact hno e he q' (by omega) hs'
   have hpw : pwr E Z = 0 ∨ pwr E Z ∈ S := by
     rcases hE with rfl | ⟨e, he, rfl, hraw⟩
@@ -3646,13 +3740,13 @@ theorem imp_of {E Q : List (ℕ × ℕ)} {Z L : ℕ} (hE : E = [] ∨ ∃ e ∈ 
     · rw [pL_pk, List.length_map, hPlen]
       refine pk_congr fun j hj => ?_
       rw [List.getD_eq_getElem?_getD, List.getElem?_map, List.getElem?_eq_getElem hj]; rfl
-  have hcl : Cl (PZ Q) (tz Z) (L - 1) (fun j => L - 1 - (Q.getD j (0, L - 1)).2) S := by
+  have hcl : Cl (PZ Q) (tz Z) (L - 1) t (fun j => L - 1 - (Q.getD j (0, L - 1)).2) S := by
     intro j hj q hq
     obtain ⟨e1, e2⟩ := hPget j hj
-    have hq' : q + (L - 1 - (Q.getD j (0, L - 1)).2) < L - 1 := hq
+    have hq' : q + t + (L - 1 - (Q.getD j (0, L - 1)).2) < L - 1 := hq
     rw [e1]; exact hno _ e2 q (by omega)
   have hle := cnt_le X hrep hwok hcl hm (by omega)
-  have hst : StOk (PZ Q) (tz Z) (lz Z) (L - 1) (pL (Q.map fun e => 16 + (L - 1 - e.2)) - sumc v) v S := by
+  have hst : StOk (PZ Q) (tz Z) (lz Z) (L - 1) t (pL (Q.map fun e => 16 + (L - 1 - e.2)) - sumc v) v S := by
     refine ⟨hrep, hwok, hgood, _, fun j _ => by omega, hcl, ?_⟩
     rw [sumc_eq hwok, pk16, pk_sub]
     intro j hj; have := hle j hj; omega
@@ -3695,7 +3789,7 @@ lemma imp_okE {E Q : List (ℕ × ℕ)} {e : ℕ × ℕ} (hE : E = [] ∨ ∃ e'
   simp only [List.mem_singleton] at hp; subst hp; exact h t ht
 def rt3 : List (ℕ × ℕ) := [(7, 5), (11, 7), (19, 6), (35, 5), (67, 5), (131, 5), (13, 7), (21, 7), (37, 7), (69, 6), (133, 5), (25, 7), (41, 7), (73, 7), (137, 7), (49, 5), (81, 6), (145, 5), (97, 5), (161, 5), (193, 4), (14, 7), (22, 7), (38, 7), (70, 6), (134, 5), (26, 6), (42, 6), (74, 7), (138, 7), (50, 6), (82, 8), (146, 7), (98, 6), (162, 6), (194, 4), (28, 7), (44, 6), (76, 6), (140, 7), (52, 7), (84, 8), (148, 6), (100, 6), (164, 7), (196, 5), (56, 5), (88, 6), (152, 5), (104, 5), (168, 6), (200, 5), (112, 6), (176, 5), (208, 4), (224, 4)]
 def rt2 : List (ℕ × ℕ) := [(3, 8), (5, 9), (9, 10), (17, 9), (33, 8), (65, 8), (129, 8), (6, 9), (10, 9), (18, 9), (34, 8), (66, 9), (130, 8), (12, 9), (20, 10), (36, 10), (68, 9), (132, 8), (24, 9), (40, 9), (72, 9), (136, 9), (48, 8), (80, 9), (144, 8), (96, 8), (160, 8), (192, 7)]
-def rt1 : List (ℕ × ℕ) := [(1, 12), (2, 11), (4, 12), (8, 12), (16, 12), (32, 11), (64, 12), (128, 11)]
+def rt1 : List (ℕ × ℕ) := [(1, 12), (2, 11), (4, 12), (8, 12), (16, 12), (32, 11), (64, 11), (128, 11)]
 def pr (T : List (ℕ × ℕ)) (Z : ℕ) : List (ℕ × ℕ) := T.filter (fun e => Nat.beq (Nat.land Z e.1) Z && !Nat.beq Z e.1)
 def rt : List (ℕ × ℕ) := rt1 ++ rt2 ++ rt3
 lemma okAll {T U : List (ℕ × ℕ)} (h : U.all (fun e => okE [] (pr T e.1) e) = true)
@@ -3758,11 +3852,70 @@ lemma iroot : Imp [] 0 14 := imp_ts (Or.inl rfl) root_p (by norm_num) ir (fun t 
   · exact one h11
   · exact one h12
   · exact one h13)
+lemma one1 {Q : List (ℕ × ℕ)} {Z K t : ℕ} (h : chk [] Q Z K t FF 1 = false) :
+    ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] Q Z K t p.1 p.2 = false :=
+  ⟨[(FF, 1)], ffull, fun q hq => by simp only [List.mem_singleton] at hq; subst hq; exact h⟩
+theorem impB_one {Q : List (ℕ × ℕ)} {Z L : ℕ} (hp : pOk Z Q = true) (hL : L + 1 ≤ 15) (hA : Imp [] Z L)
+    (hI : ∀ e ∈ Q, ImpB [] e.1 e.2 1) (hc : chk [] Q Z L 1 FF 1 = false) : ImpB [] Z (L + 1) 1 := by
+  intro q hq hs
+  obtain ⟨k, hk, t, ht, S, hS, hl⟩ := hs.live
+  by_cases hkt : k + t < L
+  · exact hA (k + t) hkt (hl.sol.mono le_rfl hS)
+  · obtain rfl : t = 1 := by omega
+    obtain rfl : L = k + 1 := by omega
+    exact imp_of_live (L := k + 1 + 1) (Or.inl rfl) hp hL hI (by omega) hS hl hA (Or.inr (one1 hc))
+def up (B T : List (ℕ × ℕ)) : List (ℕ × ℕ) :=
+  T.map fun e => (e.1, bif B.any (fun x => Nat.beq x.1 e.1 && Nat.beq x.2 e.2) then e.2 + 1 else e.2)
+lemma up_imp {B T : List (ℕ × ℕ)} (hB : ∀ e ∈ B, ImpB [] e.1 (e.2 + 1) 1) (hT : ∀ e ∈ T, Imp [] e.1 e.2) :
+    ∀ e ∈ up B T, ImpB [] e.1 e.2 1 := by
+  intro e he
+  obtain ⟨x, hx, rfl⟩ := List.mem_map.1 he
+  change ImpB [] x.1 (bif B.any (fun y => Nat.beq y.1 x.1 && Nat.beq y.2 x.2) then x.2 + 1 else x.2) 1
+  cases hc : B.any (fun y => Nat.beq y.1 x.1 && Nat.beq y.2 x.2) with
+  | false => exact (hT x hx).toB 1
+  | true =>
+    obtain ⟨y, hy, hxy⟩ := List.any_eq_true.1 hc
+    rw [Bool.and_eq_true] at hxy
+    obtain rfl : y = x := Prod.ext (Nat.eq_of_beq_eq_true hxy.1) (Nat.eq_of_beq_eq_true hxy.2)
+    exact hB y hy
+noncomputable def okB (B A T : List (ℕ × ℕ)) (e : ℕ × ℕ) : Bool :=
+  A.any (fun x => Nat.beq x.1 e.1 && Nat.beq x.2 e.2) && pOk e.1 (up B (pr T e.1)) && Nat.ble (e.2 + 1) 15 &&
+    !chk [] (up B (pr T e.1)) e.1 e.2 1 FF 1
+lemma okAllB {B A T U : List (ℕ × ℕ)} (h : U.all (okB B A T) = true) (hB : ∀ e ∈ B, ImpB [] e.1 (e.2 + 1) 1)
+    (hA : ∀ e ∈ A, Imp [] e.1 e.2) (hT : ∀ e ∈ T, Imp [] e.1 e.2) : ∀ e ∈ U, ImpB [] e.1 (e.2 + 1) 1 := by
+  intro e he
+  have h := List.all_eq_true.1 h e he
+  simp only [okB, Bool.and_eq_true, Bool.not_eq_true', List.any_eq_true] at h
+  obtain ⟨⟨⟨⟨x, hx, hx1, hx2⟩, hp⟩, hL⟩, hc⟩ := h
+  obtain rfl : x = e := Prod.ext (Nat.eq_of_beq_eq_true hx1) (Nat.eq_of_beq_eq_true hx2)
+  exact impB_one hp (Nat.le_of_ble_eq_true hL) (hA x hx) (up_imp hB fun y hy => hT y (List.mem_of_mem_filter hy)) hc
+lemma apB {A B : List (ℕ × ℕ)} (ha : ∀ e ∈ A, ImpB [] e.1 (e.2 + 1) 1) (hb : ∀ e ∈ B, ImpB [] e.1 (e.2 + 1) 1) :
+    ∀ e ∈ A ++ B, ImpB [] e.1 (e.2 + 1) 1 := fun e he => (List.mem_append.1 he).elim (ha e) (hb e)
+def rb3 : List (ℕ × ℕ) := [(7, 5), (11, 7), (19, 6), (35, 5), (67, 5), (131, 5), (13, 7), (21, 7), (37, 7), (69, 6), (133, 5), (25, 7), (41, 7), (73, 7), (137, 7), (49, 5), (81, 6), (145, 5), (97, 5), (161, 5), (193, 4), (14, 7), (22, 7), (38, 7), (70, 6), (134, 5), (26, 6), (42, 6), (74, 7), (138, 7), (50, 6), (82, 8), (146, 7), (98, 6), (162, 6), (194, 4), (28, 7), (44, 6), (76, 6), (140, 7), (52, 7), (84, 8), (148, 6), (100, 6), (164, 7), (196, 5), (56, 5), (88, 6), (152, 5), (104, 5), (168, 6), (200, 5), (112, 6), (176, 5), (208, 4), (224, 4)]
+def rb2 : List (ℕ × ℕ) := [(3, 8), (5, 9), (9, 10), (17, 9), (33, 8), (65, 8), (129, 8), (6, 9), (10, 9), (18, 9), (34, 8), (66, 9), (130, 8), (12, 9), (20, 10), (36, 10), (68, 9), (132, 8), (24, 9), (40, 9), (72, 9), (136, 9), (48, 8), (80, 9), (144, 8), (96, 8), (160, 8), (192, 7)]
+def rb1 : List (ℕ × ℕ) := [(2, 11), (4, 12), (8, 12), (16, 12), (32, 11), (64, 11), (128, 11)]
+def rtp : List (ℕ × ℕ) := up (rb1 ++ rb2 ++ rb3) rt
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1 : chk [] rt 0 14 1 FF 1 = false := by decide +kernel
+theorem b3 : rb3.all (okB [] rt3 []) = true := by decide +kernel
+lemma j3 : ∀ e ∈ rb3, ImpB [] e.1 (e.2 + 1) 1 := okAllB b3 (by simp) i3 (by simp)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem b2 : rb2.all (okB rb3 rt2 rt3) = true := by decide +kernel
+lemma j2 : ∀ e ∈ rb2, ImpB [] e.1 (e.2 + 1) 1 := okAllB b2 j3 i2 i3
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem b1 : rb1.all (okB (rb2 ++ rb3) rt1 (rt2 ++ rt3)) = true := by decide +kernel
+lemma j1 : ∀ e ∈ rb1, ImpB [] e.1 (e.2 + 1) 1 := okAllB b1 (apB j2 j3) i1 (apI i2 i3)
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem rootp_p : pOk 0 rtp = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem proot_1 : chk [] rtp 0 14 1 FF 1 = false := by decide +kernel
 lemma iroot_one {S : Finset ℕ} (hS : (S : Set ℕ) ⊆ C (mz 0) (WZ [] 0)) (hl : Live Z0 (mz 0) (tz 0) 14 1 S) : False :=
-  imp_of_live (L := 15) (Or.inl rfl) root_p (by norm_num) ir (by omega) hS hl (fun q hq => iroot q hq) (Or.inr (one proot_1))
+  imp_of_live (L := 15) (Or.inl rfl) rootp_p (by norm_num) (up_imp (apB (apB j1 j2) j3) ir) (by omega) hS hl
+    (fun q hq => iroot q hq) (Or.inr (one1 proot_1))
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
 section circuit
 variable (m : ℕ)
