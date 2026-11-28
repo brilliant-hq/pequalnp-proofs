@@ -73,3 +73,4 @@ theorem PEqualNP.Outside.L_clb_034 : ∀ (n d : ℕ), 2 ≤ n → ({x : List Boo
   have hcx := (hc x hx).mpr hxt
   have hcy := (hc y hy).mp (hce ▸ hcx)
   exact hyf hcy
+-- edit
