@@ -1039,7 +1039,8 @@ structure InstOk (I : Inst) : Prop where
 noncomputable section coreC
 def st (n : Nat) (f : Nat → Bool) : Bool := Nat.rec (motive := fun _ => Bool) (f 0) (fun m _ => f m) (Nat.succ n)
 def spC (NN : Nat) (d : Bool) (l s : Nat) : Nat :=
-  Nat.land (Nat.xor s (Nat.land (Nat.shiftRight s NN) l)) (Bool.rec (motive := fun _ => Nat) (Nat.land s l) l d)
+  let low := Nat.land s l
+  Nat.xor low (Nat.land (Nat.shiftRight s NN) (Bool.rec (motive := fun _ => Nat) low l d))
 def covC (NN : Nat) (d : Bool) (l : Nat) (v : List W) : Nat :=
   List.rec (motive := fun _ => Nat) 0 (fun w _ ih => Nat.lor (spC NN d l w.s) ih) v
 def twiceC (NN : Nat) (d : Bool) (l : Nat) (v : List W) : Nat :=
