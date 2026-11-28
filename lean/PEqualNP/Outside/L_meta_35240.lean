@@ -3983,43 +3983,6 @@ lemma getD_mem {S : Set ℕ} {w : List ℕ} (hw : ∀ x ∈ w, x ∈ S) (h0 : 0 
   by_cases h : i < w.length
   · rw [List.getElem?_eq_getElem h]; exact hw _ (List.getElem_mem h)
   · rw [List.getElem?_eq_none (by omega)]; exact h0
-lemma ex_sol {T : ℕ} (gs : List Gate) : ∀ (w : List ℕ) (S : Set ℕ), (∀ x ∈ w, x ∈ S) → 0 ∈ S → m ∈ S →
-    (∀ g ∈ gs, g.op ∈ ({GateOp.and, GateOp.or, GateOp.not} : Set GateOp) ∧ g.inputs.length ≤ 2) →
-    (∃ i, (ex m gs w).getD i 0 = T) → Sol Z0 m T gs.length S := by
-  induction gs with
-  | nil =>
-    rintro w S hw h0 _ _ ⟨i, rfl⟩
-    exact .done (getD_mem hw h0 i)
-  | cons g gs ih =>
-    intro w S hw h0 hm hg hT
-    have hgs := fun x hx => hg x (List.mem_cons_of_mem _ hx)
-    have rd := fun i => getD_mem hw h0 i
-    have stay : gv m w g ∈ S → Sol Z0 m T (g :: gs).length S := fun h =>
-      (ih (w ++ [gv m w g]) S (fun x hx => by
-        simp only [List.mem_append, List.mem_singleton] at hx
-        rcases hx with hx | rfl
-        · exact hw x hx
-        · exact h) h0 hm hgs hT).mono (by simp) subset_rfl
-    have go : Sol Z0 m T gs.length (insert (gv m w g) S) := ih (w ++ [gv m w g]) _ (fun x hx => by
-        simp only [List.mem_append, List.mem_singleton] at hx
-        rcases hx with hx | rfl
-        · exact Or.inr (hw x hx)
-        · exact Or.inl rfl) (Or.inr h0) (Or.inr hm) hgs hT
-    obtain ⟨hop, hlen⟩ := hg g List.mem_cons_self
-    obtain ⟨o, l⟩ := g
-    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hop
-    rcases hop with rfl | rfl | rfl
-    · match l with
-      | [] => exact stay hm
-      | [i] => exact stay (rd i)
-      | i :: j :: _ => exact .bi (d := false) (rd i) (rd j) (al0 _ _ _) go
-    · match l with
-      | [] => exact stay h0
-      | [i] => exact stay (rd i)
-      | i :: j :: _ => exact .bi (d := true) (rd i) (rd j) (al0 _ _ _) go
-    · match l with
-      | [] => exact stay hm
-      | i :: _ => exact .un (rd i) go
 lemma gv_sub {w : List ℕ} (hw : ∀ x ∈ w, x &&& m = x) (g : Gate) : gv m w g &&& m = gv m w g := by
   have rd : ∀ i, w.getD i 0 &&& m = w.getD i 0 := fun i => getD_mem (S := {x | x &&& m = x}) hw (by simp) i
   unfold gv
@@ -4088,70 +4051,6 @@ theorem fanInTwo_of {gates : List Gate} {o : ℕ}
     FanInTwo ⟨gates, o⟩ := by
   intro g hg; obtain ⟨ho, hl⟩ := h g hg
   exact ⟨by simpa only [Set.mem_insert_iff, Set.mem_singleton_iff] using ho, hl⟩
-
-lemma ex_sol_not {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (S : Set ℕ),
-    (∀ x ∈ w, x ∈ S) → 0 ∈ S → m ∈ S →
-    (∀ g ∈ gs, g.op ∈ ({GateOp.and, GateOp.or, GateOp.not} : Set GateOp) ∧ g.inputs.length ≤ 2) →
-    (∃ g ∈ gs, g.op = GateOp.not) →
-    (∃ i, (ex m gs w).getD i 0 = T) →
-    Sol Z0 m T (gs.length - 1) S ∨ ∃ t, 1 ≤ t ∧ ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T gs.length t S0 := by
-  induction gs with
-  | nil => intro _ _ _ _ _ _ hnot; simp at hnot
-  | cons g gs ih =>
-    intro w S hw h0 hm hg hnot hT
-    have hgs := fun x hx => hg x (List.mem_cons_of_mem _ hx)
-    have rd := fun i => getD_mem hw h0 i
-    have hwm_stay : gv m w g ∈ S → ∀ x ∈ w ++ [gv m w g], x ∈ S := fun h x hx => by
-      simp only [List.mem_append, List.mem_singleton] at hx; rcases hx with hx | rfl; exact hw x hx; exact h
-    have hwm_ins : ∀ x ∈ w ++ [gv m w g], x ∈ insert (gv m w g) S := fun x hx => by
-      simp only [List.mem_append, List.mem_singleton] at hx; rcases hx with hx | rfl; exact Or.inr (hw x hx); exact Or.inl rfl
-    obtain ⟨hop, hlen⟩ := hg g List.mem_cons_self
-    obtain ⟨o, l⟩ := g
-    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hop
-    rcases hop with rfl | rfl | rfl
-    · have hnot' : ∃ g' ∈ gs, g'.op = GateOp.not := by
-        rcases hnot with ⟨g', hg', ho⟩; simp only [List.mem_cons] at hg'; rcases hg' with rfl | hg'; simp at ho; exact ⟨g', hg', ho⟩
-      match l with
-      | [] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.and, []⟩]) S (hwm_stay hm) h0 hm hgs hT)
-      | [i] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.and, [i]⟩]) S (hwm_stay (rd i)) h0 hm hgs hT)
-      | i :: j :: _ =>
-        rcases ih (w ++ [gv m w ⟨.and, i :: j :: _⟩]) (insert (op false (w.getD i 0) (w.getD j 0)) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs hnot' hT with hs | ⟨t, ht, S1, hS1, hl1⟩
-        · exact Or.inl ((Sol.bi (d := false) (rd i) (rd j) (al0 _ _ _) hs).mono (by cases gs <;> simp at hnot' ⊢) subset_rfl)
-        · by_cases hz : op false (w.getD i 0) (w.getD j 0) ∈ S1
-          · by_cases hab : w.getD i 0 = w.getD j 0
-            · have hsub : (S1 : Set ℕ) ⊆ S := fun x hx => (hS1 hx).elim (fun e => by subst e; rw [hab, op_self]; exact rd j) id
-              exact Or.inl (hl1.sol.mono le_rfl hsub)
-            · refine Or.inr ⟨t, ht, insert (w.getD i 0) (insert (w.getD j 0) (S1.erase (op false (w.getD i 0) (w.getD j 0)))), ?_, Live.bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hz])⟩
-              intro x hx; simp at hx; rcases hx with rfl | rfl | ⟨h1, h2⟩; exact rd i; exact rd j; exact (hS1 h1).resolve_left h2
-          · exact Or.inl (hl1.sol.mono le_rfl (fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx))))
-    · have hnot' : ∃ g' ∈ gs, g'.op = GateOp.not := by
-        rcases hnot with ⟨g', hg', ho⟩; simp only [List.mem_cons] at hg'; rcases hg' with rfl | hg'; simp at ho; exact ⟨g', hg', ho⟩
-      match l with
-      | [] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.or, []⟩]) S (hwm_stay h0) h0 hm hgs hT)
-      | [i] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.or, [i]⟩]) S (hwm_stay (rd i)) h0 hm hgs hT)
-      | i :: j :: _ =>
-        rcases ih (w ++ [gv m w ⟨.or, i :: j :: _⟩]) (insert (op true (w.getD i 0) (w.getD j 0)) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs hnot' hT with hs | ⟨t, ht, S1, hS1, hl1⟩
-        · exact Or.inl ((Sol.bi (d := true) (rd i) (rd j) (al0 _ _ _) hs).mono (by cases gs <;> simp at hnot' ⊢) subset_rfl)
-        · by_cases hz : op true (w.getD i 0) (w.getD j 0) ∈ S1
-          · by_cases hab : w.getD i 0 = w.getD j 0
-            · have hsub : (S1 : Set ℕ) ⊆ S := fun x hx => (hS1 hx).elim (fun e => by subst e; rw [hab, op_self]; exact rd j) id
-              exact Or.inl (hl1.sol.mono le_rfl hsub)
-            · refine Or.inr ⟨t, ht, insert (w.getD i 0) (insert (w.getD j 0) (S1.erase (op true (w.getD i 0) (w.getD j 0)))), ?_, Live.bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hz])⟩
-              intro x hx; simp at hx; rcases hx with rfl | rfl | ⟨h1, h2⟩; exact rd i; exact rd j; exact (hS1 h1).resolve_left h2
-          · exact Or.inl (hl1.sol.mono le_rfl (fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx))))
-    · match l with
-      | [] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.not, []⟩]) S (hwm_stay hm) h0 hm hgs hT)
-      | i :: _ =>
-        have go := ex_sol m gs (w ++ [gv m w ⟨.not, i :: _⟩]) (insert (w.getD i 0 ^^^ m) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs hT
-        obtain ⟨k, hk, t, S1, hS1, hl1⟩ := go.live
-        by_cases hz : w.getD i 0 ^^^ m ∈ S1
-        · have hsub : ((insert (w.getD i 0) (S1.erase (w.getD i 0 ^^^ m)) : Finset ℕ) : Set ℕ) ⊆ S := by
-            intro x hx; simp at hx; rcases hx with rfl | ⟨h1, h2⟩; exact rd i; exact (hS1 h1).resolve_left h2
-          have hlu : Live Z0 m T (k + 1) (t + 1) (insert (w.getD i 0) (S1.erase (w.getD i 0 ^^^ m))) := Live.un (by rwa [Finset.insert_erase hz])
-          by_cases hkeq : k = gs.length
-          · subst hkeq; exact Or.inr ⟨t + 1, by omega, _, hsub, hlu⟩
-          · exact Or.inl (hlu.sol.mono (by simp; omega) hsub)
-        · exact Or.inl (hl1.sol.mono (by simp; omega) (fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx))))
 
 open Classical in
 noncomputable def notCount : List Gate → ℕ
@@ -4843,46 +4742,9 @@ set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma EF_ok : EF &&& mz 0 = tz 0 := by decide +kernel
 lemma rawP_len0 : rawP0.length = 8 := rfl
-lemma row_list (b : ℕ) : List.ofFn (fun v : Fin 8 => (rawP0.getD v.val 0).testBit b) = rawP0.map (fun x => x.testBit b) := by
-  apply List.ext_getElem
-  · simp [rawP_len0]
-  · intro i h1 h2
-    have : i < rawP0.length := by simpa using h2
-    rw [List.getElem_ofFn, List.getElem_map, List.getD_eq_getElem?_getD, List.getElem?_eq_getElem this]; rfl
 lemma f_bit (k : ℕ) : EF.testBit k = f (fun v : Fin 8 => (rawP0.getD v.val 0).testBit k) := by
   simp only [f, EF, Nat.testBit_or, Nat.testBit_and]
   rfl
-theorem bridgeLive (gates : List Gate) (o : ℕ) (hD : FanInTwo ⟨gates, o⟩)
-    (hf : ∀ y : Fin 8 → Bool, Circuit.eval ⟨gates, o⟩ (List.ofFn y) = f y) :
-    ∃ k t : ℕ, t ≤ notCount gates ∧ k + notCount gates ≤ gates.length + t ∧
-      ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ C (mz 0) (WZ [] 0) ∧ Live Z0 (mz 0) (tz 0) k t S0 := by
-  let row : ℕ → Fin 8 → Bool := fun k v => (rawP0.getD v.val 0).testBit k
-  let init : List ℕ := rawP0.map (· &&& mz 0)
-  have hinit_sub : ∀ x ∈ init, x &&& mz 0 = x := by
-    intro x hx; simp only [init, List.mem_map] at hx; obtain ⟨w, _, rfl⟩ := hx; rw [Nat.and_assoc, Nat.and_self]
-  have hinit_mem : ∀ x ∈ init, x ∈ C (mz 0) (WZ [] 0) := by
-    intro x hx; simp only [init, List.mem_map] at hx; obtain ⟨w, hw, rfl⟩ := hx; exact Or.inl ⟨w, List.mem_append_left _ hw, rfl⟩
-  have hinit_bits : ∀ k, (mz 0).testBit k = true → init.map (fun x => x.testBit k) = List.ofFn (row k) := by
-    intro k hk; simp only [init, List.map_map, Function.comp_def, Nat.testBit_and, hk, Bool.and_true]; rw [row_list]
-  have ho : (ex (mz 0) gates init).getD o 0 = tz 0 := by
-    rw [← EF_ok]
-    have hsub : ∀ x ∈ ex (mz 0) gates init, x &&& mz 0 = x := ex_sub (mz 0) hinit_sub
-    have hsub' := getD_mem (S := {x | x &&& mz 0 = x}) hsub (by simp) o
-    apply Nat.eq_of_testBit_eq; intro k
-    have e1 := congrArg (fun x => x.testBit k) hsub'
-    simp only [Nat.testBit_and] at e1; rw [← e1, Nat.testBit_and]
-    cases hk : (mz 0).testBit k with
-    | false => simp
-    | true =>
-      simp only [Bool.and_true]; rw [← getD_map, ex_bit (mz 0) hk gates init hD, hinit_bits k hk]
-      have h := hf (row k)
-      change (gates.foldl (fun w g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]) (List.ofFn (row k))).getD o false = f (row k) at h
-      rw [h]; exact (f_bit k).symm
-  exact ex_liveCount (mz 0) gates init (C (mz 0) (WZ [] 0)) hinit_mem
-    (Or.inr (Set.mem_insert _ _)) (Or.inr (Set.mem_insert_of_mem _ rfl)) hD ⟨o, ho⟩
-
-
-
 def selectedBits (flag : ℕ → Bool) : ℕ → ℕ
   | 0 => 0
   | n + 1 => if flag n then selectedBits flag n ||| 2 ^ n else selectedBits flag n
@@ -7712,10 +7574,15 @@ set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem opening_13_or_complete : initialBinary 0x80000 true (frontierMissing opening_13_or) = false := by decide +kernel
 
+
+
 abbrev SearchState := ℕ × List W
 
+noncomputable def pureAt (e : ℕ) (state : SearchState) (f : ℕ → List W → Bool) : Bool :=
+  nodeC I.NN f true I.AA rootPreparedMask rootPreparedSlots e state.2.length state.1 state.2 pairsS
+
 noncomputable def pureSecond (state : SearchState) (f : ℕ → List W → Bool) : Bool :=
-  nodeC I.NN f true I.AA rootPreparedMask rootPreparedSlots 12 state.2.length state.1 state.2 pairsS
+  pureAt 12 state f
 
 noncomputable def mixedSecond (state : SearchState) : Bool :=
   frc state.2 (fun v => st state.1 (fun z =>
@@ -7727,41 +7594,16 @@ noncomputable def afterSecond (state : SearchState) : Bool :=
   frc state.2 (fun v => st state.1 (fun z =>
     look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 13 12 1 z v))
 
-noncomputable def mixedSecondByBin (state : SearchState) (bin : ℕ) : Bool :=
-  frc state.2 (fun v => st state.1 (fun z =>
-    mvNext I.NN I.AA I.HX I.HY bin
-      (lookC I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14)
-      I.AA rootPreparedMask rootPreparedSlots 13 1 z v 0))
-
-lemma mixedSecond_false (state : SearchState)
-    (checked : ∀ b : Fin 8, mixedSecondByBin state b = false) :
-    mixedSecond state = false := by
+lemma pureAt_from_frontier (e : ℕ) (state : SearchState) (states : List SearchState)
+    (remaining : SearchState → Bool)
+    (complete : pureAt e state (frontierMissing states) = false)
+    (checked : ∀ x ∈ states, remaining x = false) :
+    pureAt e state (fun z v => remaining (z,v)) = false := by
   refine Bool.eq_false_iff.mpr fun found => ?_
-  simp only [mixedSecond, mixedSecondByBin, frc_eq, st_eq] at found checked
-  obtain ⟨b, hit⟩ := mvNext_picked _ _ _ _ _ _ _ _ _ _ _ _ _ found
-  exact Bool.noConfusion ((checked b).symm.trans hit)
-
-noncomputable def afterSecondByBin (state : SearchState) (bin : ℕ) : Bool :=
-  frc state.2 (fun v => st state.1 (fun z =>
-    look1Next I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 bin 13 12 1 z v))
-
-lemma afterSecond_by_bins (state : SearchState)
-    (checked : ∀ b : Fin 8, afterSecondByBin state b = false) :
-    afterSecond state = false := by
-  refine Bool.eq_false_iff.mpr fun found => ?_
-  simp only [afterSecond, afterSecondByBin, frc_eq, st_eq] at found checked
-  obtain ⟨b, hit⟩ := look1Next_picked _ _ _ _ _ _ _ _ _ _ _ _ _ found
-  exact Bool.noConfusion ((checked b).symm.trans hit)
-
-lemma pureSecond_from_frontier (state : SearchState) (states : List SearchState)
-    (complete : pureSecond state (frontierMissing states) = false)
-    (checked : ∀ x ∈ states, afterSecond x = false) :
-    pureSecond state (fun z v => afterSecond (z,v)) = false := by
-  refine Bool.eq_false_iff.mpr fun found => ?_
-  simp only [pureSecond, nodeC_as_mode, pairsS] at found complete
+  simp only [pureAt, nodeC_as_mode, pairsS] at found complete
   have hp := pairs_distribute _ _ (fun a c =>
     pair_distribute (fun left right da dc signal x y =>
-      mode_distribute rootPreparedMask rootPreparedSlots 12 state.2.length state.1 state.2
+      mode_distribute rootPreparedMask rootPreparedSlots e state.2.length state.1 state.2
       left right da dc signal x y
       (g := fun _ => frontierMissing states)
       (fun z v hit => by
@@ -7772,6 +7614,12 @@ lemma pureSecond_from_frontier (state : SearchState) (states : List SearchState)
     a c) _ found
   obtain ⟨_, hh⟩ := hp
   exact Bool.noConfusion (complete.symm.trans hh)
+
+lemma pureSecond_from_frontier (state : SearchState) (states : List SearchState)
+    (complete : pureSecond state (frontierMissing states) = false)
+    (checked : ∀ x ∈ states, afterSecond x = false) :
+    pureSecond state (fun z v => afterSecond (z,v)) = false :=
+  pureAt_from_frontier 12 state states afterSecond complete checked
 
 lemma afterFirst_false (state : SearchState)
     (two : 1 < state.2.length) (small : state.2.length < 12)
@@ -7809,6 +7657,7 @@ noncomputable def secondTransition (state : SearchState) (i j kept : ℕ) (kind 
   (Nat.sub (Nat.sub budget usedA) usedB, addS word keptWords)
 
 noncomputable def firstStates : List SearchState := [
+
   opening_0_or.getD 0 (0, []),
   opening_1_and.getD 0 (0, []),
   opening_1_or.getD 0 (0, []),
@@ -7832,827 +7681,217 @@ noncomputable def firstStates : List SearchState := [
   opening_13_or.getD 1 (0, [])]
 
 noncomputable def firstAt (i : ℕ) : SearchState := firstStates.getD i (0, [])
-noncomputable def recordedStep (first i j keep : ℕ) (kind : Bool) : SearchState :=
-  secondTransition (firstAt first) i j keep kind
 
-noncomputable def secondGroup0 : List SearchState := [
-  recordedStep 0 0 1 511 true,
-  recordedStep 0 0 1 509 true,
-  recordedStep 0 0 2 511 false,
-  recordedStep 0 0 2 511 true]
-noncomputable def secondGroup1 : List SearchState := [
-  recordedStep 0 0 3 511 true,
-  recordedStep 0 0 5 479 true,
-  recordedStep 0 0 6 511 true,
-  recordedStep 0 0 6 447 true]
-noncomputable def secondGroup2 : List SearchState := [
-  recordedStep 0 0 7 511 false,
-  recordedStep 0 0 7 511 true,
-  recordedStep 0 0 8 511 false,
-  recordedStep 0 0 8 511 true]
-noncomputable def secondGroup3 : List SearchState := [
-  recordedStep 0 1 2 511 true,
-  recordedStep 0 1 3 511 true,
-  recordedStep 0 1 6 511 true,
-  recordedStep 0 1 7 511 true]
-noncomputable def secondGroup4 : List SearchState := [
-  recordedStep 0 1 8 511 true,
-  recordedStep 0 2 3 511 true,
-  recordedStep 0 2 5 479 true,
-  recordedStep 0 2 6 511 true]
-noncomputable def secondGroup5 : List SearchState := [
-  recordedStep 0 2 7 511 false,
-  recordedStep 0 2 7 511 true,
-  recordedStep 0 2 8 511 false,
-  recordedStep 0 2 8 511 true]
-noncomputable def secondGroup6 : List SearchState := [
-  recordedStep 0 3 6 511 true,
-  recordedStep 0 3 6 447 true,
-  recordedStep 0 3 7 511 true,
-  recordedStep 0 3 8 511 true]
-noncomputable def secondGroup7 : List SearchState := [
-  recordedStep 0 5 7 479 true,
-  recordedStep 0 6 7 511 true,
-  recordedStep 0 6 8 511 true,
-  recordedStep 0 7 8 511 false]
-noncomputable def secondGroup8 : List SearchState := [
-  recordedStep 0 7 8 511 true,
-  recordedStep 1 0 1 509 true,
-  recordedStep 1 0 2 511 true,
-  recordedStep 1 0 3 511 true]
-noncomputable def secondGroup9 : List SearchState := [
-  recordedStep 1 0 4 511 true,
-  recordedStep 1 0 6 511 true,
-  recordedStep 1 2 3 511 true,
-  recordedStep 1 2 4 511 true]
-noncomputable def secondGroup10 : List SearchState := [
-  recordedStep 1 2 6 511 true,
-  recordedStep 1 3 4 511 true,
-  recordedStep 1 3 6 511 true,
-  recordedStep 1 4 6 511 true]
-noncomputable def secondGroup11 : List SearchState := [
-  recordedStep 1 5 7 351 true,
-  recordedStep 2 0 1 511 true,
-  recordedStep 2 0 1 509 true,
-  recordedStep 2 0 2 511 false]
-noncomputable def secondGroup12 : List SearchState := [
-  recordedStep 2 0 2 511 true,
-  recordedStep 2 0 3 511 true,
-  recordedStep 2 0 4 511 true,
-  recordedStep 2 0 6 511 true]
-noncomputable def secondGroup13 : List SearchState := [
-  recordedStep 2 0 6 447 true,
-  recordedStep 2 0 7 511 false,
-  recordedStep 2 0 7 511 true,
-  recordedStep 2 0 8 511 true]
-noncomputable def secondGroup14 : List SearchState := [
-  recordedStep 2 0 8 255 true,
-  recordedStep 2 1 2 511 true,
-  recordedStep 2 1 3 511 true,
-  recordedStep 2 1 4 511 true]
-noncomputable def secondGroup15 : List SearchState := [
-  recordedStep 2 1 6 511 true,
-  recordedStep 2 1 6 447 true,
-  recordedStep 2 1 7 511 true,
-  recordedStep 2 1 8 511 true]
-noncomputable def secondGroup16 : List SearchState := [
-  recordedStep 2 2 3 511 true,
-  recordedStep 2 2 4 511 true,
-  recordedStep 2 2 6 511 true,
-  recordedStep 2 2 6 447 true]
-noncomputable def secondGroup17 : List SearchState := [
-  recordedStep 2 2 7 511 false,
-  recordedStep 2 2 7 511 true,
-  recordedStep 2 2 8 511 true,
-  recordedStep 2 2 8 255 true]
-noncomputable def secondGroup18 : List SearchState := [
-  recordedStep 2 3 4 511 true,
-  recordedStep 2 3 6 511 true,
-  recordedStep 2 3 7 511 true,
-  recordedStep 2 3 8 511 true]
-noncomputable def secondGroup19 : List SearchState := [
-  recordedStep 2 4 7 511 true,
-  recordedStep 2 4 8 511 true,
-  recordedStep 2 6 7 447 false,
-  recordedStep 2 6 7 511 true]
-noncomputable def secondGroup20 : List SearchState := [
-  recordedStep 2 7 8 511 true,
-  recordedStep 2 7 8 255 true,
-  recordedStep 3 0 1 509 true,
-  recordedStep 3 0 2 511 false]
-noncomputable def secondGroup21 : List SearchState := [
-  recordedStep 3 0 2 511 true,
-  recordedStep 3 0 3 511 true,
-  recordedStep 3 0 4 511 true,
-  recordedStep 3 0 7 511 true]
-noncomputable def secondGroup22 : List SearchState := [
-  recordedStep 3 2 3 511 true,
-  recordedStep 3 2 4 511 true,
-  recordedStep 3 2 7 511 true,
-  recordedStep 3 3 4 511 true]
-noncomputable def secondGroup23 : List SearchState := [
-  recordedStep 3 3 7 511 true,
-  recordedStep 3 4 7 511 true,
-  recordedStep 3 5 6 415 true,
-  recordedStep 3 6 7 447 true]
-noncomputable def secondGroup24 : List SearchState := [
-  recordedStep 4 0 1 511 true,
-  recordedStep 4 0 1 509 true,
-  recordedStep 4 0 2 511 false,
-  recordedStep 4 0 2 511 true]
-noncomputable def secondGroup25 : List SearchState := [
-  recordedStep 4 0 3 511 true,
-  recordedStep 4 0 4 511 true,
-  recordedStep 4 0 6 511 true,
-  recordedStep 4 0 6 447 true]
-noncomputable def secondGroup26 : List SearchState := [
-  recordedStep 4 0 7 511 true,
-  recordedStep 4 0 7 383 true,
-  recordedStep 4 0 8 511 false,
-  recordedStep 4 0 8 511 true]
-noncomputable def secondGroup27 : List SearchState := [
-  recordedStep 4 1 2 511 true,
-  recordedStep 4 1 3 511 true,
-  recordedStep 4 1 4 511 true,
-  recordedStep 4 1 6 447 true]
-noncomputable def secondGroup28 : List SearchState := [
-  recordedStep 4 1 8 511 true,
-  recordedStep 4 2 3 511 true,
-  recordedStep 4 2 4 511 true,
-  recordedStep 4 2 6 511 true]
-noncomputable def secondGroup29 : List SearchState := [
-  recordedStep 4 2 7 511 true,
-  recordedStep 4 2 7 383 true,
-  recordedStep 4 2 8 511 false,
-  recordedStep 4 2 8 511 true]
-noncomputable def secondGroup30 : List SearchState := [
-  recordedStep 4 3 4 511 true,
-  recordedStep 4 3 6 511 true,
-  recordedStep 4 3 7 511 true,
-  recordedStep 4 3 8 511 true]
-noncomputable def secondGroup31 : List SearchState := [
-  recordedStep 4 4 7 511 true,
-  recordedStep 4 4 8 511 true,
-  recordedStep 4 7 8 511 true,
-  recordedStep 5 0 1 511 true]
-noncomputable def secondGroup32 : List SearchState := [
-  recordedStep 5 0 1 509 true,
-  recordedStep 5 0 3 511 true,
-  recordedStep 5 0 4 511 true,
-  recordedStep 5 0 6 511 true]
-noncomputable def secondGroup33 : List SearchState := [
-  recordedStep 5 0 7 511 true,
-  recordedStep 5 1 3 511 true,
-  recordedStep 5 1 4 511 true,
-  recordedStep 5 2 5 475 true]
-noncomputable def secondGroup34 : List SearchState := [
-  recordedStep 5 3 4 511 true,
-  recordedStep 5 3 6 511 true,
-  recordedStep 5 3 7 511 true,
-  recordedStep 5 4 6 511 true]
-noncomputable def secondGroup35 : List SearchState := [
-  recordedStep 5 4 7 511 true,
-  recordedStep 5 6 7 511 true,
-  recordedStep 6 0 1 511 true,
-  recordedStep 6 0 1 509 true]
-noncomputable def secondGroup36 : List SearchState := [
-  recordedStep 6 0 3 511 true,
-  recordedStep 6 0 3 503 true,
-  recordedStep 6 0 4 511 true,
-  recordedStep 6 0 5 511 true]
-noncomputable def secondGroup37 : List SearchState := [
-  recordedStep 6 0 6 511 true,
-  recordedStep 6 0 6 447 true,
-  recordedStep 6 0 7 511 false,
-  recordedStep 6 0 7 511 true]
-noncomputable def secondGroup38 : List SearchState := [
-  recordedStep 6 0 8 511 false,
-  recordedStep 6 0 8 511 true,
-  recordedStep 6 1 3 511 true,
-  recordedStep 6 1 4 511 true]
-noncomputable def secondGroup39 : List SearchState := [
-  recordedStep 6 1 5 511 true,
-  recordedStep 6 1 6 511 true,
-  recordedStep 6 1 7 511 true,
-  recordedStep 6 1 8 511 true]
-noncomputable def secondGroup40 : List SearchState := [
-  recordedStep 6 3 4 511 true,
-  recordedStep 6 3 5 511 true,
-  recordedStep 6 3 7 511 true,
-  recordedStep 6 3 7 503 true]
-noncomputable def secondGroup41 : List SearchState := [
-  recordedStep 6 3 8 511 true,
-  recordedStep 6 4 5 511 true,
-  recordedStep 6 4 6 511 true,
-  recordedStep 6 4 7 511 true]
-noncomputable def secondGroup42 : List SearchState := [
-  recordedStep 6 4 8 511 true,
-  recordedStep 6 5 7 511 true,
-  recordedStep 6 5 8 511 true,
-  recordedStep 6 7 8 511 false]
-noncomputable def secondGroup43 : List SearchState := [
-  recordedStep 6 7 8 511 true,
-  recordedStep 7 0 2 507 true,
-  recordedStep 7 0 3 511 false,
-  recordedStep 7 0 3 511 true]
-noncomputable def secondGroup44 : List SearchState := [
-  recordedStep 7 0 4 511 true,
-  recordedStep 7 0 5 511 true,
-  recordedStep 7 0 6 511 true,
-  recordedStep 7 0 7 511 true]
-noncomputable def secondGroup45 : List SearchState := [
-  recordedStep 7 0 8 511 true,
-  recordedStep 7 2 3 507 true,
-  recordedStep 7 2 7 507 true,
-  recordedStep 7 3 4 511 true]
-noncomputable def secondGroup46 : List SearchState := [
-  recordedStep 7 3 5 511 true,
-  recordedStep 7 3 7 511 true,
-  recordedStep 7 3 8 511 true,
-  recordedStep 7 4 5 511 true]
-noncomputable def secondGroup47 : List SearchState := [
-  recordedStep 7 4 6 511 true,
-  recordedStep 7 4 7 511 true,
-  recordedStep 7 4 8 511 true,
-  recordedStep 7 5 7 511 true]
-noncomputable def secondGroup48 : List SearchState := [
-  recordedStep 7 5 8 511 true,
-  recordedStep 8 0 1 511 true,
-  recordedStep 8 0 1 509 true,
-  recordedStep 8 0 2 511 false]
-noncomputable def secondGroup49 : List SearchState := [
-  recordedStep 8 0 2 511 true,
-  recordedStep 8 0 3 511 true,
-  recordedStep 8 0 4 511 true,
-  recordedStep 8 0 5 479 true]
-noncomputable def secondGroup50 : List SearchState := [
-  recordedStep 8 0 5 478 true,
-  recordedStep 8 0 6 511 true,
-  recordedStep 8 0 7 511 false,
-  recordedStep 8 0 7 511 true]
-noncomputable def secondGroup51 : List SearchState := [
-  recordedStep 8 1 2 511 true,
-  recordedStep 8 1 3 511 true,
-  recordedStep 8 1 4 511 true,
-  recordedStep 8 1 7 511 true]
-noncomputable def secondGroup52 : List SearchState := [
-  recordedStep 8 2 3 511 true,
-  recordedStep 8 2 4 511 true,
-  recordedStep 8 2 6 511 true,
-  recordedStep 8 2 7 511 false]
-noncomputable def secondGroup53 : List SearchState := [
-  recordedStep 8 2 7 511 true,
-  recordedStep 8 3 4 511 true,
-  recordedStep 8 3 6 511 true,
-  recordedStep 8 3 7 511 true]
-noncomputable def secondGroup54 : List SearchState := [
-  recordedStep 8 4 6 511 true,
-  recordedStep 8 4 7 511 true,
-  recordedStep 8 6 7 511 true,
-  recordedStep 9 1 2 511 true]
-noncomputable def secondGroup55 : List SearchState := [
-  recordedStep 9 1 2 507 true,
-  recordedStep 9 1 3 511 false,
-  recordedStep 9 1 3 511 true,
-  recordedStep 9 1 3 509 true]
-noncomputable def secondGroup56 : List SearchState := [
-  recordedStep 9 1 4 511 true,
-  recordedStep 9 1 5 511 true,
-  recordedStep 9 1 7 511 false,
-  recordedStep 9 1 7 511 true]
-noncomputable def secondGroup57 : List SearchState := [
-  recordedStep 9 1 7 509 true,
-  recordedStep 9 1 8 511 false,
-  recordedStep 9 1 8 511 true,
-  recordedStep 9 2 3 511 true]
-noncomputable def secondGroup58 : List SearchState := [
-  recordedStep 9 2 4 511 true,
-  recordedStep 9 2 5 511 true,
-  recordedStep 9 2 7 511 true,
-  recordedStep 9 2 8 511 true]
-noncomputable def secondGroup59 : List SearchState := [
-  recordedStep 9 3 4 511 true,
-  recordedStep 9 3 5 511 true,
-  recordedStep 9 3 7 511 false,
-  recordedStep 9 3 7 511 true]
-noncomputable def secondGroup60 : List SearchState := [
-  recordedStep 9 3 8 511 false,
-  recordedStep 9 3 8 511 true,
-  recordedStep 9 4 5 511 true,
-  recordedStep 9 4 6 511 true]
-noncomputable def secondGroup61 : List SearchState := [
-  recordedStep 9 4 6 447 true,
-  recordedStep 9 4 7 511 true,
-  recordedStep 9 4 8 511 true,
-  recordedStep 9 5 7 511 true]
-noncomputable def secondGroup62 : List SearchState := [
-  recordedStep 9 5 8 511 true,
-  recordedStep 9 7 8 511 false,
-  recordedStep 9 7 8 511 true,
-  recordedStep 10 0 2 507 true]
-noncomputable def secondGroup63 : List SearchState := [
-  recordedStep 10 0 3 511 false,
-  recordedStep 10 0 3 511 true,
-  recordedStep 10 0 4 511 true,
-  recordedStep 10 0 7 511 true]
-noncomputable def secondGroup64 : List SearchState := [
-  recordedStep 10 0 8 511 true,
-  recordedStep 10 2 4 507 true,
-  recordedStep 10 3 4 511 true,
-  recordedStep 10 3 7 511 true]
-noncomputable def secondGroup65 : List SearchState := [
-  recordedStep 10 3 8 511 true,
-  recordedStep 10 4 6 511 true,
-  recordedStep 10 4 7 511 true,
-  recordedStep 10 4 8 511 true]
-noncomputable def secondGroup66 : List SearchState := [
-  recordedStep 10 5 7 479 true,
-  recordedStep 10 5 8 479 true,
-  recordedStep 11 0 1 511 true,
-  recordedStep 11 0 1 509 true]
-noncomputable def secondGroup67 : List SearchState := [
-  recordedStep 11 0 2 511 false,
-  recordedStep 11 0 2 511 true,
-  recordedStep 11 0 3 511 true,
-  recordedStep 11 0 5 479 true]
-noncomputable def secondGroup68 : List SearchState := [
-  recordedStep 11 0 7 511 false,
-  recordedStep 11 0 7 511 true,
-  recordedStep 11 0 8 511 true,
-  recordedStep 11 0 8 255 true]
-noncomputable def secondGroup69 : List SearchState := [
-  recordedStep 11 1 2 511 true,
-  recordedStep 11 1 3 511 true,
-  recordedStep 11 1 7 511 true,
-  recordedStep 11 1 8 511 true]
-noncomputable def secondGroup70 : List SearchState := [
-  recordedStep 11 2 3 511 true,
-  recordedStep 11 2 5 479 true,
-  recordedStep 11 2 7 511 false,
-  recordedStep 11 2 7 511 true]
-noncomputable def secondGroup71 : List SearchState := [
-  recordedStep 11 2 8 511 true,
-  recordedStep 11 3 6 511 true,
-  recordedStep 11 3 7 511 true,
-  recordedStep 11 3 8 511 true]
-noncomputable def secondGroup72 : List SearchState := [
-  recordedStep 11 3 8 255 true,
-  recordedStep 11 7 8 511 true,
-  recordedStep 12 0 1 511 true,
-  recordedStep 12 0 1 509 true]
-noncomputable def secondGroup73 : List SearchState := [
-  recordedStep 12 0 2 511 false,
-  recordedStep 12 0 2 511 true,
-  recordedStep 12 0 4 495 true,
-  recordedStep 12 0 5 479 true]
-noncomputable def secondGroup74 : List SearchState := [
-  recordedStep 12 0 7 511 false,
-  recordedStep 12 0 7 511 true,
-  recordedStep 12 0 8 511 false,
-  recordedStep 12 0 8 511 true]
-noncomputable def secondGroup75 : List SearchState := [
-  recordedStep 12 1 2 511 true,
-  recordedStep 12 1 7 511 true,
-  recordedStep 12 1 8 511 true,
-  recordedStep 12 2 7 511 false]
-noncomputable def secondGroup76 : List SearchState := [
-  recordedStep 12 2 7 511 true,
-  recordedStep 12 2 8 511 false,
-  recordedStep 12 2 8 511 true,
-  recordedStep 12 7 8 511 false]
-noncomputable def secondGroup77 : List SearchState := [
-  recordedStep 12 7 8 511 true,
-  recordedStep 13 1 2 511 true,
-  recordedStep 13 1 2 507 true,
-  recordedStep 13 1 3 511 false]
-noncomputable def secondGroup78 : List SearchState := [
-  recordedStep 13 1 3 511 true,
-  recordedStep 13 1 4 511 true,
-  recordedStep 13 1 4 509 true,
-  recordedStep 13 1 7 511 false]
-noncomputable def secondGroup79 : List SearchState := [
-  recordedStep 13 1 7 511 true,
-  recordedStep 13 1 8 511 false,
-  recordedStep 13 1 8 511 true,
-  recordedStep 13 2 3 511 true]
-noncomputable def secondGroup80 : List SearchState := [
-  recordedStep 13 2 4 511 true,
-  recordedStep 13 2 7 511 true,
-  recordedStep 13 2 8 511 true,
-  recordedStep 13 3 4 511 true]
-noncomputable def secondGroup81 : List SearchState := [
-  recordedStep 13 3 5 479 true,
-  recordedStep 13 3 7 511 false,
-  recordedStep 13 3 7 511 true,
-  recordedStep 13 3 8 511 false]
-noncomputable def secondGroup82 : List SearchState := [
-  recordedStep 13 3 8 511 true,
-  recordedStep 13 4 6 511 true,
-  recordedStep 13 4 7 511 true,
-  recordedStep 13 4 8 511 true]
-noncomputable def secondGroup83 : List SearchState := [
-  recordedStep 13 5 7 479 true,
-  recordedStep 13 7 8 511 false,
-  recordedStep 13 7 8 511 true,
-  recordedStep 14 0 1 509 true]
-noncomputable def secondGroup84 : List SearchState := [
-  recordedStep 14 0 2 511 true,
-  recordedStep 14 0 3 511 true,
-  recordedStep 14 2 3 511 true,
-  recordedStep 14 2 4 511 true]
-noncomputable def secondGroup85 : List SearchState := [
-  recordedStep 14 3 5 511 true,
-  recordedStep 14 6 7 319 true,
-  recordedStep 15 0 1 509 true,
-  recordedStep 15 0 2 511 false]
-noncomputable def secondGroup86 : List SearchState := [
-  recordedStep 15 0 2 511 true,
-  recordedStep 15 0 3 511 true,
-  recordedStep 15 0 7 511 true,
-  recordedStep 15 0 7 383 true]
-noncomputable def secondGroup87 : List SearchState := [
-  recordedStep 15 0 8 511 true,
-  recordedStep 15 0 8 255 true,
-  recordedStep 15 1 7 383 true,
-  recordedStep 15 1 8 255 true]
-noncomputable def secondGroup88 : List SearchState := [
-  recordedStep 15 2 3 511 true,
-  recordedStep 15 2 4 511 true,
-  recordedStep 15 2 7 511 true,
-  recordedStep 15 2 7 383 true]
-noncomputable def secondGroup89 : List SearchState := [
-  recordedStep 15 2 8 255 false,
-  recordedStep 15 2 8 511 true,
-  recordedStep 15 3 5 511 true,
-  recordedStep 15 3 7 511 true]
-noncomputable def secondGroup90 : List SearchState := [
-  recordedStep 15 3 8 511 true,
-  recordedStep 15 4 7 511 true,
-  recordedStep 16 0 2 507 true,
-  recordedStep 16 0 3 511 true]
-noncomputable def secondGroup91 : List SearchState := [
-  recordedStep 16 0 4 511 true,
-  recordedStep 16 0 7 511 true,
-  recordedStep 16 0 8 511 true,
-  recordedStep 16 2 3 507 true]
-noncomputable def secondGroup92 : List SearchState := [
-  recordedStep 16 3 4 511 true,
-  recordedStep 16 3 5 511 true,
-  recordedStep 16 3 7 511 true,
-  recordedStep 16 4 6 511 true]
-noncomputable def secondGroup93 : List SearchState := [
-  recordedStep 16 4 7 511 true,
-  recordedStep 16 4 8 511 true,
-  recordedStep 16 5 7 511 true,
-  recordedStep 17 0 1 509 true]
-noncomputable def secondGroup94 : List SearchState := [
-  recordedStep 17 0 2 511 true,
-  recordedStep 17 0 3 511 true,
-  recordedStep 17 0 6 511 true,
-  recordedStep 17 0 7 383 true]
-noncomputable def secondGroup95 : List SearchState := [
-  recordedStep 17 0 7 382 true,
-  recordedStep 17 2 3 511 true,
-  recordedStep 17 2 4 511 true,
-  recordedStep 17 2 6 511 true]
-noncomputable def secondGroup96 : List SearchState := [
-  recordedStep 17 3 5 511 true,
-  recordedStep 17 3 6 511 true,
-  recordedStep 17 4 6 511 true,
-  recordedStep 18 1 2 511 true]
-noncomputable def secondGroup97 : List SearchState := [
-  recordedStep 18 1 2 507 true,
-  recordedStep 18 1 2 509 true,
-  recordedStep 18 1 2 505 true,
-  recordedStep 18 1 3 511 false]
-noncomputable def secondGroup98 : List SearchState := [
-  recordedStep 18 1 3 511 true,
-  recordedStep 18 1 3 509 true,
-  recordedStep 18 1 4 511 true,
-  recordedStep 18 1 7 511 false]
-noncomputable def secondGroup99 : List SearchState := [
-  recordedStep 18 1 7 511 true,
-  recordedStep 18 2 3 511 true,
-  recordedStep 18 2 4 511 true,
-  recordedStep 18 2 7 511 true]
-noncomputable def secondGroup100 : List SearchState := [
-  recordedStep 18 3 4 511 true,
-  recordedStep 18 3 5 511 true,
-  recordedStep 18 3 7 511 false,
-  recordedStep 18 3 7 511 true]
-noncomputable def secondGroup101 : List SearchState := [
-  recordedStep 18 3 8 511 true,
-  recordedStep 18 3 8 255 true,
-  recordedStep 18 4 6 511 true,
-  recordedStep 18 4 7 511 true]
-noncomputable def secondGroup102 : List SearchState := [
-  recordedStep 18 4 8 511 true,
-  recordedStep 18 4 8 255 true,
-  recordedStep 18 5 7 511 true,
-  recordedStep 19 1 3 511 false]
-noncomputable def secondGroup103 : List SearchState := [
-  recordedStep 19 1 3 511 true,
-  recordedStep 19 1 4 511 true,
-  recordedStep 19 1 7 511 true,
-  recordedStep 19 1 7 509 true]
-noncomputable def secondGroup104 : List SearchState := [
-  recordedStep 19 2 3 507 true,
-  recordedStep 19 2 4 507 true,
-  recordedStep 19 2 7 507 true,
-  recordedStep 19 3 4 511 true]
-noncomputable def secondGroup105 : List SearchState := [
-  recordedStep 19 3 5 511 true,
-  recordedStep 19 3 7 511 true,
-  recordedStep 19 3 8 511 true,
-  recordedStep 19 4 6 511 true]
-noncomputable def secondGroup106 : List SearchState := [
-  recordedStep 19 4 7 511 true,
-  recordedStep 19 4 8 511 true,
-  recordedStep 19 5 7 511 true,
-  recordedStep 20 1 2 255 false]
-noncomputable def secondGroup107 : List SearchState := [
-  recordedStep 20 1 2 255 true,
-  recordedStep 20 1 3 255 true,
-  recordedStep 20 1 6 255 false,
-  recordedStep 20 1 6 255 true]
-noncomputable def secondGroup108 : List SearchState := [
-  recordedStep 20 1 6 253 true,
-  recordedStep 20 2 3 255 true,
-  recordedStep 20 2 4 255 true,
-  recordedStep 20 2 6 255 false]
-noncomputable def secondGroup109 : List SearchState := [
-  recordedStep 20 2 6 255 true,
-  recordedStep 20 2 7 255 false,
-  recordedStep 20 2 7 255 true,
-  recordedStep 20 3 5 255 true]
-noncomputable def secondGroup110 : List SearchState := [
-  recordedStep 20 3 6 255 true,
-  recordedStep 20 3 7 255 true,
-  recordedStep 20 4 6 255 true]
+def secondCount : ℕ := 443
 
-noncomputable def secondGroups : List (List SearchState) := [
-  secondGroup0,
-  secondGroup1,
-  secondGroup2,
-  secondGroup3,
-  secondGroup4,
-  secondGroup5,
-  secondGroup6,
-  secondGroup7,
-  secondGroup8,
-  secondGroup9,
-  secondGroup10,
-  secondGroup11,
-  secondGroup12,
-  secondGroup13,
-  secondGroup14,
-  secondGroup15,
-  secondGroup16,
-  secondGroup17,
-  secondGroup18,
-  secondGroup19,
-  secondGroup20,
-  secondGroup21,
-  secondGroup22,
-  secondGroup23,
-  secondGroup24,
-  secondGroup25,
-  secondGroup26,
-  secondGroup27,
-  secondGroup28,
-  secondGroup29,
-  secondGroup30,
-  secondGroup31,
-  secondGroup32,
-  secondGroup33,
-  secondGroup34,
-  secondGroup35,
-  secondGroup36,
-  secondGroup37,
-  secondGroup38,
-  secondGroup39,
-  secondGroup40,
-  secondGroup41,
-  secondGroup42,
-  secondGroup43,
-  secondGroup44,
-  secondGroup45,
-  secondGroup46,
-  secondGroup47,
-  secondGroup48,
-  secondGroup49,
-  secondGroup50,
-  secondGroup51,
-  secondGroup52,
-  secondGroup53,
-  secondGroup54,
-  secondGroup55,
-  secondGroup56,
-  secondGroup57,
-  secondGroup58,
-  secondGroup59,
-  secondGroup60,
-  secondGroup61,
-  secondGroup62,
-  secondGroup63,
-  secondGroup64,
-  secondGroup65,
-  secondGroup66,
-  secondGroup67,
-  secondGroup68,
-  secondGroup69,
-  secondGroup70,
-  secondGroup71,
-  secondGroup72,
-  secondGroup73,
-  secondGroup74,
-  secondGroup75,
-  secondGroup76,
-  secondGroup77,
-  secondGroup78,
-  secondGroup79,
-  secondGroup80,
-  secondGroup81,
-  secondGroup82,
-  secondGroup83,
-  secondGroup84,
-  secondGroup85,
-  secondGroup86,
-  secondGroup87,
-  secondGroup88,
-  secondGroup89,
-  secondGroup90,
-  secondGroup91,
-  secondGroup92,
-  secondGroup93,
-  secondGroup94,
-  secondGroup95,
-  secondGroup96,
-  secondGroup97,
-  secondGroup98,
-  secondGroup99,
-  secondGroup100,
-  secondGroup101,
-  secondGroup102,
-  secondGroup103,
-  secondGroup104,
-  secondGroup105,
-  secondGroup106,
-  secondGroup107,
-  secondGroup108,
-  secondGroup109,
-  secondGroup110]
+def encodedSecond : List ℕ := [0x90228e22cc228c22882286228422d00290028e020e02cc028c028802860284020402c2028202eea18c818c6188618c41884186418c01880186018401c20190e010e090c08ec0aea090608e60cc608c60904010408e400e408c40ca40864090208e208c2086208420900010008e000e00cc008c00ca00860084000400c2008200, 0x820590e490848e8490648e648c64886490441044ce448e448c44884486449024cc2488248624842490041004ce048e04cc048c048804860484040404c2048204aec3eca38e838e6388638e43884386438e038803860384030403c203d0e290e28ec22ec290828e8290628e628c628862d04290428e420e42cc428c4288428642, 0x8ea790878e878c878a8790678e678a678867ae47a64790078e078c078a07880786070607c40790e610e690a68ea690868e868c868a869066ae668e668a66886690268e268c268a2688268626900610068e060e06cc068c068a068806c6068606c20682068ec58e858c858e658c658865ea45882586258e058c0588058605c205, 0x8e0a880a860a060ac40a90e910e990a98ea990898e89cc898c898a89906910698e690e698a69886990498e498a498849864990291029ae298e290e298a298829a62986290629c42984298ec88e888c888e688c6888688e480e488c48884886488e288828862884288e080e088c08ea08ca088808860884080408c208820890a7, 0x864d902d102d8e2d0e2da82d882d862d062dc42d842d90ec10ec904c104c8e4c0e4c902c8e2c842c900c100c8e0c0e0cca0cc80c840c040cc20c820c90ebd06b906b8e6b8c6b904b8e4b0e4bca4b864b902b8e2b862b842bd00b900b8e0b0e0bca0b860b840b040bc20b820bb0aaaeaa908a8e8a8c8a906a8e6a886aa84a900a, 0x8c5188518651ee11ce118c1186118411c2118eb090908e908c908e708a708870a65090108e1088108610c4108e8f906f8e6f8a6f904f504fce4f8e4f884f864fd02fce2fd00f900fce0f8e0f860f840f040fc20feece8a6e884e864e860e840ec20e90ed10edaead908d8e8d8c8d906d106d8e6d0e6dca6d886d904d8e4d884d, 0x8c948e748c748a748e540e548c540c5488548654ac348c340c348634843404348eb390938e938c9390738e738a738873ae53a853a653ae338e338833863306338eb2d09290928e928c92d07290728e720e728a7288728e52885286528e320e328832a63286320632e432a432c43284328c918c718a71]
+
+
+noncomputable def transitionFromCode (width : ℕ) (parentAt : ℕ → SearchState) (entry : ℕ) : SearchState :=
+  let before := parentAt (entry % 2 ^ width)
+  let left := (entry >>> width) % 16
+  let right := (entry >>> (width + 4)) % 16
+  let dropLeft := if entry.testBit (width + 8) then 2 ^ left else 0
+  let dropRight := if entry.testBit (width + 9) then 2 ^ right else 0
+  let kept := 2 ^ before.2.length - 1 - dropLeft - dropRight
+  secondTransition before left right kept (entry.testBit (width + 10))
 
 noncomputable def secondAt (i : ℕ) : SearchState :=
-  (secondGroups.getD (i / 4) []).getD (i % 4) (0, [])
+  let block := encodedSecond.getD (i / 64) 0
+  transitionFromCode 5 firstAt ((block >>> (16 * (i % 64))) % 65536)
+
+noncomputable def secondSlice (n : ℕ) : List SearchState :=
+  (List.range (min 4 (secondCount - 4 * n))).map fun i => secondAt (4 * n + i)
+
+noncomputable def secondGroups : List (List SearchState) :=
+  (List.range ((secondCount + 3) / 4)).map secondSlice
+
 
 def successors0 : List ℕ := [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors0_complete : pureSecond (firstAt 0) (frontierMissing (successors0.map secondAt)) = false := by
+
   decide +kernel
 
 def successors1 : List ℕ := [33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors1_complete : pureSecond (firstAt 1) (frontierMissing (successors1.map secondAt)) = false := by
+
   decide +kernel
 
 def successors2 : List ℕ := [30, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors2_complete : pureSecond (firstAt 2) (frontierMissing (successors2.map secondAt)) = false := by
+
   decide +kernel
 
 def successors3 : List ℕ := [78, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors3_complete : pureSecond (firstAt 3) (frontierMissing (successors3.map secondAt)) = false := by
+
   decide +kernel
 
 def successors4 : List ℕ := [29, 79, 94, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors4_complete : pureSecond (firstAt 4) (frontierMissing (successors4.map secondAt)) = false := by
+
   decide +kernel
 
 def successors5 : List ℕ := [127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors5_complete : pureSecond (firstAt 5) (frontierMissing (successors5.map secondAt)) = false := by
+
   decide +kernel
 
 def successors6 : List ℕ := [19, 66, 67, 115, 135, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors6_complete : pureSecond (firstAt 6) (frontierMissing (successors6.map secondAt)) = false := by
+
   decide +kernel
 
 def successors7 : List ℕ := [14, 60, 61, 111, 157, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors7_complete : pureSecond (firstAt 7) (frontierMissing (successors7.map secondAt)) = false := by
+
   decide +kernel
 
 def successors8 : List ℕ := [193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors8_complete : pureSecond (firstAt 8) (frontierMissing (successors8.map secondAt)) = false := by
+
   decide +kernel
 
 def successors9 : List ℕ := [6, 7, 51, 52, 102, 103, 148, 149, 178, 199, 200, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors9_complete : pureSecond (firstAt 9) (frontierMissing (successors9.map secondAt)) = false := by
+
   decide +kernel
 
 def successors10 : List ℕ := [59, 110, 134, 156, 206, 233, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors10_complete : pureSecond (firstAt 10) (frontierMissing (successors10.map secondAt)) = false := by
+
   decide +kernel
 
 def successors11 : List ℕ := [77, 93, 125, 140, 170, 192, 217, 248, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors11_complete : pureSecond (firstAt 11) (frontierMissing (successors11.map secondAt)) = false := by
+
   decide +kernel
 
 def successors12 : List ℕ := [41, 72, 91, 120, 136, 165, 187, 213, 242, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors12_complete : pureSecond (firstAt 12) (frontierMissing (successors12.map secondAt)) = false := by
+
   decide +kernel
 
 def successors13 : List ℕ := [5, 36, 50, 86, 101, 130, 147, 177, 198, 225, 271, 295, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors13_complete : pureSecond (firstAt 13) (frontierMissing (successors13.map secondAt)) = false := by
+
   decide +kernel
 
 def successors14 : List ℕ := [31, 171, 249, 307, 333, 335, 336, 337, 338, 339, 340, 341]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors14_complete : pureSecond (firstAt 14) (frontierMissing (successors14.map secondAt)) = false := by
+
   decide +kernel
 
 def successors15 : List ℕ := [32, 80, 81, 95, 126, 141, 172, 218, 250, 289, 308, 334, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors15_complete : pureSecond (firstAt 15) (frontierMissing (successors15.map secondAt)) = false := by
+
   decide +kernel
 
 def successors16 : List ℕ := [16, 63, 112, 159, 207, 235, 279, 302, 322, 351, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors16_complete : pureSecond (firstAt 16) (frontierMissing (successors16.map secondAt)) = false := by
+
   decide +kernel
 
 def successors17 : List ℕ := [10, 106, 152, 202, 229, 298, 317, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors17_complete : pureSecond (firstAt 17) (frontierMissing (successors17.map secondAt)) = false := by
+
   decide +kernel
 
 def successors18 : List ℕ := [11, 55, 56, 87, 107, 132, 153, 180, 203, 230, 256, 274, 275, 299, 318, 348, 349, 366, 379, 380, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors18_complete : pureSecond (firstAt 18) (frontierMissing (successors18.map secondAt)) = false := by
+
   decide +kernel
 
 def successors19 : List ℕ := [0, 45, 96, 127, 142, 173, 193, 219, 251, 266, 290, 309, 362, 387, 389, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors19_complete : pureSecond (firstAt 19) (frontierMissing (successors19.map secondAt)) = false := by
+
   decide +kernel
 
 def successors20 : List ℕ := [1, 33, 46, 82, 97, 128, 143, 194, 220, 267, 291, 310, 335, 342, 375, 388, 390, 427, 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma successors20_complete : pureSecond (firstAt 20) (frontierMissing (successors20.map secondAt)) = false := by
+
   decide +kernel
 
 noncomputable def groupChecked (group : List SearchState) : Bool :=
   group.all fun x => !afterSecond x
 
-noncomputable def indexValid (i : ℕ) : Bool :=
-  (((secondGroups[i / 4]?).getD [])[i % 4]?).isSome
+def indexValid (i : ℕ) : Bool := decide (i < secondCount)
 
 lemma secondAt_mem (i : ℕ) (valid : indexValid i = true) :
     ∃ group ∈ secondGroups, secondAt i ∈ group := by
-  simp only [indexValid] at valid
-  rw [secondAt, List.getD_eq_getElem?_getD]
-  cases h : secondGroups[i/4]? with
-  | none => simp [h] at valid
-  | some group =>
-    simp only [h, Option.getD_some] at valid ⊢
-    have hg := List.mem_of_getElem? h
-    rw [List.getD_eq_getElem?_getD]
-    cases he : group[i%4]? with
-    | none => simp [he] at valid
-    | some state =>
-      refine ⟨group, hg, ?_⟩
-      simpa only [h, he, Option.getD_some] using (List.mem_of_getElem? he)
+  have hi : i < secondCount := of_decide_eq_true valid
+  have block : i / 4 < (secondCount + 3) / 4 := by omega
+  have hn : i % 4 < min 4 (secondCount - 4 * (i / 4)) :=
+    lt_min (Nat.mod_lt _ (by decide)) (by omega)
+  refine ⟨secondSlice (i/4), ?_, ?_⟩
+  · exact List.mem_map.mpr ⟨i/4, List.mem_range.mpr block, rfl⟩
+  · apply List.mem_map.mpr
+    refine ⟨i%4, List.mem_range.mpr hn, ?_⟩
+    congr 1
+    omega
 
 lemma checkIndexTable (tableGood : secondGroups.all groupChecked = true)
     {ids : List ℕ} (wellFormed : ids.all indexValid = true)
@@ -8664,481 +7903,917 @@ lemma checkIndexTable (tableGood : secondGroups.all groupChecked = true)
   have hit := List.all_eq_true.mp good (secondAt i) member
   cases result : afterSecond (secondAt i) <;> simp [result] at hit ⊢
 
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem checkedGroup0 : groupChecked secondGroup0 = true := by decide +kernel
+def thirdEncodedSteps : List ℕ := [
+0xb020190201ae2018e201cc2018c201ca2018420192e00b0c009280090800ce8008e80092600906008e600cc60088600b2400b0400ae400a8400a6400b220092200b020090200ce2008e200cc20086200, 0x904038e4038840386403b22039220390203ee203ae203ce2038e203cc20390e028e2028c202e400290e0110e0190c018ec01aea01906018e601cc6018c60190401104018e4010e4018c401ca40186401, 0xae804926041260490604106048e604c860492404904048e40486404ec204930031300392e0390e03b0c039280390803ce8038e803b260392603b060390603ae6038e603ec603cc603a86038860392403, 0xb02069020690e0510e0590c058ec05908058e805cc8058c80590605106058e6050e6058c60588605904058e4058c4058840586405902058e205cc2058c205930041300492e0490e04b2804b0804ee804,
+0x8e80790607106078e6070e607cc60788607904078e407884078640790207ae2078e20793006b2e06b0e06b0c069280690806ce806926061260690606ce606cc6068860692406ce406884068640692206, 0x8640b8ec0a8e40af000ab30099300992e09d0e09f0c09b0c0992809d080990809ce8098e8099260912609d0609906098e609cc609886099240988409864099220990408ee00890e0710e07aec0790807, 0xce80c8e80cb260cb060c9060c8e60ccc60c8860cb240cae40cd300b9300bd2e0b92e0b90e0bb0c0bd280b9280b9080bce80b8e80bd260b9260b9060b1060b8e60bcc60b8860b9240b9040b8e40b8840b, 0x9281090810ce8108e810906108e610cc61088610b300f9280fce80f9260fcc60f8860fb2e0e9280ece80e9260ecc60e8860e92e0db0c0db280db080d9260d9060d8e60dcc60d92e0cb0c0c9280c9080c,
+0xb0c139281390813ce813b061390e1210e1290c128ec12908128e812cc8128c812906128e6128c612930111301192e1190e11b0c11b2811ee811ae81192611906118e611ec611cc611d301092e10b0c10, 0xb0c18b081893017d2e1790e17b0c179281790817ce8178e817d0e16aea168e616cc6168c616f0416b30159301592e15d0e15b0c159281590815ce8158e815926153261592614cc614ee41493013b2e13, 0xaa622a86228e2228a22288222eea21886218842186421882218622184221f0e1fd301e9301e90e1c90c1c9301b92e1b90e1bb0c1b9301a92e1af0c1ab0c1a90e1910e19aec19ae81993018b2e18b0e18, 0x8ea26aa626f0c25cea25ce8258a825ce6258a62588625f0c24aea248e824ca8248e624ca624886248e224f0c238ea23ae823aa8238e6238a623c86238e223aa2238a223f0c228ea228e8228a822ae622,
+0x9022eae22e8e22ecc22e8c22e8822e8622e8422e0422e8e82d8a82dd262dce62d8e62d8a62d8862df222dd222dce22d8e22d8a22d8822d8622df0c2bf0c2acea2af0c29f0c288a828f0c278e827f0c26, 0x8e2308a23088230d0e2f8e82f8e62f8862fd002f8e02fcc02f8802f8602fe402fc402fd0e2e8ec2e9082e8e82e9062e8e62e8c62e8862ed042e9042e8e42ecc42e8c42e8842e8642ef022eb022ed022e, 0x92a3090a3092830908308e8308a830f2630b2630d2630b063090630ee630ae630ce630aa6308a630a86308863090430ce4308e4308a43088430f2230b2230d2230922309023010230ee230ae230ce230, 0x92a3190a31b2831b0831ae831aa831d2631926319063110631ce6318e6318a631c86319243190431ce4318e4318a43186431d2231922319023110231ce2318e231aa2318a231d30309303090e3030e30,
+0x90e3230e32b2a32b0a3292832908328e832ca832d2632926329063210632ce6328e632ca632886329243290432ce4328e4328843286432d2232922329023210232ce2328e232d30319303190e3130e31, 0x8843486434d023490234ae2348e2340e234d303393033b0e3392a3390a339283390833ce8338a833d263390633ce6338a6338863392433ce4338a4338843386433d223392233b023390233d303293032, 0xd063690636ce6368e6368a63688636d22369223688635d0435cc4358843586435d0035ee035ce035d0e3490e3490a348ea34908348e8348a834d0634906348e6340e6348a63488634904348e4348a434, 0x8e4388a4388843886438d303790e37d2a3790a37d2837908378e8378a837d263790637ce6378a63788637d2437f3036b3036d3036d0e3692a36d0a3690a3692836d0836908368e8368a836d263692636,
+0xce83c8a83cd263cce63c8a63c8863c8e83bd263bce63b8e63b8863bd263ace63a8e63a8a63a8e8398a839f263990e3830e3890a38908388e8388a8389063810638ce6388e6388a6388863890438ce438, 0xb2a4192841908418e841d264190641ce641d30409304090e4030e4092a4090a40b2840ae840d264090640ce640aa6408a6408e83f8a83ff303e8a83ed263ece63e8a63e8863e8a83dd063d8a63d8863d, 0xd3045d0e4592a4590a4592845908458e8458a845d264588644ee444d0e4390e4390a438ea43908438e8438a843d0643ae6438e643d3042b0e4290a4290842ce8428a842b0642d30419304190e4130e41, 0xd304cd304b90e4bd2a4b90a4bd304a92a4ad0a4a90a4ad30499304992a4990a49b0849d30489304890e4830e4890e4730e4790a47908478e8478a847d3046d2a4690a46d2846908468a846f3045b3045,
+0x8a255b0e54eec5490a54908548a854b0654aa6548a654a865488654b0254902548a25488254eca53886538805386053e4053c4053eca5288652884528645288252862528425204252eec4ed304d90e4d, 0xeec5890a58b0858aa6588a658f0e57eec57d0a57d08578a857d06578a65788657b0e56eec56b0a5690856ca85690656ca6568865690256b0e55eec5590a55b0855aa855906558a655c865590255aa255, 0xae261ce2618e261cc2618c261882618626184261042618a860d06608a66088660f0260d0260ce2608a260882608626006260eec5deec5cd0a5cb0e5beec5beec5a8a85ab0e59eec59b0a5990859b0e58, 0xce2638e2638a26388263908629066288662cc262882628626290062ce062cc0628806286062e4062c4062908618e861906618e6618c6618866190461ce4618e4618c4618846186461b026190261ee261,
+0x8e264aa2648a2649306392a6390a6392863908638e8638a863b266392663f0663b0663d0663ae663aa6638a663a86638866392463ce4638a4638846386463b22639226312263d026390263ee263ae263, 0xce46588465864659226512265d026590265ce2658e2659306492a6490a64b2864b0864ae864aa8649266412664d0664906648e6648a664c866492464ce4648a464864649226412264d026490264ce264, 0xee267ae267ce2678e26792a6692866ce8668a86692666d0666ce6668a666886669226612266f0266d026693065b2a65b0a6592865908658e865ca8659266512665d0665906658e665ca6658866592465, 0x864699026910269b306892a68d0a6892868d08688a86892668d06688a668886689226890e6790a678ea67908678e8678a8679066710667ce6678e6678a66788667904678a46788467864679026710267,
+0xd286b9286b9086b8e86b8a86bd266b9266bd066b9066b8e66b8a66b8866b8c66a8866ace46a8846a8646af006ad006a90a69908698e8698a86990669106698e6698a6698866990469ce4698a46988469, 0x92672d06729307192a7190a71b2871ae87192671d0671aa6718a6718a870d06708a670886708a86fce66f8a66f8866fd066e8866ed066d8a66d8a86cf066cd066c8a66c8866cd306bd2a6b92a6b90a6b, 0xd0a7a92a799307892a7790a7792877908778e8778a87788676f047690a75908758e8758a8759067530675b307492a74d0a7492874d08748a87492a73928738a873f067393072b2a7292872908728e872, 0xb0881ae881aa881ec6818a481902818e281aa2818a2818ec808e8808c8808e6808c68088680ea480ae2808e280ac2808c28088280862808a87fec67faa47fa847f8a27f8827fd2a7b92a7b90a7b92a7a,
+0x88687ec686ec685aa485d0e84d0a848ea84d08848e8848a884ec684b0e8390a83cea8390883ce8838a883ec6839028390e82b0a82aea82908828e882ca882ec68288482902828e28290e8190a818ea81, 0x8ea8e8ca8eb088e9088e8c88e8a88eb248eb048eae48eac48eaa48ea848eb228e9228eb028e9028ece28e8e28e8c28e8a28ec828e8828ed0a8a8ea8a90a89cea8990e888ca878c8878a8878c6878a687, 0x8e2908c2908a29090e8f10e8f90a8f8ea8f9088f8e88f8c88f8a88f9068fae68f8e68f8a68f8868fb028f9028f1028fae28f8e28f0e28fcc28f8c28f8a28f8828fc628f8628f92c8e90c8e92a8e90a8e, 0x90291102918e2910e291ec291ac291cc2918c2918a291882919309092c9090c9092a9090a908ea908ca90b2890b0890ac890aa890904908e4908c4908a490c8490b22909229090290ee290ae290ce290,
+0x92892b0892908928c892ca89292492904928e4928c4928849292292122929029210292ce2928e292ac2928c29290e9110e9190a918ea91908918e8918c8918a891904918e4918c4918a49188491b0291, 0x9309313093b2c93b0c9392a9390a938ea93cca9392893b089390893cc8938a89392493904938e4938a4938849392293122939029310293ce2938e293930921309292c9290c92b2a92b0a92aea92aca92, 0xae8958e8958c8958a895904958e4958c4958a495884959029510295ae2958e2950e2959309492c9490c9492a9490a94cea948ca94b08948c8948a89492494ce4948c4948a4948849492294b029490294, 0x90c9792a97d0a9790a978ea978ca9792897f0897b0897d08978c8978a897924978c4978a49788497922971229790a96908968a89690096ee096ce09690e9510e9590c958ec9590a958ea958ca9590895,
+0x8ca9ab089aae49ad309993099d2c9992c9990c99d2a9992a9990a998ea998ca99d2899b0899908998c8998a899904998e4998c4998a4998ea988e8988a898ae698f0098d0098b30979309792c97d0c97, 0x8ca9fb089fb309e92c9e92a9e8ca9e8c89e8a89e92c9d92a9d8ca9d8c89d8a89db2c9cb0c9c92a9c90a9c8ea9cb089c9089c8a89c92c9b90c9bb2a9bb0a9bb089b9089b8c89bac49b90c9a90a9a8ea9a, 0x90aa48caa4b0ea390ea390aa38eaa3908a38e8a38c8a38a8a3b30a292ca292aa28caa2b28a2930a1b2ca192aa190aa18eaa1b08a1930a092ca090ca0b2aa0aeaa0b08a0ac8a0d309f90c9f90a9f8ea9f, 0x8c0ae8a0ae880aee60aec60ae8c8ad8a8ad8a6ad886ad8c2ad8a2ad882ad862ad062adf0eab930aa930a9930a8d2ca892ca890ca8930a792ca7d0ca790ca7930a692ca690ca6b0aa6930a5130a590ca4,
+0x902b08e2b0ac2b08c2b092caf90caf92aaf90aaf8eaaf8caafb28afb08af908afac8af8c8afaa8af8a8afb06afa86afb22af922af902afae2af8e2af8c2af8a2af8eaae8e8ae8c8ae8a8aeae4ae8e0ae, 0x8c8b28a8b2a86b2922b2b2cb1b0cb192ab190ab18eab1ccab1928b1908b1cc8b18a8b1b06b1a86b1922b1902b18e2b192cb090cb0b2ab0b0ab0aeab0acab0928b0908b08c8b0ca8b0b06b0a86b0922b0, 0x92cb790cb7b2ab7aeab7908b7ac8b78c8b78a8b68a6b6886b68c8b58a8b58a6b5886b5d2cb4d2ab48eab48cab4d28b48c8b48a8b4d0cb3d0ab38cab3d08b38c8b38a8b392cb292ab2ceab28cab2928b2, 0xea0c3e40c38ecc28e4c20e4c28c4c2ae2c28e2c2ac2c28c2c2ea2c2ca2c2842c2906c1b04c1a64c1b02c1902c1ec2c1cc2c1862c1d2cbed0cbd92cbc8eaba8caba8cab9b2cb892ab890ab88eab8908b8,
+0x8c6c78e4c7864c7ae2c78e2c72e2c7ac2c78c2c790ec6906c6106c68e6c6904c6864c6ec2c690ec5906c5106c58e6c5904c5864c5ec2c590ec4b06c4ae6c4904c4864c4b02c4902c48e2c4ec2c4cc2c4, 0x8a6cc886ccb04ccd0ecb90ecbd06cb8e6cb904cb864cbee0cab0ec9906c9ce6c9902c98cac88c8c88a8c88c6c88a6c8886c88c4c80c4c88a4c8884c8864c88c2c8882c8862c8842c88ecc78e6c70e6c7, 0xb04db904db8c4db8a4dba84db884db084db90ed990ed790ed58ead48e8d48a8d4886d3ee4d3b0ed290ad2908d28a8d290ed190ed090acf908cf8a8cf8a6cf886cf906ce906cd90acc908cc8a8ccb06cc, 0xe6dc8a6dc886dcb04dc904dc104dcae4dc8e4dc0e4dc8a4dc884dca64dc864dc064dc92cdb90cdb92adb90adbceadb8eadb8cadb928db908db8c8db8a8dbb26dbb06dbac6dbaa6dba86dbb24db924db,
+0x886deb24de924de324de124deb04de904de304de104deac4de8c4deaa4de8a4de90edd8e4dd902ddae2dd8e2dde62ddc62dd90edc10edc90adc8eadc908dc8e8dccc8dc8c8dc8a8dc906dc106dc8e6dc, 0xae6df8e6dfaa6df8a6dfa86df886df904df8e4df8a4df884df864df930de130de92cde90cde92ade90adeceade8eade8cadeb28de928deb08de908deac8de8c8deaa8de8a8de926de906de8c6de8a6de, 0xb04e1904e1930e0130e0b2ae0b0ae0eeae0aeae0acae0928e0128e0908e0108e0ca8e0926e0906e0886e0924e0b04e0904e0ac4e090edf10edf90adf8eadf908df8e8dfcc8df8c8df8a8dfb06df906df, 0x928e3128e3d08e3908e38c8e38a8e3926e38c6e38a6e3886e3b24e3924e3324e3124e3906e2902e2ee2e2ce2e2930e1130e1b2ce1b0ce1ccae1928e1128e1908e1108e1cc8e1926e1906e1886e1924e1,
+0xb0ee490ee490ae4ceae48eae4908e4ce8e48e8e4cc8e48c8e48a8e4906e4106e4ce6e48e6e48a6e4886e4904e48a4e4884e4864e4b30e3930e392ce3d0ce390ce392ae3d0ae390ae3ceae38eae38cae3, 0x8cae7b28e7b08e7908e78c8e78a8e7b26e7d30e6930e6d2ce692ce690ce6d2ae692ae690ae6ceae68eae68cae6d28e6928e6908e6108e68c8e68a8e6926e6906e68c6e68a6e6886e68e6e5f02e5d02e5, 0x8a8ebb30ea92cea92aeaceaea8caea928ea8c8ea8a8eab2ce9b0ce992ae990ae9ceae98eae9928e9908e98a8e992ce890ce8b2ae8b0ae8928e8908e88c8e8ac6e892ce790ce792ae790ae7ceae78eae7, 0x8a8eeee6ee930ed130edb2ced92aed90aedceaed8eaed928ed908ed930ec130ec92cec90cecb2aeceeaecaeaec928ec908ecac8ec8c8ecd30eb92ceb90ceb92aeb90aebceaeb8eaeb8caeb908eb8c8eb,
+0xb0af3930f2130f2930f192cf190cf192af190af1ceaf18eaf18caf1d0ef08eaf08e8f0cc8f08c8f08a8f0f06f0b30ef930ef92cef90cef92aef90aefceaef8eaef8caef928ef328ef92aee928eecc8ee, 0xb28fdb08fd908fdaa8fd8a8fdaa6fdb22fd922fd902fde60fc8c8fb886fb862fbf0ef9930f8930f7930f6d2cf692cf690cf6930f592cf5d0cf590cf590ef410ef490cf48ecf4aeaf4930f392cf390cf3, 0xf0d06b2d05b0d05b0b058eb048eb03b2d02b0d02b2b02aeb0290902f2d00d2b008eb00d29008a900f0cffd0aff8eaffd08ff8a8ffb2afeb0afeaeafe928fe908feca8feb2cfdb0cfd92afd90afd8eafd, 0xf230db230dd230d9230d9030dcc30de410cd070b9070b8e70b8c70b9050b8e50bca50b8650bf030bb030bd030b9030bae30b8e30bca30b8430bd290a8e90acc70a8870af230ad230acc30a8630af2d07,
+0x8850f8650fd030f9030f8e30f9310ef290eb290eb090eae90e9270e9070e1070ec870e9250e9050e8650eec30e9310dd290d9290d9090d8e90db270db070d9070dec70dcc70da870d8870d9050d8850d, 0x909128e912d271290712cc71288712d2512b3111d291192911d0911909118e91192711d071190711cc71188711d231192311ee11090f0fd090f9090f8e90f8c90f9070f8e70f0e70f8870f9050f8e50f, 0x909198e9198c9198e71993118f2918b2918ae91890718ec718cc718d29178e917d29168e916cc71688716f2915cc715d29148e914909138e9139071310713cc71388713905138851386513d3112d2912, 0x8e323ca323c8323843239272290722b2522b0522a6522b232292322b032290322cc322ca32286322d311f9311db091dd291c9091c8e91cb311bd291b9291b9091b8e91bd271a8c71aee51a90f19d0919,
+0x8e52686526903268e326ea326ca3269312513125b272592725b072590725925259052586525b23259232590325cc325ca32590f248e324e412490f2310f2390523105238e5230e523b032390323ae323, 0x8e52af012ab3129931299272912729d0729907299252990529865299232990528ee12890f2710f2790727107278e7270e727905278e52786527903278e32790f2610f2690726107268e7260e72690526, 0x92535b053590535aa53588535f0f3393132d0f31f0531b3130931309273032730ee52fd312e9072eb312d9272d9072db272cb072c9072cb252cd312b9312bd272b9272b9072b1072b9252b9052b8652b, 0x927389073888738b25389253890538aa53890f378e537e633790f3610f36aeb3690736107368e7360e736ca736b053690536ae5368e536a853686536b0d359293590935cc935b2735b0735a8735b2535,
+0xb093aae93aac93a9073a1073a8e73a0e73aca73ac873a9053a8e53a8653a931391313992939129399093910939927399073988739b2539b05399313813138b0d38b293892938b093890938ec938cc938, 0xb273fd313e9313eb0d3ed293e9293e9093e1093ecc93e9273e9073e8873e8e73df033db313c9313cf0d3cb0d3c9293c1293cd093c9093ccc93c9273c9073c8873c9253c9073bee33b90f3a10f3aaeb3a, 0xec943cc943d3142b0d4292b4290b428eb4290942cc9428a942b3141b0d4192b4190b418eb419294190941cc9418a941b0d409294090940cc940b0d3f92b3f90b3f8eb3fb293fb093f9093fcc93f8a93f, 0xb0d4892b4890b488eb48d0f47aeb478e9478c947f0747b314693146b0d4692b4690b468eb469294632946929458c945ee74590f4410f4490b448eb448cb44909448e9449314313143b0d439294390943,
+0xf0f54f0f538c953f0f52ac952aa752f0f51ac9518a751c8751f0f508c950aa750a875088350eed4f8a74f8854f8654f8634f8434ff0f4d90f4c9314bb0d4b9314af0d4ab0d4a9314913149b0d4993148, 0x8a758a875888758d2558d0558f2358b2358d235892358d035890358883588e9578e7578a757d0157ce1578e15786157e4157c41578a756ce5568855686556f0356d0356ee356ce356863568435604356, 0xd095a8c95ad075a8a75a8875ad235a90b59b2959b0959ac9599275952759d0759907598a759c8759d2559d0559d235992359d03599035990b5892958909588c958b2758f0758b0758d075890758aa758, 0x8a7608c95fd075f8a75f8875f8c95e8a75e8875e90b5d9095d8c95dd075d9075d8a75d8875dd055dd295c8c95cd275cd075c8a75c8875c9095b8c95b9075b5075b8a75b8875bd055bd035b9035bd0b5a,
+0xb096bac96baa96b9036b8a36b8c96a8a76a8876a8836a8636ad0b6790b66b09668c9658a764909638c96370763d0b62d09628c96292961909618c961d07619076190b60b2960ac960d076090760aa760, 0x84377d0d7490d73b0b738eb7290b718eb7190d70aeb70ac9708c96fd2b6e8eb6ed0d6dd0b6d8eb6dd096d8c96d8a96d90d6cb2b6cb0b6caeb6c9096c8c96cca96ca876c9236c9036c90d6b90b6b8eb6b, 0xa6584865842658406584d2b838eb83d29838c9838a983aa5838a583a8583885838c97f8c97c8c77c8a77c8c57c8857c8657c8e77bce77af037ad037a8e779f0379ae778f0378d03788e378ee377ce377, 0x8e387e6387c63878c986ce7868e7868c7868a786ce5868e5868c5868858686586d09858c985d07858a785887858eb84d0984909848e9848c984d0784907848e7848a78488784ae5848e584a858488584,
+0xb0789d0789ae7898e789aa7898a789a8789887898e5898858990d88d2b8892b8890b888eb88f2988b2988d2988b098890988ac9888c988aa9888a988907888a788b0588905883058810588aa5888a588, 0xd2b8c92b8cd0b8c90b8c8eb8cd298c9298cd098c9098c8c98c8a98cd078bee38bce38bf2b8ab2b8ab0b8aaeb8ad298a9298a9098a1098aca98a9078a8878a9058a8eb89d0989909898e9898c989f0789, 0x8eb93d2993d29928c992ee792d2b9192b9190b918eb91d29919099190d90f2b90b2b90aeb90d299090990ac9908c990d2b8f8eb8fd298f8c98f8a98ff2b8ed298e8c98ed2b8d8eb8df298dd0d8c90d8c, 0xac99c8c99caa99c8a99cb079caa79ca879cb059c9059c8a59cae59bae39b8e39be639bc639b90d9990d98d0d9790d9790d96b0b9690d9590b958eb9590d94d2b9490b948eb9490d93d2b9392b9390b93,
+0x8c9a08a7a0887a0ceb9fce99f8c99fce79f8a79f8879fd0d9ed0b9e8eb9ed099e8c99e8a99eb2b9db0b9daeb9d9299d9099dca99db079da879db059d9059d90d9c92b9c90b9c8eb9cb299cb099c9099c, 0x8e7acaa7ac8a7aca87ac887acae5ac8e5ac0e5ac885acac3ab8c3abe43abc43abd0da890da7b0ba78eba68eba592ba490ba48eba4909a490da3b2ba3aeba3909a3ac9a38c9a38c9a28a7a2887a28a7a1, 0x885b0865b0cebaf8ebaf909afce9af8e9af8c9af907afce7af8e7af8a7af887afec3aecc3aeb09adae9adac9ad907ad107ad8e7ad0e7adc87adae5ad8e5ad8ebac909ac8e9ac8c9acb07ac907acae7ac, 0x8e9b68c9b68a7b5ee5b58ebb4909b48e9b48c9b4907b48a7b3ec5b3909b28e9b28c9b2907b28e7b28ebb1b09b1ac9b1907b18e7b1aa7b18a7b1cc9b08c9b08e7b0cc7b08c7b08a7b08e5b0cc5b08c5b0,
+0x8ebb9cebb88ebb88ebb7ae9b78ebb6909b6,
+]
+
+def thirdEncodedRows : List ℕ := [
+0x18ff, 0x17ff19, 0x3ff31, 0x1fff04181801,
+0x12ff55, 0x16ff13201b1802, 0x13ff1730021b1803, 0x11ff2a30021b1804,
+0x1a5, 0x15ff021101130115301c01170105, 0x101bd, 0x16ff03161214162f011b01170107,
+0xdff171812141616193409, 0x7ff24181214162f340a, 0x5ff16153e1617180d270b, 0x5ff302b2917180d270c,
+0xaff21141a1114151718340d, 0xcff0b060614141a11141517170121130e, 0xaff0c010a0606090b141a1114420122130f, 0x6ff0b0b0b150b141a2516171401231310,
+0x1015b2c29173824, 0xaff03070a0b0b150a01130b0f01111415171401231411, 0x5ff0b76121415173826, 0x7ff060a140b1306070a1301190b071415171401231512,
+0x4ff08050a0b090b0c0d11131a26151714241513, 0x3ff0c050a050f0b0c0816131a3b1714241514, 0x3ff040506050a0c081716081319011413141714241515, 0x3ff120f0606080c0b090607081201191513141714241516,
+0x104030103050506090c140b160812190115133f241517, 0xc050f150b3b130629151713242d, 0x102020408050f0d080b0c10060810011929151713241618, 0xe2c0b6c261713242f,
+0x3ff02040404050806010d070b0d0b220119011712141713200430, 0x6ff0155fe, 0x9ff070155fe, 0x9ff0a060156fe,
+0x7ff090109060157fe, 0x6ff08080a015efe, 0x1010707080a070158fe, 0x1030607080a070159fe,
+0x10a07080a0161fe, 0x20907080a08015afe, 0x1050607080a0163fe, 0x2070307080a0164fe,
+0x1020102020307080a0a015bfe, 0xdff0172fe18, 0x1aff3d012dfe2e, 0xaff1b0198fe,
+0x26ff0a011a0f250113fe52, 0x1fff27091b0f1c010afe65, 0x1dff1f0126091b0f15fb7c, 0x16ff1e1e2502240ffc91,
+0x16ff341e25020a1a0f018efe, 0x7ff17331e2501c4fe, 0x15ff0701150117011b1e250d190120c4ba, 0xdff161c181c1e23022402cdd3,
+0x11ff230715181c1e23020e16021101bbd4, 0x101123e181c1e0109fee4, 0x3ff143e181c42deec, 0x4ff173e183b2301cbfe,
+0x5ff1b561d1e23daf2, 0x3ff20731e2301cdfe, 0x5ff2340331e2301cefe, 0x13c2c181b1ef00102fe,
+0xcff080406051313150710181b1e23012b131073010efe, 0xaff0c010704060a0e13150710181b1e22012c130f6a0119fe, 0x6ff2806040e282f1b1e212e13720121fe, 0x9ff120b080f040e141408421e21022c130194fe,
+0x14f41311e01f7fe, 0xaff020901070a0b281513011818191e21012e2357012efe, 0x5ff6f1319311e203001a9fe, 0x5ff110a120b0905050504062d0b0e19181e20022e1558013dfe,
+0x3ff06060a0208091b0205050f0714120b0e19181e20210f15100186fe, 0x4ff0910130a0b060c060907141232181e203015550142fe, 0x3ff050807090b080a331411011a18181e20220e253e014afe, 0x3ff17090b120c3b111b18181e203060014efe,
+0x40301040806090b0915281310011b18181e20230d26390150fe, 0x10403050e090b130b3b101c18181e203001b0fe, 0x14022c0b296e1e2001e1fe, 0x30e020f15080b29131034171e203101b1fe,
+0x3090509070d110b3c0f1e17171e20910152fe, 0x305040510020b0a070b0f3c021c17171e20270b5f0153fe, 0x7ff0304fe, 0x5ff080304fe,
+0xdff0501070124fe01e1fe, 0xaff0e04080105fe0201fe, 0x8ff0a010d0408e8021ffe, 0x7ff09090d0187028dfe,
+0x5ff0808090c010e5202b6fe, 0x3ff05010708090b010f4802c1fe, 0x11008090b2d02edfe, 0x1020f08090b0b061b02effe,
+0x108040608090b031cfe, 0x207040608090b031dfe, 0x1030103040608090b0d06030bfe, 0x4040608090b1c0303fe,
+0xaff034dfe, 0x17ff4d015afe0184fe2d, 0xcff180b3c0311fe, 0x20ff0c01170b30013cfe0191fe51,
+0x19ff210b180b260127fe019efe64, 0x17ff1901200b180b1e0112fe01a5fe7b, 0xcff18181f02230125fe01a7fe90, 0x15ff24181f020c170c0351fe,
+0xaff140223181f2302035efe, 0xfff1e020d0115181f0f14020c01e701b2feb9, 0x6ff101d0f16181f02c6febf, 0xfff06010f0c110f16181e0110130128ac1301a9fed2,
+0x4ff251d25181e0388fe, 0x1291d2536120377fe, 0x12a1d3e1d120378fe, 0x3ff2b43181d120379fe,
+0x3ff2e1e25181d038cfe, 0x8ff0404020710050b110d1312181c012910148901aafe010dfe, 0x6ff08010304050410050b110d1312181b012a10118201aafe0118fe, 0x3ff2f103112181b2b9c02cafe,
+0x5ff32220d24181a2c0367fe, 0x5ff0a07070404030203010e07281311181a022a127701b2fe012dfe, 0x106481d241803affe, 0x5ff020511071e0111120b1410181a012c225901b2fe013cfe,
+0x6010508031204080d0909120b1410181a1d10130f5802f0fe, 0x60612071d09093110181a2d022afe0141fe, 0x1060f0924250b23181a2d036cfe, 0x1010707080405081b0113120b140f181a1f0e224d01b1fe014dfe,
+0x2040f111b260b23181a2d036efe, 0x102020208070505071a0115110b150e181a200d234b0301fe, 0xf0a071a270b23181a039dfe, 0x5ff0465fe,
+0xcff046bfe, 0xbff0d060465fe, 0x9ff0b010c060466fe, 0x7ff0a0a0c01046dfe,
+0x6ff08090a0b01046ffe, 0x1171f0467fe, 0x221140468fe, 0x7ff0807080a0c080469fe,
+0x60907080a0c08046afe, 0x1060907080a0c0473fe, 0x1070907080a0c0474fe, 0x2040907080a0c0475fe,
+0x2040907080a0c0476fe, 0x10907080a0c0477fe, 0x19ff4202d5fe010183fe10, 0x18ff54010bfe01bffe010183fe23,
+0x18ff191a02d8fe018dfe46, 0x17ff311a011bfe01bcfe01018dfe47, 0x19ff1819171a30d101b6fe01019afe5b, 0x17ff19011719171a27c301b0fe0101a1fe72,
+0x11ff181816021702171ad901a8fe01a6fe88, 0x15ff291816021702171a04b0fe, 0x5ff16281816320275fe0256fe, 0x15ff0501140112011518161a17011a01228801a9fe0101b0fead,
+0x5ff16192918163104cefe, 0x12ff050115051414151815011a0115011b011d7f0191fe011301abfec7, 0x5ff2d19141518303203dafedb, 0x7ff19191914152e1a3218020afe0101adfee6,
+0x7ff08181919142e151a32180207fe010297fe, 0x4ff1611461618151a32021bfe029dfe, 0x5ff2b332918151a320212fe02a7fe, 0x5ff4b18141518154c03bffefb,
+0x6ff0c05081d1a18141518301b16020cfe01a9fe0106fe, 0x5ff070b0510151a18141518301b160202fe01a9fe0111fe, 0x4ff06061907070e1a182918301b1601f1fe02ccfe, 0x7ff181107150b0e01181514184b16780179fe0801a9fe011cfe,
+0x1010d3f19192918311a0207fe02cefe, 0x1030804130505160c0c0d0f0a1613181a171a171f590178fe0902c6fe, 0x3ff0c0b0606120e0c192f13181a171a1701f9fe01aafe011dfe, 0x3ff0404070b0c1208060c0d0b011a1513181a171a172001d1fe0801aafe011efe,
+0x3ff120605070c05060811011812091513181a171a17205a0177fe01b2fe011ffe, 0x4030103040612061108070a0f09011b1513181a171a172001d1fe0901a9fe0120fe, 0x30103040a0705060d05050810011814081513181a171a17205b0176fe02d3fe, 0x107b28181a3104dcfe,
+0x3ff04040405010705060706210118011b1612181a18193801d0fe010901a9fe0122fe, 0x8ff013bfe04adfe0b, 0xaff09027afe0347fe32, 0x15ff0a0108f01a015ffe01befe01018dfe3f,
+0x10ff160909dc0171fe01b8fe010198fe57, 0xeff1001150909c50171fe01b2fe01019ffe6e, 0x8ff0f0f15010909b0031dfe01a6fe84, 0x5ff170f150a01fefe0403fe,
+0x6ff0f0d0f14017f030cfe0101befec2, 0x3ff150d0f147004c7fed7, 0x101250f140d0602fe, 0x6ff03040706070c0f130118440186fe018dfe0601aefeed,
+0x4ff060102040706070c0f120119440186fe018dfe0601aefeee, 0x50514130f110101e4fe0430fe, 0x1190d0b0f110373fe0501affeef, 0x10d040606070b0f111409440185fe018dfe05029ffe,
+0x1060507060d0b0f111409035bfe01b0fef0, 0x719110f11140605fe, 0x7060d0d0a0f116304c6fef1, 0xb14100f11150606fe,
+0x204050e0d090f116405b8fe, 0x7ff066cfe, 0xaff0674fe, 0x1067ffe,
+0x9ff020b08066cfe, 0x6ff068bfe, 0x6ff0692fe, 0xaff07070901010a010701066dfe,
+0xeff06a4fe, 0x3ff1901160b010677fe, 0x1c069bfe, 0x6ff04160117010a010901066ffe,
+0x6ff0614060b0706150671fe, 0x2006a5fe, 0x2006a6fe, 0x4ff090512080b0706150672fe,
+0x5081706a8fe, 0x5081706a9fe, 0x3ff14060a0a0b07060d067bfe, 0x1270a0b0713067cfe,
+0x101020c01040606090a0b07070c0a0673fe, 0x3010505071506adfe, 0x2706aefe, 0x905071406affe,
+0x2606b0fe, 0x905071306b1fe, 0x1010604010f0106040f0b07070c067efe, 0x18ff6c01760147fe01015efe01c3fe010189fe0103,
+0x19ff7d0101abfe01016cfe0101bffe010180fe011b, 0x6ff1a195a80028cfe01bdfe01b7fe, 0x21ff060118011801590178010ffe0118010160fe0101befe010189fe0136, 0x15ff012cfe010efe0118010160fe0101befe010189fe0138,
+0x12ff37011e19526c010dfe010170fe0101b8fe0101e7fe, 0xfff1335011f194c640104fe010170fe0101b2fe01019cfe0168, 0x3ff56012001a5fe0319fe023afe, 0x18ff03010f01110132010a011501190145010145fe130163fe010d0195fe180190fe147f,
+0x14ff0237fe130162fe010e0195fe180190fe1480, 0x1012d01560121600145fe0175fe0f03d2fe, 0x15ff02012b0104101230010d14011a0144015fe6140161fe0f0195fe0117010190fe1481, 0xcff16181515121a163d3f0660e6140161fe01a4fe180191fe1482,
+0x7ff22181541163d3f014cfe140161fe01a4fe180191fe1483, 0x8ff0821181541163d3f014cfe140161fe01a4fe180229fe, 0x7ff3144121816112c018bfe0319fe01aafe98, 0xaff26121915161218163d40080143fe140162fe01a3fe180192fe1485,
+0xaff0b080914121915281701150127164069e2140162fe130190fe180192fe1486, 0x8ff0a010a08110c121915172701150128164069e2140162fe130190fe180192fe1487, 0x4ff5445125404bafe01aafe9c, 0xaff0509090b12070b011109100114011612150115012817400a0140fe01140161fe01120190fe180192fe1489,
+0x6ff0b7015171254570a02b6fe034dfe148a, 0x7ff070a0e091409070b110118150e09121501150128183f0a61e00175fe14018ffe01180191fe148b, 0x108060a061d081b1119151712151629183f6be016015ffe14018ffe190231fe, 0x3ff09060a0f090b12111119152915162918aaf60173fe01a8fe01a6fe8c,
+0x4ff0c060a0708090b090911111915291516291806eefe, 0x3ff050407060a0f141209081118011401291516291841014bfe150160fe01a3fe180193fe138d, 0x3ff131008070a0a0a080908100118152a15162918416be0150160fe14018ffe180193fe138e, 0x403010404060709190a12090810180114011c2316291841014bfe150160fe01a3fe180193fe138f,
+0x30103050406100907090a0b0709080f0118151d23162918416cdf150160fe15018efe180236fe, 0xc092109871013162901a4fe04c4fea3, 0x3ff04040504020807010f090b0b2601180114011c10131622075a0f013bfe160160fe01a2fe0116010194fe1292, 0x101014ffe022efe4f0468fe,
+0x4bffe0378fe, 0xeff03fc16021ffe1a015ffe01bffe01cbfe, 0x5ff032efe9cd501b9fe01eefe, 0x4ff14aa150206fe0171fe0402fe,
+0x4ff170193021afe030dfe027ffe, 0x740223fe0107fe049dfe, 0x4ff050506090107660223fe0180fe0196fe0296fe, 0x5090608016e0222fe010180fe042dfe,
+0xa0a086f010bfe042dfe0299fe, 0x4ff04040505080b63010223fe0315fe029afe, 0x30e05086e0224fe05b0fe, 0x90409086e0224fe05b1fe,
+0x205090c6e0224fe05b2fe, 0x20505106e0224fe05b3fe, 0x7ff0170fe022efe04c4fe, 0xfff0160fe022ffe650107fe01bffe01b0fe,
+0x4fefe037cfe, 0x14ff10081dfc160117fe0110fe170159fe7f013dfe01e0fe, 0xcff0262fe0107fea4cc8e0128fe0200fe, 0xfff0d141008f70130fe00fefeb2be9d0113fe021efe,
+0x33efe056efe, 0xdff10200f01ce150207feee87110192fe026afe, 0x8ff0d101e020d02b8021cfe0178fe01a8fe027afe, 0x8ff15101e020d020a010f9e0165feb70100fe78ea0339fe,
+0x109240fca0102fe06c4fe, 0x10a241fb30223fe05abfe, 0x3ff0b24100fa40221fe05bdfe, 0x11a1810a9011efe06cbfe,
+0x6ff060a0b0c0c100f01110c0c670193fe96018dfe00fefe8a02b5fe, 0x5ff06010503070b0c2a01120c6b0197fe95018cfe0101fe8302c0fe, 0x1011b2410910803fe, 0x4ff0306050f0c0b010c100d011368013cfef4070180fe070170fe02defe,
+0x1012d0b0d100d145903bffe0176fe02e7fe, 0x10305020605050206020b0b0d100d140e09390401b9fe830187fe016afe02f5fe, 0x20508140b0a010d100d144c0241fe0142fe470167fe02fafe, 0x305080605140a0e100d144a0241fe018afe0166fe02fdfe,
+0x40406080402150e100d1410083201c4fe7d0144fe46011afe034afe, 0x10508061a090e100d5c0159fee802effe0302fe, 0xbff0205fef2013bfe550113fe01c1fe0196fe, 0xcff01f9fe022efe640108fe60015ffe51015afe,
+0x1010307fe0289fe6a0156fe01bafe, 0xdff030d0c01aefe160116fe0110fe170159fe7c0140fe790162fe, 0xcff0e0f0c019afe0130fe0107fea3cd8b012bfe8f016cfe, 0xaff0c010d0f0c0189fe0133fe00fefeb1bf9a0116fea50174fe,
+0x103c7fe0314fe0258fe, 0x9ff020b0b0e0e010b01015efe150138feceeb86120195fee8017bfe, 0x103b7fe0175fe0413fe, 0x8ff020a0c0b0d010d010b010147fe0160febbfd7be5ae140275fe,
+0x3ff090b0c0b0d1a0138fe00fefe6db50177fe0199fe0290fe, 0x1010c0b0c0b0d0812011efe0182fe9e0312fe02a9fe, 0x107070b0c0b0d1a0117fe011afe0109fe018bfe018afe02abfe, 0xf170b1e0104fe0529fe02d7fe,
+0x4ff02030201060506010b0b0d01100af50138fe688f040181fe080171fe0155fe0184fe, 0x104190c0b1ef6013dfe027cfe0457fe, 0x203060206010a08040b0d01100be60142fe6d880187fe0112fe5d0602e3fe, 0x2a0b0d11ea023cfe05e2fe,
+0x1010201040207010a010b0b0d0e03ea0148fef4013dfe480115fe570102f1fe, 0xcff69900185fee80148fe480116fe01c4fe018afe02, 0xdff6a940174fe022ffe5c0111fe54016cfe44013dfe1a, 0x1010378fe028cfe640159fe01b6fe,
+0xfff030e0d4e930164fe01010efe0110fe190161fe6b0154fe620128fe35, 0xaff10100d4201cffe012ffe010efe97da7e013bfe7f0166fe, 0xeff798d0271fe010efe97da7e013bfe7f0112fe55, 0x10479fe0324fe0207fe,
+0xcff021a0f0f010c01368c013cfe010130fe0103fea8c90101b2fe980106fe6a, 0x10486fe0171fe03bcfe, 0xaff020d1b0e010e010c01378b01013cfe0131fe0102fea9c8920121fe01019efe6b, 0x9ff0b0e12090e1c388b013dfecf620102fe0171fe01b3fe019ffe6c,
+0x3ff012afe0370feaac701b3fe019ffe6d, 0x8ff180e12090e0715388a013efe0131fe0100fe0323fe01a0fe6f, 0x7ff17090e12090e1c388a013efed00161fe0172fe01b1fe01a0fe70, 0x6ff08090d29f50270fe00fffe0172fe96011bfea00100fe71,
+0x6ff0601070905080a0e111701120a0200fe0131fe00fffe0172fe96011bfea00172fe, 0x101341f0b1f4389013efe0551fe01a2fe73, 0x7ff030705080905070109060801100b0c01120b3889013efed26000fefe010170fe0101affea300fffe74, 0x4ff0843110b1f4301c7fed202cffe0352fe75,
+0x4ff05070a0511050709010d09080b0c01120c378a013dfed26100fefe0170fe9a0116fe0101a1fe76, 0x10105040704060e080c28f7026ffe00fefe0170fe01b0fe01a2fe0177, 0x1010704070a0e080c28f7026ffe00fefeb2be01b0fea6fc79, 0x1090b05050e080c28f601026ffe00fefeb2be9c0114fe01a2fe7a,
+0x202010302050612060808040c0d010e1a130c01fdfe0130fe00fefeb2be01b0fea70176fe, 0x81807420f0b134401c4fe022efe04c2fe7d, 0x1010203030505010a07070817010c010e0f0b10034487013dfed60158feb3be9c0111fe0101a3fe7e, 0x5ff976d01fdfe022ffe04adfe2f,
+0x4ff06846f01cffe160227fe04bafe53, 0x3ff05056b0f6d01c9fe0236fe04c1fe66, 0x1010404052a01f0fe06e5fe010ffe, 0x1030304052401eefe06e3fe011afe,
+0x2020304050d01dcfe06e1fe0146fe, 0x10203040506b00128fe0241fe049efe0154fe, 0xaff109b6d01fdfe8e01a1fe6602c5fe0182fe30, 0x8ff0ba86d01f9fe0556fe0189fe34,
+0x15ff08010a0c8d6f8c0143fe16ab017cfe180159fe7e013bfe01018ffe54, 0xfff16070b09770f6d8c013dfecd0169fea5cc8d0126fe01019cfe67, 0x6ff1015077e74019efe150207fe0186fe0191fe01b1febb, 0x8ff1615070b017274850119fe15d50132feef0227fe0101b1febc,
+0x5ff091513027a7686010afefc0120fe0320fe01a7fed5, 0x7ff0e080d1302080a0167760190fefc0120fe0101fe78e90265fed6, 0x10108221366860171fe0221fe0314fe01b2fef8, 0x3ff1814135f8c0168fe0226fe04c1fe0103fe,
+0x6ff0403070706090b1201160b380109fee70129fe0101fe018dfefd880101a8fe0110fe, 0x4ff06010303070706090b1101170a33010afee40131fefc018cfe0100fe810101a8fe011bfe, 0x10105050e160b0f024ca00149fe0230fe018efe016ffe01b1fe012ffe, 0x1010705050908190f021933a06ddc013dfef30802f4fe0101b1fe0130fe,
+0x3281259a30144fe06dffe0136fe, 0x2506121045a7013dfe0535fe01aafe013efe, 0x3ff0204030505040507060a081015070b1c0115fec705023cfe02f0fe0101affe040143fe, 0x2070313170810152c01dbfe0241fe02f0fe01b0fe014bfe,
+0x60615061110400119fec00158fee902f0fe01b0fe014ffe, 0x107080e170710162a01d9fe0241fe02f0fe01affe0151fe, 0x4ff0133fe6a0213fe7501b8fe04adfe0d, 0x7ff055abd6c01dafe169d0181fe017afe034bfe41,
+0x9ff080448b9096d8f0140fec50172fe0172fe01b7fe0199fe59, 0x5ff0a0739bb7101a9fe150206fe0170fe035afeaa, 0x10fee74890112feef044afe01abfec4, 0x10e6760190fefc05e6fed8,
+0x101090709051da501f7fe0119fe0295fe0339fef9, 0x103080709051da501f7fe0119fe0295fe0339fefa, 0xc070922a588016ffe0223fe018bfe0338fefc, 0x10102020202030709061ca50106feef010223fe0315fe01aefe01fd,
+0x202090709c701f5fe0224fe04c3fe00fffe, 0x9d00107feee011dfe05cafe0100fe, 0x10506060ac601f5fe0225fe04c2fe0101fe, 0x10103c5fe022dfe04cefe,
+0x3ff0303a3fe01021dfe017afe0385fe, 0x105b2fe0171fe03a4fe, 0x10106034ffe010204fe0171fe03fefe, 0x20102020103010efe0211fe01021cfe0177fe040efe,
+0x5ff018efe03b9fe0177fe0352febd, 0x6bdfe0410fe, 0x6bdfe0411fe, 0x4030103020112fe74019dfe021cfe0175fe0354febe,
+0x306bcfe0414fe, 0x548fe0589fe, 0x548fe058afe, 0x8ff0173fe016a920182fe01710101bcfe0324fe0188fe07,
+0x11ff1b019bb8016b93010171fe01820101aafe60010dfe01c1fe010181fe1f, 0x4ff01f8fe9203b1fe0324fe0188fe08, 0x9ffcd0124fe920103a0fe60010dfe01c0fe010182fe20, 0x1012001ac0320fe039bfe01bdfe01b9fe,
+0x15ff02011e010a010f018b01bb016c920144011afe01990178010cfe1b015ffe72014dfe01018bfe3b, 0xfffdc010129fe910145022dfe010cfe1b015ffe72014cfe01018cfe3c, 0xbff25011f010a010f225701c26d01cffe012efe010bfe9bd6830136fe0101ebfe, 0x1012f010392fe0206fe0318fe0253fe,
+0xcff02010c2101051c011901660107b57187010137fe01c20143fee28f0c0199fe0101b2fea7, 0x1011b0173fe747e011ffeec043bfe01bdfec0, 0x1012f100243fe011ffe021afe030dfe01bdfec1, 0x4ff20111097bb747d011efe0219fe030cfe01bffec3,
+0x7ff05130c10010f0115050a0d0b5b0701a5fe0b6aa8015dfebd017afee1b11301abfec5, 0x5ff070104040f1b010f0116050a0d0b5b07b4f10b0112fe015dfebd017afee1b11301abfec6, 0x101310172fe757c011dfe0524fe01bffec8, 0x5ff03060617010c0e010f01170f1803570107b3757c0c0111fef20128fe010178fe010190fe1501aafec9,
+0x3ff2b0d0d10190f7ab375880111fe0393fe01a6fe01aafeca, 0x1010a08060604040806070d020e021707080f011efe75f5a4f36dbb0178fee5026bfecb, 0x10304050305060608080d0d101907080f0b1c3e0701a5fe0b6ca2010160febb0178fe0193fe1401a9fe01cc, 0x102020405081b010d0d10190f1a5a01acfe0b010efe021cfe00fefe7a0193fe1401a9fece,
+0x9050807140e0d10190f374501affe010efe021cfe0178fe01a7fe01a9fecf, 0xe050307070503050e0d10190906110288fea00163feb900fffe79e80268fed0, 0x4ff0203040f13011b10190f1c5abb0208fe021cfe00fffe790195fe1301a8fed1, 0x4ff0498fee702a6fe034dfe,
+0x10ff04019d013d013bfe6b8f2e0158fe016f780148fe01015dfe01c4fe0189fe01, 0x9ff11a0013e013bfe6b0215fee80148fe480116fe01c4fe018bfe, 0x5ff09010f0103010215fe016a0214fe01022efe015ffe034dfe05, 0x5ff02a3fe0443fe015ffe034dfe06,
+0x10114100218fe6a0215fe7201bcfe04acfe09, 0x260497fe022efe4f045dfe0a, 0x101170f060213fe6a0213fe022dfe04adfe0c, 0x5ff03040606060e018e173f0233fe31014dfef0013dfe0167fe01c3fe0183fe0e,
+0x3ff0501020202060613018f173f0135fe00fefe017efef0013dfe0167fe01c3fe0183fe0f, 0x4040d06070b01021bfe6b0211fe022cfe010167fe0345fe11, 0x220b92170173fe6b0211fe7804defe0183fe12, 0x3ff030404040506060b9217400233fe320148fe01f2013bfe0329fe0183fe0113,
+0x2041106060b0496fe022efe04acfe15, 0x5180b93170273fe0179fe022efe04acfe16, 0x1080d0610021ffe0277fe022efe04acfe17, 0x3ffd601bc032efe039bfe54016cfe0198fe,
+0xfff0301d4011f9e16a36c930175fe018001aefe01016cfe54016cfe44013cfe19, 0x9ff10d601be16a36c0208fe022ffe5c0111fe54016cfe440156fe, 0x11904c1fe022dfe04cbfe, 0xcff09010d010301d201bfb8016b940172fe01810101abfe5f010efe0101c0fe0181fe1d,
+0xaff01bafe0124fe9403a0fe5f010dfe0101c1fe0181fe1e, 0x6ff0b0b0a0d01c80fbd1a019cfe0174fe022dfe016dfe5c0164fe4c0137fe21, 0x4ff06010a0b1601c90fbd1aa0fc0174fe022dfe016dfe5c0164fe4c0137fe22, 0x12b025bfe6c0204fe06dcfe24,
+0x4ff0205050a010a010a0b01ca0fbdb96c910173fe8601a7fe01016bfe0101bffe0183fe25, 0x130025bfe6c0204fe860656fe26, 0x3ff020506050a0b0a0b01ca010e010175fe6c920172fe8601a8fe016cfe01bffe010182fe27, 0x10401050204050a0b0a0bcb0fbf1b019afe0170fe01022efe016cfe01bffe0183fe0128,
+0x1020306060e010a010a0bcb0f0274fe0170fe022ffe650107fe01bffe0183fe2a, 0x6060606080b0b0bca010e010273fe010170fe022ffe650107fe01bffe0183fe2b, 0x3ff02060c07010a0116ca0f017afe026bfe022ffe650107fe01bffe0183fe2c,
+]
+
+def thirdCount : ℕ := 3079
+
+def decodeDeltas (fuel : ℕ) : ℕ → ℕ → List ℕ :=
+  Nat.rec (motive := fun _ => ℕ → ℕ → List ℕ) (fun _ _ => [])
+    (fun _ rest before data =>
+      let lead := data % 256
+      if lead = 0 then []
+      else if lead = 255 then
+        let count := (data >>> 8) % 256
+        List.range' before count ++ rest (before + count) (data >>> 16)
+      else if lead = 254 then
+        let following := before + (data >>> 8) % 65536
+        (following - 1) :: rest following (data >>> 24)
+      else
+        let following := before + lead
+        (following - 1) :: rest following (data >>> 8)) fuel
+
+def thirdSuccessors (state : ℕ) : List ℕ :=
+  decodeDeltas 64 0 (thirdEncodedRows.getD state 0)
+
+noncomputable def thirdAt (i : ℕ) : SearchState :=
+  let block := thirdEncodedSteps.getD (i / 32) 0
+  let entry := (block >>> (20 * (i % 32))) % 1048576
+  transitionFromCode 9 secondAt entry
+
+noncomputable def mixedFromSecond (state : SearchState) : Bool :=
+  frc state.2 (fun v => st state.1 (fun z =>
+    mvC I.NN I.AA I.HX I.HY
+      (lookC I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14)
+      I.AA rootPreparedMask rootPreparedSlots 12 1 z v 0))
+
+noncomputable def afterThird (state : SearchState) : Bool :=
+  frc state.2 (fun v => st state.1 (fun z =>
+    look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 12 11 1 z v))
+
+lemma afterSecond_false (state : SearchState)
+    (two : 1 < state.2.length) (small : state.2.length < 11)
+    (mixed : mixedFromSecond state = false)
+    (pure : pureAt 11 state (fun z v => afterThird (z,v)) = false) :
+    afterSecond state = false := by
+  have lengthOkay : Nat.ble state.2.length 1 = false := by
+    cases h : Nat.ble state.2.length 1
+    · rfl
+    · exact absurd (Nat.le_of_ble_eq_true h) (Nat.not_le_of_gt two)
+  have choose0 (F : ℕ → Bool) : tstC I.NN I.AA I.HX I.HY true I.AA 12 state.2 F = F 0 := by
+    have h0 : Nat.beq state.2.length 12 = false := beq_f (by omega)
+    have h1 : Nat.beq state.2.length.succ 12 = false := beq_f (by omega)
+    simp only [tstC, bR, h0, h1, Bool.cond_false]
+  rw [afterSecond, frc_eq, st_eq, show (13 : ℕ) = Nat.succ 12 from rfl, look1C_step,
+    lengthOkay, Bool.cond_false]
+  change tstC I.NN I.AA I.HX I.HY true I.AA 12 state.2 _ = _
+  rw [choose0]
+  simp only [afterThird, frc_eq, st_eq] at pure
+  simp only [mixedFromSecond, frc_eq, st_eq] at mixed
+  change (bif pureAt 11 state
+      (look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 12 11 1)
+    then true else _) = _
+  rw [pure, mixed]
+  rfl
+
+def rangeCheck (test : ℕ → Bool) (start count : ℕ) : Bool :=
+  (List.range' start count).all test
 
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem checkedGroup1 : groupChecked secondGroup1 = true := by decide +kernel
+lemma rangeCheck_append (test : ℕ → Bool) {s a b : ℕ}
+    (left : rangeCheck test s a = true) (right : rangeCheck test (s+a) b = true) :
+    rangeCheck test s (a+b) = true := by
+  unfold rangeCheck at *
+  rw [← List.range'_append_1, List.all_append, left, right]
+  rfl
 
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem checkedGroup2 : groupChecked secondGroup2 = true := by decide +kernel
+lemma rangeCheck_at {test : ℕ → Bool} {n i : ℕ} (checked : rangeCheck test 0 n = true) (hi : i < n) :
+    test i = true :=
+  List.all_eq_true.mp checked _ (List.mem_range'_1.mpr ⟨Nat.zero_le _, by simpa using hi⟩)
 
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem checkedGroup3 : groupChecked secondGroup3 = true := by decide +kernel
+lemma boolOfNeg {b : Bool} (h : (!b) = true) : b = false := by cases b <;> simp_all
 
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem checkedGroup4 : groupChecked secondGroup4 = true := by decide +kernel
+noncomputable def readyForThird (i : ℕ) : Bool :=
+  let state := secondAt i
+  let ids := thirdSuccessors i
+  (!pureAt 11 state (frontierMissing (ids.map thirdAt))) &&
+    ((ids.all fun j => decide (j < thirdCount)) &&
+      (decide (1 < state.2.length) && decide (state.2.length < 11)))
+
+noncomputable def thirdTest (j : ℕ) : Bool := !afterThird (thirdAt j)
+noncomputable def secondMixedTest (j : ℕ) : Bool := !mixedFromSecond (secondAt j)
 
+lemma checkedAfterSecond (i : ℕ) (hi : i < secondCount)
+    (ready : rangeCheck readyForThird 0 secondCount = true)
+    (mixed : rangeCheck secondMixedTest 0 secondCount = true)
+    (third : rangeCheck thirdTest 0 thirdCount = true) :
+    afterSecond (secondAt i) = false := by
+  have h := rangeCheck_at ready hi
+  simp only [readyForThird, Bool.and_eq_true, decide_eq_true_eq] at h
+  obtain ⟨hc, hvalid, htwo, hsmall⟩ := h
+  refine afterSecond_false (secondAt i) htwo hsmall (boolOfNeg (rangeCheck_at mixed hi)) ?_
+  refine pureAt_from_frontier 11 (secondAt i) ((thirdSuccessors i).map thirdAt) afterThird (boolOfNeg hc) ?_
+  intro state membership
+  obtain ⟨j, hj, rfl⟩ := List.mem_map.mp membership
+  have hj' : j < thirdCount := of_decide_eq_true (List.all_eq_true.mp hvalid j hj)
+  exact boolOfNeg (rangeCheck_at third hj')
+
+lemma checkedSecondGroups
+    (ready : rangeCheck readyForThird 0 secondCount = true)
+    (mixed : rangeCheck secondMixedTest 0 secondCount = true)
+    (third : rangeCheck thirdTest 0 thirdCount = true) :
+    secondGroups.all groupChecked = true := by
+  apply List.all_eq_true.mpr
+  intro group member
+  obtain ⟨block, _, rfl⟩ := List.mem_map.mp member
+  apply List.all_eq_true.mpr
+  intro state found
+  obtain ⟨i, hi, rfl⟩ := List.mem_map.mp found
+  have hb := List.mem_range.mp hi
+  have bound : 4*block+i < secondCount := by omega
+  simp only [checkedAfterSecond _ bound ready mixed third, Bool.not_false]
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup5 : groupChecked secondGroup5 = true := by decide +kernel
+theorem coverageChunk0 : rangeCheck readyForThird 0 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup6 : groupChecked secondGroup6 = true := by decide +kernel
+theorem coverageChunk1 : rangeCheck readyForThird 16 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup7 : groupChecked secondGroup7 = true := by decide +kernel
+theorem coverageChunk2 : rangeCheck readyForThird 32 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup8 : groupChecked secondGroup8 = true := by decide +kernel
+theorem coverageChunk3 : rangeCheck readyForThird 48 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup9 : groupChecked secondGroup9 = true := by decide +kernel
+theorem coverageChunk4 : rangeCheck readyForThird 64 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup10 : groupChecked secondGroup10 = true := by decide +kernel
+theorem coverageChunk5 : rangeCheck readyForThird 80 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup11 : groupChecked secondGroup11 = true := by decide +kernel
+theorem coverageChunk6 : rangeCheck readyForThird 96 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup12 : groupChecked secondGroup12 = true := by decide +kernel
+theorem coverageChunk7 : rangeCheck readyForThird 112 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup13 : groupChecked secondGroup13 = true := by decide +kernel
+theorem coverageChunk8 : rangeCheck readyForThird 128 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup14 : groupChecked secondGroup14 = true := by decide +kernel
+theorem coverageChunk9 : rangeCheck readyForThird 144 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup15 : groupChecked secondGroup15 = true := by decide +kernel
+theorem coverageChunk10 : rangeCheck readyForThird 160 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup16 : groupChecked secondGroup16 = true := by decide +kernel
+theorem coverageChunk11 : rangeCheck readyForThird 176 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup17 : groupChecked secondGroup17 = true := by decide +kernel
+theorem coverageChunk12 : rangeCheck readyForThird 192 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup18 : groupChecked secondGroup18 = true := by decide +kernel
+theorem coverageChunk13 : rangeCheck readyForThird 208 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup19 : groupChecked secondGroup19 = true := by decide +kernel
+theorem coverageChunk14 : rangeCheck readyForThird 224 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup20 : groupChecked secondGroup20 = true := by decide +kernel
+theorem coverageChunk15 : rangeCheck readyForThird 240 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup21 : groupChecked secondGroup21 = true := by decide +kernel
+theorem coverageChunk16 : rangeCheck readyForThird 256 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup22 : groupChecked secondGroup22 = true := by decide +kernel
+theorem coverageChunk17 : rangeCheck readyForThird 272 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup23 : groupChecked secondGroup23 = true := by decide +kernel
+theorem coverageChunk18 : rangeCheck readyForThird 288 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup24 : groupChecked secondGroup24 = true := by decide +kernel
+theorem coverageChunk19 : rangeCheck readyForThird 304 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup25 : groupChecked secondGroup25 = true := by decide +kernel
+theorem coverageChunk20 : rangeCheck readyForThird 320 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup26 : groupChecked secondGroup26 = true := by decide +kernel
+theorem coverageChunk21 : rangeCheck readyForThird 336 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup27 : groupChecked secondGroup27 = true := by decide +kernel
+theorem coverageChunk22 : rangeCheck readyForThird 352 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup28 : groupChecked secondGroup28 = true := by decide +kernel
+theorem coverageChunk23 : rangeCheck readyForThird 368 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup29 : groupChecked secondGroup29 = true := by decide +kernel
+theorem coverageChunk24 : rangeCheck readyForThird 384 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup30 : groupChecked secondGroup30 = true := by decide +kernel
+theorem coverageChunk25 : rangeCheck readyForThird 400 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup31 : groupChecked secondGroup31 = true := by decide +kernel
+theorem coverageChunk26 : rangeCheck readyForThird 416 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup32 : groupChecked secondGroup32 = true := by decide +kernel
+theorem coverageChunk27 : rangeCheck readyForThird 432 11 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup33 : groupChecked secondGroup33 = true := by decide +kernel
+theorem coverageChunkAll : rangeCheck readyForThird 0 secondCount = true := by
+  exact (@rangeCheck_append readyForThird 0 224 219
+    (@rangeCheck_append readyForThird 0 112 112
+     (@rangeCheck_append readyForThird 0 48 64
+      (@rangeCheck_append readyForThird 0 16 32
+       coverageChunk0
+       (@rangeCheck_append readyForThird 16 16 16
+        coverageChunk1
+        coverageChunk2))
+      (@rangeCheck_append readyForThird 48 32 32
+       (@rangeCheck_append readyForThird 48 16 16
+        coverageChunk3
+        coverageChunk4)
+       (@rangeCheck_append readyForThird 80 16 16
+        coverageChunk5
+        coverageChunk6)))
+     (@rangeCheck_append readyForThird 112 48 64
+      (@rangeCheck_append readyForThird 112 16 32
+       coverageChunk7
+       (@rangeCheck_append readyForThird 128 16 16
+        coverageChunk8
+        coverageChunk9))
+      (@rangeCheck_append readyForThird 160 32 32
+       (@rangeCheck_append readyForThird 160 16 16
+        coverageChunk10
+        coverageChunk11)
+       (@rangeCheck_append readyForThird 192 16 16
+        coverageChunk12
+        coverageChunk13))))
+    (@rangeCheck_append readyForThird 224 112 107
+     (@rangeCheck_append readyForThird 224 48 64
+      (@rangeCheck_append readyForThird 224 16 32
+       coverageChunk14
+       (@rangeCheck_append readyForThird 240 16 16
+        coverageChunk15
+        coverageChunk16))
+      (@rangeCheck_append readyForThird 272 32 32
+       (@rangeCheck_append readyForThird 272 16 16
+        coverageChunk17
+        coverageChunk18)
+       (@rangeCheck_append readyForThird 304 16 16
+        coverageChunk19
+        coverageChunk20)))
+     (@rangeCheck_append readyForThird 336 48 59
+      (@rangeCheck_append readyForThird 336 16 32
+       coverageChunk21
+       (@rangeCheck_append readyForThird 352 16 16
+        coverageChunk22
+        coverageChunk23))
+      (@rangeCheck_append readyForThird 384 32 27
+       (@rangeCheck_append readyForThird 384 16 16
+        coverageChunk24
+        coverageChunk25)
+       (@rangeCheck_append readyForThird 416 16 11
+        coverageChunk26
+        coverageChunk27)))))
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup34 : groupChecked secondGroup34 = true := by decide +kernel
+theorem mixedChunk0 : rangeCheck secondMixedTest 0 7 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup35 : groupChecked secondGroup35 = true := by decide +kernel
+theorem mixedChunk1 : rangeCheck secondMixedTest 7 11 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup36 : groupChecked secondGroup36 = true := by decide +kernel
+theorem mixedChunk2 : rangeCheck secondMixedTest 18 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup37 : groupChecked secondGroup37 = true := by decide +kernel
+theorem mixedChunk3 : rangeCheck secondMixedTest 34 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup38 : groupChecked secondGroup38 = true := by decide +kernel
+theorem mixedChunk4 : rangeCheck secondMixedTest 50 6 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup39 : groupChecked secondGroup39 = true := by decide +kernel
+theorem mixedChunk5 : rangeCheck secondMixedTest 56 13 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup40 : groupChecked secondGroup40 = true := by decide +kernel
+theorem mixedChunk6 : rangeCheck secondMixedTest 69 12 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup41 : groupChecked secondGroup41 = true := by decide +kernel
+theorem mixedChunk7 : rangeCheck secondMixedTest 81 7 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup42 : groupChecked secondGroup42 = true := by decide +kernel
+theorem mixedChunk8 : rangeCheck secondMixedTest 88 9 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup43 : groupChecked secondGroup43 = true := by decide +kernel
+theorem mixedChunk9 : rangeCheck secondMixedTest 97 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup44 : groupChecked secondGroup44 = true := by decide +kernel
+theorem mixedChunk10 : rangeCheck secondMixedTest 113 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup45 : groupChecked secondGroup45 = true := by decide +kernel
+theorem mixedChunk11 : rangeCheck secondMixedTest 129 9 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup46 : groupChecked secondGroup46 = true := by decide +kernel
+theorem mixedChunk12 : rangeCheck secondMixedTest 138 9 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup47 : groupChecked secondGroup47 = true := by decide +kernel
+theorem mixedChunk13 : rangeCheck secondMixedTest 147 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup48 : groupChecked secondGroup48 = true := by decide +kernel
+theorem mixedChunk14 : rangeCheck secondMixedTest 163 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup49 : groupChecked secondGroup49 = true := by decide +kernel
+theorem mixedChunk15 : rangeCheck secondMixedTest 179 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup50 : groupChecked secondGroup50 = true := by decide +kernel
+theorem mixedChunk16 : rangeCheck secondMixedTest 195 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup51 : groupChecked secondGroup51 = true := by decide +kernel
+theorem mixedChunk17 : rangeCheck secondMixedTest 211 12 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup52 : groupChecked secondGroup52 = true := by decide +kernel
+theorem mixedChunk18 : rangeCheck secondMixedTest 223 4 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup53 : groupChecked secondGroup53 = true := by decide +kernel
+theorem mixedChunk19 : rangeCheck secondMixedTest 227 10 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup54 : groupChecked secondGroup54 = true := by decide +kernel
+theorem mixedChunk20 : rangeCheck secondMixedTest 237 7 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem state220_checked : afterSecond (recordedStep 9 1 2 507 true) = false := by decide +kernel
+theorem mixedChunk21 : rangeCheck secondMixedTest 244 6 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem state221_checked : afterSecond (recordedStep 9 1 3 511 false) = false := by decide +kernel
+theorem mixedChunk22 : rangeCheck secondMixedTest 250 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem state222_checked : afterSecond (recordedStep 9 1 3 511 true) = false := by decide +kernel
+theorem mixedChunk23 : rangeCheck secondMixedTest 266 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem state223_checked : afterSecond (recordedStep 9 1 3 509 true) = false := by decide +kernel
+theorem mixedChunk24 : rangeCheck secondMixedTest 282 16 = true := by decide +kernel
 
-theorem checkedGroup55 : groupChecked secondGroup55 = true := by
-  simp only [groupChecked, secondGroup55, List.all_cons, List.all_nil, state220_checked, state221_checked, state222_checked, state223_checked, Bool.not_false, Bool.true_and]
-
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup56 : groupChecked secondGroup56 = true := by decide +kernel
+theorem mixedChunk25 : rangeCheck secondMixedTest 298 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup57 : groupChecked secondGroup57 = true := by decide +kernel
+theorem mixedChunk26 : rangeCheck secondMixedTest 314 12 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup58 : groupChecked secondGroup58 = true := by decide +kernel
+theorem mixedChunk27 : rangeCheck secondMixedTest 326 15 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup59 : groupChecked secondGroup59 = true := by decide +kernel
+theorem mixedChunk28 : rangeCheck secondMixedTest 341 6 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup60 : groupChecked secondGroup60 = true := by decide +kernel
+theorem mixedChunk29 : rangeCheck secondMixedTest 347 6 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup61 : groupChecked secondGroup61 = true := by decide +kernel
+theorem mixedChunk30 : rangeCheck secondMixedTest 353 7 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup62 : groupChecked secondGroup62 = true := by decide +kernel
+theorem mixedChunk31 : rangeCheck secondMixedTest 360 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup63 : groupChecked secondGroup63 = true := by decide +kernel
+theorem mixedChunk32 : rangeCheck secondMixedTest 376 14 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup64 : groupChecked secondGroup64 = true := by decide +kernel
+theorem mixedChunk33 : rangeCheck secondMixedTest 390 4 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup65 : groupChecked secondGroup65 = true := by decide +kernel
+theorem mixedChunk34 : rangeCheck secondMixedTest 394 13 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup66 : groupChecked secondGroup66 = true := by decide +kernel
+theorem mixedChunk35 : rangeCheck secondMixedTest 407 16 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup67 : groupChecked secondGroup67 = true := by decide +kernel
+theorem mixedChunk36 : rangeCheck secondMixedTest 423 9 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup68 : groupChecked secondGroup68 = true := by decide +kernel
+theorem mixedChunk37 : rangeCheck secondMixedTest 432 7 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup69 : groupChecked secondGroup69 = true := by decide +kernel
+theorem mixedChunk38 : rangeCheck secondMixedTest 439 4 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup70 : groupChecked secondGroup70 = true := by decide +kernel
+theorem mixedChunkAll : rangeCheck secondMixedTest 0 secondCount = true := by
+  exact (@rangeCheck_append secondMixedTest 0 227 216
+    (@rangeCheck_append secondMixedTest 0 97 130
+     (@rangeCheck_append secondMixedTest 0 50 47
+      (@rangeCheck_append secondMixedTest 0 18 32
+       (@rangeCheck_append secondMixedTest 0 7 11
+        mixedChunk0
+        mixedChunk1)
+       (@rangeCheck_append secondMixedTest 18 16 16
+        mixedChunk2
+        mixedChunk3))
+      (@rangeCheck_append secondMixedTest 50 19 28
+       (@rangeCheck_append secondMixedTest 50 6 13
+        mixedChunk4
+        mixedChunk5)
+       (@rangeCheck_append secondMixedTest 69 12 16
+        mixedChunk6
+        (@rangeCheck_append secondMixedTest 81 7 9
+         mixedChunk7
+         mixedChunk8))))
+     (@rangeCheck_append secondMixedTest 97 66 64
+      (@rangeCheck_append secondMixedTest 97 32 34
+       (@rangeCheck_append secondMixedTest 97 16 16
+        mixedChunk9
+        mixedChunk10)
+       (@rangeCheck_append secondMixedTest 129 9 25
+        mixedChunk11
+        (@rangeCheck_append secondMixedTest 138 9 16
+         mixedChunk12
+         mixedChunk13)))
+      (@rangeCheck_append secondMixedTest 163 32 32
+       (@rangeCheck_append secondMixedTest 163 16 16
+        mixedChunk14
+        mixedChunk15)
+       (@rangeCheck_append secondMixedTest 195 16 16
+        mixedChunk16
+        (@rangeCheck_append secondMixedTest 211 12 4
+         mixedChunk17
+         mixedChunk18)))))
+    (@rangeCheck_append secondMixedTest 227 120 96
+     (@rangeCheck_append secondMixedTest 227 55 65
+      (@rangeCheck_append secondMixedTest 227 17 38
+       (@rangeCheck_append secondMixedTest 227 10 7
+        mixedChunk19
+        mixedChunk20)
+       (@rangeCheck_append secondMixedTest 244 6 32
+        mixedChunk21
+        (@rangeCheck_append secondMixedTest 250 16 16
+         mixedChunk22
+         mixedChunk23)))
+      (@rangeCheck_append secondMixedTest 282 32 33
+       (@rangeCheck_append secondMixedTest 282 16 16
+        mixedChunk24
+        mixedChunk25)
+       (@rangeCheck_append secondMixedTest 314 12 21
+        mixedChunk26
+        (@rangeCheck_append secondMixedTest 326 15 6
+         mixedChunk27
+         mixedChunk28))))
+     (@rangeCheck_append secondMixedTest 347 47 49
+      (@rangeCheck_append secondMixedTest 347 13 34
+       (@rangeCheck_append secondMixedTest 347 6 7
+        mixedChunk29
+        mixedChunk30)
+       (@rangeCheck_append secondMixedTest 360 16 18
+        mixedChunk31
+        (@rangeCheck_append secondMixedTest 376 14 4
+         mixedChunk32
+         mixedChunk33)))
+      (@rangeCheck_append secondMixedTest 394 29 20
+       (@rangeCheck_append secondMixedTest 394 13 16
+        mixedChunk34
+        mixedChunk35)
+       (@rangeCheck_append secondMixedTest 423 9 11
+        mixedChunk36
+        (@rangeCheck_append secondMixedTest 432 7 4
+         mixedChunk37
+         mixedChunk38))))))
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup71 : groupChecked secondGroup71 = true := by decide +kernel
+theorem thirdChunk0 : rangeCheck thirdTest 0 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup72 : groupChecked secondGroup72 = true := by decide +kernel
+theorem thirdChunk1 : rangeCheck thirdTest 80 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup73 : groupChecked secondGroup73 = true := by decide +kernel
+theorem thirdChunk2 : rangeCheck thirdTest 160 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup74 : groupChecked secondGroup74 = true := by decide +kernel
+theorem thirdChunk3 : rangeCheck thirdTest 240 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup75 : groupChecked secondGroup75 = true := by decide +kernel
+theorem thirdChunk4 : rangeCheck thirdTest 320 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup76 : groupChecked secondGroup76 = true := by decide +kernel
+theorem thirdChunk5 : rangeCheck thirdTest 400 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup77 : groupChecked secondGroup77 = true := by decide +kernel
+theorem thirdChunk6 : rangeCheck thirdTest 480 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup78 : groupChecked secondGroup78 = true := by decide +kernel
+theorem thirdChunk7 : rangeCheck thirdTest 560 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup79 : groupChecked secondGroup79 = true := by decide +kernel
+theorem thirdChunk8 : rangeCheck thirdTest 640 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup80 : groupChecked secondGroup80 = true := by decide +kernel
+theorem thirdChunk9 : rangeCheck thirdTest 720 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup81 : groupChecked secondGroup81 = true := by decide +kernel
+theorem thirdChunk10 : rangeCheck thirdTest 800 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup82 : groupChecked secondGroup82 = true := by decide +kernel
+theorem thirdChunk11 : rangeCheck thirdTest 880 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup83 : groupChecked secondGroup83 = true := by decide +kernel
+theorem thirdChunk12 : rangeCheck thirdTest 960 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup84 : groupChecked secondGroup84 = true := by decide +kernel
+theorem thirdChunk13 : rangeCheck thirdTest 1040 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup85 : groupChecked secondGroup85 = true := by decide +kernel
+theorem thirdChunk14 : rangeCheck thirdTest 1120 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup86 : groupChecked secondGroup86 = true := by decide +kernel
+theorem thirdChunk15 : rangeCheck thirdTest 1200 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup87 : groupChecked secondGroup87 = true := by decide +kernel
+theorem thirdChunk16 : rangeCheck thirdTest 1280 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup88 : groupChecked secondGroup88 = true := by decide +kernel
+theorem thirdChunk17 : rangeCheck thirdTest 1360 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup89 : groupChecked secondGroup89 = true := by decide +kernel
+theorem thirdChunk18 : rangeCheck thirdTest 1440 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup90 : groupChecked secondGroup90 = true := by decide +kernel
+theorem thirdChunk19 : rangeCheck thirdTest 1520 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup91 : groupChecked secondGroup91 = true := by decide +kernel
+theorem thirdChunk20 : rangeCheck thirdTest 1600 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup92 : groupChecked secondGroup92 = true := by decide +kernel
+theorem thirdChunk21 : rangeCheck thirdTest 1680 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup93 : groupChecked secondGroup93 = true := by decide +kernel
+theorem thirdChunk22 : rangeCheck thirdTest 1760 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup94 : groupChecked secondGroup94 = true := by decide +kernel
+theorem thirdChunk23 : rangeCheck thirdTest 1840 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup95 : groupChecked secondGroup95 = true := by decide +kernel
+theorem thirdChunk24 : rangeCheck thirdTest 1920 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup96 : groupChecked secondGroup96 = true := by decide +kernel
+theorem thirdChunk25 : rangeCheck thirdTest 2000 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup97 : groupChecked secondGroup97 = true := by decide +kernel
+theorem thirdChunk26 : rangeCheck thirdTest 2080 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup98 : groupChecked secondGroup98 = true := by decide +kernel
+theorem thirdChunk27 : rangeCheck thirdTest 2160 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup99 : groupChecked secondGroup99 = true := by decide +kernel
+theorem thirdChunk28 : rangeCheck thirdTest 2240 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup100 : groupChecked secondGroup100 = true := by decide +kernel
+theorem thirdChunk29 : rangeCheck thirdTest 2320 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup101 : groupChecked secondGroup101 = true := by decide +kernel
+theorem thirdChunk30 : rangeCheck thirdTest 2400 62 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup102 : groupChecked secondGroup102 = true := by decide +kernel
+theorem thirdChunk31 : rangeCheck thirdTest 2462 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup103 : groupChecked secondGroup103 = true := by decide +kernel
+theorem thirdChunk32 : rangeCheck thirdTest 2542 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup104 : groupChecked secondGroup104 = true := by decide +kernel
+theorem thirdChunk33 : rangeCheck thirdTest 2622 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup105 : groupChecked secondGroup105 = true := by decide +kernel
+theorem thirdChunk34 : rangeCheck thirdTest 2702 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup106 : groupChecked secondGroup106 = true := by decide +kernel
+theorem thirdChunk35 : rangeCheck thirdTest 2782 47 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup107 : groupChecked secondGroup107 = true := by decide +kernel
+theorem thirdChunk36 : rangeCheck thirdTest 2829 45 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup108 : groupChecked secondGroup108 = true := by decide +kernel
+theorem thirdChunk37 : rangeCheck thirdTest 2874 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup109 : groupChecked secondGroup109 = true := by decide +kernel
+theorem thirdChunk38 : rangeCheck thirdTest 2954 80 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem checkedGroup110 : groupChecked secondGroup110 = true := by decide +kernel
+theorem thirdChunk39 : rangeCheck thirdTest 3034 45 = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem completeSecondTable : secondGroups.all groupChecked = true := by
-  simp only [secondGroups, List.all_cons, List.all_nil, Bool.true_and,
-    checkedGroup0, checkedGroup1, checkedGroup2, checkedGroup3, checkedGroup4, checkedGroup5, checkedGroup6, checkedGroup7, checkedGroup8, checkedGroup9,
-    checkedGroup10, checkedGroup11, checkedGroup12, checkedGroup13, checkedGroup14, checkedGroup15, checkedGroup16, checkedGroup17, checkedGroup18, checkedGroup19,
-    checkedGroup20, checkedGroup21, checkedGroup22, checkedGroup23, checkedGroup24, checkedGroup25, checkedGroup26, checkedGroup27, checkedGroup28, checkedGroup29,
-    checkedGroup30, checkedGroup31, checkedGroup32, checkedGroup33, checkedGroup34, checkedGroup35, checkedGroup36, checkedGroup37, checkedGroup38, checkedGroup39,
-    checkedGroup40, checkedGroup41, checkedGroup42, checkedGroup43, checkedGroup44, checkedGroup45, checkedGroup46, checkedGroup47, checkedGroup48, checkedGroup49,
-    checkedGroup50, checkedGroup51, checkedGroup52, checkedGroup53, checkedGroup54, checkedGroup55, checkedGroup56, checkedGroup57, checkedGroup58, checkedGroup59,
-    checkedGroup60, checkedGroup61, checkedGroup62, checkedGroup63, checkedGroup64, checkedGroup65, checkedGroup66, checkedGroup67, checkedGroup68, checkedGroup69,
-    checkedGroup70, checkedGroup71, checkedGroup72, checkedGroup73, checkedGroup74, checkedGroup75, checkedGroup76, checkedGroup77, checkedGroup78, checkedGroup79,
-    checkedGroup80, checkedGroup81, checkedGroup82, checkedGroup83, checkedGroup84, checkedGroup85, checkedGroup86, checkedGroup87, checkedGroup88, checkedGroup89,
-    checkedGroup90, checkedGroup91, checkedGroup92, checkedGroup93, checkedGroup94, checkedGroup95, checkedGroup96, checkedGroup97, checkedGroup98, checkedGroup99,
-    checkedGroup100, checkedGroup101, checkedGroup102, checkedGroup103, checkedGroup104, checkedGroup105, checkedGroup106, checkedGroup107, checkedGroup108, checkedGroup109,
-    checkedGroup110]
+theorem thirdChunkAll : rangeCheck thirdTest 0 thirdCount = true := by
+  exact (@rangeCheck_append thirdTest 0 1600 1479
+    (@rangeCheck_append thirdTest 0 800 800
+     (@rangeCheck_append thirdTest 0 400 400
+      (@rangeCheck_append thirdTest 0 160 240
+       (@rangeCheck_append thirdTest 0 80 80
+        thirdChunk0
+        thirdChunk1)
+       (@rangeCheck_append thirdTest 160 80 160
+        thirdChunk2
+        (@rangeCheck_append thirdTest 240 80 80
+         thirdChunk3
+         thirdChunk4)))
+      (@rangeCheck_append thirdTest 400 160 240
+       (@rangeCheck_append thirdTest 400 80 80
+        thirdChunk5
+        thirdChunk6)
+       (@rangeCheck_append thirdTest 560 80 160
+        thirdChunk7
+        (@rangeCheck_append thirdTest 640 80 80
+         thirdChunk8
+         thirdChunk9))))
+     (@rangeCheck_append thirdTest 800 400 400
+      (@rangeCheck_append thirdTest 800 160 240
+       (@rangeCheck_append thirdTest 800 80 80
+        thirdChunk10
+        thirdChunk11)
+       (@rangeCheck_append thirdTest 960 80 160
+        thirdChunk12
+        (@rangeCheck_append thirdTest 1040 80 80
+         thirdChunk13
+         thirdChunk14)))
+      (@rangeCheck_append thirdTest 1200 160 240
+       (@rangeCheck_append thirdTest 1200 80 80
+        thirdChunk15
+        thirdChunk16)
+       (@rangeCheck_append thirdTest 1360 80 160
+        thirdChunk17
+        (@rangeCheck_append thirdTest 1440 80 80
+         thirdChunk18
+         thirdChunk19)))))
+    (@rangeCheck_append thirdTest 1600 800 679
+     (@rangeCheck_append thirdTest 1600 400 400
+      (@rangeCheck_append thirdTest 1600 160 240
+       (@rangeCheck_append thirdTest 1600 80 80
+        thirdChunk20
+        thirdChunk21)
+       (@rangeCheck_append thirdTest 1760 80 160
+        thirdChunk22
+        (@rangeCheck_append thirdTest 1840 80 80
+         thirdChunk23
+         thirdChunk24)))
+      (@rangeCheck_append thirdTest 2000 160 240
+       (@rangeCheck_append thirdTest 2000 80 80
+        thirdChunk25
+        thirdChunk26)
+       (@rangeCheck_append thirdTest 2160 80 160
+        thirdChunk27
+        (@rangeCheck_append thirdTest 2240 80 80
+         thirdChunk28
+         thirdChunk29))))
+     (@rangeCheck_append thirdTest 2400 382 297
+      (@rangeCheck_append thirdTest 2400 142 240
+       (@rangeCheck_append thirdTest 2400 62 80
+        thirdChunk30
+        thirdChunk31)
+       (@rangeCheck_append thirdTest 2542 80 160
+        thirdChunk32
+        (@rangeCheck_append thirdTest 2622 80 80
+         thirdChunk33
+         thirdChunk34)))
+      (@rangeCheck_append thirdTest 2782 92 205
+       (@rangeCheck_append thirdTest 2782 47 45
+        thirdChunk35
+        thirdChunk36)
+       (@rangeCheck_append thirdTest 2874 80 125
+        thirdChunk37
+        (@rangeCheck_append thirdTest 2954 80 45
+         thirdChunk38
+         thirdChunk39))))))
+
+theorem completeSecondTable : secondGroups.all groupChecked = true :=
+  checkedSecondGroups coverageChunkAll mixedChunkAll thirdChunkAll
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
