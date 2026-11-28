@@ -5293,294 +5293,122 @@ lemma co2_id : ∀ a ∈ q2, Imp [] a.1 a.2 := by
   intro a ha
   unfold q2 pr at ha
   exact ir a (List.mem_of_mem_filter ha)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_0 : chk [] q2 2 11 0 0x0 1 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_1 : chk [] q2 2 11 0 0x20 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_2 : chk [] q2 2 11 0 0x2000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_3 : chk [] q2 2 11 0 0x400000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_4 : chk [] q2 2 11 0 0x40000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_5 : chk [] q2 2 11 0 0x400000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_6 : chk [] q2 2 11 0 0x800000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_7 : chk [] q2 2 11 0 0x8000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_8 : chk [] q2 2 11 0 0x40000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_9 : chk [] q2 2 11 0 0x100000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_10 : chk [] q2 2 11 0 0x800000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_11 : chk [] q2 2 11 0 0x10000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_12 : chk [] q2 2 11 0 0x800000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_13 : chk [] q2 2 11 0 0x10000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_14 : chk [] q2 2 11 0 0x200000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_15 : chk [] q2 2 11 0 0x10000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_16 : chk [] q2 2 11 0 0x200000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_17 : chk [] q2 2 11 0 0x4000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_18 : chk [] q2 2 11 0 0x200000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_19 : chk [] q2 2 11 0 0x4000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_20 : chk [] q2 2 11 0 0x80000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_21 : chk [] q2 2 11 0 0x400000000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t0_22 : chk [] q2 2 11 0 0x3ffbffffffffffff7bdffffbdeffffdef7ef6b73fffbfbffffdfdf 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+def rangeCheck (test : ℕ → Bool) (start count : ℕ) : Bool :=
+  (List.range' start count).all test
+
+lemma rangeCheck_append (test : ℕ → Bool) {s a b : ℕ}
+    (left : rangeCheck test s a = true) (right : rangeCheck test (s+a) b = true) :
+    rangeCheck test s (a+b) = true := by
+  unfold rangeCheck at *
+  rw [← List.range'_append_1, List.all_append, left, right]
+  rfl
+
+lemma rangeCheck_at {test : ℕ → Bool} {n i : ℕ} (checked : rangeCheck test 0 n = true) (hi : i < n) :
+    test i = true :=
+  List.all_eq_true.mp checked _ (List.mem_range'_1.mpr ⟨Nat.zero_le _, by simpa using hi⟩)
+
+lemma boolOfNeg {b : Bool} (h : (!b) = true) : b = false := by cases b <;> simp_all
+
+noncomputable def restrictedTest (Q : List (ℕ × ℕ)) (Z t : ℕ)
+    (cases : List (ℕ × ℕ)) (i : ℕ) : Bool :=
+  let a := cases.getD i (0,0)
+  !chkFast [] Q Z 11 t a.1 a.2
+
+lemma restrictedWitness (Q : List (ℕ × ℕ)) (Z t : ℕ) (M : List (ℕ × ℕ))
+    (covers : mFull M = true) (checked : rangeCheck (restrictedTest Q Z t M) 0 M.length = true) :
+    ∃ cases : List (ℕ × ℕ), mFull cases = true ∧
+      ∀ a ∈ cases, chk [] Q Z 11 t a.1 a.2 = false := by
+  refine ⟨M,covers,?_⟩
+  intro a ha
+  obtain ⟨i,hi,rfl⟩ := List.mem_iff_getElem.mp ha
+  have h := boolOfNeg (rangeCheck_at checked hi)
+  simpa only [restrictedTest, List.getD_eq_getElem?_getD, List.getElem?_eq_getElem hi,
+    Option.getD_some, chkFast_eq] using h
+
 def co2t0_cov : List (ℕ × ℕ) := [(0x0, 1), (0x20, 0), (0x2000, 0), (0x400000000, 0), (0x40000000000, 0), (0x400000000000000, 0), (0x800000000000000, 0), (0x8000000000000000, 0), (0x40000000000000000, 0), (0x100000000000000000, 0), (0x800000000000000000, 0), (0x10000000000000000000, 0), (0x800000000000000000000, 0), (0x10000000000000000000000, 0), (0x200000000000000000000000, 0), (0x10000000000000000000000000000, 0), (0x200000000000000000000000000000, 0), (0x4000000000000000000000000000000, 0), (0x200000000000000000000000000000000000, 0), (0x4000000000000000000000000000000000000, 0), (0x80000000000000000000000000000000000000, 0), (0x400000000000000000000000000000000000000000000000000, 0), (0x3ffbffffffffffff7bdffffbdeffffdef7ef6b73fffbfbffffdfdf, 0)]
-lemma co2t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 0 a.1 a.2 = false := by
-  refine ⟨co2t0_cov, by decide +kernel, ?_⟩
-  intro a ha
-  simp only [co2t0_cov, List.mem_cons, List.not_mem_nil, or_false] at ha
-  rcases ha with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact co2t0_0
-  · exact co2t0_1
-  · exact co2t0_2
-  · exact co2t0_3
-  · exact co2t0_4
-  · exact co2t0_5
-  · exact co2t0_6
-  · exact co2t0_7
-  · exact co2t0_8
-  · exact co2t0_9
-  · exact co2t0_10
-  · exact co2t0_11
-  · exact co2t0_12
-  · exact co2t0_13
-  · exact co2t0_14
-  · exact co2t0_15
-  · exact co2t0_16
-  · exact co2t0_17
-  · exact co2t0_18
-  · exact co2t0_19
-  · exact co2t0_20
-  · exact co2t0_21
-  · exact co2t0_22
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_0 : chk [] q2 2 11 1 0x0 1 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+theorem co2t0batch0 : rangeCheck (restrictedTest q2 2 0 co2t0_cov) 0 4 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_1 : chk [] q2 2 11 1 0x20 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+theorem co2t0batch1 : rangeCheck (restrictedTest q2 2 0 co2t0_cov) 4 4 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_2 : chk [] q2 2 11 1 0x2000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+theorem co2t0batch2 : rangeCheck (restrictedTest q2 2 0 co2t0_cov) 8 4 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_3 : chk [] q2 2 11 1 0x400000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+theorem co2t0batch3 : rangeCheck (restrictedTest q2 2 0 co2t0_cov) 12 4 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_4 : chk [] q2 2 11 1 0x40000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+theorem co2t0batch4 : rangeCheck (restrictedTest q2 2 0 co2t0_cov) 16 4 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_5 : chk [] q2 2 11 1 0x400000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+theorem co2t0batch5 : rangeCheck (restrictedTest q2 2 0 co2t0_cov) 20 3 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_6 : chk [] q2 2 11 1 0x800000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_7 : chk [] q2 2 11 1 0x8000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_8 : chk [] q2 2 11 1 0x40000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_9 : chk [] q2 2 11 1 0x100000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_10 : chk [] q2 2 11 1 0x800000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_11 : chk [] q2 2 11 1 0x10000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_12 : chk [] q2 2 11 1 0x800000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_13 : chk [] q2 2 11 1 0x10000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_14 : chk [] q2 2 11 1 0x200000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_15 : chk [] q2 2 11 1 0x10000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_16 : chk [] q2 2 11 1 0x200000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_17 : chk [] q2 2 11 1 0x4000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_18 : chk [] q2 2 11 1 0x200000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_19 : chk [] q2 2 11 1 0x4000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_20 : chk [] q2 2 11 1 0x80000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_21 : chk [] q2 2 11 1 0x400000000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co2t1_22 : chk [] q2 2 11 1 0x3ffbffffffffffff7bdffffbdeffffdef7ef6b73fffbfbffffdfdf 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+lemma co2t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 0 a.1 a.2 = false :=
+  restrictedWitness q2 2 0 co2t0_cov (by decide +kernel)
+    (@rangeCheck_append (restrictedTest q2 2 0 co2t0_cov) 0 12 11
+      (@rangeCheck_append (restrictedTest q2 2 0 co2t0_cov) 0 4 8
+       co2t0batch0
+       (@rangeCheck_append (restrictedTest q2 2 0 co2t0_cov) 4 4 4
+        co2t0batch1
+        co2t0batch2))
+      (@rangeCheck_append (restrictedTest q2 2 0 co2t0_cov) 12 4 7
+       co2t0batch3
+       (@rangeCheck_append (restrictedTest q2 2 0 co2t0_cov) 16 4 3
+        co2t0batch4
+        co2t0batch5)))
+
 def co2t1_cov : List (ℕ × ℕ) := [(0x0, 1), (0x20, 0), (0x2000, 0), (0x400000000, 0), (0x40000000000, 0), (0x400000000000000, 0), (0x800000000000000, 0), (0x8000000000000000, 0), (0x40000000000000000, 0), (0x100000000000000000, 0), (0x800000000000000000, 0), (0x10000000000000000000, 0), (0x800000000000000000000, 0), (0x10000000000000000000000, 0), (0x200000000000000000000000, 0), (0x10000000000000000000000000000, 0), (0x200000000000000000000000000000, 0), (0x4000000000000000000000000000000, 0), (0x200000000000000000000000000000000000, 0), (0x4000000000000000000000000000000000000, 0), (0x80000000000000000000000000000000000000, 0), (0x400000000000000000000000000000000000000000000000000, 0), (0x3ffbffffffffffff7bdffffbdeffffdef7ef6b73fffbfbffffdfdf, 0)]
-lemma co2t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 1 a.1 a.2 = false := by
-  refine ⟨co2t1_cov, by decide +kernel, ?_⟩
-  intro a ha
-  simp only [co2t1_cov, List.mem_cons, List.not_mem_nil, or_false] at ha
-  rcases ha with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact co2t1_0
-  · exact co2t1_1
-  · exact co2t1_2
-  · exact co2t1_3
-  · exact co2t1_4
-  · exact co2t1_5
-  · exact co2t1_6
-  · exact co2t1_7
-  · exact co2t1_8
-  · exact co2t1_9
-  · exact co2t1_10
-  · exact co2t1_11
-  · exact co2t1_12
-  · exact co2t1_13
-  · exact co2t1_14
-  · exact co2t1_15
-  · exact co2t1_16
-  · exact co2t1_17
-  · exact co2t1_18
-  · exact co2t1_19
-  · exact co2t1_20
-  · exact co2t1_21
-  · exact co2t1_22
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem co2t1batch0 : rangeCheck (restrictedTest q2 2 1 co2t1_cov) 0 4 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem co2t1batch1 : rangeCheck (restrictedTest q2 2 1 co2t1_cov) 4 4 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem co2t1batch2 : rangeCheck (restrictedTest q2 2 1 co2t1_cov) 8 4 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem co2t1batch3 : rangeCheck (restrictedTest q2 2 1 co2t1_cov) 12 4 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem co2t1batch4 : rangeCheck (restrictedTest q2 2 1 co2t1_cov) 16 4 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem co2t1batch5 : rangeCheck (restrictedTest q2 2 1 co2t1_cov) 20 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma co2t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 1 a.1 a.2 = false :=
+  restrictedWitness q2 2 1 co2t1_cov (by decide +kernel)
+    (@rangeCheck_append (restrictedTest q2 2 1 co2t1_cov) 0 12 11
+      (@rangeCheck_append (restrictedTest q2 2 1 co2t1_cov) 0 4 8
+       co2t1batch0
+       (@rangeCheck_append (restrictedTest q2 2 1 co2t1_cov) 4 4 4
+        co2t1batch1
+        co2t1batch2))
+      (@rangeCheck_append (restrictedTest q2 2 1 co2t1_cov) 12 4 7
+       co2t1batch3
+       (@rangeCheck_append (restrictedTest q2 2 1 co2t1_cov) 16 4 3
+        co2t1batch4
+        co2t1batch5)))
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem co2t2_res : chk [] q2 2 11 2 FF 1 = false := by
@@ -5855,282 +5683,90 @@ lemma co64_id : ∀ a ∈ q64, Imp [] a.1 a.2 := by
   intro a ha
   unfold q64 pr at ha
   exact ir a (List.mem_of_mem_filter ha)
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_0 : chk [] q64 64 11 0 0x0 1 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_1 : chk [] q64 64 11 0 0x1 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_2 : chk [] q64 64 11 0 0x2 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_3 : chk [] q64 64 11 0 0x40 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_4 : chk [] q64 64 11 0 0x80 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_5 : chk [] q64 64 11 0 0x400 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_6 : chk [] q64 64 11 0 0x1000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_7 : chk [] q64 64 11 0 0x2000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_8 : chk [] q64 64 11 0 0x10000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_9 : chk [] q64 64 11 0 0x20000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_10 : chk [] q64 64 11 0 0x40000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_11 : chk [] q64 64 11 0 0x200000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_12 : chk [] q64 64 11 0 0x800000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_13 : chk [] q64 64 11 0 0x4000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_14 : chk [] q64 64 11 0 0x8000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_15 : chk [] q64 64 11 0 0x4000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_16 : chk [] q64 64 11 0 0x100000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_17 : chk [] q64 64 11 0 0x40000000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_18 : chk [] q64 64 11 0 0x2000000000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_19 : chk [] q64 64 11 0 0x40000000000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_20 : chk [] q64 64 11 0 0x80000000000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_21 : chk [] q64 64 11 0 0x33dfbfefbfffffffffffffffffffffffffffffffffff359ffecb3c 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
 def co64t0_cov : List (ℕ × ℕ) := [(0x0, 1), (0x1, 0), (0x2, 0), (0x40, 0), (0x80, 0), (0x400, 0), (0x1000, 0), (0x2000, 0), (0x10000, 0), (0x20000000, 0), (0x40000000, 0), (0x200000000, 0), (0x800000000, 0), (0x4000000000, 0), (0x8000000000, 0), (0x4000000000000000000000000000000000000000000000, 0), (0x100000000000000000000000000000000000000000000000, 0), (0x40000000000000000000000000000000000000000000000000, 0), (0x2000000000000000000000000000000000000000000000000000, 0), (0x40000000000000000000000000000000000000000000000000000, 0), (0x80000000000000000000000000000000000000000000000000000, 0), (0x33dfbfefbfffffffffffffffffffffffffffffffffff359ffecb3c, 0)]
-lemma co64t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 0 a.1 a.2 = false := by
-  refine ⟨co64t0_cov, by decide +kernel, ?_⟩
-  intro a ha
-  simp only [co64t0_cov, List.mem_cons, List.not_mem_nil, or_false] at ha
-  rcases ha with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact co64t0_0
-  · exact co64t0_1
-  · exact co64t0_2
-  · exact co64t0_3
-  · exact co64t0_4
-  · exact co64t0_5
-  · exact co64t0_6
-  · exact co64t0_7
-  · exact co64t0_8
-  · exact co64t0_9
-  · exact co64t0_10
-  · exact co64t0_11
-  · exact co64t0_12
-  · exact co64t0_13
-  · exact co64t0_14
-  · exact co64t0_15
-  · exact co64t0_16
-  · exact co64t0_17
-  · exact co64t0_18
-  · exact co64t0_19
-  · exact co64t0_20
-  · exact co64t0_21
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_0 : chk [] q64 64 11 1 0x0 1 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+theorem co64t0batch0 : rangeCheck (restrictedTest q64 64 0 co64t0_cov) 0 4 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_1 : chk [] q64 64 11 1 0x1 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+theorem co64t0batch1 : rangeCheck (restrictedTest q64 64 0 co64t0_cov) 4 4 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_2 : chk [] q64 64 11 1 0x2 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+theorem co64t0batch2 : rangeCheck (restrictedTest q64 64 0 co64t0_cov) 8 4 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_3 : chk [] q64 64 11 1 0x40 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+theorem co64t0batch3 : rangeCheck (restrictedTest q64 64 0 co64t0_cov) 12 4 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_4 : chk [] q64 64 11 1 0x80 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+theorem co64t0batch4 : rangeCheck (restrictedTest q64 64 0 co64t0_cov) 16 4 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_5 : chk [] q64 64 11 1 0x400 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+theorem co64t0batch5 : rangeCheck (restrictedTest q64 64 0 co64t0_cov) 20 2 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_6 : chk [] q64 64 11 1 0x1000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_7 : chk [] q64 64 11 1 0x2000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_8 : chk [] q64 64 11 1 0x10000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_9 : chk [] q64 64 11 1 0x20000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_10 : chk [] q64 64 11 1 0x40000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_11 : chk [] q64 64 11 1 0x200000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_12 : chk [] q64 64 11 1 0x800000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_13 : chk [] q64 64 11 1 0x4000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_14 : chk [] q64 64 11 1 0x8000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_15 : chk [] q64 64 11 1 0x4000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_16 : chk [] q64 64 11 1 0x100000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_17 : chk [] q64 64 11 1 0x40000000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_18 : chk [] q64 64 11 1 0x2000000000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_19 : chk [] q64 64 11 1 0x40000000000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_20 : chk [] q64 64 11 1 0x80000000000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_21 : chk [] q64 64 11 1 0x33dfbfefbfffffffffffffffffffffffffffffffffff359ffecb3c 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
+lemma co64t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 0 a.1 a.2 = false :=
+  restrictedWitness q64 64 0 co64t0_cov (by decide +kernel)
+    (@rangeCheck_append (restrictedTest q64 64 0 co64t0_cov) 0 12 10
+      (@rangeCheck_append (restrictedTest q64 64 0 co64t0_cov) 0 4 8
+       co64t0batch0
+       (@rangeCheck_append (restrictedTest q64 64 0 co64t0_cov) 4 4 4
+        co64t0batch1
+        co64t0batch2))
+      (@rangeCheck_append (restrictedTest q64 64 0 co64t0_cov) 12 4 6
+       co64t0batch3
+       (@rangeCheck_append (restrictedTest q64 64 0 co64t0_cov) 16 4 2
+        co64t0batch4
+        co64t0batch5)))
+
 def co64t1_cov : List (ℕ × ℕ) := [(0x0, 1), (0x1, 0), (0x2, 0), (0x40, 0), (0x80, 0), (0x400, 0), (0x1000, 0), (0x2000, 0), (0x10000, 0), (0x20000000, 0), (0x40000000, 0), (0x200000000, 0), (0x800000000, 0), (0x4000000000, 0), (0x8000000000, 0), (0x4000000000000000000000000000000000000000000000, 0), (0x100000000000000000000000000000000000000000000000, 0), (0x40000000000000000000000000000000000000000000000000, 0), (0x2000000000000000000000000000000000000000000000000000, 0), (0x40000000000000000000000000000000000000000000000000000, 0), (0x80000000000000000000000000000000000000000000000000000, 0), (0x33dfbfefbfffffffffffffffffffffffffffffffffff359ffecb3c, 0)]
-lemma co64t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 1 a.1 a.2 = false := by
-  refine ⟨co64t1_cov, by decide +kernel, ?_⟩
-  intro a ha
-  simp only [co64t1_cov, List.mem_cons, List.not_mem_nil, or_false] at ha
-  rcases ha with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact co64t1_0
-  · exact co64t1_1
-  · exact co64t1_2
-  · exact co64t1_3
-  · exact co64t1_4
-  · exact co64t1_5
-  · exact co64t1_6
-  · exact co64t1_7
-  · exact co64t1_8
-  · exact co64t1_9
-  · exact co64t1_10
-  · exact co64t1_11
-  · exact co64t1_12
-  · exact co64t1_13
-  · exact co64t1_14
-  · exact co64t1_15
-  · exact co64t1_16
-  · exact co64t1_17
-  · exact co64t1_18
-  · exact co64t1_19
-  · exact co64t1_20
-  · exact co64t1_21
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem co64t1batch0 : rangeCheck (restrictedTest q64 64 1 co64t1_cov) 0 4 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem co64t1batch1 : rangeCheck (restrictedTest q64 64 1 co64t1_cov) 4 4 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem co64t1batch2 : rangeCheck (restrictedTest q64 64 1 co64t1_cov) 8 4 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem co64t1batch3 : rangeCheck (restrictedTest q64 64 1 co64t1_cov) 12 4 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem co64t1batch4 : rangeCheck (restrictedTest q64 64 1 co64t1_cov) 16 4 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem co64t1batch5 : rangeCheck (restrictedTest q64 64 1 co64t1_cov) 20 2 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma co64t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 1 a.1 a.2 = false :=
+  restrictedWitness q64 64 1 co64t1_cov (by decide +kernel)
+    (@rangeCheck_append (restrictedTest q64 64 1 co64t1_cov) 0 12 10
+      (@rangeCheck_append (restrictedTest q64 64 1 co64t1_cov) 0 4 8
+       co64t1batch0
+       (@rangeCheck_append (restrictedTest q64 64 1 co64t1_cov) 4 4 4
+        co64t1batch1
+        co64t1batch2))
+      (@rangeCheck_append (restrictedTest q64 64 1 co64t1_cov) 12 4 6
+       co64t1batch3
+       (@rangeCheck_append (restrictedTest q64 64 1 co64t1_cov) 16 4 2
+        co64t1batch4
+        co64t1batch5)))
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem co64t2_res : chk [] q64 64 11 2 FF 1 = false := by
@@ -7011,224 +6647,6 @@ lemma look1C_step (nn aa hx hy l m g K fuel k t z : ℕ) (v : List W) :
             l m g (Nat.sub (Nat.sub k t) y) v.length z v pairsS))) true (Nat.ble v.length 1) = _
   simp only [bR]
 
-noncomputable def notCandidate (f : Nat → Nat → List W → Bool) (m g e n z q : Nat)
-    (v : List W) (a : W) : Bool :=
-  nots f m g e n z q v [a]
-
-lemma nots_cons (f : Nat → Nat → List W → Bool) (m g e n z q : Nat)
-    (v : List W) (a : W) (r : List W) :
-    nots f m g e n z q v (a :: r) =
-      (notCandidate f m g e n z q v a || nots f m g e n z q v r) := by
-  unfold notCandidate
-  unfold nots
-  dsimp only
-  simp only [bR]
-  have fact (d x : Bool) : (bif d then true else x) = ((bif d then true else false) || x) := by
-    cases d <;> rfl
-  exact fact _ _
-
-lemma nots_true_iff (f : Nat → Nat → List W → Bool) (m g e n z q : Nat) (v r : List W) :
-    nots f m g e n z q v r = true ↔
-      ∃ a ∈ r, notCandidate f m g e n z q v a = true := by
-  induction r with
-  | nil => simp [nots]
-  | cons a r ih =>
-    rw [nots_cons, Bool.or_eq_true, ih]
-    constructor
-    · rintro (h | ⟨b,hb,ht⟩)
-      · exact ⟨a, by simp, h⟩
-      · exact ⟨b, by simp [hb], ht⟩
-    · rintro ⟨b,hb,ht⟩
-      rcases List.mem_cons.mp hb with rfl | hb
-      · exact Or.inl ht
-      · exact Or.inr ⟨b,hb,ht⟩
-
-lemma nots_some_bin (f : Nat → Nat → List W → Bool) (m g e n z q : Nat) (v r : List W)
-    (h : nots f m g e n z q v r = true) :
-    ∃ b : Fin 8, nots f m g e n z q v (r.filter fun a => a.s % 8 == b.val) = true := by
-  obtain ⟨a,ha,hit⟩ := (nots_true_iff _ _ _ _ _ _ _ _ _).mp h
-  refine ⟨⟨a.s % 8, Nat.mod_lt _ (by decide)⟩,
-    (nots_true_iff _ _ _ _ _ _ _ _ _).mpr ⟨a, ?_, hit⟩⟩
-  simp [ha]
-
-def nextPairPred (b : ℕ) (p : XW → XW → Bool) (a c : XW) : Bool :=
-  Bool.rec (motive := fun _ => Bool) false (p a c) (Nat.beq (((a.s + c.s) % MM) % 8) b)
-
-lemma nextPairPred_picked (p : XW → XW → Bool) (a : XW) :
-    picked (p a) (fun b => nextPairPred b p a) := by
-  intro c h
-  refine ⟨⟨((a.s + c.s) % MM) % 8, Nat.mod_lt _ (by decide)⟩, ?_⟩
-  simpa only [nextPairPred, bR, Nat.beq_refl, Bool.cond_true] using h
-
-def nextPairS (b : ℕ) (p : XW → XW → Bool) (xs : List XW) : Bool :=
-  pairsS (nextPairPred b p) xs
-
-def nextPairN (b : ℕ) (p : XW → XW → Bool) (xs : List XW) : Bool :=
-  pairsN (nextPairPred b p) xs
-
-lemma nextPairS_picked (p : XW → XW → Bool) (xs : List XW) :
-    pairsS p xs = true → ∃ b : Fin 8, nextPairS b p xs = true :=
-  pairs_distribute _ _ (nextPairPred_picked p) _
-
-lemma nextPairN_picked (p : XW → XW → Bool) (xs : List XW) :
-    pairsN p xs = true → ∃ b : Fin 8, nextPairN b p xs = true := by
-  simp only [nextPairN, pairsN, bR]
-  cases hs : pairs p (fr xs)
-  · simp only [Bool.cond_false]
-    intro h
-    obtain ⟨b, hb⟩ := scan_picked _ _ _
-      (fun a => scan_picked _ _ _ (nextPairPred_picked p a)) h
-    refine ⟨b, ?_⟩
-    simp only [hb, Bool.cond_self]
-  · intro _
-    obtain ⟨b, hb⟩ := pairs_distribute _ _ (nextPairPred_picked p) _ hs
-    exact ⟨b, by simp only [hb, Bool.cond_true]⟩
-
-noncomputable def mvNext (NN AA HX HY bin : Nat) (F : Nat → Nat → Nat → List W → Bool) (l m g k t z : Nat) (v : List W) (y : Nat) : Bool :=
-  (fun n => Bool.rec (motive := fun _ => Bool) (prd t (fun s => nots (fun q z v => cvC NN (pos s) l v (tstC NN AA HX HY (pos s) l (Nat.sub k s) v (fun y =>
-      Bool.rec (motive := fun _ => Bool) (prd s (fun s => nots (fun q' z v => cvC NN (pos s) l v (tstC NN AA HX HY (pos s) l (Nat.sub (Nat.sub k 1) s) v (fun y =>
-          nodeC NN (F (Nat.sub k 3) s) (pos s) l m g (Nat.sub (Nat.sub (Nat.sub k 2) s) y) v.length z v (pairsQ q q'))))
-          m g (Nat.sub (Nat.sub (Nat.sub k 1) s) y) v.length z (Nat.succ q) v v)) true
-        (nodeC NN (F (Nat.sub k 2) s) (pos s) l m g (Nat.sub (Nat.sub (Nat.sub k 1) s) y) v.length z v (pairsP q)))))
-      m g (Nat.sub (Nat.sub k s) y) n z 0 v (v.filter fun a => a.s % 8 == bin))) true
-    (nodeC NN (F (Nat.sub k 1) t) (pos t) l m g (Nat.sub (Nat.sub k t) y) n z v (nextPairN bin))) v.length
-lemma prdNots_picked (t : ℕ) (f : ℕ → ℕ → ℕ → List W → Bool)
-    (m g n z q : ℕ) (e : ℕ → ℕ) (v : List W) :
-    prd t (fun s => nots (f s) m g (e s) n z q v v) = true →
-    ∃ b : Fin 8, prd t (fun s => nots (f s) m g (e s) n z q v
-      (v.filter fun a => a.s % 8 == (b : ℕ))) = true := by
-  cases t with
-  | zero => simp [prd]
-  | succ t => exact nots_some_bin (f t) m g (e t) n z q v v
-
-lemma mvNext_picked (nn aa hx hy l m g k t z : ℕ)
-    (F : ℕ → ℕ → ℕ → List W → Bool) (v : List W) (y : ℕ) :
-    mvC nn aa hx hy F l m g k t z v y = true →
-    ∃ b : Fin 8, mvNext nn aa hx hy b F l m g k t z v y = true := by
-  simp only [mvC, mvNext, bR]
-  cases hd : nodeC nn (F (Nat.sub k 1) t) (pos t) l m g
-      (Nat.sub (Nat.sub k t) y) v.length z v pairsN
-  · simp only [Bool.cond_false]
-    intro h
-    obtain ⟨b, hb⟩ := prdNots_picked t _ m g v.length z 0 _ v h
-    exact ⟨b, by simp only [hb, Bool.cond_self]⟩
-  · intro _
-    rw [nodeC_as_mode] at hd
-    obtain ⟨b, hb⟩ := nextPairN_picked _ _ hd
-    exact ⟨b, by simp only [nodeC_as_mode, hb, Bool.cond_true]⟩
-
-noncomputable def look1Next (nn aa hx hy l m g K : ℕ) (bin : ℕ) :
-    ℕ → ℕ → ℕ → ℕ → List W → Bool
-  | 0, _, _, _, _ => Nat.beq bin 0
-  | fuel + 1, k, t, z, v =>
-    Bool.rec (motive := fun _ => Bool) (tstC nn aa hx hy (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
-      Bool.rec (motive := fun _ => Bool)
-        (mvNext nn aa hx hy bin (lookC nn aa hx hy l m g K) l m g k t z v y) true
-        (nodeC nn (look1C nn aa hx hy l m g K fuel (Nat.sub k 1) t)
-          (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v (nextPairS bin))))
-        (Nat.beq bin 0) (Nat.ble v.length 1)
-
-lemma look1Next_picked (nn aa hx hy l m g K fuel k t : ℕ) :
-    ∀ z, picked (look1C nn aa hx hy l m g K fuel k t z)
-      (fun b => look1Next nn aa hx hy l m g K b fuel k t z) := by
-  intro z v
-  cases fuel with
-  | zero =>
-    intro _
-    exact ⟨0, rfl⟩
-  | succ fuel =>
-    rw [look1C_step]
-    simp only [look1Next, bR]
-    cases hv : Nat.ble v.length 1
-    · simp only [Bool.cond_false]
-      apply tst_picked
-      intro y h
-      let f := look1C nn aa hx hy l m g K fuel (Nat.sub k 1) t
-      let e := Nat.sub (Nat.sub k t) y
-      cases hd : nodeC nn f (pos t) l m g e v.length z v pairsS
-      · have hm : mvC nn aa hx hy (lookC nn aa hx hy l m g K) l m g k t z v y = true := by
-          simpa only [f, e, hd, Bool.cond_false, Bool.or_false] using h
-        obtain ⟨b, hb⟩ := mvNext_picked nn aa hx hy l m g k t z _ v y hm
-        exact ⟨b, by simp only [hb, Bool.cond_self]⟩
-      · rw [nodeC_as_mode] at hd
-        obtain ⟨b, hb⟩ := nextPairS_picked _ _ hd
-        refine ⟨b, ?_⟩
-        simp only [nodeC_as_mode, hb, Bool.cond_true, f, e]
-    · exact fun _ => ⟨0, rfl⟩
-
-noncomputable def topPairNext (NN AA HX HY l m g K H ph k t z : ℕ)
-    (v : List W) (kind : Bool) (bin : ℕ) : Bool :=
-  Bool.rec (motive := fun _ => Bool) (tstC NN AA HX HY (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
-    Bool.rec (motive := fun _ => Bool)
-      (Bool.rec (motive := fun _ => Bool) false
-        (mvC NN AA HX HY (lookC NN AA HX HY l m g K) l m g k t z v y) (Nat.beq ph 1)) true
-      (nodePicked NN (look1Next NN AA HX HY l m g K bin K (Nat.sub k 1) t) (pos t) l m g (Nat.sub (Nat.sub k t) y)
-        v.length z v H kind))) true (Nat.ble v.length 1)
-
-lemma topPairNext_picked (nn aa hx hy l m g K H ph k t z : ℕ) (v : List W) (kind : Bool) :
-    topPairPicked nn aa hx hy l m g K H ph k t z v kind = true →
-      ∃ b : Fin 8, topPairNext nn aa hx hy l m g K H ph k t z v kind b = true := by
-  simp only [topPairPicked, topPairNext, bR]
-  cases ht : Nat.ble v.length 1
-  · simp only [ht, Bool.cond_false]
-    apply tst_picked
-    intro y h
-    dsimp only at h ⊢
-    cases hx' : nodePicked nn (look1C nn aa hx hy l m g K K (Nat.sub k 1) t) (pos t) l m g
-        (Nat.sub (Nat.sub k t) y) v.length z v H kind
-    · simp only [hx', Bool.cond_false] at h
-      refine ⟨0, ?_⟩
-      simp only [h, Bool.cond_self]
-    · obtain ⟨b,hb⟩ := nodePicked_distribute nn (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v H kind
-        (look1Next_picked nn aa hx hy l m g K K (Nat.sub k 1) t) hx'
-      exact ⟨b, by simp only [hb, Bool.cond_true]⟩
-  · simp only [ht, Bool.cond_true]
-    exact fun _ => ⟨0,by simp⟩
-
-noncomputable def startPairNext (NN AA HX HY l m g B K t p H ph : ℕ) (v : List W) (kind : Bool) (bin : ℕ) : Bool :=
-  Bool.rec (motive := fun _ => Bool) false (Bool.rec (motive := fun _ => Bool) false
-    (child (fun z r => topPairNext NN AA HX HY l m g K H ph K t z r kind bin) g (fun h => h v) (Nat.sub B (sumc v)))
-    (Nat.ble v.length (Nat.sub (Nat.succ K) t))) (hasP p v)
-
-lemma startPairNext_picked (nn aa hx hy l m g B K t p H ph : ℕ) (kind : Bool) :
-    picked (fun v => startPairPicked nn aa hx hy l m g B K t p H ph v kind)
-      (fun b v => startPairNext nn aa hx hy l m g B K t p H ph v kind b) := by
-  intro v
-  simp only [startPairPicked, startPairNext, child, st_eq, bR]
-  cases h : hasP p v
-  · simp [h]
-  · simp only [h, Bool.cond_true]
-    cases hb : Nat.ble v.length (Nat.sub K.succ t)
-    · simp [hb]
-    · simp only [hb, Bool.cond_true]
-      cases hz : Nat.beq (Nat.land (Nat.sub B (sumc v)) g) g
-      · simp [hz]
-      · simp only [hz, Bool.cond_true]
-        exact topPairNext_picked _ _ _ _ _ _ _ _ _ _ _ _ _ v kind
-
-noncomputable def chkPairNext (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (kind : Bool) (bin : ℕ) : Bool :=
-  searchInputs E Q Z K t H ph (fun nn aa hx hy l m g B p v =>
-    startPairNext nn aa hx hy l m g B K t p H ph v kind bin)
-
-lemma guardStart_picked (t H ph : ℕ) {f : List W → Bool} {g : Fin 8 → List W → Bool}
-    (pickedTest : picked f g) :
-    picked (guardStart t H ph f) (fun b => guardStart t H ph (g b)) := by
-  intro v
-  unfold guardStart
-  cases h : relevantStart t H ph v
-  · simp
-  · simpa [h] using pickedTest v
-
-lemma chkPair_next (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (kind : Bool)
-    (checked : ∀ b : Fin 8, chkPairNext E Q Z K t H ph kind b = false) :
-    chkPairPicked E Q Z K t H ph kind = false := by
-  rw [← chkPairFast_eq]
-  refine Bool.eq_false_iff.mpr fun h => ?_
-  simp only [chkPairFast, chkPairNext, searchInputs, frc_eq, st_eq] at h checked
-  obtain ⟨b, hb⟩ := anySub_picked _ _ _ _ _ _
-    (guardStart_picked t H ph (startPairNext_picked _ _ _ _ _ _ _ _ _ _ _ _ _ kind)) _ h
-  exact Bool.noConfusion ((checked b).symm.trans hb)
-
 lemma pair_distribute {f : W → W → ℕ → ℕ → ℕ → ℕ → ℕ → Bool}
     {g : Fin 8 → W → W → ℕ → ℕ → ℕ → ℕ → ℕ → Bool}
     (h : ∀ a c da dc s x y, f a c da dc s x y = true → ∃ b, g b a c da dc s x y = true)
@@ -8066,22 +7484,6 @@ lemma afterSecond_false (state : SearchState)
     then true else _) = _
   rw [pure, mixed]
   rfl
-
-def rangeCheck (test : ℕ → Bool) (start count : ℕ) : Bool :=
-  (List.range' start count).all test
-
-lemma rangeCheck_append (test : ℕ → Bool) {s a b : ℕ}
-    (left : rangeCheck test s a = true) (right : rangeCheck test (s+a) b = true) :
-    rangeCheck test s (a+b) = true := by
-  unfold rangeCheck at *
-  rw [← List.range'_append_1, List.all_append, left, right]
-  rfl
-
-lemma rangeCheck_at {test : ℕ → Bool} {n i : ℕ} (checked : rangeCheck test 0 n = true) (hi : i < n) :
-    test i = true :=
-  List.all_eq_true.mp checked _ (List.mem_range'_1.mpr ⟨Nat.zero_le _, by simpa using hi⟩)
-
-lemma boolOfNeg {b : Bool} (h : (!b) = true) : b = false := by cases b <;> simp_all
 
 noncomputable def readyForThird (i : ℕ) : Bool :=
   let state := secondAt i
@@ -9382,182 +8784,532 @@ theorem binaryCertificates : BinaryCertificates rootBounds := by
   · exact ⟨0x40000000000000000000000000000000, by decide +kernel,caseBinary_12⟩
   · exact ⟨0x80000, by decide +kernel,caseBinary_13⟩
 
-def unaryProofBounds : List (ℕ × ℕ) :=
-  ((rt1 ++ rt) ++ pinsAll).filter (fun e => e.2 ≥ 5)
+def subChoices (nn : ℕ) (d : Bool) (l : ℕ) (words : List W) : ℕ → List (List W) :=
+  List.rec (fun _ => [[]]) (fun w rest later bits =>
+    (later (Nat.lor bits (spC nn d l w.s))).map (w :: ·) ++
+      if Nat.beq (Nat.lor bits (covC nn d l rest)) l then later bits else []) words
 
-lemma unaryProofBounds_I : ∀ e ∈ unaryProofBounds, Imp [] e.1 e.2 := by
-  intro e he
-  exact apI (apI i1 ir) pinsAll_I e (List.mem_of_mem_filter he)
+lemma anySub_choices (nn : ℕ) (d : Bool) (l : ℕ) (words : List W) (bits : ℕ)
+    (test : List W → Bool) :
+    anySubC nn d l words bits test = (subChoices nn d l words bits).any test := by
+  induction words generalizing bits test with
+  | nil => simp [anySubC, subChoices]
+  | cons w rest ih =>
+    let included := Nat.lor bits (spC nn d l w.s)
+    let skip := Nat.beq (Nat.lor bits (covC nn d l rest)) l
+    change (Bool.rec (motive := fun _ => Bool)
+        (Bool.rec (motive := fun _ => Bool) false (anySubC nn d l rest bits test) skip)
+        true (st included fun c => anySubC nn d l rest c (fun r => test (w :: r)))) =
+      (((subChoices nn d l rest included).map (w :: ·)) ++
+        if skip then subChoices nn d l rest bits else []).any test
+    simp only [bR, st_eq, ih, List.any_append, List.any_map, Function.comp_def]
+    cases skip <;> cases (subChoices nn d l rest included).any (fun r => test (w :: r)) <;> simp
+
+lemma startvC_hasP (nn aa hx hy l m g B K t p H ph : ℕ) (v : List W) :
+    startvC nn aa hx hy l m g B K t p H ph v =
+      (hasP p v && startvC nn aa hx hy l m g B K t 0 H ph v) := by
+  unfold startvC
+  rw [show hasP 0 v = true from rfl]
+  cases hasP p v <;> rfl
+
+lemma chk_preselected (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (v : List W)
+    (chosen : ((subChoices I.NN (pos t) (lz Z) (avl (PZ Q) (mz Z) (rawL E)) 0).filter
+      (hasP (pwr E Z))) = [v]) :
+    chk E Q Z K t H ph = startvC I.NN I.AA I.HX I.HY (lz Z) (mz Z)
+      (pL (Q.map fun _ => 16)) (pL (Q.map fun e => 16 + (K - e.2))) K t 0 H ph v := by
+  simp only [chk, frc_eq, st_eq, anySub_choices]
+  simp_rw [startvC_hasP _ _ _ _ _ _ _ _ _ _ (pwr E Z)]
+  rw [← List.any_filter, chosen]
+  simp only [List.any_cons, List.any_nil, Bool.or_false]
+
+abbrev rawNegBounds := rootBounds
+
+def rawNegCofactors (i : ℕ) : List (ℕ × ℕ) := rawNegBounds.map (unaryCharge i)
+
+noncomputable def rawNegWords (i : ℕ) : List W :=
+  avl (PZ (rawNegCofactors i)) rootPreparedMask (rawL [(i,0)])
+
+noncomputable def rawNegSlots : ℕ := rootPreparedSlots
+
+noncomputable def rawNegRoot (i : ℕ) : SearchState :=
+  (pL ((rawNegCofactors i).map fun e => 16 + (13 - e.2)) - sumc (rawNegWords i), rawNegWords i)
+
+noncomputable def rawNegOpen (i : ℕ) (next : ℕ → List W → Bool) : Bool :=
+  nodeC I.NN next false I.AA rootPreparedMask rawNegSlots 13 (rawNegWords i).length
+    (rawNegRoot i).1 (rawNegWords i) (fun h xs => pairsC FF h (fs xs))
+
+noncomputable def rawNegAfterOpen : ℕ → List W → Bool :=
+  look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rawNegSlots 13 13 12 0
+
+lemma noMixedRaw (nn aa hx hy l m g k z : ℕ) (v : List W)
+    (F : ℕ → ℕ → ℕ → List W → Bool) (raw : ∀ w ∈ v, w.r ≠ 0) :
+    mvC nn aa hx hy F l m g k 0 z v 0 = false := by
+  have noInternal : fr (mkXC nn false l (wstC nn false l v) v) = [] := by
+    rw [fr_eq_filter, List.filter_eq_nil_iff]
+    intro a ha
+    rw [mkXC_map] at ha
+    obtain ⟨w, hw, rfl⟩ := List.mem_map.mp ha
+    exact fun h => raw w hw (Nat.eq_of_beq_eq_true h)
+  simp only [mvC, pos, prd, Nat.sub_zero, bR]
+  rw [nodeC_as_mode]
+  simp [pairsN, noInternal, pairs, scan]
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-lemma unaryProofBounds_p : pOk 0 unaryProofBounds = true := by decide +kernel
+lemma rawNegSlots_eq (i : ℕ) : pL ((rawNegCofactors i).map fun _ => 16) = rawNegSlots := by
+  simp only [rawNegCofactors, List.map_map, Function.comp_def]
+  rfl
+
+lemma rawNegSelection (i : ℕ)
+    (selected : ((subChoices I.NN false I.AA (rawNegWords i) 0).filter
+      (hasP (pwr [(i,0)] 0))) = [rawNegWords i])
+    (hlen : (rawNegWords i).length = 9) (hraw : ∀ w ∈ rawNegWords i, w.r ≠ 0) :
+    chk [(i,0)] (rawNegCofactors i) 0 13 0 FF 1 =
+      (bif Nat.beq (Nat.land (rawNegRoot i).1 rawNegSlots) rawNegSlots
+        then rawNegOpen i rawNegAfterOpen else false) := by
+  have hselected : ((subChoices I.NN (pos 0) (lz 0)
+      (avl (PZ (rawNegCofactors i)) (mz 0) (rawL [(i,0)])) 0).filter
+      (hasP (pwr [(i,0)] 0))) = [rawNegWords i] := by
+    rw [show pos 0 = false from rfl, rootPreparedL_eq, rootPreparedMask_eq]
+    exact selected
+  rw [chk_preselected _ _ _ _ _ _ _ _ hselected, rootPreparedL_eq, rootPreparedMask_eq, rawNegSlots_eq]
+  simp only [startvC, hasP, bR, Nat.beq_refl, Bool.cond_true, hlen, child, st_eq]
+  simp only [show Nat.ble 9 (Nat.sub 14 0) = true from rfl, Bool.cond_true]
+  change (bif Nat.beq (Nat.land (rawNegRoot i).1 rawNegSlots) rawNegSlots then
+    topCC I.NN I.AA I.HX I.HY I.AA rootPreparedMask rawNegSlots 13 FF 1 13 0 (rawNegRoot i).1
+      (rawNegWords i) else false) = _
+  simp only [topCC, hlen, pos, bR, show Nat.ble 9 1 = false from rfl, Bool.cond_false]
+  simp only [tstC, hlen, bR, show Nat.beq 9 (Nat.sub 14 0) = false from rfl,
+    show Nat.beq 10 (Nat.sub 14 0) = false from rfl, Bool.cond_false]
+  have toBool (b : Bool) : (bif b then true else false) = b := by cases b <;> rfl
+  simp only [noMixedRaw _ _ _ _ _ _ _ _ _ _ _ hraw, Bool.cond_false,
+    Bool.cond_self, toBool, rawNegOpen, rawNegAfterOpen, hlen]
+  rfl
+
+lemma rawNegHashFull (x : ℕ) : hb FF x = true := by
+  have hm : x % MM < MM := Nat.mod_lt _ (by decide)
+  have bit : FF.testBit (x % MM) = true := by simpa [FF] using hm
+  have positive : (1 &&& (FF >>> (x % MM))) ≠ 0 := by simpa [Nat.testBit] using bit
+  have small : 1 &&& (FF >>> (x % MM)) ≤ 1 := Nat.and_le_left
+  rw [hb, Nat.beq_eq]
+  change (FF >>> (x % MM)) &&& 1 = 1
+  rw [Nat.and_comm]
+  omega
+
+lemma rawNegPairs (f : XW → XW → Bool) (xs : List XW) : pairsC FF f xs = pairs f xs := by
+  induction xs with
+  | nil => rfl
+  | cons a rest ih =>
+    rw [pairsC_eq, ih]
+    simp only [rawNegHashFull, Bool.true_and]
+    simp only [pairs, bR, scan_eq_any]
+    cases rest.any (f a) <;> rfl
+
+noncomputable def rawNegPure (e : ℕ) (state : SearchState) (next : ℕ → List W → Bool) : Bool :=
+  nodeC I.NN next false I.AA rootPreparedMask rawNegSlots e state.2.length state.1 state.2 pairsS
+
+lemma rawNegOpening_eq (i : ℕ) (next : ℕ → List W → Bool) :
+    rawNegOpen i next = rawNegPure 13 (rawNegRoot i) next := by
+  unfold rawNegOpen rawNegPure pairsS
+  simp only [rawNegPairs, rawNegRoot]
+
+lemma rawNegPure_from_frontier (e : ℕ) (state : SearchState) (states : List SearchState)
+    (remaining : SearchState → Bool)
+    (complete : rawNegPure e state (frontierMissing states) = false)
+    (checked : ∀ x ∈ states, remaining x = false) :
+    rawNegPure e state (fun z v => remaining (z,v)) = false := by
+  refine Bool.eq_false_iff.mpr fun found => ?_
+  simp only [rawNegPure, nodeC_as_mode, pairsS] at found complete
+  have hp := pairs_distribute _ _ (fun a c =>
+    pair_distribute (fun left right da dc signal x y =>
+      mode_distribute rootPreparedMask rawNegSlots e state.2.length state.1 state.2
+      left right da dc signal x y
+      (g := fun _ => frontierMissing states)
+      (fun z v hit => by
+        refine ⟨0, ?_⟩
+        cases missed : frontierMissing states z v
+        · exact Bool.noConfusion ((checked _ (frontierMissing_false missed)).symm.trans hit)
+        · exact missed))
+    a c) _ found
+  obtain ⟨_, hh⟩ := hp
+  exact Bool.noConfusion (complete.symm.trans hh)
+
+noncomputable def rawNegMixed (state : SearchState) : Bool :=
+  frc state.2 (fun v => st state.1 (fun z =>
+    mvC I.NN I.AA I.HX I.HY
+      (lookC I.NN I.AA I.HX I.HY I.AA rootPreparedMask rawNegSlots 13)
+      I.AA rootPreparedMask rawNegSlots 12 0 z v 0))
+
+noncomputable def rawNegAfterTwo (state : SearchState) : Bool :=
+  frc state.2 (fun v => st state.1 (fun z =>
+    look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rawNegSlots 13 12 11 0 z v))
+
+lemma rawNegAfterOpen_false (state : SearchState)
+    (two : 1 < state.2.length) (small : state.2.length < 12)
+    (mixed : rawNegMixed state = false)
+    (pure : rawNegPure 12 state (fun z v => rawNegAfterTwo (z,v)) = false) :
+    rawNegAfterOpen state.1 state.2 = false := by
+  have hl : Nat.ble state.2.length 1 = false := by
+    cases h : Nat.ble state.2.length 1
+    · rfl
+    · exact absurd (Nat.le_of_ble_eq_true h) (Nat.not_le_of_gt two)
+  have choose0 (F : ℕ → Bool) : tstC I.NN I.AA I.HX I.HY false I.AA 13 state.2 F = F 0 := by
+    have h0 : Nat.beq state.2.length 13 = false := beq_f (by omega)
+    have h1 : Nat.beq state.2.length.succ 13 = false := beq_f (by omega)
+    simp only [tstC, bR, h0, h1, Bool.cond_false]
+  rw [rawNegAfterOpen, show (13 : ℕ) = Nat.succ 12 from rfl, look1C_step, hl, Bool.cond_false]
+  change tstC I.NN I.AA I.HX I.HY false I.AA 13 state.2 _ = _
+  rw [choose0]
+  simp only [rawNegAfterTwo, frc_eq, st_eq] at pure
+  simp only [rawNegMixed, frc_eq, st_eq] at mixed
+  change (bif rawNegPure 12 state
+      (look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rawNegSlots 13 12 11 0)
+    then true else _) = _
+  rw [pure, mixed]
+  rfl
+
+noncomputable def rawNegStoredWords (index : ℕ) : List W :=
+  let word := rootPreparedWords.getD index ⟨0,0,0,0,3⟩
+  addS ⟨rootPreparedMask ^^^ word.s, word.b, word.a, word.c, 3⟩ rootPreparedWords
+
+noncomputable def rawNegStarts : List SearchState := [⟨0x9d295ace759d294a4e94a4e938ca54a56b39ce738d293a4a9494a948d252a465194a30, rawNegStoredWords 5⟩, ⟨0x8d295ace35ad294a4e94a46919d254956b39ce339d291a5292952549ca54a465194232, rawNegStoredWords 7⟩, ⟨0x9ca55ace75aca92a4e9494e939d294a4e739ce739d293a5294952949d2949465194a32, rawNegStoredWords 0⟩]
+def rawNegFirstCodes : List ℕ := [
+0x10860c8604861202020211c201c2118201821142110210c200c21842104211d911d5119511d11191115111cd118d114d110d11c5118501851145110510c5188505c1058104c10441121c121411d4121011d01150120c020c11cc114c110c12081148110810c81204020411c41144110410c400c418841084060005c004c00440, 0x121e021e121a021a11da01da121611d61196121211d211921152120e020e11ce01ce118e018e114e110e160a120a060a020a15ca11ca05ca01ca158a118a058a018a154a114a150a110a14ca10ca04ca00ca120611c611861146110610c61886,
+]
+
+def rawNegSecondCodes : List ℕ := [
+0x8e0062801880071001c2006080190e0242808ea0242008e8022a009060041808e60229808860241008a402210086402400010002b8008e0022800880029800860001800c40021000, 0x8c40e21038640f38038c00e20038600e1003c200e42029060a21829040b31028840a19029000b30028800a18028400b080290e0642818ea0642018e8062a01ae4062881882064001, 0x8a6162185b0416410510416b9058e4162905884161905064164b0492a1232849281232048a812c984ac612a984a8612c9049241231048a4122104084133b038c80e31838860f3903, 0x90a1e3287b281ec207ac81e3207aa81e2a079261e31878a61e2187b241e49079041e31078a41e2a068a41a21068a21a2086c621a438590a163a85908163a058a8164185106163985,
+0x9082732098a82649898a6262189924244909904264c0892c224308b2a22c288aca224a081282242088c8232a08926223188886224908124224108ac42231089301e4b0790c1e4a87, 0x8ca334a0c90832320c8a832498c8c632298c886323a8b8e82e2a0bb302a4b0ad0c2a4a8ad0a2a328a9282b420a8c82a2a0a92428490a93026cb09b0c264a8990a273289928244a09, 0xb2a46b2118c8464b1092a4232908c8422a10b2c3e4a8f9283e2a0f92c3aca8e9283a320eac63a4b0d92a36328db2836320d8a836c98dd30324c0cd2c324b0c90c334a8c92a32428c, 0x8e072301c0c072281c88072981c86073901cc40724c1a930634b1892c62431892c5f43179305a431590a5632958a852cc1392c4e4a938ca4e4c12b2c4a4a9290a4a4c1192c464311,
+0x8e47b291e8847a191e8e07b281e8807a181e8407b081e8ec763a9d8ca763a1d8c8762a1d8e076301d8a076201dc4077081d8ec723a9c8ca723a1c8c8722a1c8e672319c8a672219c, 0xaa8864121ae48639218c48629218ca8232208a88231a08a68221a08c48031208a4822120864822a1f8a67e219fcc47e291f8847e191fcc07e281f8807e181f8407e3a1e8e67a219e, 0xcca8e42238e88f32238a88e41238e48c392390e8a43228ec8ac2a2aea8ab2a29088a3a228c88b2a229048a39220e48ab1228c48a43a190c863b2190a863aa18ca86c221ae886b221, 0xd0a9a3aa68ca9b42268e89a32268a89ac3a590e964325cec963b2590a973aa58ea9632a5908973a258c8962a25b049641258ea923a248a89238a4cc29243a3b0c8ebb2390a8e3aa3,
+0x8e2c620b190ebac32ed0cb63b2d90eb2432ccecb23b2cb0ab243abd0eaa3b2a8eaaa32aa90ca642a98caa6c22990ea2bb2890aa23aa890e9e43278ec9ebaa7ac89f43a6d0c9a3b26, 0x64cac0b2902cab8b28e2ca30b2862ca4bb190ec64a31908c63a310e8c6c9b1b06c6b9b12e6c439b1ac6c6a9b1a86c4a1b1086c6c931b04c6b931a84c79931b22c648b1b02c640b1, 0x8eccc3b332e4ccb1338e2ce30b3642ce43b210eca433210cca3b320ecca41b2106ca39b20e6ca31b20c6cac132304c84132ae4c8b9320e4cab1322c4c83132aa4caa132a64c89932, 0x928d2c234908d2ba348e8d2c9b4326d049b4b06d0c1b4106d2b9b42e6d039b4ac6d2a9b4e86d2a1b4924d241348e4d22134c64d19934264d2c8b4922d240b4ae2d238b490ece4333,
+0x8e4da2136664da4c35130d64bb512ed643b510ed64a35128d64235108d63a350e8d4c9b5306d4b9b5ea6d4a1b5924d641358e4d62135664d64c34130d24bb412ed243b410ed2ca34, 0x264e248b8b02e240b890ede41b7106de39b7304dc9937902de18b7642de4c36130da4bb612eda43b610eda4a36128da4236108da3a360e8d8c9b6306d8b9b6ec6d8a1b6924da4136, 0x642e64c38130e2cbb892ee2c3b890ee24a38128e24238108e33a388e8e2c9b8326e049b8b06e0c1b8106e3b9b8ae6e2b1b8aa6e2a1b8286e021b8924e241388e4e22138c64e19938, 0x90eea4a3a128eb423a908ea3a3a0e8eac9ba326e849baf06eac1baae6e8b9ba0e6eab1baaa6eaa1ba286e821ba924ea413a8e4ea213ac64e9993a264ea48ba90ce641b98c6e49939,
+0x8e8f03a3cf26f2c9bcb06f0c1bc106f2b9bc2e6f039bcac6f2a9bca86f0a1bc086f2493c904f2393c884f3193c664f0993c8ecee39bb8c6ecb13b642eecc3a930ea4bba12eeb43ba, 0x8ecf43b3d906f441bd8e6f439bd8c6f431bdb02f4c0bd102f6b8bd2e2f438bdac2f4b0bd0c2f6a8bda82f698bd262f418bdd30f24c3cd2ef24bbc90ef043bcd28f24a3c908f0423c, 0x90efe4a3f908fe3a3f0e8fcb9bf286fe3b3e0ecfa3abe0eafa32be0cafa3a3e8c8fa2a3e8e6fa31be8a6fa21be8e4f8393e8c4f8313e8a4f8293e884fa193e90ef443bd90cf4433d, 0x90b063ac18cb06ca41b090642418e90632418a906c9c192706c1c190706b9c18e704b9c10e706b1c18c706a9c18a706a1c188706c941ae50643408ed0241c08e70231c00c7024bbf,
+0x8e712b1c48c712a9c48a712a1c488710a1c408712c14492f0e43c39290e42438e90c3a432e70ca1c392f0a43c29290a42428e9083a422e708a1c292f0643c192d0643418ed064ac1, 0xb071641c5ae71639c5ac71631c5aa71629c5a871621c52871421c5b2f124bc4b0f124b4490d123b4492b1242c48eb1232c49291242448e91232448a912c9c492712c1c490712b9c4, 0x8c91a2a46b271a49c6b071a41c6ae71a39c62e71839c6ac71a31c6aa71a29c6a871a21c6b31164bc592d1643458ed164ac590b163ac58cb164a45909163a458c9162a45b271649c5, 0xac522a948a85224c4792f1e43c710f1ec9c7b071eb9c7b251ec1473051c4147ae51cb9470e51eb147aa51f9947d311a4bc690f1a4b4690d1a3b4692b1a42c68eb1a32c69091a3a46,
+0x90d28434a8ed283b4a9072a39ca8c72a4c49131264bc912f2643c910f264a49909263a4932724c1c92e72643c890d223b480ed2242c88eb2232c8909223a488c9222a48b0522b948, 0x32734c1cd2e73643cc10f32434c10d323b4c0ed3241cc1073239cc0e73231cc0c7324c4b1312e4bcb12f2e43cb10f2e4a4b1292e424b1092e3a4b0e92cc9cb3072cb9cb90f2843ca, 0x1273e41cfcc73ec94f3253c494fb053fb14f90f3843ce90d38434e8ed383b4e9073841ce8e73839ce8c73831ce931344c4d92f344bcd90f3443cd929344a4d90934424d8e9343a4d, 0x8c74a4c51131464bd190f464a51129464251109463a5132744c1d190f42c2d0aeb4242508e9432a509074239d0ca74221d09054041508e54329508854219509313ecb4fb0d3e49cf,
+0x32756c35490b5332d49095332548a95241d4cc75229d4887524154cc5522954885521954b2f4e4b53ced4e49d3ce74e31d3b254fb95390f4843d290d4a3b529074841d28e74839d2, 0x8a76221d8ce56231588a56221588656343d7d0d5e3b57d075e39d78c75fc15790f5a435610d5a3b569075841d68e75a31d60c75a4c5592f544bd590f564a551295642558e9543a55, 0x12f6e43db10f6e4a5b9096e3a5b90f6a435a8ed683b5a9076a39da0e76a31da0c76a4c5992f6643d910f664a599096442598e9643a59ced633ad88cb633a588c9622a58ce76231d8, 0x1317acbde92f7a43de92d7a435e8ed7a4ade90b7a3ade8cb7a4a5eb097a425e90f7642dd8eb76425d8e9762a5d931704c5c92f704bdc90f7043dc92972425c8e9724c5b1316e4bdb,
+0x90b8a3ae28cb8b43e18ed863ae18cb863a618c9862a61b31824c6092f804be0d0f8243e092d8243608ed824ae090b823ae08cb824a60329824b5f92b7e32df9297e325f8a97e4c5e, 0x90fa24c671319e4be790f9e4c6692f9a43e610f9a4c6592f944be590f964c64131924be490f924c631318e4be312f8e43e310f8e4c62d2f8a4be290f8843e292d8a43628ed8a4ae2, 0x34c6d931b64c6b92faec3eab0daa4c6992fa643e910fa64c6892fa04be8,
+]
+
+def rawNegSecondRows : List ℕ := [
+0x1aff, 0xfff1b, 0xcff2b, 0xdff38,
+0xfff2b1a01, 0x13ff1e0d0f1a02, 0x5ff14104303, 0x14ff0613100e0d0f180104,
+0x12ff150513100e0d0f1806, 0x10ff1201140513100e0d0f1807, 0xbff11111517011e0d0f170108, 0x1010c10112c520a,
+0x10ff0e10111501150112010d0d0f160b, 0x6ff111d111529400c, 0x4ff171d2609202b150d, 0x3ff05162f1409202b150e,
+0x4ff100e1e111429400f, 0x5ff05040b0e110d1113011a0f120d2110, 0x3ff05010409060e110d1112011b0f120d2111, 0x3ff2a110d11121c210d0f1212,
+0x4b112e4f13, 0x1011704060d110c11131b11110d2014, 0x301040d0e0d0b060c1113100b11110d101015, 0x1030a230b060c11131b221d1016,
+0x3ff0a0405040504050b01110c11131b121e0f1017, 0x2020e1d0d050c11131b231c1018, 0x20102080404050504050901120c11131b131e0e1019, 0x1060504041b01130c11131b241b101a,
+0x12fff8, 0xbff010bfe, 0xcff0117fe, 0xbff0124fe,
+0xaff190c1201f8, 0xeff0b0c0c0c1101fa, 0xeff0f0a0c0c0c11fc, 0xcff0e010e0a0c0c0c11fd,
+0x4ff0d0d193500fefe, 0xeff050c0d0f01090d0c0c1000fffe, 0x9ff0e01040c0d0f170c0c100100fe, 0x4ff0a0d110d0f0b0c0c1c0101fe,
+0x3ff05090d110d0f0b0c0c1c0102fe, 0x3ff110d110d0f0b0c0c1c0103fe, 0x3ff04100d110d0f170c1c0104fe, 0x403100d09080d0f0c0b0c100c0105fe,
+0x4ff040904060c01110d0f0c0b1c0c0106fe, 0x10507050a0c0b070d0f240f0c0107fe, 0x1020301040805050b01120d0f0d0b1b0c0108fe, 0x1030909050b0d060d0f250e0c0109fe,
+0x405010804050a01130d0f330c010afe, 0x1aff019ffe, 0x1fff01bafe, 0x8ff01dafe,
+0x24ff291b019ffe, 0x15ff0208fe, 0x15ff021efe, 0x8ff0234fe,
+0x22ff5901281b01a0fe, 0x4ff0260fe, 0x20ff27015828011a0101a1fe, 0x4ff0286fe,
+0x1fff2626580127011a0101a3fe, 0x19ff2025265801e8fe, 0x14ff39061f071f0d16161f0f01dafe, 0x7ff02dafe,
+0x5ff552526584501a5fe, 0x1eff5a25260e16161e4501a6fe, 0x7ff0307fe, 0x7ff030ffe,
+0x1dff2f59252624161e113401a7fe, 0x1bff1e87252624161e113401a8fe, 0x1bff685825261014161e4501a9fe, 0x10ff381d3e2e01192526871601aafe,
+0xfff481d0a0874250d191114164c1601abfe, 0xbff211c1a1d303d02adfe, 0x8ff481a1d3057252659012d1601acfe, 0xeff351b1a1d303e02aefe,
+0xbff5e1a1d305825263c1d2e1601adfe, 0xeff4f1a1a1d303f02affe, 0xbff771a1d3059252627322e1601aefe, 0xbff1b1b151d011967152a0119257f2e1601affe,
+0xfff8d4808175911144e161b17171601b0fe, 0xaff1c67191c1d2e4002b2fe, 0x8ffa61c1d2e5a252701572e1601b1fe, 0x7ff14361b151b01bf01194c582e01c8fe,
+0xeff0176fe4c291619191501c9fe, 0x9ff172f651a1c1d2e3f02b5fe, 0x8ffce1c1d2e59260125582e1801b2fe, 0x6ff132a1a011b1b15d9013f26582e01cbfe,
+0xeff01c2fe261a1116172e01ccfe, 0x8ff16292d67191c1d2e3e02b8fe, 0x8fff41c1d2e59012426582e1a01b3fe, 0x8ff21292c671f1c1d2e3302c5fe,
+0x8ff29292c671f1c1d2e3302c6fe, 0x5ff1b091f09540c0f0c95082706150e1a255216441a01b4fe, 0xeff0f0908090e0809090f080b091009100c0f0c0d091109161c1d1608101706150e1a180d190d012b1616012d1a01b5fe, 0x5ff2e094a09290c0f0cdf0e1a4b2c164401d0fe,
+0xeff14010e0907090f0809090f080a0911090f0c0f0c0e091109161c1d16080f011706140e1a190c01251e0e1616012d1b01b6fe, 0x6ff0f5b09210911090f0c0f0cdf0e3f261e0e164401d2fe, 0xbff15140f0907090f0808091008090911090f0c0f0c0f091109321d16080f1806130e1a01241c0a1e0e1616012d1c01b7fe, 0x5ff0c070d080c092e292b68201b1d2d3102cdfe,
+0x3ff11070d080c37292b68201b1d2d3102cefe, 0x3ff14070d140a2d292b68201b1d2d3102cffe, 0x3ff1714090b0a2d292b68201b1d2d3102d0fe, 0x3ff1a080c090b37292b68201b1d2d3102d1fe,
+0x3ff1d080c140b2c292b68201b1d2d3102d2fe, 0x3ff20140a0a0b2c292b68201b1d2d3102d3fe, 0x1040c0e053e0907097b0c0f0c0f090a10a6151a771616230b01d4fe, 0x105050403050405050a0a011415090709090f0809090f09090a100e0c0f0c0f090a1011381d08081f060b151a1c090125012b1616230b1d01b8fe,
+0xc09192a093009520c0f0c0f09c0153f5216162e01d6fe, 0x10202020405030405040501130d080114090809090f07090a0f09090a100d0c0f0c0f090b10111c1b011d08081f060a151a01241f07012b1616240a1e01b9fe, 0xc042e15095b09270c0f0c0f09c015652c16162e01d8fe, 0x1010202040404040404060c0701140f06090909090f07090a0f08090b100c0c0f0c0f090c10111c77151a0124012523091616250901d9fe,
+]
+
+noncomputable def rawNegStart (i : ℕ) : SearchState := rawNegStarts.getD i (0, [])
+
+noncomputable def rawNegFirst (i : ℕ) : SearchState :=
+  let block := rawNegFirstCodes.getD (i / 64) 0
+  transitionFromCode 2 rawNegStart ((block >>> (16 * (i % 64))) % 65536)
+
+noncomputable def rawNegSecond (i : ℕ) : SearchState :=
+  let block := rawNegSecondCodes.getD (i / 32) 0
+  transitionFromCode 7 rawNegFirst ((block >>> (18 * (i % 32))) % 262144)
+
+def rawNegSuccessors (i : ℕ) : List ℕ := decodeDeltas 64 0 (rawNegSecondRows.getD i 0)
+
+noncomputable def rawNegCover (i : ℕ) : Bool :=
+  let state := rawNegFirst i
+  let ids := rawNegSuccessors i
+  (!rawNegPure 12 state (frontierMissing (ids.map rawNegSecond))) &&
+    ((ids.all fun j => decide (j < 1229)) &&
+      (decide (1 < state.2.length) && decide (state.2.length < 12)))
+
+noncomputable def rawNegMixedTest (i : ℕ) : Bool := !rawNegMixed (rawNegFirst i)
+noncomputable def rawNegSecondTest (i : ℕ) : Bool := !rawNegAfterTwo (rawNegSecond i)
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_and : chkPairPicked [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
+theorem rawNegStored0 : rawNegRoot 0 = rawNegStart 0 := Eq.refl _
+
+noncomputable def rawNegOpening0 : List SearchState := (List.range' 0 28).map rawNegFirst
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move0 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 0 = false := by decide +kernel
+theorem rawNegOpening0_complete :
+    rawNegPure 13 (rawNegStart 0) (frontierMissing rawNegOpening0) = false := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move1 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 1 = false := by decide +kernel
+theorem rawNegStored2 : rawNegRoot 2 = rawNegStart 1 := Eq.refl _
+
+noncomputable def rawNegOpening2 : List SearchState := (List.range' 28 21).map rawNegFirst
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move2 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 2 = false := by decide +kernel
+theorem rawNegOpening2_complete :
+    rawNegPure 13 (rawNegStart 1) (frontierMissing rawNegOpening2) = false := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move3 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 3 = false := by decide +kernel
+theorem rawNegStored7 : rawNegRoot 7 = rawNegStart 2 := Eq.refl _
+
+noncomputable def rawNegOpening7 : List SearchState := (List.range' 49 63).map rawNegFirst
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move4 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 4 = false := by decide +kernel
+theorem rawNegOpening7_complete :
+    rawNegPure 13 (rawNegStart 2) (frontierMissing rawNegOpening7) = false := by decide +kernel
+
+lemma rawNegFirst_checked (i : ℕ) (hi : i < 112)
+    (coverage : rangeCheck rawNegCover 0 112 = true)
+    (mixed : rangeCheck rawNegMixedTest 0 112 = true)
+    (second : rangeCheck rawNegSecondTest 0 1229 = true) :
+    rawNegAfterOpen (rawNegFirst i).1 (rawNegFirst i).2 = false := by
+  have h := rangeCheck_at coverage hi
+  simp only [rawNegCover, Bool.and_eq_true, decide_eq_true_eq] at h
+  obtain ⟨complete, valid, htwo, hsmall⟩ := h
+  refine rawNegAfterOpen_false (rawNegFirst i) htwo hsmall (boolOfNeg (rangeCheck_at mixed hi)) ?_
+  refine rawNegPure_from_frontier 12 (rawNegFirst i) ((rawNegSuccessors i).map rawNegSecond)
+    rawNegAfterTwo (boolOfNeg complete) ?_
+  intro state member
+  obtain ⟨j, hj, rfl⟩ := List.mem_map.mp member
+  have bound : j < 1229 := of_decide_eq_true (List.all_eq_true.mp valid j hj)
+  exact boolOfNeg (rangeCheck_at second bound)
+
+lemma rawNeg_checked (i root start count : ℕ)
+    (selected : ((subChoices I.NN false I.AA (rawNegWords i) 0).filter
+      (hasP (pwr [(i,0)] 0))) = [rawNegWords i])
+    (len : (rawNegWords i).length = 9) (raw : ∀ w ∈ rawNegWords i, w.r ≠ 0)
+    (stored : rawNegRoot i = rawNegStart root) (bound : start+count ≤ 112)
+    (opening : rawNegPure 13 (rawNegStart root)
+      (frontierMissing ((List.range' start count).map rawNegFirst)) = false)
+    (coverage : rangeCheck rawNegCover 0 112 = true)
+    (mixed : rangeCheck rawNegMixedTest 0 112 = true)
+    (second : rangeCheck rawNegSecondTest 0 1229 = true) :
+    chk [(i,0)] (rawNegCofactors i) 0 13 0 FF 1 = false := by
+  rw [rawNegSelection i selected len raw, rawNegOpening_eq, stored]
+  have result := rawNegPure_from_frontier 13 (rawNegStart root)
+    ((List.range' start count).map rawNegFirst) (fun s => rawNegAfterOpen s.1 s.2) opening (by
+      intro state h
+      obtain ⟨j, hj, rfl⟩ := List.mem_map.mp h
+      have hbound := (List.mem_range'_1.mp hj).2
+      exact rawNegFirst_checked j (by omega) coverage mixed second)
+  rw [result]
+  cases Nat.beq (Nat.land (rawNegStart root).1 rawNegSlots) rawNegSlots <;> rfl
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move5 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 5 = false := by decide +kernel
+theorem negCover0 : rangeCheck rawNegCover 0 16 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move6 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 6 = false := by decide +kernel
+theorem negCover1 : rangeCheck rawNegCover 16 16 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0_or_move7 : chkPairNext [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true 7 = false := by decide +kernel
-theorem caseUnary_0_or : chkPairPicked [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact caseUnary_0_or_move0
-  · exact caseUnary_0_or_move1
-  · exact caseUnary_0_or_move2
-  · exact caseUnary_0_or_move3
-  · exact caseUnary_0_or_move4
-  · exact caseUnary_0_or_move5
-  · exact caseUnary_0_or_move6
-  · exact caseUnary_0_or_move7
-theorem caseUnary_0 : chk [(0,0)] (unaryBoundsStrong unaryProofBounds 0) 0 13 0 FF 1 = false := by
-  apply chkPair_picked
-  intro kind
-  cases kind
-  · exact caseUnary_0_and
-  · exact caseUnary_0_or
+theorem negCover2 : rangeCheck rawNegCover 32 16 = true := by decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_1 : chk [(1,0)] (unaryBoundsStrong unaryProofBounds 1) 0 13 0 FF 1 = false := by
+theorem negCover3 : rangeCheck rawNegCover 48 16 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negCover4 : rangeCheck rawNegCover 64 16 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negCover5 : rangeCheck rawNegCover 80 16 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negCover6 : rangeCheck rawNegCover 96 16 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negCoverAll : rangeCheck rawNegCover 0 112 = true :=
+  (@rangeCheck_append rawNegCover 0 48 64
+    (@rangeCheck_append rawNegCover 0 16 32
+     negCover0
+     (@rangeCheck_append rawNegCover 16 16 16
+      negCover1
+      negCover2))
+    (@rangeCheck_append rawNegCover 48 32 32
+     (@rangeCheck_append rawNegCover 48 16 16
+      negCover3
+      negCover4)
+     (@rangeCheck_append rawNegCover 80 16 16
+      negCover5
+      negCover6)))
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negMixed0 : rangeCheck rawNegMixedTest 0 56 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negMixed1 : rangeCheck rawNegMixedTest 56 56 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negMixedAll : rangeCheck rawNegMixedTest 0 112 = true :=
+  (@rangeCheck_append rawNegMixedTest 0 56 56
+    negMixed0
+    negMixed1)
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond0 : rangeCheck rawNegSecondTest 0 96 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond1 : rangeCheck rawNegSecondTest 96 96 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond2 : rangeCheck rawNegSecondTest 192 96 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond3 : rangeCheck rawNegSecondTest 288 96 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond4 : rangeCheck rawNegSecondTest 384 96 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond5 : rangeCheck rawNegSecondTest 480 96 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond6 : rangeCheck rawNegSecondTest 576 96 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond7 : rangeCheck rawNegSecondTest 672 96 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond8 : rangeCheck rawNegSecondTest 768 96 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond9 : rangeCheck rawNegSecondTest 864 96 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond10 : rangeCheck rawNegSecondTest 960 96 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond11 : rangeCheck rawNegSecondTest 1056 96 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecond12 : rangeCheck rawNegSecondTest 1152 77 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem negSecondAll : rangeCheck rawNegSecondTest 0 1229 = true :=
+  (@rangeCheck_append rawNegSecondTest 0 576 653
+    (@rangeCheck_append rawNegSecondTest 0 288 288
+     (@rangeCheck_append rawNegSecondTest 0 96 192
+      negSecond0
+      (@rangeCheck_append rawNegSecondTest 96 96 96
+       negSecond1
+       negSecond2))
+     (@rangeCheck_append rawNegSecondTest 288 96 192
+      negSecond3
+      (@rangeCheck_append rawNegSecondTest 384 96 96
+       negSecond4
+       negSecond5)))
+    (@rangeCheck_append rawNegSecondTest 576 288 365
+     (@rangeCheck_append rawNegSecondTest 576 96 192
+      negSecond6
+      (@rangeCheck_append rawNegSecondTest 672 96 96
+       negSecond7
+       negSecond8))
+     (@rangeCheck_append rawNegSecondTest 864 192 173
+      (@rangeCheck_append rawNegSecondTest 864 96 96
+       negSecond9
+       negSecond10)
+      (@rangeCheck_append rawNegSecondTest 1056 96 77
+       negSecond11
+       negSecond12))))
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem rawNegCase0 : chk [(0,0)] (rawNegCofactors 0) 0 13 0 FF 1 = false := by
+  have noInternal : (rawNegWords 0).all (fun w => !Nat.beq w.r 0) = true := by decide +kernel
+  refine rawNeg_checked 0 0 0 28 rfl rfl ?_ rawNegStored0
+    (by decide) rawNegOpening0_complete negCoverAll negMixedAll negSecondAll
+  intro w hw h
+  have bad := List.all_eq_true.mp noInternal w hw
+  simp [h] at bad
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem rawNegCase2 : chk [(2,0)] (rawNegCofactors 2) 0 13 0 FF 1 = false := by
+  have noInternal : (rawNegWords 2).all (fun w => !Nat.beq w.r 0) = true := by decide +kernel
+  refine rawNeg_checked 2 1 28 21 rfl rfl ?_ rawNegStored2
+    (by decide) rawNegOpening2_complete negCoverAll negMixedAll negSecondAll
+  intro w hw h
+  have bad := List.all_eq_true.mp noInternal w hw
+  simp [h] at bad
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem rawNegCase7 : chk [(7,0)] (rawNegCofactors 7) 0 13 0 FF 1 = false := by
+  have noInternal : (rawNegWords 7).all (fun w => !Nat.beq w.r 0) = true := by decide +kernel
+  refine rawNeg_checked 7 2 49 63 rfl rfl ?_ rawNegStored7
+    (by decide) rawNegOpening7_complete negCoverAll negMixedAll negSecondAll
+  intro w hw h
+  have bad := List.all_eq_true.mp noInternal w hw
+  simp [h] at bad
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem rawNegCase1 : chk [(1,0)] (rawNegCofactors 1) 0 13 0 FF 1 = false := by
   rw [← chkFast_eq]
   decide +kernel
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_2_and : chkPairPicked [(2,0)] (unaryBoundsStrong unaryProofBounds 2) 0 13 0 FF 1 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_2_or : chkPairPicked [(2,0)] (unaryBoundsStrong unaryProofBounds 2) 0 13 0 FF 1 true = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-theorem caseUnary_2 : chk [(2,0)] (unaryBoundsStrong unaryProofBounds 2) 0 13 0 FF 1 = false := by
-  apply chkPair_picked
-  intro kind
-  cases kind
-  · exact caseUnary_2_and
-  · exact caseUnary_2_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_6 : chk [(6,0)] (unaryBoundsStrong unaryProofBounds 6) 0 13 0 FF 1 = false := by
+theorem rawNegCase6 : chk [(6,0)] (rawNegCofactors 6) 0 13 0 FF 1 = false := by
   rw [← chkFast_eq]
   decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move0 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move1 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move2 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move3 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move4 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move5 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move6 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_and_move7 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false 7 = false := by decide +kernel
-theorem caseUnary_7_and : chkPairPicked [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 false = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact caseUnary_7_and_move0
-  · exact caseUnary_7_and_move1
-  · exact caseUnary_7_and_move2
-  · exact caseUnary_7_and_move3
-  · exact caseUnary_7_and_move4
-  · exact caseUnary_7_and_move5
-  · exact caseUnary_7_and_move6
-  · exact caseUnary_7_and_move7
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move0 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move1 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move2 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move3 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move4 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move5 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move6 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseUnary_7_or_move7 : chkPairNext [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true 7 = false := by decide +kernel
-theorem caseUnary_7_or : chkPairPicked [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact caseUnary_7_or_move0
-  · exact caseUnary_7_or_move1
-  · exact caseUnary_7_or_move2
-  · exact caseUnary_7_or_move3
-  · exact caseUnary_7_or_move4
-  · exact caseUnary_7_or_move5
-  · exact caseUnary_7_or_move6
-  · exact caseUnary_7_or_move7
-theorem caseUnary_7 : chk [(7,0)] (unaryBoundsStrong unaryProofBounds 7) 0 13 0 FF 1 = false := by
-  apply chkPair_picked
-  intro kind
-  cases kind
-  · exact caseUnary_7_and
-  · exact caseUnary_7_or
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem unaryCertificates : UnaryCertificates :=
-  build_unary_strong_certificates unaryProofBounds_p unaryProofBounds_I iroot
+  build_unary_strong_certificates rootBounds_p rootBounds_I iroot
     (by decide +kernel) (by decide +kernel) (by decide +kernel)
     (by
       intro i hi
       simp only [unaryRepresentatives,List.mem_cons,List.not_mem_nil,or_false] at hi
       rcases hi with rfl | rfl | rfl | rfl | rfl
-      · exact caseUnary_0
-      · exact caseUnary_1
-      · exact caseUnary_2
-      · exact caseUnary_6
-      · exact caseUnary_7
+      · exact rawNegCase0
+      · exact rawNegCase1
+      · exact rawNegCase2
+      · exact rawNegCase6
+      · exact rawNegCase7
     )
 
 theorem onFinal : (∀ (gates : List PEqualNP.CircuitLowerBounds.Gate) (o : ℕ), (∀ g ∈ gates, (g.op = PEqualNP.CircuitLowerBounds.GateOp.and ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.or ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.not) ∧ g.inputs.length ≤ 2) → (∀ i j : Fin gates.length, (gates.get i).op = PEqualNP.CircuitLowerBounds.GateOp.not → (gates.get j).op = PEqualNP.CircuitLowerBounds.GateOp.not → i = j) → (∀ x : Fin 8 → Bool, PEqualNP.CircuitLowerBounds.Circuit.eval ⟨gates, o⟩ (List.ofFn x) = decide (∃ i < ([0, 3, 1, 4, 0, 5, 2, 5, 2, 6, 3, 6, 0, 7, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7] : List ℕ).length / 2, (List.ofFn x).getD (([0, 3, 1, 4, 0, 5, 2, 5, 2, 6, 3, 6, 0, 7, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7] : List ℕ).getD (2 * i) 0) false = true ∧ (List.ofFn x).getD (([0, 3, 1, 4, 0, 5, 2, 5, 2, 6, 3, 6, 0, 7, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7] : List ℕ).getD (2 * i + 1) 0) false = true)) → ∃ (gates' : List PEqualNP.CircuitLowerBounds.Gate) (o' : ℕ), (∀ g ∈ gates', (g.op = PEqualNP.CircuitLowerBounds.GateOp.and ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.or) ∧ g.inputs.length ≤ 2) ∧ gates'.length ≤ gates.length ∧ ∀ x : Fin 8 → Bool, PEqualNP.CircuitLowerBounds.Circuit.eval ⟨gates', o'⟩ (List.ofFn x) = decide (∃ i < ([0, 3, 1, 4, 0, 5, 2, 5, 2, 6, 3, 6, 0, 7, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7] : List ℕ).length / 2, (List.ofFn x).getD (([0, 3, 1, 4, 0, 5, 2, 5, 2, 6, 3, 6, 0, 7, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7] : List ℕ).getD (2 * i) 0) false = true ∧ (List.ofFn x).getD (([0, 3, 1, 4, 0, 5, 2, 5, 2, 6, 3, 6, 0, 7, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7] : List ℕ).getD (2 * i + 1) 0) false = true)) := by
