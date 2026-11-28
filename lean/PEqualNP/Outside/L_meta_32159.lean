@@ -1076,11 +1076,14 @@ def put (m s x y : Nat) (v : List W) (h : List W → Bool) : Bool :=
 def kids (c : ((List W → Bool) → Bool) → Nat → Bool) (e n z x y a c' : Nat) (oa oc : Bool) (mk : (List W → Bool) → Bool) : Bool :=
   (Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) (false) (c mk (Nat.sub (Nat.sub z x) y)) (Nat.ble (Nat.succ (Nat.succ n)) e))) (true) ((Bool.rec (motive := fun _ => Bool) (false) ((Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) (false) (c (fun h => mk (fun r => rm a a r h)) (Nat.sub z y)) (oa))) (true) ((Bool.rec (motive := fun _ => Bool) (false) (c (fun h => mk (fun r => rm c' c' r h)) (Nat.sub z x)) (oc))))) (Nat.ble (Nat.succ n) e))))) (true) ((Bool.rec (motive := fun _ => Bool) (false) ((Bool.rec (motive := fun _ => Bool) (false) (c (fun h => mk (fun r => rm a c' r h)) z) (oc))) (oa))))
 def mid (f : Nat → List W → Bool) (m g e n z : Nat) (v : List W) (a c : W) (da dc s x y : Nat) : Bool :=
-  (Bool.rec (motive := fun _ => Bool) (false) ((st (Nat.sub (Nat.add z (Nat.land a.c c.c)) (Nat.lor x y)) (fun z => kids (child f g) e n z a.c c.c a.s c.s (Nat.beq da 0) (Nat.beq dc 0) (put m s x y v)))) (Nat.beq (Nat.land (Nat.sub (Nat.add z (Nat.land a.c c.c)) (Nat.lor x y)) g) g))
+  st (Nat.sub (Nat.add z (Nat.land a.c c.c)) (Nat.lor x y)) fun remaining =>
+    Bool.rec (motive := fun _ => Bool) false
+      (kids (child f g) e n remaining a.c c.c a.s c.s (Nat.beq da 0) (Nat.beq dc 0) (put m s x y v))
+      (Nat.beq (Nat.land remaining g) g)
 def f0 (h : W → W → Nat → Nat → Nat → Nat → Nat → Bool) (a c : W) (da dc s x y : Nat) : Bool :=
   (Bool.rec (motive := fun _ => Bool) (false) (h a c da dc s x y) (Nat.beq (Nat.lor da dc) 0))
 def f1 (h : W → W → Nat → Nat → Nat → Nat → Nat → Bool) (a c : W) (da dc s x y : Nat) : Bool :=
-  (Bool.rec (motive := fun _ => Bool) (false) (h a c da dc s x y) (Nat.beq (Nat.mul da dc) 0))
+  (Bool.rec (motive := fun _ => Bool) (false) (h a c da dc s x y) (Bool.rec (motive := fun _ => Bool) (Nat.beq dc 0) true (Nat.beq da 0)))
 def f2 (h : W → W → Nat → Nat → Nat → Nat → Nat → Bool) (a c : W) (da dc s x y : Nat) : Bool := h a c da dc s x y
 def pair (h : W → W → Nat → Nat → Nat → Nat → Nat → Bool) (a c : XW) : Bool :=
   XW.rec (motive := fun _ => Bool) (fun a s q u => XW.rec (motive := fun _ => Bool) (fun c s' q' u' => (Bool.rec (motive := fun _ => Bool) (h a c (Nat.land u q') (Nat.land u' q) (Nat.lor s s') (Nat.land a.a c.a) (Nat.lor a.b c.b)) (true) (h a c (Nat.xor (Nat.land u s') u) (Nat.xor (Nat.land u' s) u') (Nat.land s s') (Nat.lor a.a c.a) (Nat.land a.b c.b)))) c) a
@@ -1832,9 +1835,10 @@ lemma modeF_false {n e : ℕ} {h : W → W → ℕ → ℕ → ℕ → ℕ → �
     cases b2 : Nat.ble (Nat.succ n) e with
     | false =>
       have := h1 (fun h => by rw [Nat.ble_eq_true_of_le h] at b2; simp at b2)
-      have h3 : Nat.beq (Nat.mul da dc) 0 = true := by
-        change Nat.beq (da * dc) 0 = true
-        rcases this with h | h <;> simp [h]
+      have h3 : Bool.rec (motive := fun _ => Bool) (Nat.beq dc 0) true (Nat.beq da 0) = true := by
+        rcases this with h | h
+        · simp [h]
+        · cases Nat.beq da 0 <;> simp [h]
       rw [b1, b2] at hf
       simp only [Bool.cond_true, Bool.cond_false, f1, h3] at hf
       exact hf
@@ -3902,16 +3906,104 @@ theorem fanInTwo_of {gates : List Gate} {o : ℕ}
   intro g hg; obtain ⟨ho, hl⟩ := h g hg
   exact ⟨by simpa only [Set.mem_insert_iff, Set.mem_singleton_iff] using ho, hl⟩
 
+def UniqueNot (gs : List Gate) : Prop :=
+  ∀ i j : Fin gs.length, (gs.get i).op = .not → (gs.get j).op = .not → i = j
+
+lemma UniqueNot.tail {g : Gate} {gs : List Gate} (h : UniqueNot (g :: gs)) : UniqueNot gs := by
+  intro i j hi hj
+  let i' : Fin (g :: gs).length := ⟨i.val + 1, Nat.succ_lt_succ i.isLt⟩
+  let j' : Fin (g :: gs).length := ⟨j.val + 1, Nat.succ_lt_succ j.isLt⟩
+  have he := congrArg Fin.val (h i' j' hi hj)
+  apply Fin.ext
+  dsimp [i', j'] at he
+  omega
+
+lemma UniqueNot.tail_of_head {g : Gate} {gs : List Gate} (h : UniqueNot (g :: gs)) (hg : g.op = .not) :
+    ∀ a ∈ gs, a.op ≠ .not := by
+  intro a ha hnot
+  obtain ⟨i, hi⟩ := List.mem_iff_get.mp ha
+  let j : Fin (g :: gs).length := ⟨i.val + 1, Nat.succ_lt_succ i.isLt⟩
+  let z : Fin (g :: gs).length := ⟨0, by simp⟩
+  have hj : ((g :: gs).get j).op = .not := by
+    change (gs.get i).op = .not
+    rw [hi, hnot]
+  have he := congrArg Fin.val (h z j hg hj)
+  dsimp [z, j] at he
+  omega
+
+lemma Live.add_binary {m T k t : ℕ} {S : Set ℕ} {S1 : Finset ℕ} {d : Bool} {a b : ℕ}
+    (hl : Live Z0 m T k t S1) (hs : (S1 : Set ℕ) ⊆ insert (op d a b) S) (ha : a ∈ S) (hb : b ∈ S) :
+    ∃ k' ≤ k + 1, ∃ S' : Finset ℕ, (S' : Set ℕ) ⊆ S ∧ Live Z0 m T k' t S' := by
+  by_cases hg : op d a b ∈ S1
+  · by_cases hab : a = b
+    · subst hab
+      rw [op_self] at hs
+      exact ⟨k, by omega, S1, fun x hx => (hs hx).elim (fun e => e ▸ ha) id, hl⟩
+    · refine ⟨k + 1, le_rfl, insert a (insert b (S1.erase (op d a b))), ?_,
+        .bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hg])⟩
+      intro x hx
+      simp at hx
+      rcases hx with rfl | rfl | ⟨h1, h2⟩
+      · exact ha
+      · exact hb
+      · exact (hs h1).resolve_left h2
+  · exact ⟨k, by omega, S1, fun x hx => (hs hx).resolve_left (fun e => hg (e ▸ hx)), hl⟩
+
+lemma ex_mono_live {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (S : Set ℕ),
+    (∀ x ∈ w, x ∈ S) → 0 ∈ S → m ∈ S →
+    (∀ g ∈ gs, g.op = .and ∨ g.op = .or) →
+    (∃ i, (ex m gs w).getD i 0 = T) →
+    ∃ k ≤ gs.length, ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T k 0 S0 := by
+  induction gs with
+  | nil =>
+    rintro w S hw h0 _ _ ⟨i, rfl⟩
+    exact ⟨0, by simp, _, by simpa [ex] using getD_mem hw h0 i, .stop⟩
+  | cons g gs ih =>
+    intro w S hw h0 hm hg hT
+    have hgs := fun x hx => hg x (List.mem_cons_of_mem _ hx)
+    have rd := fun i => getD_mem hw h0 i
+    have stay : gv m w g ∈ S → ∃ k ≤ (g :: gs).length, ∃ S0 : Finset ℕ,
+        (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T k 0 S0 := by
+      intro h
+      obtain ⟨k, hk, S0, hS0, hl⟩ := ih (w ++ [gv m w g]) S (fun x hx => by
+        simp only [List.mem_append, List.mem_singleton] at hx
+        rcases hx with hx | rfl
+        · exact hw x hx
+        · exact h) h0 hm hgs hT
+      exact ⟨k, by simp; omega, S0, hS0, hl⟩
+    have go := ih (w ++ [gv m w g]) (insert (gv m w g) S) (fun x hx => by
+        simp only [List.mem_append, List.mem_singleton] at hx
+        rcases hx with hx | rfl
+        · exact Or.inr (hw x hx)
+        · exact Or.inl rfl) (Or.inr h0) (Or.inr hm) hgs hT
+    have hop := hg g List.mem_cons_self
+    obtain ⟨o, l⟩ := g
+    rcases hop with rfl | rfl
+    · match l with
+      | [] => exact stay hm
+      | [i] => exact stay (rd i)
+      | i :: j :: _ =>
+        obtain ⟨k, hk, S0, hS0, hl⟩ := go
+        obtain ⟨k', hk', S', hS', hl'⟩ := Live.add_binary (d := false) hl hS0 (rd i) (rd j)
+        exact ⟨k', by simp; omega, S', hS', hl'⟩
+    · match l with
+      | [] => exact stay h0
+      | [i] => exact stay (rd i)
+      | i :: j :: _ =>
+        obtain ⟨k, hk, S0, hS0, hl⟩ := go
+        obtain ⟨k', hk', S', hS', hl'⟩ := Live.add_binary (d := true) hl hS0 (rd i) (rd j)
+        exact ⟨k', by simp; omega, S', hS', hl'⟩
+
 lemma ex_sol_not {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (S : Set ℕ),
     (∀ x ∈ w, x ∈ S) → 0 ∈ S → m ∈ S →
     (∀ g ∈ gs, g.op ∈ ({GateOp.and, GateOp.or, GateOp.not} : Set GateOp) ∧ g.inputs.length ≤ 2) →
-    (∃ g ∈ gs, g.op = GateOp.not) →
+    UniqueNot gs → (∃ g ∈ gs, g.op = GateOp.not) →
     (∃ i, (ex m gs w).getD i 0 = T) →
-    Sol Z0 m T (gs.length - 1) S ∨ ∃ t, 1 ≤ t ∧ ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T gs.length t S0 := by
+    Sol Z0 m T (gs.length - 1) S ∨ ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T gs.length 1 S0 := by
   induction gs with
-  | nil => intro _ _ _ _ _ _ hnot; simp at hnot
+  | nil => intro _ _ _ _ _ _ _ hnot; simp at hnot
   | cons g gs ih =>
-    intro w S hw h0 hm hg hnot hT
+    intro w S hw h0 hm hg huniq hnot hT
     have hgs := fun x hx => hg x (List.mem_cons_of_mem _ hx)
     have rd := fun i => getD_mem hw h0 i
     have hwm_stay : gv m w g ∈ S → ∀ x ∈ w ++ [gv m w g], x ∈ S := fun h x hx => by
@@ -3928,13 +4020,13 @@ lemma ex_sol_not {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (S : 
       | [] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.and, []⟩]) S (hwm_stay hm) h0 hm hgs hT)
       | [i] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.and, [i]⟩]) S (hwm_stay (rd i)) h0 hm hgs hT)
       | i :: j :: _ =>
-        rcases ih (w ++ [gv m w ⟨.and, i :: j :: _⟩]) (insert (op false (w.getD i 0) (w.getD j 0)) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs hnot' hT with hs | ⟨t, ht, S1, hS1, hl1⟩
+        rcases ih (w ++ [gv m w ⟨.and, i :: j :: _⟩]) (insert (op false (w.getD i 0) (w.getD j 0)) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs huniq.tail hnot' hT with hs | ⟨S1, hS1, hl1⟩
         · exact Or.inl ((Sol.bi (d := false) (rd i) (rd j) (al0 _ _ _) hs).mono (by cases gs <;> simp at hnot' ⊢) subset_rfl)
         · by_cases hz : op false (w.getD i 0) (w.getD j 0) ∈ S1
           · by_cases hab : w.getD i 0 = w.getD j 0
             · have hsub : (S1 : Set ℕ) ⊆ S := fun x hx => (hS1 hx).elim (fun e => by subst e; rw [hab, op_self]; exact rd j) id
               exact Or.inl (hl1.sol.mono le_rfl hsub)
-            · refine Or.inr ⟨t, ht, insert (w.getD i 0) (insert (w.getD j 0) (S1.erase (op false (w.getD i 0) (w.getD j 0)))), ?_, Live.bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hz])⟩
+            · refine Or.inr ⟨insert (w.getD i 0) (insert (w.getD j 0) (S1.erase (op false (w.getD i 0) (w.getD j 0)))), ?_, Live.bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hz])⟩
               intro x hx; simp at hx; rcases hx with rfl | rfl | ⟨h1, h2⟩; exact rd i; exact rd j; exact (hS1 h1).resolve_left h2
           · exact Or.inl (hl1.sol.mono le_rfl (fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx))))
     · have hnot' : ∃ g' ∈ gs, g'.op = GateOp.not := by
@@ -3943,26 +4035,36 @@ lemma ex_sol_not {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (S : 
       | [] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.or, []⟩]) S (hwm_stay h0) h0 hm hgs hT)
       | [i] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.or, [i]⟩]) S (hwm_stay (rd i)) h0 hm hgs hT)
       | i :: j :: _ =>
-        rcases ih (w ++ [gv m w ⟨.or, i :: j :: _⟩]) (insert (op true (w.getD i 0) (w.getD j 0)) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs hnot' hT with hs | ⟨t, ht, S1, hS1, hl1⟩
+        rcases ih (w ++ [gv m w ⟨.or, i :: j :: _⟩]) (insert (op true (w.getD i 0) (w.getD j 0)) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs huniq.tail hnot' hT with hs | ⟨S1, hS1, hl1⟩
         · exact Or.inl ((Sol.bi (d := true) (rd i) (rd j) (al0 _ _ _) hs).mono (by cases gs <;> simp at hnot' ⊢) subset_rfl)
         · by_cases hz : op true (w.getD i 0) (w.getD j 0) ∈ S1
           · by_cases hab : w.getD i 0 = w.getD j 0
             · have hsub : (S1 : Set ℕ) ⊆ S := fun x hx => (hS1 hx).elim (fun e => by subst e; rw [hab, op_self]; exact rd j) id
               exact Or.inl (hl1.sol.mono le_rfl hsub)
-            · refine Or.inr ⟨t, ht, insert (w.getD i 0) (insert (w.getD j 0) (S1.erase (op true (w.getD i 0) (w.getD j 0)))), ?_, Live.bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hz])⟩
+            · refine Or.inr ⟨insert (w.getD i 0) (insert (w.getD j 0) (S1.erase (op true (w.getD i 0) (w.getD j 0)))), ?_, Live.bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hz])⟩
               intro x hx; simp at hx; rcases hx with rfl | rfl | ⟨h1, h2⟩; exact rd i; exact rd j; exact (hS1 h1).resolve_left h2
           · exact Or.inl (hl1.sol.mono le_rfl (fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx))))
     · match l with
       | [] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.not, []⟩]) S (hwm_stay hm) h0 hm hgs hT)
       | i :: _ =>
-        have go := ex_sol m gs (w ++ [gv m w ⟨.not, i :: _⟩]) (insert (w.getD i 0 ^^^ m) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs hT
-        obtain ⟨k, hk, t, S1, hS1, hl1⟩ := go.live
+        have hgsMono : ∀ g ∈ gs, g.op = .and ∨ g.op = .or := by
+          intro g hg
+          have hne := huniq.tail_of_head (by rfl) g hg
+          have ho := (hgs g hg).1
+          simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at ho
+          rcases ho with h | h | h
+          · exact Or.inl h
+          · exact Or.inr h
+          · exact (hne h).elim
+        obtain ⟨k, hk, S1, hS1, hl1⟩ := ex_mono_live m gs
+          (w ++ [gv m w ⟨.not, i :: _⟩]) (insert (w.getD i 0 ^^^ m) S)
+          hwm_ins (Or.inr h0) (Or.inr hm) hgsMono hT
         by_cases hz : w.getD i 0 ^^^ m ∈ S1
         · have hsub : ((insert (w.getD i 0) (S1.erase (w.getD i 0 ^^^ m)) : Finset ℕ) : Set ℕ) ⊆ S := by
             intro x hx; simp at hx; rcases hx with rfl | ⟨h1, h2⟩; exact rd i; exact (hS1 h1).resolve_left h2
-          have hlu : Live Z0 m T (k + 1) (t + 1) (insert (w.getD i 0) (S1.erase (w.getD i 0 ^^^ m))) := Live.un (by rwa [Finset.insert_erase hz])
+          have hlu : Live Z0 m T (k + 1) 1 (insert (w.getD i 0) (S1.erase (w.getD i 0 ^^^ m))) := Live.un (by rwa [Finset.insert_erase hz])
           by_cases hkeq : k = gs.length
-          · subst hkeq; exact Or.inr ⟨t + 1, by omega, _, hsub, hlu⟩
+          · subst hkeq; exact Or.inr ⟨_, hsub, hlu⟩
           · exact Or.inl (hlu.sol.mono (by simp; omega) hsub)
         · exact Or.inl (hl1.sol.mono (by simp; omega) (fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx))))
 
@@ -4683,7 +4785,7 @@ lemma mode_distribute {f : ℕ → List W → Bool} {g : Fin 8 → ℕ → List 
   · simp only [hn,Bool.cond_true]
     cases hs : Nat.ble n.succ e
     · simp only [hs,Bool.cond_false,f1,bR]
-      cases ha : Nat.beq (Nat.mul da dc) 0
+      cases ha : (bif Nat.beq da 0 then true else Nat.beq dc 0)
       · simp [ha]
       · simpa only [ha,Bool.cond_true] using mid'
     · simpa only [hs,Bool.cond_true,f2] using mid'
@@ -4974,7 +5076,7 @@ lemma v1 : pin1.all (fun e => okE [] (pr pv2 e.1) e) = true := by decide +kernel
 lemma h1 : ∀ e ∈ pin1, Imp [] e.1 e.2 := okAll (T := pv2) v1 hv2
 def pv1 : List (ℕ × ℕ) := pv2 ++ pin1
 lemma hv1 : ∀ e ∈ pv1, Imp [] e.1 e.2 := apI hv2 h1
-def rootBounds : List (ℕ × ℕ) := pv1.filter (fun p => p.2 ≥ 7)
+def rootBounds : List (ℕ × ℕ) := pv1.filter (fun p => p.2 ≥ 5)
 lemma rootBounds_sound : ∀ p ∈ rootBounds, Imp [] p.1 p.2 := fun p h => hv1 p (List.mem_of_mem_filter h)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
@@ -5084,10 +5186,10 @@ theorem bridge (D : PEqualNP.CircuitLowerBounds.Circuit) (hD : PEqualNP.MetaComp
       change (gates.foldl (fun w g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]) (List.ofFn (row k))).getD out false = f (row k) at h
       rw [h]; exact (f_bit k).symm
   exact ex_sol (mz 0) gates init (C (mz 0) (WZ [] 0)) hinit_mem (Or.inr (Set.mem_insert _ _)) (Or.inr (Set.mem_insert_of_mem _ rfl)) hD ⟨out, hout⟩
-theorem bridge_not (gates : List Gate) (o : ℕ) (hD : FanInTwo ⟨gates, o⟩) (hnot : ∃ g ∈ gates, g.op = GateOp.not)
+theorem bridge_not (gates : List Gate) (o : ℕ) (hD : FanInTwo ⟨gates, o⟩) (hu : UniqueNot gates) (hnot : ∃ g ∈ gates, g.op = GateOp.not)
     (hf : ∀ y : Fin 8 → Bool, Circuit.eval ⟨gates, o⟩ (List.ofFn y) = f y) :
     Sol Z0 (mz 0) (tz 0) (gates.length - 1) (C (mz 0) (WZ [] 0)) ∨
-    ∃ t, 1 ≤ t ∧ ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ C (mz 0) (WZ [] 0) ∧ Live Z0 (mz 0) (tz 0) gates.length t S0 := by
+    ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ C (mz 0) (WZ [] 0) ∧ Live Z0 (mz 0) (tz 0) gates.length 1 S0 := by
   let row : ℕ → Fin 8 → Bool := fun k v => (rawP0.getD v.val 0).testBit k
   let init : List ℕ := rawP0.map (· &&& mz 0)
   have hinit_sub : ∀ x ∈ init, x &&& mz 0 = x := by intro x hx; simp only [init, List.mem_map] at hx; obtain ⟨w, _, rfl⟩ := hx; rw [Nat.and_assoc, Nat.and_self]
@@ -5107,7 +5209,7 @@ theorem bridge_not (gates : List Gate) (o : ℕ) (hD : FanInTwo ⟨gates, o⟩) 
       have h := hf (row k)
       change (gates.foldl (fun w g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]) (List.ofFn (row k))).getD o false = f (row k) at h
       rw [h]; exact (f_bit k).symm
-  exact ex_sol_not (mz 0) gates init (C (mz 0) (WZ [] 0)) hinit_mem (Or.inr (Set.mem_insert _ _)) (Or.inr (Set.mem_insert_of_mem _ rfl)) hD hnot ⟨o, hout⟩
+  exact ex_sol_not (mz 0) gates init (C (mz 0) (WZ [] 0)) hinit_mem (Or.inr (Set.mem_insert _ _)) (Or.inr (Set.mem_insert_of_mem _ rfl)) hD hu hnot ⟨o, hout⟩
 def rootCases : List (ℕ × ℕ) := [(0x2, 0), (0x10, 0), (0x2000, 0), (0x4000, 0), (0x100000, 0), (0x4000000, 0), (0x20000000, 0), (0x2000000000, 0), (0x40000000000, 0), (0x400000000000, 0), (0x4000000000000, 0), (0x800000000000000, 0), (0x40000000000000000, 0), (0x40000000000000000000, 0), (0x800000000000000000000, 0), (0x800000000000000000000000, 0), (0x1000000000000000000000000000, 0), (0x8000000000000000000000000000, 0), (0x200000000000000000000000000000, 0), (0x400000000000000000000000000000000, 0), (0x400000000000000000000000000000000000000, 0), (0x400000000000000000000000000000000000000000, 0), (0x2000000000000000000000000000000000000000000, 0), (0x4000000000000000000000000000000000000000000000, 0), (0x800000000000000000000000000000000000000000000000, 0), (0x80000000000000000000000000000000000000000000000000, 0), (0x4000000000000000000000000000000000000000000000000000, 0), (0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed, 1)]
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
@@ -6452,246 +6554,6 @@ lemma certify_1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk
   · exact rt1_27
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-lemma rt2_0 : chk [] rootBounds 0 14 2 0x2 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_1 : chk [] rootBounds 0 14 2 0x10 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_2 : chk [] rootBounds 0 14 2 0x2000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_3 : chk [] rootBounds 0 14 2 0x4000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_4 : chk [] rootBounds 0 14 2 0x100000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_5 : chk [] rootBounds 0 14 2 0x4000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_6 : chk [] rootBounds 0 14 2 0x20000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_7 : chk [] rootBounds 0 14 2 0x2000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_8 : chk [] rootBounds 0 14 2 0x40000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_9 : chk [] rootBounds 0 14 2 0x400000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_10 : chk [] rootBounds 0 14 2 0x4000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_11 : chk [] rootBounds 0 14 2 0x800000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_12 : chk [] rootBounds 0 14 2 0x40000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_13 : chk [] rootBounds 0 14 2 0x40000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_14 : chk [] rootBounds 0 14 2 0x800000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_15 : chk [] rootBounds 0 14 2 0x800000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_16 : chk [] rootBounds 0 14 2 0x1000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_17 : chk [] rootBounds 0 14 2 0x8000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_18 : chk [] rootBounds 0 14 2 0x200000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_19 : chk [] rootBounds 0 14 2 0x400000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_20 : chk [] rootBounds 0 14 2 0x400000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_21 : chk [] rootBounds 0 14 2 0x400000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_22 : chk [] rootBounds 0 14 2 0x2000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_23 : chk [] rootBounds 0 14 2 0x4000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_24 : chk [] rootBounds 0 14 2 0x800000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_25 : chk [] rootBounds 0 14 2 0x80000000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_26 : chk [] rootBounds 0 14 2 0x4000000000000000000000000000000000000000000000000000 0 = false := by
-  rw [← chkFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_27_0 : chkPicked [] rootBounds 0 14 2 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_27_1 : chkPicked [] rootBounds 0 14 2 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_27_2 : chkPicked [] rootBounds 0 14 2 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_27_3 : chkPicked [] rootBounds 0 14 2 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_27_4 : chkPicked [] rootBounds 0 14 2 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_27_5 : chkPicked [] rootBounds 0 14 2 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_27_6 : chkPicked [] rootBounds 0 14 2 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt2_27_7 : chkPicked [] rootBounds 0 14 2 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 7 = false := by decide +kernel
-lemma rt2_27 : chk [] rootBounds 0 14 2 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 = false := by
-  apply chk_picked
-  intro b
-  fin_cases b
-  · exact rt2_27_0
-  · exact rt2_27_1
-  · exact rt2_27_2
-  · exact rt2_27_3
-  · exact rt2_27_4
-  · exact rt2_27_5
-  · exact rt2_27_6
-  · exact rt2_27_7
-lemma certify_2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rootBounds 0 14 2 p.1 p.2 = false := by
-  refine ⟨rootCases, rootCases_full, ?_⟩
-  intro p hp
-  simp only [rootCases, List.mem_cons, List.not_mem_nil, or_false] at hp
-  rcases hp with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact rt2_0
-  · exact rt2_1
-  · exact rt2_2
-  · exact rt2_3
-  · exact rt2_4
-  · exact rt2_5
-  · exact rt2_6
-  · exact rt2_7
-  · exact rt2_8
-  · exact rt2_9
-  · exact rt2_10
-  · exact rt2_11
-  · exact rt2_12
-  · exact rt2_13
-  · exact rt2_14
-  · exact rt2_15
-  · exact rt2_16
-  · exact rt2_17
-  · exact rt2_18
-  · exact rt2_19
-  · exact rt2_20
-  · exact rt2_21
-  · exact rt2_22
-  · exact rt2_23
-  · exact rt2_24
-  · exact rt2_25
-  · exact rt2_26
-  · exact rt2_27
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma root_3 : chk [] rootBounds 0 14 3 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma root_4 : chk [] rootBounds 0 14 4 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma root_5 : chk [] rootBounds 0 14 5 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma root_6 : chk [] rootBounds 0 14 6 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma root_7 : chk [] rootBounds 0 14 7 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma root_8 : chk [] rootBounds 0 14 8 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma root_9 : chk [] rootBounds 0 14 9 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma root_10 : chk [] rootBounds 0 14 10 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma root_11 : chk [] rootBounds 0 14 11 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma root_12 : chk [] rootBounds 0 14 12 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma root_13 : chk [] rootBounds 0 14 13 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma root_14 : chk [] rootBounds 0 14 14 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
 lemma small_0 : chk [] rootBounds 0 13 0 FF 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
@@ -6750,34 +6612,14 @@ lemma lower14 : Imp [] 0 14 := imp_ts (Or.inl rfl) root_p (by norm_num) rootBoun
   · exact one small_13
 )
 
-lemma needs15 {t : ℕ} {S : Finset ℕ} (ht : 1 ≤ t) (hS : (S : Set ℕ) ⊆ C (mz 0) (WZ [] 0))
-    (hl : Live Z0 (mz 0) (tz 0) 14 t S) : False := by
+lemma needs15 {S : Finset ℕ} (hS : (S : Set ℕ) ⊆ C (mz 0) (WZ [] 0))
+    (hl : Live Z0 (mz 0) (tz 0) 14 1 S) : False := by
   have hmin : ∀ q < 14, ¬ Sol Z0 (mz 0) (tz 0) q (C (mz 0) (WZ [] 0)) := fun q hq => lower14 q hq
-  have hm : Min Z0 (mz 0) (tz 0) 14 t S := ⟨hl, fun q hq hs => hmin q hq (hs.mono le_rfl (by
-    rintro x (hx | hx)
-    · exact hS hx
-    · exact Or.inr hx))⟩
-  have htk : t < 15 := by have := hm.size.2; omega
-  have hM : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rootBounds 0 14 t p.1 p.2 = false := by
-    interval_cases t
-    · exact certify_1
-    · exact certify_2
-    · exact one root_3
-    · exact one root_4
-    · exact one root_5
-    · exact one root_6
-    · exact one root_7
-    · exact one root_8
-    · exact one root_9
-    · exact one root_10
-    · exact one root_11
-    · exact one root_12
-    · exact one root_13
-    · exact one root_14
-  exact imp_of_live (L := 15) (Or.inl rfl) root_p (by norm_num) rootBounds_sound (by omega) hS hl hmin (Or.inr hM)
+  exact imp_of_live (L := 15) (Or.inl rfl) root_p (by norm_num) rootBounds_sound
+    (by norm_num) hS hl hmin (Or.inr certify_1)
 
 lemma onFinal : (∀ (gates : List PEqualNP.CircuitLowerBounds.Gate) (o : ℕ), (∀ g ∈ gates, (g.op = PEqualNP.CircuitLowerBounds.GateOp.and ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.or ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.not) ∧ g.inputs.length ≤ 2) → (∀ i j : Fin gates.length, (gates.get i).op = PEqualNP.CircuitLowerBounds.GateOp.not → (gates.get j).op = PEqualNP.CircuitLowerBounds.GateOp.not → i = j) → (∀ x : Fin 8 → Bool, PEqualNP.CircuitLowerBounds.Circuit.eval ⟨gates, o⟩ (List.ofFn x) = decide (∃ i < ([0, 3, 1, 4, 0, 5, 1, 5, 3, 5, 0, 6, 1, 6, 2, 6, 4, 6, 0, 7, 2, 7, 3, 7, 5, 7] : List ℕ).length / 2, (List.ofFn x).getD (([0, 3, 1, 4, 0, 5, 1, 5, 3, 5, 0, 6, 1, 6, 2, 6, 4, 6, 0, 7, 2, 7, 3, 7, 5, 7] : List ℕ).getD (2 * i) 0) false = true ∧ (List.ofFn x).getD (([0, 3, 1, 4, 0, 5, 1, 5, 3, 5, 0, 6, 1, 6, 2, 6, 4, 6, 0, 7, 2, 7, 3, 7, 5, 7] : List ℕ).getD (2 * i + 1) 0) false = true)) → ∃ (gates' : List PEqualNP.CircuitLowerBounds.Gate) (o' : ℕ), (∀ g ∈ gates', (g.op = PEqualNP.CircuitLowerBounds.GateOp.and ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.or) ∧ g.inputs.length ≤ 2) ∧ gates'.length ≤ gates.length ∧ ∀ x : Fin 8 → Bool, PEqualNP.CircuitLowerBounds.Circuit.eval ⟨gates', o'⟩ (List.ofFn x) = decide (∃ i < ([0, 3, 1, 4, 0, 5, 1, 5, 3, 5, 0, 6, 1, 6, 2, 6, 4, 6, 0, 7, 2, 7, 3, 7, 5, 7] : List ℕ).length / 2, (List.ofFn x).getD (([0, 3, 1, 4, 0, 5, 1, 5, 3, 5, 0, 6, 1, 6, 2, 6, 4, 6, 0, 7, 2, 7, 3, 7, 5, 7] : List ℕ).getD (2 * i) 0) false = true ∧ (List.ofFn x).getD (([0, 3, 1, 4, 0, 5, 1, 5, 3, 5, 0, 6, 1, 6, 2, 6, 4, 6, 0, 7, 2, 7, 3, 7, 5, 7] : List ℕ).getD (2 * i + 1) 0) false = true)) := by
-  intro gates o hfit _hone hev
+  intro gates o hfit hone hev
   by_cases hnot : ∃ g ∈ gates, g.op = GateOp.not
   · have hge : 15 ≤ gates.length := by
       by_contra! hlt
@@ -6786,10 +6628,10 @@ lemma onFinal : (∀ (gates : List PEqualNP.CircuitLowerBounds.Gate) (o : ℕ), 
       by_cases hsmall : gates.length < 14
       · exact lower14 gates.length hsmall (bridge ⟨gates, o⟩ (fanInTwo_of hfit) hf)
       · have hsize : gates.length = 14 := by omega
-        rcases bridge_not gates o (fanInTwo_of hfit) hnot hf with hsol | ⟨t, ht, S, hS, hl⟩
+        rcases bridge_not gates o (fanInTwo_of hfit) hone hnot hf with hsol | ⟨S, hS, hl⟩
         · exact lower14 (gates.length - 1) (by omega) hsol
         · rw [hsize] at hl
-          exact needs15 ht hS hl
+          exact needs15 hS hl
     exact ⟨witness.gates, witness.output, witness_basis, by rw [witness_size]; omega, witness_eval⟩
   · refine ⟨gates, o, ?_, le_rfl, hev⟩
     intro g hg
