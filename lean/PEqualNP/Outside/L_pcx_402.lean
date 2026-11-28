@@ -144,7 +144,7 @@ theorem permCount : PermCountStmt := by
     intro a b hab
     exact Subtype.ext (σ.injective hab)
   
-  have ht : #t ≤ Y.card.descFactorial T.card := by
+  have ht : t.card ≤ Y.card.descFactorial T.card := by
     have hinj : Function.Injective
         (fun g : t => (⟨fun x => ⟨g.1 x, ((mem_filter.mp g.2).2.2 x)⟩,
           fun a b hab => (mem_filter.mp g.2).2.1 (congrArg Subtype.val hab)⟩ : T ↪ Y)) := by
@@ -156,7 +156,7 @@ theorem permCount : PermCountStmt := by
     rw [Fintype.card_embedding_eq] at this
     simpa using this
   
-  have hfib : ∀ g ∈ t, #{σ ∈ S | f σ = g} ≤ (Fintype.card α - T.card).factorial := by
+  have hfib : ∀ g ∈ t, Finset.card {σ ∈ S | f σ = g} ≤ (Fintype.card α - T.card).factorial := by
     intro g _
     rcases Finset.eq_empty_or_nonempty {σ ∈ S | f σ = g} with h | ⟨σ₀, hσ₀⟩
     · rw [h]; simp
@@ -185,7 +185,7 @@ theorem permCount : PermCountStmt := by
     rw [hcardP, Fintype.card_coe] at this
     exact this
   have := Finset.card_le_mul_card_image_of_maps_to hmaps _ hfib
-  calc #S ≤ (Fintype.card α - T.card).factorial * #t := this
+  calc S.card ≤ (Fintype.card α - T.card).factorial * t.card := this
     _ ≤ (Fintype.card α - T.card).factorial * Y.card.descFactorial T.card :=
         Nat.mul_le_mul_left _ ht
     _ = _ := Nat.mul_comm _ _
