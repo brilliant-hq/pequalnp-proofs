@@ -7397,6 +7397,139 @@ lemma chkPair_next (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (kind : Bool)
   exact Bool.noConfusion ((checked b).symm.trans hb)
 
 
+lemma pair_distribute {f : W → W → ℕ → ℕ → ℕ → ℕ → ℕ → Bool}
+    {g : Fin 8 → W → W → ℕ → ℕ → ℕ → ℕ → ℕ → Bool}
+    (h : ∀ a c da dc s x y, f a c da dc s x y = true → ∃ b, g b a c da dc s x y = true)
+    (a c : XW) : pair f a c = true → ∃ b, pair (g b) a c = true := by
+  obtain ⟨w,s,q,u⟩ := a
+  obtain ⟨w',s',q',u'⟩ := c
+  simp only [pair,bR]
+  cases hb : f w w' (Nat.xor (Nat.land u s') u) (Nat.xor (Nat.land u' s) u')
+      (Nat.land s s') (Nat.lor w.a w'.a) (Nat.land w.b w'.b)
+  · simp only [hb,Bool.cond_false]
+    intro hor
+    obtain ⟨b,hb⟩ := h _ _ _ _ _ _ _ hor
+    refine ⟨b, ?_⟩
+    rw [hb]
+    simp
+  · intro _
+    obtain ⟨b,hb⟩ := h _ _ _ _ _ _ _ hb
+    exact ⟨b,by rw [hb]; rfl⟩
+
+
+lemma nodeNextS_distribute {f : ℕ → List W → Bool} {branches : Fin 8 → ℕ → List W → Bool}
+    (nn : ℕ) (d : Bool) (l m g e n z : ℕ) (v : List W) (bin : ℕ)
+    (h : ∀ j, picked (f j) (fun b => branches b j)) :
+    nodeC nn f d l m g e n z v (nextPairS bin) = true →
+      ∃ b, nodeC nn (branches b) d l m g e n z v (nextPairS bin) = true := by
+  simp only [nodeC_as_mode, nextPairS, pairsS]
+  apply pairs_distribute
+  intro a c hit
+  unfold nextPairPred at hit ⊢
+  simp only [bR] at hit ⊢
+  cases he : Nat.beq (((a.s + c.s) % MM) % 8) bin
+  · simp [he] at hit
+  · simp only [he, Bool.cond_true] at hit ⊢
+    exact pair_distribute (fun _ _ _ _ _ _ _ =>
+      mode_distribute m g e n z v _ _ _ _ _ _ _ h) a c hit
+
+noncomputable def look1Nested (nn aa hx hy l m g K : ℕ) (bin inner : ℕ) :
+    ℕ → ℕ → ℕ → ℕ → List W → Bool
+  | 0, _, _, _, _ => Nat.beq inner 0 && Nat.beq bin 0
+  | fuel + 1, k, t, z, v =>
+    Bool.rec (motive := fun _ => Bool) (tstC nn aa hx hy (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
+      Bool.rec (motive := fun _ => Bool)
+        (Bool.rec (motive := fun _ => Bool) false
+          (mvNext nn aa hx hy bin (lookC nn aa hx hy l m g K) l m g k t z v y) (Nat.beq inner 0)) true
+        (nodeC nn (look1Next nn aa hx hy l m g K inner fuel (Nat.sub k 1) t)
+          (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v (nextPairS bin))))
+        (Nat.beq inner 0 && Nat.beq bin 0) (Nat.ble v.length 1)
+
+lemma look1Nested_picked (nn aa hx hy l m g K bin fuel k t : ℕ) :
+    ∀ z, picked (look1Next nn aa hx hy l m g K bin fuel k t z)
+      (fun b => look1Nested nn aa hx hy l m g K bin b fuel k t z) := by
+  intro z v
+  cases fuel with
+  | zero => exact fun h => ⟨0, h⟩
+  | succ fuel =>
+    simp only [look1Next, look1Nested, bR]
+    cases hsize : Nat.ble v.length 1
+    · simp only [Bool.cond_false]
+      apply tst_picked
+      intro y h
+      cases hn : nodeC nn (look1C nn aa hx hy l m g K fuel (Nat.sub k 1) t)
+          (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v (nextPairS bin)
+      · simp only [hn, Bool.cond_false] at h
+        refine ⟨0, ?_⟩
+        simp only [show ((0 : Fin 8) : ℕ) = 0 from rfl, Nat.beq_refl, Bool.cond_true, h, Bool.cond_self]
+      · obtain ⟨b, hb⟩ := nodeNextS_distribute nn (pos t) l m g (Nat.sub (Nat.sub k t) y)
+          v.length z v bin (look1Next_picked nn aa hx hy l m g K fuel (Nat.sub k 1) t) hn
+        exact ⟨b, by simp only [hb, Bool.cond_true]⟩
+    · exact fun h => ⟨0, h⟩
+
+noncomputable def topPairNested (NN AA HX HY l m g K H ph k t z : ℕ)
+    (v : List W) (kind : Bool) (bin inner : ℕ) : Bool :=
+  Bool.rec (motive := fun _ => Bool) (tstC NN AA HX HY (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
+    Bool.rec (motive := fun _ => Bool)
+      (Bool.rec (motive := fun _ => Bool) false
+        (mvC NN AA HX HY (lookC NN AA HX HY l m g K) l m g k t z v y) (Nat.beq ph 1)) true
+      (nodePicked NN (look1Nested NN AA HX HY l m g K bin inner K (Nat.sub k 1) t) (pos t) l m g (Nat.sub (Nat.sub k t) y)
+        v.length z v H kind))) true (Nat.ble v.length 1)
+
+lemma topPairNested_picked (nn aa hx hy l m g K H ph k t z : ℕ) (v : List W) (kind : Bool) (bin : ℕ) :
+    topPairNext nn aa hx hy l m g K H ph k t z v kind bin = true →
+      ∃ b : Fin 8, topPairNested nn aa hx hy l m g K H ph k t z v kind bin b = true := by
+  simp only [topPairNext, topPairNested, bR]
+  cases ht : Nat.ble v.length 1
+  · simp only [ht, Bool.cond_false]
+    apply tst_picked
+    intro y h
+    dsimp only at h ⊢
+    cases hx' : nodePicked nn (look1Next nn aa hx hy l m g K bin K (Nat.sub k 1) t) (pos t) l m g
+        (Nat.sub (Nat.sub k t) y) v.length z v H kind
+    · simp only [hx', Bool.cond_false] at h
+      refine ⟨0, ?_⟩
+      simp only [h, Bool.cond_self]
+    · obtain ⟨b,hb⟩ := nodePicked_distribute nn (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v H kind
+        (look1Nested_picked nn aa hx hy l m g K bin K (Nat.sub k 1) t) hx'
+      exact ⟨b, by simp only [hb, Bool.cond_true]⟩
+  · simp only [ht, Bool.cond_true]
+    exact fun _ => ⟨0,by simp⟩
+
+noncomputable def startPairNested (NN AA HX HY l m g B K t p H ph : ℕ) (v : List W) (kind : Bool) (bin inner : ℕ) : Bool :=
+  Bool.rec (motive := fun _ => Bool) false (Bool.rec (motive := fun _ => Bool) false
+    (child (fun z r => topPairNested NN AA HX HY l m g K H ph K t z r kind bin inner) g (fun h => h v) (Nat.sub B (sumc v)))
+    (Nat.ble v.length (Nat.sub (Nat.succ K) t))) (hasP p v)
+
+lemma startPairNested_picked (nn aa hx hy l m g B K t p H ph : ℕ) (kind : Bool) (bin : ℕ) :
+    picked (fun v => startPairNext nn aa hx hy l m g B K t p H ph v kind bin)
+      (fun b v => startPairNested nn aa hx hy l m g B K t p H ph v kind bin b) := by
+  intro v
+  simp only [startPairNext, startPairNested, child, st_eq, bR]
+  cases h : hasP p v
+  · simp [h]
+  · simp only [h, Bool.cond_true]
+    cases hb : Nat.ble v.length (Nat.sub K.succ t)
+    · simp [hb]
+    · simp only [hb, Bool.cond_true]
+      cases hz : Nat.beq (Nat.land (Nat.sub B (sumc v)) g) g
+      · simp [hz]
+      · simp only [hz, Bool.cond_true]
+        exact topPairNested_picked _ _ _ _ _ _ _ _ _ _ _ _ _ v kind bin
+
+noncomputable def chkPairNested (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (kind : Bool) (bin inner : ℕ) : Bool :=
+  searchInputs E Q Z K t H ph (fun nn aa hx hy l m g B p v =>
+    startPairNested nn aa hx hy l m g B K t p H ph v kind bin inner)
+
+lemma chkPair_next_nested (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (kind : Bool) (bin : ℕ)
+    (checked : ∀ b : Fin 8, chkPairNested E Q Z K t H ph kind bin b = false) :
+    chkPairNext E Q Z K t H ph kind bin = false := by
+  refine Bool.eq_false_iff.mpr fun h => ?_
+  simp only [chkPairNext, chkPairNested, searchInputs, frc_eq, st_eq] at h checked
+  obtain ⟨b, hb⟩ := anySub_picked _ _ _ _ _ _
+    (guardStart_picked t H ph (startPairNested_picked _ _ _ _ _ _ _ _ _ _ _ _ _ kind bin)) _ h
+  exact Bool.noConfusion ((checked b).symm.trans hb)
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem caseBinary_0_and : chkPairPicked [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 false = false := by
@@ -7404,9 +7537,42 @@ theorem caseBinary_0_and : chkPairPicked [] rootBounds 0 14 1 0x2000000000000000
   decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_0_or_move0 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 true 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_0_or_move1 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 true 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_0_or_move2 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 true 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_0_or_move3 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 true 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_0_or_move4 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 true 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_0_or_move5 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 true 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_0_or_move6 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 true 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_0_or_move7 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 true 7 = false := by decide +kernel
 theorem caseBinary_0_or : chkPairPicked [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 true = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
+  apply chkPair_next
+  intro n
+  fin_cases n
+  · exact caseBinary_0_or_move0
+  · exact caseBinary_0_or_move1
+  · exact caseBinary_0_or_move2
+  · exact caseBinary_0_or_move3
+  · exact caseBinary_0_or_move4
+  · exact caseBinary_0_or_move5
+  · exact caseBinary_0_or_move6
+  · exact caseBinary_0_or_move7
 theorem caseBinary_0 : chk [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
@@ -7421,9 +7587,42 @@ theorem caseBinary_1_and : chkPairPicked [] rootBounds 0 14 1 0x1000000000000000
   decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_1_or_move0 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 true 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_1_or_move1 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 true 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_1_or_move2 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 true 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_1_or_move3 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 true 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_1_or_move4 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 true 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_1_or_move5 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 true 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_1_or_move6 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 true 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_1_or_move7 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 true 7 = false := by decide +kernel
 theorem caseBinary_1_or : chkPairPicked [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 true = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
+  apply chkPair_next
+  intro n
+  fin_cases n
+  · exact caseBinary_1_or_move0
+  · exact caseBinary_1_or_move1
+  · exact caseBinary_1_or_move2
+  · exact caseBinary_1_or_move3
+  · exact caseBinary_1_or_move4
+  · exact caseBinary_1_or_move5
+  · exact caseBinary_1_or_move6
+  · exact caseBinary_1_or_move7
 theorem caseBinary_1 : chk [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
@@ -7438,9 +7637,42 @@ theorem caseBinary_2_and : chkPairPicked [] rootBounds 0 14 1 0x4000000000000000
   decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_2_or_move0 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 true 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_2_or_move1 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 true 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_2_or_move2 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 true 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_2_or_move3 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 true 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_2_or_move4 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 true 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_2_or_move5 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 true 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_2_or_move6 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 true 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_2_or_move7 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 true 7 = false := by decide +kernel
 theorem caseBinary_2_or : chkPairPicked [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 true = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
+  apply chkPair_next
+  intro n
+  fin_cases n
+  · exact caseBinary_2_or_move0
+  · exact caseBinary_2_or_move1
+  · exact caseBinary_2_or_move2
+  · exact caseBinary_2_or_move3
+  · exact caseBinary_2_or_move4
+  · exact caseBinary_2_or_move5
+  · exact caseBinary_2_or_move6
+  · exact caseBinary_2_or_move7
 theorem caseBinary_2 : chk [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
@@ -7455,9 +7687,42 @@ theorem caseBinary_3_and : chkPairPicked [] rootBounds 0 14 1 0x1000000000000000
   decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_3_or_move0 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000 0 true 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_3_or_move1 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000 0 true 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_3_or_move2 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000 0 true 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_3_or_move3 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000 0 true 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_3_or_move4 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000 0 true 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_3_or_move5 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000 0 true 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_3_or_move6 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000 0 true 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_3_or_move7 : chkPairNext [] rootBounds 0 14 1 0x10000000000000000 0 true 7 = false := by decide +kernel
 theorem caseBinary_3_or : chkPairPicked [] rootBounds 0 14 1 0x10000000000000000 0 true = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
+  apply chkPair_next
+  intro n
+  fin_cases n
+  · exact caseBinary_3_or_move0
+  · exact caseBinary_3_or_move1
+  · exact caseBinary_3_or_move2
+  · exact caseBinary_3_or_move3
+  · exact caseBinary_3_or_move4
+  · exact caseBinary_3_or_move5
+  · exact caseBinary_3_or_move6
+  · exact caseBinary_3_or_move7
 theorem caseBinary_3 : chk [] rootBounds 0 14 1 0x10000000000000000 0 = false := by
   apply chkPair_picked
   intro v
@@ -7491,7 +7756,40 @@ set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_5_or_move0 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 0 = false := by decide +kernel
+theorem caseBinary_5_or_move0_inner0 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 0 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move0_inner1 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 0 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move0_inner2 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 0 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move0_inner3 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 0 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move0_inner4 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 0 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move0_inner5 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 0 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move0_inner6 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 0 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move0_inner7 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 0 7 = false := by decide +kernel
+theorem caseBinary_5_or_move0 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 0 = false := by
+  apply chkPair_next_nested
+  intro b
+  fin_cases b
+  · exact caseBinary_5_or_move0_inner0
+  · exact caseBinary_5_or_move0_inner1
+  · exact caseBinary_5_or_move0_inner2
+  · exact caseBinary_5_or_move0_inner3
+  · exact caseBinary_5_or_move0_inner4
+  · exact caseBinary_5_or_move0_inner5
+  · exact caseBinary_5_or_move0_inner6
+  · exact caseBinary_5_or_move0_inner7
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem caseBinary_5_or_move1 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 1 = false := by decide +kernel
@@ -7503,13 +7801,79 @@ set_option maxHeartbeats 0 in
 theorem caseBinary_5_or_move3 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 3 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_5_or_move4 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 4 = false := by decide +kernel
+theorem caseBinary_5_or_move4_inner0 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 4 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move4_inner1 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 4 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move4_inner2 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 4 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move4_inner3 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 4 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move4_inner4 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 4 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move4_inner5 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 4 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move4_inner6 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 4 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move4_inner7 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 4 7 = false := by decide +kernel
+theorem caseBinary_5_or_move4 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 4 = false := by
+  apply chkPair_next_nested
+  intro b
+  fin_cases b
+  · exact caseBinary_5_or_move4_inner0
+  · exact caseBinary_5_or_move4_inner1
+  · exact caseBinary_5_or_move4_inner2
+  · exact caseBinary_5_or_move4_inner3
+  · exact caseBinary_5_or_move4_inner4
+  · exact caseBinary_5_or_move4_inner5
+  · exact caseBinary_5_or_move4_inner6
+  · exact caseBinary_5_or_move4_inner7
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem caseBinary_5_or_move5 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 5 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_5_or_move6 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 6 = false := by decide +kernel
+theorem caseBinary_5_or_move6_inner0 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 6 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move6_inner1 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 6 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move6_inner2 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 6 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move6_inner3 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 6 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move6_inner4 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 6 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move6_inner5 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 6 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move6_inner6 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 6 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move6_inner7 : chkPairNested [] rootBounds 0 14 1 0x100000000000000000000000 0 true 6 7 = false := by decide +kernel
+theorem caseBinary_5_or_move6 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 6 = false := by
+  apply chkPair_next_nested
+  intro b
+  fin_cases b
+  · exact caseBinary_5_or_move6_inner0
+  · exact caseBinary_5_or_move6_inner1
+  · exact caseBinary_5_or_move6_inner2
+  · exact caseBinary_5_or_move6_inner3
+  · exact caseBinary_5_or_move6_inner4
+  · exact caseBinary_5_or_move6_inner5
+  · exact caseBinary_5_or_move6_inner6
+  · exact caseBinary_5_or_move6_inner7
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem caseBinary_5_or_move7 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 7 = false := by decide +kernel
@@ -7539,9 +7903,42 @@ theorem caseBinary_6_and : chkPairPicked [] rootBounds 0 14 1 0x8000000000000000
   decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_6_or_move0 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_6_or_move1 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_6_or_move2 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_6_or_move3 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_6_or_move4 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_6_or_move5 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_6_or_move6 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_6_or_move7 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 7 = false := by decide +kernel
 theorem caseBinary_6_or : chkPairPicked [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
+  apply chkPair_next
+  intro n
+  fin_cases n
+  · exact caseBinary_6_or_move0
+  · exact caseBinary_6_or_move1
+  · exact caseBinary_6_or_move2
+  · exact caseBinary_6_or_move3
+  · exact caseBinary_6_or_move4
+  · exact caseBinary_6_or_move5
+  · exact caseBinary_6_or_move6
+  · exact caseBinary_6_or_move7
 theorem caseBinary_6 : chk [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
@@ -7690,9 +8087,108 @@ theorem caseBinary_12_and : chkPairPicked [] rootBounds 0 14 1 0x400000000000000
   decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move0 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move1 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move2 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move3_inner0 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 3 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move3_inner1 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 3 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move3_inner2 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 3 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move3_inner3 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 3 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move3_inner4 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 3 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move3_inner5 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 3 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move3_inner6 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 3 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move3_inner7 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 3 7 = false := by decide +kernel
+theorem caseBinary_12_or_move3 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 3 = false := by
+  apply chkPair_next_nested
+  intro b
+  fin_cases b
+  · exact caseBinary_12_or_move3_inner0
+  · exact caseBinary_12_or_move3_inner1
+  · exact caseBinary_12_or_move3_inner2
+  · exact caseBinary_12_or_move3_inner3
+  · exact caseBinary_12_or_move3_inner4
+  · exact caseBinary_12_or_move3_inner5
+  · exact caseBinary_12_or_move3_inner6
+  · exact caseBinary_12_or_move3_inner7
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move4 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move5 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move6_inner0 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 6 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move6_inner1 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 6 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move6_inner2 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 6 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move6_inner3 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 6 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move6_inner4 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 6 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move6_inner5 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 6 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move6_inner6 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 6 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move6_inner7 : chkPairNested [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 6 7 = false := by decide +kernel
+theorem caseBinary_12_or_move6 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 6 = false := by
+  apply chkPair_next_nested
+  intro b
+  fin_cases b
+  · exact caseBinary_12_or_move6_inner0
+  · exact caseBinary_12_or_move6_inner1
+  · exact caseBinary_12_or_move6_inner2
+  · exact caseBinary_12_or_move6_inner3
+  · exact caseBinary_12_or_move6_inner4
+  · exact caseBinary_12_or_move6_inner5
+  · exact caseBinary_12_or_move6_inner6
+  · exact caseBinary_12_or_move6_inner7
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_12_or_move7 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true 7 = false := by decide +kernel
 theorem caseBinary_12_or : chkPairPicked [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
+  apply chkPair_next
+  intro n
+  fin_cases n
+  · exact caseBinary_12_or_move0
+  · exact caseBinary_12_or_move1
+  · exact caseBinary_12_or_move2
+  · exact caseBinary_12_or_move3
+  · exact caseBinary_12_or_move4
+  · exact caseBinary_12_or_move5
+  · exact caseBinary_12_or_move6
+  · exact caseBinary_12_or_move7
 theorem caseBinary_12 : chk [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
@@ -7707,9 +8203,108 @@ theorem caseBinary_13_and : chkPairPicked [] rootBounds 0 14 1 0x80000 0 false =
   decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move0 : chkPairNext [] rootBounds 0 14 1 0x80000 0 true 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move1 : chkPairNext [] rootBounds 0 14 1 0x80000 0 true 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move2 : chkPairNext [] rootBounds 0 14 1 0x80000 0 true 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move3 : chkPairNext [] rootBounds 0 14 1 0x80000 0 true 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move4_inner0 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 4 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move4_inner1 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 4 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move4_inner2 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 4 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move4_inner3 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 4 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move4_inner4 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 4 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move4_inner5 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 4 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move4_inner6 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 4 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move4_inner7 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 4 7 = false := by decide +kernel
+theorem caseBinary_13_or_move4 : chkPairNext [] rootBounds 0 14 1 0x80000 0 true 4 = false := by
+  apply chkPair_next_nested
+  intro b
+  fin_cases b
+  · exact caseBinary_13_or_move4_inner0
+  · exact caseBinary_13_or_move4_inner1
+  · exact caseBinary_13_or_move4_inner2
+  · exact caseBinary_13_or_move4_inner3
+  · exact caseBinary_13_or_move4_inner4
+  · exact caseBinary_13_or_move4_inner5
+  · exact caseBinary_13_or_move4_inner6
+  · exact caseBinary_13_or_move4_inner7
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move5 : chkPairNext [] rootBounds 0 14 1 0x80000 0 true 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move6_inner0 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 6 0 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move6_inner1 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 6 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move6_inner2 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 6 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move6_inner3 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 6 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move6_inner4 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 6 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move6_inner5 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 6 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move6_inner6 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 6 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move6_inner7 : chkPairNested [] rootBounds 0 14 1 0x80000 0 true 6 7 = false := by decide +kernel
+theorem caseBinary_13_or_move6 : chkPairNext [] rootBounds 0 14 1 0x80000 0 true 6 = false := by
+  apply chkPair_next_nested
+  intro b
+  fin_cases b
+  · exact caseBinary_13_or_move6_inner0
+  · exact caseBinary_13_or_move6_inner1
+  · exact caseBinary_13_or_move6_inner2
+  · exact caseBinary_13_or_move6_inner3
+  · exact caseBinary_13_or_move6_inner4
+  · exact caseBinary_13_or_move6_inner5
+  · exact caseBinary_13_or_move6_inner6
+  · exact caseBinary_13_or_move6_inner7
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_13_or_move7 : chkPairNext [] rootBounds 0 14 1 0x80000 0 true 7 = false := by decide +kernel
 theorem caseBinary_13_or : chkPairPicked [] rootBounds 0 14 1 0x80000 0 true = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
+  apply chkPair_next
+  intro n
+  fin_cases n
+  · exact caseBinary_13_or_move0
+  · exact caseBinary_13_or_move1
+  · exact caseBinary_13_or_move2
+  · exact caseBinary_13_or_move3
+  · exact caseBinary_13_or_move4
+  · exact caseBinary_13_or_move5
+  · exact caseBinary_13_or_move6
+  · exact caseBinary_13_or_move7
 theorem caseBinary_13 : chk [] rootBounds 0 14 1 0x80000 0 = false := by
   apply chkPair_picked
   intro v
@@ -7740,9 +8335,20 @@ theorem binaryCertificates : BinaryCertificates rootBounds := by
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0 : chk [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 = false := by
-  rw [← chkFast_eq]
+theorem caseUnary_0_and : chkPairPicked [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 false = false := by
+  rw [← chkPairFast_eq]
   decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseUnary_0_or : chkPairPicked [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 true = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
+theorem caseUnary_0 : chk [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 = false := by
+  apply chkPair_picked
+  intro kind
+  cases kind
+  · exact caseUnary_0_and
+  · exact caseUnary_0_or
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem caseUnary_1 : chk [(1,0)] (unaryBoundsStrong rootBounds 1) 0 13 0 FF 1 = false := by
