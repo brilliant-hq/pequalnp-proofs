@@ -16,45 +16,24 @@ def bigNat_8 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (N
 def bigNat_9 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7ffff) 64) 0x807ffffbffffdfff) 64) 0xfee0000000000000) 64) 0x0) 64) 0x0) 64) 0x35ab05c000) 64) 0x5c0005c0005c005) 64) 0xc017004d4c409f00) 64) 0x12609f004f800000) 64) 0x780003c001e000) 64) 0x3c0000780000) 64) 0x1f8) 64) 0x1c00103fc081fe04) 64) 0xff0380780003c00) 64) 0xf002003c00841) 64) 0x780108000f0021) 64) 0x882001c0d6ac000) 64) 0x0) 64) 0x1b5b5ab7) 64) 0xffd6dab7ffdbffe0) 64) 0x0) 64) 0x0) 64) 0x1fffc0003fffc002
 def bigNat_10 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7ffff) 64) 0xbf00000000000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x252a060000) 64) 0x600006000060006) 64) 0x18000000001000) 64) 0x100008000000) 64) 0x40000200010000) 64) 0x200000400000) 64) 0x1ff) 64) 0xe00fdfc000fe0007) 64) 0xf00003f8001fc000) 64) 0x87f00041fc001082) 64) 0x3f80021047f00042) 64) 0x110447e00d6ad5ff) 64) 0xf555fff55fff55ff) 64) 0xf5fff7ffc0000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x1fffffffc000007c
 def bigNat_11 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x1ff) 64) 0xffefdffffefffff7) 64) 0xffffbbffffdffffe) 64) 0xf7ffff7dffffdefb) 64) 0xbffffbdf77ffff7b) 64) 0xddf777ffed6ad5ff) 64) 0xf555fff55fff55ff) 64) 0xf5fff7ffdb5b5ab7) 64) 0xffd6dab7ffdbffeb) 64) 0x5b6adfff5afffb7f) 64) 0xfdb6db6fffb6dfff) 64) 0xffffffffffffffff
-def bigNat_12 : Nat := Nat.lor (Nat.shiftLeft (0x3ffffc0) 64) 0x0
-def bigNat_13 : Nat := Nat.lor (Nat.shiftLeft (0xffc000000) 64) 0x0
-def bigNat_14 : Nat := Nat.lor (Nat.shiftLeft (0x3f000000000) 64) 0x0
-def bigNat_15 : Nat := Nat.lor (Nat.shiftLeft (0x40000000000) 64) 0x0
-def bigNat_16 : Nat := Nat.lor (Nat.shiftLeft (0xf80000000000) 64) 0x0
-def bigNat_17 : Nat := Nat.lor (Nat.shiftLeft (0x3ff000000000000) 64) 0x0
-def bigNat_18 : Nat := Nat.lor (Nat.shiftLeft (0x400000000000000) 64) 0x0
-def bigNat_19 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3f) 64) 0xf800000000000000) 64) 0x0
-def bigNat_20 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x40) 64) 0x0) 64) 0x0
-def bigNat_21 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x80) 64) 0x0) 64) 0x0
-def bigNat_22 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x100) 64) 0x0) 64) 0x0
-def bigNat_23 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x600) 64) 0x0) 64) 0x0
-def bigNat_24 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x800) 64) 0x0) 64) 0x0
-def bigNat_25 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3000) 64) 0x0) 64) 0x0
-def bigNat_26 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x4000) 64) 0x0) 64) 0x0
-def bigNat_27 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x78000) 64) 0x0) 64) 0x0
-def bigNat_28 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x80000) 64) 0x0) 64) 0x0
-def bigNat_29 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x100000) 64) 0x0) 64) 0x0
-def bigNat_30 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x200000) 64) 0x0) 64) 0x0
-def bigNat_31 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7fffffc00000) 64) 0x0) 64) 0x0
-def bigNat_32 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x800000000000) 64) 0x0) 64) 0x0
-def bigNat_33 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x1000000000000) 64) 0x0) 64) 0x0
-def bigNat_34 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x1fe000000000000) 64) 0x0) 64) 0x0
-def bigNat_35 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x200000000000000) 64) 0x0) 64) 0x0
-def bigNat_36 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3c00000000000000) 64) 0x0) 64) 0x0
-def bigNat_37 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x4000000000000000) 64) 0x0) 64) 0x0
-def bigNat_38 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7) 64) 0x8000000000000000) 64) 0x0) 64) 0x0
-def bigNat_39 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x8) 64) 0x0) 64) 0x0) 64) 0x0
-def bigNat_40 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x10) 64) 0x0) 64) 0x0) 64) 0x0
-def bigNat_41 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xe0) 64) 0x0) 64) 0x0) 64) 0x0
-def bigNat_42 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3fff00) 64) 0x0) 64) 0x0) 64) 0x0
-def bigNat_43 : Nat := Nat.lor (Nat.shiftLeft (0xffffffffe) 64) 0x0
-def bigNat_44 : Nat := Nat.lor (Nat.shiftLeft (0x3fffff000000000) 64) 0x0
-def bigNat_45 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7ff) 64) 0xfc00000000000000) 64) 0x0
-def bigNat_46 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7ffffffff800) 64) 0x0) 64) 0x0
-def bigNat_47 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x1ff800000000000) 64) 0x0) 64) 0x0
-def bigNat_48 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3fffff) 64) 0xfe00000000000000) 64) 0x0) 64) 0x0
-def bigNat_49 : Nat := Nat.lor (Nat.shiftLeft (0xfffffffff) 64) 0xffffffffffc00000
-def bigNat_50 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3fffff) 64) 0xffffffffffffffff) 64) 0xfffffff000000000) 64) 0x0
+def bigNat_12 : Nat := Nat.lor (Nat.shiftLeft (0xfffffffe0) 64) 0x0
+def bigNat_13 : Nat := Nat.lor (Nat.shiftLeft (0xfff000000000) 64) 0x0
+def bigNat_14 : Nat := Nat.lor (Nat.shiftLeft (0x3ff000000000000) 64) 0x0
+def bigNat_15 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3f) 64) 0xfc00000000000000) 64) 0x0
+def bigNat_16 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x40) 64) 0x0) 64) 0x0
+def bigNat_17 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x780) 64) 0x0) 64) 0x0
+def bigNat_18 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3800) 64) 0x0) 64) 0x0
+def bigNat_19 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7c000) 64) 0x0) 64) 0x0
+def bigNat_20 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7ffffff80000) 64) 0x0) 64) 0x0
+def bigNat_21 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x800000000000) 64) 0x0) 64) 0x0
+def bigNat_22 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x1ff000000000000) 64) 0x0) 64) 0x0
+def bigNat_23 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3e00000000000000) 64) 0x0) 64) 0x0
+def bigNat_24 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7) 64) 0xc000000000000000) 64) 0x0) 64) 0x0
+def bigNat_25 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3ffff8) 64) 0x0) 64) 0x0) 64) 0x0
+def bigNat_26 : Nat := Nat.lor (Nat.shiftLeft (0x3ffffff) 64) 0xffff800000000000
+def bigNat_27 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3f) 64) 0xfffffffffc000000) 64) 0x0
+def bigNat_28 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7fffffffffc0) 64) 0x0) 64) 0x0
+def bigNat_29 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3fffff) 64) 0xffff800000000000) 64) 0x0) 64) 0x0
 variable {R : ℕ → ℕ}
 def op (d : Bool) (a b : ℕ) : ℕ := bif d then a ||| b else a &&& b
 lemma op_comm (d : Bool) (a b : ℕ) : op d a b = op d b a := by
@@ -3736,13 +3715,12 @@ lemma imp_okE {E Q : List (ℕ × ℕ)} {e : ℕ × ℕ} (hE : E = [] ∨ ∃ e'
     ⟨[(FF, 1)], ffull, fun p hp => ?_⟩)
   simp only [List.mem_singleton] at hp; subst hp; exact h t ht
 def rt3 : List (ℕ × ℕ) := [(7, 7), (11, 6), (13, 7), (14, 7), (19, 7), (21, 7), (22, 7), (25, 6), (26, 7), (28, 7), (35, 5), (37, 7), (38, 7), (41, 6), (42, 5), (44, 7), (49, 5), (50, 7), (52, 7), (56, 5), (67, 6), (69, 8), (70, 8), (73, 8), (74, 6), (76, 8), (81, 6), (82, 8), (84, 8), (88, 6), (97, 6), (98, 6), (100, 8), (104, 6), (112, 6), (131, 5), (133, 6), (134, 6), (137, 7), (138, 5), (140, 6), (145, 5), (146, 7), (148, 6), (152, 5), (161, 5), (162, 4), (164, 6), (168, 5), (176, 4), (193, 4), (194, 5), (196, 6), (200, 4), (208, 5), (224, 3)]
-def rt2 : List (ℕ × ℕ) := [(3, 9), (5, 10), (6, 10), (9, 9), (10, 9), (12, 10), (17, 9), (18, 10), (20, 10), (24, 9), (33, 8), (34, 8), (36, 10), (40, 8), (48, 8), (65, 9), (66, 9), (68, 10), (72, 9), (80, 9), (96, 9), (129, 8), (130, 8), (132, 9), (136, 8), (144, 8), (160, 7), (192, 7)]
-def rt1_0 : List (ℕ × ℕ) := [(1, 12)]
-def rt1_1 : List (ℕ × ℕ) := [(2, 12), (4, 12)]
-def rt1_2 : List (ℕ × ℕ) := [(8, 12)]
-def rt1_3 : List (ℕ × ℕ) := [(16, 12), (32, 11)]
-def rt1_4 : List (ℕ × ℕ) := [(64, 12), (128, 11)]
-def rt1 : List (ℕ × ℕ) := rt1_0 ++ rt1_1 ++ rt1_2 ++ rt1_3 ++ rt1_4
+def rt2_0 : List (ℕ × ℕ) := [(3, 9), (5, 10), (6, 10), (9, 9), (10, 9), (12, 10), (17, 9), (18, 10), (20, 10), (24, 9), (33, 8), (34, 8), (36, 10), (40, 8), (48, 8), (65, 9), (66, 9)]
+def rt2_1 : List (ℕ × ℕ) := [(68, 11), (72, 9), (80, 9), (96, 9), (129, 8), (130, 8), (132, 9), (136, 8), (144, 8), (160, 7), (192, 7)]
+def rt2 : List (ℕ × ℕ) := rt2_0 ++ rt2_1
+def rt1_0 : List (ℕ × ℕ) := [(1, 12), (2, 12), (4, 12)]
+def rt1_1 : List (ℕ × ℕ) := [(8, 12), (16, 12), (32, 11), (64, 12), (128, 11)]
+def rt1 : List (ℕ × ℕ) := rt1_0 ++ rt1_1
 def pr (T : List (ℕ × ℕ)) (Z : ℕ) : List (ℕ × ℕ) := T.filter (fun e => Nat.beq (Nat.land Z e.1) Z && !Nat.beq Z e.1)
 def rt : List (ℕ × ℕ) := rt1 ++ rt2 ++ rt3
 lemma okAll {T U : List (ℕ × ℕ)} (h : U.all (fun e => okE [] (pr T e.1) e) = true)
@@ -3761,7 +3739,12 @@ theorem r3 : rt3.all (fun e => okE [] (pr [] e.1) e) = true := by decide +kernel
 lemma i3 : ∀ e ∈ rt3, Imp [] e.1 e.2 := okAll (T := []) r3 (by simp)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem r2 : rt2.all (fun e => okE [] (pr rt3 e.1) e) = true := by decide +kernel
+theorem r2_0 : rt2_0.all (fun e => okE [] (pr rt3 e.1) e) = true := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem r2_1 : rt2_1.all (fun e => okE [] (pr rt3 e.1) e) = true := by decide +kernel
+theorem r2 : rt2.all (fun e => okE [] (pr rt3 e.1) e) = true := by
+  simp only [rt2, List.all_append, r2_0, r2_1, Bool.and_self]
 lemma i2 : ∀ e ∈ rt2, Imp [] e.1 e.2 := okAll r2 i3
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
@@ -3769,17 +3752,8 @@ theorem r1_0 : rt1_0.all (fun e => okE [] (pr (rt2 ++ rt3) e.1) e) = true := by 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem r1_1 : rt1_1.all (fun e => okE [] (pr (rt2 ++ rt3) e.1) e) = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem r1_2 : rt1_2.all (fun e => okE [] (pr (rt2 ++ rt3) e.1) e) = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem r1_3 : rt1_3.all (fun e => okE [] (pr (rt2 ++ rt3) e.1) e) = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem r1_4 : rt1_4.all (fun e => okE [] (pr (rt2 ++ rt3) e.1) e) = true := by decide +kernel
 theorem r1 : rt1.all (fun e => okE [] (pr (rt2 ++ rt3) e.1) e) = true := by
-  simp only [rt1, List.all_append, r1_0, r1_1, r1_2, r1_3, r1_4, Bool.and_self]
+  simp only [rt1, List.all_append, r1_0, r1_1, Bool.and_self]
 lemma i1 : ∀ e ∈ rt1, Imp [] e.1 e.2 := okAll r1 (apI i2 i3)
 lemma ir : ∀ e ∈ rt, Imp [] e.1 e.2 := apI (apI i1 i2) i3
 set_option maxRecDepth 100000 in
@@ -3824,212 +3798,101 @@ set_option maxHeartbeats 0 in
 theorem proot_1_0 : chk [] rt 0 14 1 0xf 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_1 : chk [] rt 0 14 1 0x10 0 = false := by decide +kernel
+theorem proot_1_1 : chk [] rt 0 14 1 0x30 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_2 : chk [] rt 0 14 1 0x20 0 = false := by decide +kernel
+theorem proot_1_2 : chk [] rt 0 14 1 0x3fc0 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_3 : chk [] rt 0 14 1 0x40 0 = false := by decide +kernel
+theorem proot_1_3 : chk [] rt 0 14 1 0x4000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_4 : chk [] rt 0 14 1 0x780 0 = false := by decide +kernel
+theorem proot_1_4 : chk [] rt 0 14 1 0x8000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_5 : chk [] rt 0 14 1 0x800 0 = false := by decide +kernel
+theorem proot_1_5 : chk [] rt 0 14 1 0x3f0000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_6 : chk [] rt 0 14 1 0x3000 0 = false := by decide +kernel
+theorem proot_1_6 : chk [] rt 0 14 1 0xfc00000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_7 : chk [] rt 0 14 1 0x4000 0 = false := by decide +kernel
+theorem proot_1_7 : chk [] rt 0 14 1 0x1f0000000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_8 : chk [] rt 0 14 1 0x8000 0 = false := by decide +kernel
+theorem proot_1_8 : chk [] rt 0 14 1 0x7e00000000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_9 : chk [] rt 0 14 1 0x10000 0 = false := by decide +kernel
+theorem proot_1_9 : chk [] rt 0 14 1 0x8000000000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_10 : chk [] rt 0 14 1 0x20000 0 = false := by decide +kernel
+theorem proot_1_10 : chk [] rt 0 14 1 0x10000000000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_11 : chk [] rt 0 14 1 0x40000 0 = false := by decide +kernel
+theorem proot_1_11 : chk [] rt 0 14 1 0x20000000000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_12 : chk [] rt 0 14 1 0x380000 0 = false := by decide +kernel
+theorem proot_1_12 : chk [] rt 0 14 1 0x7c0000000000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_13 : chk [] rt 0 14 1 0x400000 0 = false := by decide +kernel
+theorem proot_1_13 : chk [] rt 0 14 1 0x1fff800000000000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_14 : chk [] rt 0 14 1 0xf800000 0 = false := by decide +kernel
+theorem proot_1_14 : chk [] rt 0 14 1 0x1e000000000000000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_15 : chk [] rt 0 14 1 0x10000000 0 = false := by decide +kernel
+theorem proot_1_15 : chk [] rt 0 14 1 0x20000000000000000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_16 : chk [] rt 0 14 1 0x1e0000000 0 = false := by decide +kernel
+theorem proot_1_16 : chk [] rt 0 14 1 0x1c0000000000000000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_17 : chk [] rt 0 14 1 0x200000000 0 = false := by decide +kernel
+theorem proot_1_17 : chk [] rt 0 14 1 bigNat_12 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_18 : chk [] rt 0 14 1 0x7c00000000 0 = false := by decide +kernel
+theorem proot_1_18 : chk [] rt 0 14 1 bigNat_13 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_19 : chk [] rt 0 14 1 0x8000000000 0 = false := by decide +kernel
+theorem proot_1_19 : chk [] rt 0 14 1 bigNat_14 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_20 : chk [] rt 0 14 1 0x10000000000 0 = false := by decide +kernel
+theorem proot_1_20 : chk [] rt 0 14 1 bigNat_15 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_21 : chk [] rt 0 14 1 0x20000000000 0 = false := by decide +kernel
+theorem proot_1_21 : chk [] rt 0 14 1 bigNat_16 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_22 : chk [] rt 0 14 1 0x40000000000 0 = false := by decide +kernel
+theorem proot_1_22 : chk [] rt 0 14 1 bigNat_17 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_23 : chk [] rt 0 14 1 0x80000000000 0 = false := by decide +kernel
+theorem proot_1_23 : chk [] rt 0 14 1 bigNat_18 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_24 : chk [] rt 0 14 1 0x100000000000 0 = false := by decide +kernel
+theorem proot_1_24 : chk [] rt 0 14 1 bigNat_19 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_25 : chk [] rt 0 14 1 0x200000000000 0 = false := by decide +kernel
+theorem proot_1_25 : chk [] rt 0 14 1 bigNat_20 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_26 : chk [] rt 0 14 1 0x400000000000 0 = false := by decide +kernel
+theorem proot_1_26 : chk [] rt 0 14 1 bigNat_21 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_27 : chk [] rt 0 14 1 0x800000000000 0 = false := by decide +kernel
+theorem proot_1_27 : chk [] rt 0 14 1 bigNat_22 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_28 : chk [] rt 0 14 1 0x1fff000000000000 0 = false := by decide +kernel
+theorem proot_1_28 : chk [] rt 0 14 1 bigNat_23 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_29 : chk [] rt 0 14 1 0x2000000000000000 0 = false := by decide +kernel
+theorem proot_1_29 : chk [] rt 0 14 1 bigNat_24 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_30 : chk [] rt 0 14 1 0x4000000000000000 0 = false := by decide +kernel
+theorem proot_1_30 : chk [] rt 0 14 1 bigNat_25 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_31 : chk [] rt 0 14 1 0x8000000000000000 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_32 : chk [] rt 0 14 1 0x10000000000000000 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_33 : chk [] rt 0 14 1 0x20000000000000000 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_34 : chk [] rt 0 14 1 0x40000000000000000 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_35 : chk [] rt 0 14 1 0x180000000000000000 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_36 : chk [] rt 0 14 1 0x200000000000000000 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_37 : chk [] rt 0 14 1 bigNat_12 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_38 : chk [] rt 0 14 1 bigNat_13 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_39 : chk [] rt 0 14 1 bigNat_14 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_40 : chk [] rt 0 14 1 bigNat_15 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_41 : chk [] rt 0 14 1 bigNat_16 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_42 : chk [] rt 0 14 1 bigNat_17 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_43 : chk [] rt 0 14 1 bigNat_18 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_44 : chk [] rt 0 14 1 bigNat_19 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_45 : chk [] rt 0 14 1 bigNat_20 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_46 : chk [] rt 0 14 1 bigNat_21 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_47 : chk [] rt 0 14 1 bigNat_22 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_48 : chk [] rt 0 14 1 bigNat_23 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_49 : chk [] rt 0 14 1 bigNat_24 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_50 : chk [] rt 0 14 1 bigNat_25 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_51 : chk [] rt 0 14 1 bigNat_26 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_52 : chk [] rt 0 14 1 bigNat_27 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_53 : chk [] rt 0 14 1 bigNat_28 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_54 : chk [] rt 0 14 1 bigNat_29 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_55 : chk [] rt 0 14 1 bigNat_30 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_56 : chk [] rt 0 14 1 bigNat_31 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_57 : chk [] rt 0 14 1 bigNat_32 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_58 : chk [] rt 0 14 1 bigNat_33 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_59 : chk [] rt 0 14 1 bigNat_34 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_60 : chk [] rt 0 14 1 bigNat_35 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_61 : chk [] rt 0 14 1 bigNat_36 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_62 : chk [] rt 0 14 1 bigNat_37 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_63 : chk [] rt 0 14 1 bigNat_38 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_64 : chk [] rt 0 14 1 bigNat_39 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_65 : chk [] rt 0 14 1 bigNat_40 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_66 : chk [] rt 0 14 1 bigNat_41 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_67 : chk [] rt 0 14 1 bigNat_42 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pfull_1 : mFull [(0xf, 1), (0x10, 0), (0x20, 0), (0x40, 0), (0x780, 0), (0x800, 0), (0x3000, 0), (0x4000, 0), (0x8000, 0), (0x10000, 0), (0x20000, 0), (0x40000, 0), (0x380000, 0), (0x400000, 0), (0xf800000, 0), (0x10000000, 0), (0x1e0000000, 0), (0x200000000, 0), (0x7c00000000, 0), (0x8000000000, 0), (0x10000000000, 0), (0x20000000000, 0), (0x40000000000, 0), (0x80000000000, 0), (0x100000000000, 0), (0x200000000000, 0), (0x400000000000, 0), (0x800000000000, 0), (0x1fff000000000000, 0), (0x2000000000000000, 0), (0x4000000000000000, 0), (0x8000000000000000, 0), (0x10000000000000000, 0), (0x20000000000000000, 0), (0x40000000000000000, 0), (0x180000000000000000, 0), (0x200000000000000000, 0), (bigNat_12, 0), (bigNat_13, 0), (bigNat_14, 0), (bigNat_15, 0), (bigNat_16, 0), (bigNat_17, 0), (bigNat_18, 0), (bigNat_19, 0), (bigNat_20, 0), (bigNat_21, 0), (bigNat_22, 0), (bigNat_23, 0), (bigNat_24, 0), (bigNat_25, 0), (bigNat_26, 0), (bigNat_27, 0), (bigNat_28, 0), (bigNat_29, 0), (bigNat_30, 0), (bigNat_31, 0), (bigNat_32, 0), (bigNat_33, 0), (bigNat_34, 0), (bigNat_35, 0), (bigNat_36, 0), (bigNat_37, 0), (bigNat_38, 0), (bigNat_39, 0), (bigNat_40, 0), (bigNat_41, 0), (bigNat_42, 0)] = true := by decide +kernel
+theorem pfull_1 : mFull [(0xf, 1), (0x30, 0), (0x3fc0, 0), (0x4000, 0), (0x8000, 0), (0x3f0000, 0), (0xfc00000, 0), (0x1f0000000, 0), (0x7e00000000, 0), (0x8000000000, 0), (0x10000000000, 0), (0x20000000000, 0), (0x7c0000000000, 0), (0x1fff800000000000, 0), (0x1e000000000000000, 0), (0x20000000000000000, 0), (0x1c0000000000000000, 0), (bigNat_12, 0), (bigNat_13, 0), (bigNat_14, 0), (bigNat_15, 0), (bigNat_16, 0), (bigNat_17, 0), (bigNat_18, 0), (bigNat_19, 0), (bigNat_20, 0), (bigNat_21, 0), (bigNat_22, 0), (bigNat_23, 0), (bigNat_24, 0), (bigNat_25, 0)] = true := by decide +kernel
 lemma pex_1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 14 1 p.1 p.2 = false := by
-  refine ⟨[(0xf, 1), (0x10, 0), (0x20, 0), (0x40, 0), (0x780, 0), (0x800, 0), (0x3000, 0), (0x4000, 0), (0x8000, 0), (0x10000, 0), (0x20000, 0), (0x40000, 0), (0x380000, 0), (0x400000, 0), (0xf800000, 0), (0x10000000, 0), (0x1e0000000, 0), (0x200000000, 0), (0x7c00000000, 0), (0x8000000000, 0), (0x10000000000, 0), (0x20000000000, 0), (0x40000000000, 0), (0x80000000000, 0), (0x100000000000, 0), (0x200000000000, 0), (0x400000000000, 0), (0x800000000000, 0), (0x1fff000000000000, 0), (0x2000000000000000, 0), (0x4000000000000000, 0), (0x8000000000000000, 0), (0x10000000000000000, 0), (0x20000000000000000, 0), (0x40000000000000000, 0), (0x180000000000000000, 0), (0x200000000000000000, 0), (bigNat_12, 0), (bigNat_13, 0), (bigNat_14, 0), (bigNat_15, 0), (bigNat_16, 0), (bigNat_17, 0), (bigNat_18, 0), (bigNat_19, 0), (bigNat_20, 0), (bigNat_21, 0), (bigNat_22, 0), (bigNat_23, 0), (bigNat_24, 0), (bigNat_25, 0), (bigNat_26, 0), (bigNat_27, 0), (bigNat_28, 0), (bigNat_29, 0), (bigNat_30, 0), (bigNat_31, 0), (bigNat_32, 0), (bigNat_33, 0), (bigNat_34, 0), (bigNat_35, 0), (bigNat_36, 0), (bigNat_37, 0), (bigNat_38, 0), (bigNat_39, 0), (bigNat_40, 0), (bigNat_41, 0), (bigNat_42, 0)], pfull_1, fun p hp => ?_⟩
+  refine ⟨[(0xf, 1), (0x30, 0), (0x3fc0, 0), (0x4000, 0), (0x8000, 0), (0x3f0000, 0), (0xfc00000, 0), (0x1f0000000, 0), (0x7e00000000, 0), (0x8000000000, 0), (0x10000000000, 0), (0x20000000000, 0), (0x7c0000000000, 0), (0x1fff800000000000, 0), (0x1e000000000000000, 0), (0x20000000000000000, 0), (0x1c0000000000000000, 0), (bigNat_12, 0), (bigNat_13, 0), (bigNat_14, 0), (bigNat_15, 0), (bigNat_16, 0), (bigNat_17, 0), (bigNat_18, 0), (bigNat_19, 0), (bigNat_20, 0), (bigNat_21, 0), (bigNat_22, 0), (bigNat_23, 0), (bigNat_24, 0), (bigNat_25, 0)], pfull_1, fun p hp => ?_⟩
   simp only [List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at hp
-  rcases hp with h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h
+  rcases hp with h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h
   · subst h; exact proot_1_0
   · subst h; exact proot_1_1
   · subst h; exact proot_1_2
@@ -4061,86 +3924,34 @@ lemma pex_1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] 
   · subst h; exact proot_1_28
   · subst h; exact proot_1_29
   · subst h; exact proot_1_30
-  · subst h; exact proot_1_31
-  · subst h; exact proot_1_32
-  · subst h; exact proot_1_33
-  · subst h; exact proot_1_34
-  · subst h; exact proot_1_35
-  · subst h; exact proot_1_36
-  · subst h; exact proot_1_37
-  · subst h; exact proot_1_38
-  · subst h; exact proot_1_39
-  · subst h; exact proot_1_40
-  · subst h; exact proot_1_41
-  · subst h; exact proot_1_42
-  · subst h; exact proot_1_43
-  · subst h; exact proot_1_44
-  · subst h; exact proot_1_45
-  · subst h; exact proot_1_46
-  · subst h; exact proot_1_47
-  · subst h; exact proot_1_48
-  · subst h; exact proot_1_49
-  · subst h; exact proot_1_50
-  · subst h; exact proot_1_51
-  · subst h; exact proot_1_52
-  · subst h; exact proot_1_53
-  · subst h; exact proot_1_54
-  · subst h; exact proot_1_55
-  · subst h; exact proot_1_56
-  · subst h; exact proot_1_57
-  · subst h; exact proot_1_58
-  · subst h; exact proot_1_59
-  · subst h; exact proot_1_60
-  · subst h; exact proot_1_61
-  · subst h; exact proot_1_62
-  · subst h; exact proot_1_63
-  · subst h; exact proot_1_64
-  · subst h; exact proot_1_65
-  · subst h; exact proot_1_66
-  · subst h; exact proot_1_67
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_2_0 : chk [] rt 0 14 2 0x7ff 1 = false := by decide +kernel
+theorem proot_2_0 : chk [] rt 0 14 2 0x3fff 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_2_1 : chk [] rt 0 14 2 0x3800 0 = false := by decide +kernel
+theorem proot_2_1 : chk [] rt 0 14 2 0x7fffffc000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_2_2 : chk [] rt 0 14 2 0xfffc000 0 = false := by decide +kernel
+theorem proot_2_2 : chk [] rt 0 14 2 0x7f8000000000 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_2_3 : chk [] rt 0 14 2 0x7ff0000000 0 = false := by decide +kernel
+theorem proot_2_3 : chk [] rt 0 14 2 bigNat_26 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_2_4 : chk [] rt 0 14 2 0x7f8000000000 0 = false := by decide +kernel
+theorem proot_2_4 : chk [] rt 0 14 2 bigNat_27 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_2_5 : chk [] rt 0 14 2 0x1ffff800000000000 0 = false := by decide +kernel
+theorem proot_2_5 : chk [] rt 0 14 2 bigNat_28 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_2_6 : chk [] rt 0 14 2 bigNat_43 0 = false := by decide +kernel
+theorem proot_2_6 : chk [] rt 0 14 2 bigNat_29 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_2_7 : chk [] rt 0 14 2 bigNat_44 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_2_8 : chk [] rt 0 14 2 bigNat_45 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_2_9 : chk [] rt 0 14 2 bigNat_46 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_2_10 : chk [] rt 0 14 2 bigNat_47 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_2_11 : chk [] rt 0 14 2 bigNat_48 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pfull_2 : mFull [(0x7ff, 1), (0x3800, 0), (0xfffc000, 0), (0x7ff0000000, 0), (0x7f8000000000, 0), (0x1ffff800000000000, 0), (bigNat_43, 0), (bigNat_44, 0), (bigNat_45, 0), (bigNat_46, 0), (bigNat_47, 0), (bigNat_48, 0)] = true := by decide +kernel
+theorem pfull_2 : mFull [(0x3fff, 1), (0x7fffffc000, 0), (0x7f8000000000, 0), (bigNat_26, 0), (bigNat_27, 0), (bigNat_28, 0), (bigNat_29, 0)] = true := by decide +kernel
 lemma pex_2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 14 2 p.1 p.2 = false := by
-  refine ⟨[(0x7ff, 1), (0x3800, 0), (0xfffc000, 0), (0x7ff0000000, 0), (0x7f8000000000, 0), (0x1ffff800000000000, 0), (bigNat_43, 0), (bigNat_44, 0), (bigNat_45, 0), (bigNat_46, 0), (bigNat_47, 0), (bigNat_48, 0)], pfull_2, fun p hp => ?_⟩
+  refine ⟨[(0x3fff, 1), (0x7fffffc000, 0), (0x7f8000000000, 0), (bigNat_26, 0), (bigNat_27, 0), (bigNat_28, 0), (bigNat_29, 0)], pfull_2, fun p hp => ?_⟩
   simp only [List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at hp
-  rcases hp with h | h | h | h | h | h | h | h | h | h | h | h
+  rcases hp with h | h | h | h | h | h | h
   · subst h; exact proot_2_0
   · subst h; exact proot_2_1
   · subst h; exact proot_2_2
@@ -4148,30 +3959,9 @@ lemma pex_2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] 
   · subst h; exact proot_2_4
   · subst h; exact proot_2_5
   · subst h; exact proot_2_6
-  · subst h; exact proot_2_7
-  · subst h; exact proot_2_8
-  · subst h; exact proot_2_9
-  · subst h; exact proot_2_10
-  · subst h; exact proot_2_11
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_3_0 : chk [] rt 0 14 3 0x3fffff 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_3_1 : chk [] rt 0 14 3 bigNat_49 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_3_2 : chk [] rt 0 14 3 bigNat_50 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pfull_3 : mFull [(0x3fffff, 1), (bigNat_49, 0), (bigNat_50, 0)] = true := by decide +kernel
-lemma pex_3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 14 3 p.1 p.2 = false := by
-  refine ⟨[(0x3fffff, 1), (bigNat_49, 0), (bigNat_50, 0)], pfull_3, fun p hp => ?_⟩
-  simp only [List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at hp
-  rcases hp with h | h | h
-  · subst h; exact proot_3_0
-  · subst h; exact proot_3_1
-  · subst h; exact proot_3_2
+theorem proot_3 : chk [] rt 0 14 3 FF 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem proot_hi : okT [] rt 0 15 [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] = true := by decide +kernel
@@ -4187,7 +3977,7 @@ lemma iroot_pos {t : ℕ} {S : Finset ℕ} (ht1 : 1 ≤ t) (hS : (S : Set ℕ) �
     interval_cases t
     · exact pex_1
     · exact pex_2
-    · exact pex_3
+    · exact one proot_3
     · exact one h4
     · exact one h5
     · exact one h6
