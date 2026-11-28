@@ -1,6 +1,8 @@
 import PEqualNP.Defs
 
 namespace PEqualNP.Outside.L_meta_38109
+
+theorem heck_yeah : True := trivial
 def bigNat_0 : Nat := 0x7ffffffffffffffffffffffbfdfeff7fbfdfeff7f7f7f7f7f7f7f7f0000000000000000
 def bigNat_1 : Nat := 0x80808080808080800000000000000000
 def bigNat_2 : Nat := 0x402010080402010000000000000000000000000000000000
@@ -4018,12 +4020,8 @@ theorem r1 : rt1.all (fun e => okE [] (pr (rt2 ++ (rt3 ++ rt4)) e.1) e) = true :
 lemma i1 : ∀ e ∈ rt1, Imp [] e.1 e.2 := okAll r1 (ir2)
 lemma ir1 : ∀ e ∈ rt1 ++ (rt2 ++ (rt3 ++ rt4)), Imp [] e.1 e.2 := apI i1 ir2
 
-def rt := rt1 ++ rt2.filter (fun e => 5 ≤ e.2)
-lemma root_restrictions : ∀ e ∈ rt, Imp [] e.1 e.2 := by
-  intro e he
-  rcases List.mem_append.mp he with h | h
-  · exact i1 _ h
-  · exact i2 _ (List.mem_of_mem_filter h)
+def rt := rt1 ++ (rt2 ++ (rt3 ++ rt4))
+lemma root_restrictions : ∀ e ∈ rt, Imp [] e.1 e.2 := ir1
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem root_p : pOk 0 rt = true := by decide +kernel
