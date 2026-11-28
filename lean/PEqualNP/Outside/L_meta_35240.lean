@@ -1124,9 +1124,14 @@ def mvC (NN AA HX HY : Nat) (F : Nat → Nat → Nat → List W → Bool) (l m g
         (nodeC NN (F (Nat.sub k 2) s) (pos s) l m g (Nat.sub (Nat.sub (Nat.sub k 1) s) y) v.length z v (pairsP q)))))
       m g (Nat.sub (Nat.sub k s) y) n z 0 v v)) true
     (nodeC NN (F (Nat.sub k 1) t) (pos t) l m g (Nat.sub (Nat.sub k t) y) n z v pairsN)) v.length
-def lookC (NN AA HX HY : Nat) (l m g : Nat) (fuel : Nat) : Nat → Nat → Nat → List W → Bool :=
+def guardedCoverage (nn : ℕ) (enabled d : Bool) (l : ℕ) (v : List W) (b : Bool) : Bool :=
+  Bool.rec (motive := fun _ => Bool) b (Bool.rec (motive := fun _ => Bool) false b (Nat.beq (covC nn d l v) l)) enabled
+def lookCore (NN AA HX HY : Nat) (l m g : Nat) (enabled : Bool) (fuel : Nat) : Nat → Nat → Nat → List W → Bool :=
   Nat.rec (motive := fun _ => Nat → Nat → Nat → List W → Bool) (fun _ _ _ _ => true)
-    (fun _ ih k t z v => Bool.rec (motive := fun _ => Bool) (tstC NN AA HX HY (pos t) l (Nat.sub (Nat.succ k) t) v (fun y => mvC NN AA HX HY ih l m g k t z v y)) true (Nat.ble v.length 1)) fuel
+    (fun _ ih k t z v => Bool.rec (motive := fun _ => Bool) (guardedCoverage NN enabled (pos t) l v (tstC NN AA HX HY (pos t) l (Nat.sub (Nat.succ k) t) v (fun y => mvC NN AA HX HY ih l m g k t z v y))) true (Nat.ble v.length 1)) fuel
+-- Check coverage at each step of the fourteen-gate search.
+abbrev lookC (NN AA HX HY : Nat) (l m g fuel : Nat) : Nat → Nat → Nat → List W → Bool :=
+  lookCore NN AA HX HY l m g (Nat.beq fuel 14) fuel
 def look1C (NN AA HX HY : Nat) (l m g K : Nat) (fuel : Nat) : Nat → Nat → Nat → List W → Bool :=
   Nat.rec (motive := fun _ => Nat → Nat → Nat → List W → Bool) (fun _ _ _ _ => true)
     (fun _ ih k t z v => Bool.rec (motive := fun _ => Bool) (tstC NN AA HX HY (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
@@ -2329,22 +2334,23 @@ lemma tst_sound {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l 
       cases h3 : flk l (wst (pos' t) l v) v star with
       | true => exact ⟨0, fun F => by rw [e, h1, h2, hbip, h3]; rfl, Or.inl rfl⟩
       | false => exact ⟨1, fun F => by rw [e, h1, h2, hbip, h3]; rfl, Or.inr ⟨rfl, by omega, nk_ok X hs hm (by omega) h3⟩⟩
+lemma cov_full {t k k' z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k z v S) (hl : Live R m T k' t S) : Nat.beq (cov (pos' t) l v) l = true := by
+  rw [Nat.beq_eq]
+  apply Nat.eq_of_testBit_eq; intro i
+  cases hli : l.testBit i with
+  | false =>
+    by_contra hc
+    obtain ⟨w, _, hw⟩ := (cov_bit _ _ _ _).1 (by simpa using hc)
+    rw [sp_bit, hli] at hw; simp at hw
+  | true =>
+    rw [cov_bit]
+    obtain ⟨⟨m1, m2, t1, t2⟩, _⟩ := X.lg i hli
+    obtain ⟨w, hw, hs1⟩ := hl.cov m1 m2 t1 t2
+    obtain ⟨w', hw', rfl⟩ := hs.rep.mem.1 hw
+    exact ⟨w', hw', by rw [sp_bit, hli, hs1]; rfl⟩
 lemma cv_ok {t k k' z : ℕ} {v : List W} {S : Finset ℕ} {b : Bool} (hs : StOk P T l k z v S) (hl : Live R m T k' t S)
     (h : cv (pos' t) l v b = false) : b = false := by
-  have hcov : Nat.beq (cov (pos' t) l v) l = true := by
-    rw [Nat.beq_eq]
-    apply Nat.eq_of_testBit_eq; intro i
-    cases hli : l.testBit i with
-    | false =>
-      by_contra hc
-      obtain ⟨w, _, hw⟩ := (cov_bit _ _ _ _).1 (by simpa using hc)
-      rw [sp_bit, hli] at hw; simp at hw
-    | true =>
-      rw [cov_bit]
-      obtain ⟨⟨m1, m2, t1, t2⟩, _⟩ := X.lg i hli
-      obtain ⟨w, hw, hs1⟩ := hl.cov m1 m2 t1 t2
-      obtain ⟨w', hw', rfl⟩ := hs.rep.mem.1 hw
-      exact ⟨w', hw', by rw [sp_bit, hli, hs1]; rfl⟩
+  have hcov := cov_full X hs hl
   simp only [cv, cvC, bR, hcov, cond_true] at h
   cases hp : pos' t <;> rw [hp] at h <;> simpa using h
 end sound
@@ -2840,14 +2846,14 @@ lemma mv_sound (hR : RR R) {F : ℕ → ℕ → ℕ → List W → Bool}
       subst hxs
       exact Or.inl (pairsQ_false hp (List.mem_map_of_mem ha) hax (List.mem_map_of_mem hc) hcy)) hf3
     exact hF _ _ _ _ _ hf hst (codB (codU (codU hcod hmem1) hmem2) hmem) k0 (by simpa using hk) (hb.min hl hm2.2)
-theorem look_sound (hR : RR R) : ∀ (fuel k t z : ℕ) (v : List W) (S : Finset ℕ), look l m g fuel k t z v = false → StOk P T l k z v S → Cod R v →
+theorem lookCore_sound (hR : RR R) (enabled : Bool) : ∀ (fuel k t z : ℕ) (v : List W) (S : Finset ℕ), lookCore I.NN I.AA I.HX I.HY l m g enabled fuel k t z v = false → StOk P T l k z v S → Cod R v →
     ∀ k' ≤ k, ¬ Min R m T k' t S := by
   intro fuel
   induction fuel with
-  | zero => intro k t z v S h; simp [look, lookC] at h
+  | zero => intro k t z v S h; simp [lookCore] at h
   | succ fuel ih =>
     intro k t z v S h hs hcod k' hk hm
-    change (Bool.rec (motive := fun _ => Bool) (tst (pos t) l (k + 1 - t) v (fun y => mv (look l m g fuel) l m g k t z v y)) true (Nat.ble v.length 1) : Bool) = false at h
+    change (Bool.rec (motive := fun _ => Bool) (guardedCoverage I.NN enabled (pos t) l v (tst (pos t) l (k + 1 - t) v (fun y => mv (lookCore I.NN I.AA I.HX I.HY l m g enabled fuel) l m g k t z v y))) true (Nat.ble v.length 1) : Bool) = false at h
     rw [bR, pos_eq] at h
     cases h0 : Nat.ble v.length 1 with
     | true => rw [h0] at h; simp at h
@@ -2856,10 +2862,18 @@ theorem look_sound (hR : RR R) : ∀ (fuel k t z : ℕ) (v : List W) (S : Finset
       have hlen : 2 ≤ v.length := by
         by_contra hc
         rw [Nat.ble_eq_true_of_le (by omega)] at h0; simp at h0
+      have same (b : Bool) : guardedCoverage I.NN enabled (pos' t) l v b = b := by
+        have hc := cov_full X hs hm.1
+        cases enabled <;> simp [guardedCoverage, bR, hc]
+      rw [same] at h
       obtain ⟨y, hFy, hyk⟩ := tst_sound X hs hm hk
       have hy := (hFy _).symm.trans h
       beta_reduce at hy
       exact mv_sound X hR ih hs hcod hlen hy k' hk hm hyk
+theorem look_sound (hR : RR R) : ∀ (fuel k t z : ℕ) (v : List W) (S : Finset ℕ), look l m g fuel k t z v = false → StOk P T l k z v S → Cod R v →
+    ∀ k' ≤ k, ¬ Min R m T k' t S := by
+  intro fuel
+  exact lookCore_sound X hR (Nat.beq fuel 14) fuel
 end sound
 lemma Live.W {m T k t : ℕ} {S : Finset ℕ} {Q : Set ℕ} (hl : Live R m T k t S) (hQ : (S : Set ℕ) ⊆ Q) : Sol Z0 m T k Q := hl.sol.mono le_rfl hQ
 lemma front {m T : ℕ} (hR : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {k t : ℕ} {S : Finset ℕ} (hl : Live Z0 m T k t S)
@@ -5296,7 +5310,7 @@ lemma co2_id : ∀ a ∈ q2, Imp [] a.1 a.2 := by
 def rangeCheck (test : ℕ → Bool) (start count : ℕ) : Bool :=
   (List.range' start count).all test
 
-lemma rangeCheck_append (test : ℕ → Bool) {s a b : ℕ}
+lemma rangeAppend (test : ℕ → Bool) {s a b : ℕ}
     (left : rangeCheck test s a = true) (right : rangeCheck test (s+a) b = true) :
     rangeCheck test s (a+b) = true := by
   unfold rangeCheck at *
@@ -5355,15 +5369,15 @@ set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma co2t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 0 a.1 a.2 = false :=
   restrictedWitness q2 2 0 co2t0_cov (by decide +kernel)
-    (@rangeCheck_append (restrictedTest q2 2 0 co2t0_cov) 0 12 11
-      (@rangeCheck_append (restrictedTest q2 2 0 co2t0_cov) 0 4 8
+    (@rangeAppend (restrictedTest q2 2 0 co2t0_cov) 0 12 11
+      (@rangeAppend (restrictedTest q2 2 0 co2t0_cov) 0 4 8
        co2t0batch0
-       (@rangeCheck_append (restrictedTest q2 2 0 co2t0_cov) 4 4 4
+       (@rangeAppend (restrictedTest q2 2 0 co2t0_cov) 4 4 4
         co2t0batch1
         co2t0batch2))
-      (@rangeCheck_append (restrictedTest q2 2 0 co2t0_cov) 12 4 7
+      (@rangeAppend (restrictedTest q2 2 0 co2t0_cov) 12 4 7
        co2t0batch3
-       (@rangeCheck_append (restrictedTest q2 2 0 co2t0_cov) 16 4 3
+       (@rangeAppend (restrictedTest q2 2 0 co2t0_cov) 16 4 3
         co2t0batch4
         co2t0batch5)))
 
@@ -5397,15 +5411,15 @@ set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma co2t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 1 a.1 a.2 = false :=
   restrictedWitness q2 2 1 co2t1_cov (by decide +kernel)
-    (@rangeCheck_append (restrictedTest q2 2 1 co2t1_cov) 0 12 11
-      (@rangeCheck_append (restrictedTest q2 2 1 co2t1_cov) 0 4 8
+    (@rangeAppend (restrictedTest q2 2 1 co2t1_cov) 0 12 11
+      (@rangeAppend (restrictedTest q2 2 1 co2t1_cov) 0 4 8
        co2t1batch0
-       (@rangeCheck_append (restrictedTest q2 2 1 co2t1_cov) 4 4 4
+       (@rangeAppend (restrictedTest q2 2 1 co2t1_cov) 4 4 4
         co2t1batch1
         co2t1batch2))
-      (@rangeCheck_append (restrictedTest q2 2 1 co2t1_cov) 12 4 7
+      (@rangeAppend (restrictedTest q2 2 1 co2t1_cov) 12 4 7
        co2t1batch3
-       (@rangeCheck_append (restrictedTest q2 2 1 co2t1_cov) 16 4 3
+       (@rangeAppend (restrictedTest q2 2 1 co2t1_cov) 16 4 3
         co2t1batch4
         co2t1batch5)))
 
@@ -5713,15 +5727,15 @@ set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma co64t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 0 a.1 a.2 = false :=
   restrictedWitness q64 64 0 co64t0_cov (by decide +kernel)
-    (@rangeCheck_append (restrictedTest q64 64 0 co64t0_cov) 0 12 10
-      (@rangeCheck_append (restrictedTest q64 64 0 co64t0_cov) 0 4 8
+    (@rangeAppend (restrictedTest q64 64 0 co64t0_cov) 0 12 10
+      (@rangeAppend (restrictedTest q64 64 0 co64t0_cov) 0 4 8
        co64t0batch0
-       (@rangeCheck_append (restrictedTest q64 64 0 co64t0_cov) 4 4 4
+       (@rangeAppend (restrictedTest q64 64 0 co64t0_cov) 4 4 4
         co64t0batch1
         co64t0batch2))
-      (@rangeCheck_append (restrictedTest q64 64 0 co64t0_cov) 12 4 6
+      (@rangeAppend (restrictedTest q64 64 0 co64t0_cov) 12 4 6
        co64t0batch3
-       (@rangeCheck_append (restrictedTest q64 64 0 co64t0_cov) 16 4 2
+       (@rangeAppend (restrictedTest q64 64 0 co64t0_cov) 16 4 2
         co64t0batch4
         co64t0batch5)))
 
@@ -5755,15 +5769,15 @@ set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma co64t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 1 a.1 a.2 = false :=
   restrictedWitness q64 64 1 co64t1_cov (by decide +kernel)
-    (@rangeCheck_append (restrictedTest q64 64 1 co64t1_cov) 0 12 10
-      (@rangeCheck_append (restrictedTest q64 64 1 co64t1_cov) 0 4 8
+    (@rangeAppend (restrictedTest q64 64 1 co64t1_cov) 0 12 10
+      (@rangeAppend (restrictedTest q64 64 1 co64t1_cov) 0 4 8
        co64t1batch0
-       (@rangeCheck_append (restrictedTest q64 64 1 co64t1_cov) 4 4 4
+       (@rangeAppend (restrictedTest q64 64 1 co64t1_cov) 4 4 4
         co64t1batch1
         co64t1batch2))
-      (@rangeCheck_append (restrictedTest q64 64 1 co64t1_cov) 12 4 6
+      (@rangeAppend (restrictedTest q64 64 1 co64t1_cov) 12 4 6
        co64t1batch3
-       (@rangeCheck_append (restrictedTest q64 64 1 co64t1_cov) 16 4 2
+       (@rangeAppend (restrictedTest q64 64 1 co64t1_cov) 16 4 2
         co64t1batch4
         co64t1batch5)))
 
@@ -7640,59 +7654,59 @@ theorem coverageChunk27 : rangeCheck readyForThird 432 11 = true := by decide +k
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem coverageChunkAll : rangeCheck readyForThird 0 secondCount = true := by
-  exact (@rangeCheck_append readyForThird 0 224 219
-    (@rangeCheck_append readyForThird 0 112 112
-     (@rangeCheck_append readyForThird 0 48 64
-      (@rangeCheck_append readyForThird 0 16 32
+  exact (@rangeAppend readyForThird 0 224 219
+    (@rangeAppend readyForThird 0 112 112
+     (@rangeAppend readyForThird 0 48 64
+      (@rangeAppend readyForThird 0 16 32
        coverageChunk0
-       (@rangeCheck_append readyForThird 16 16 16
+       (@rangeAppend readyForThird 16 16 16
         coverageChunk1
         coverageChunk2))
-      (@rangeCheck_append readyForThird 48 32 32
-       (@rangeCheck_append readyForThird 48 16 16
+      (@rangeAppend readyForThird 48 32 32
+       (@rangeAppend readyForThird 48 16 16
         coverageChunk3
         coverageChunk4)
-       (@rangeCheck_append readyForThird 80 16 16
+       (@rangeAppend readyForThird 80 16 16
         coverageChunk5
         coverageChunk6)))
-     (@rangeCheck_append readyForThird 112 48 64
-      (@rangeCheck_append readyForThird 112 16 32
+     (@rangeAppend readyForThird 112 48 64
+      (@rangeAppend readyForThird 112 16 32
        coverageChunk7
-       (@rangeCheck_append readyForThird 128 16 16
+       (@rangeAppend readyForThird 128 16 16
         coverageChunk8
         coverageChunk9))
-      (@rangeCheck_append readyForThird 160 32 32
-       (@rangeCheck_append readyForThird 160 16 16
+      (@rangeAppend readyForThird 160 32 32
+       (@rangeAppend readyForThird 160 16 16
         coverageChunk10
         coverageChunk11)
-       (@rangeCheck_append readyForThird 192 16 16
+       (@rangeAppend readyForThird 192 16 16
         coverageChunk12
         coverageChunk13))))
-    (@rangeCheck_append readyForThird 224 112 107
-     (@rangeCheck_append readyForThird 224 48 64
-      (@rangeCheck_append readyForThird 224 16 32
+    (@rangeAppend readyForThird 224 112 107
+     (@rangeAppend readyForThird 224 48 64
+      (@rangeAppend readyForThird 224 16 32
        coverageChunk14
-       (@rangeCheck_append readyForThird 240 16 16
+       (@rangeAppend readyForThird 240 16 16
         coverageChunk15
         coverageChunk16))
-      (@rangeCheck_append readyForThird 272 32 32
-       (@rangeCheck_append readyForThird 272 16 16
+      (@rangeAppend readyForThird 272 32 32
+       (@rangeAppend readyForThird 272 16 16
         coverageChunk17
         coverageChunk18)
-       (@rangeCheck_append readyForThird 304 16 16
+       (@rangeAppend readyForThird 304 16 16
         coverageChunk19
         coverageChunk20)))
-     (@rangeCheck_append readyForThird 336 48 59
-      (@rangeCheck_append readyForThird 336 16 32
+     (@rangeAppend readyForThird 336 48 59
+      (@rangeAppend readyForThird 336 16 32
        coverageChunk21
-       (@rangeCheck_append readyForThird 352 16 16
+       (@rangeAppend readyForThird 352 16 16
         coverageChunk22
         coverageChunk23))
-      (@rangeCheck_append readyForThird 384 32 27
-       (@rangeCheck_append readyForThird 384 16 16
+      (@rangeAppend readyForThird 384 32 27
+       (@rangeAppend readyForThird 384 16 16
         coverageChunk24
         coverageChunk25)
-       (@rangeCheck_append readyForThird 416 16 11
+       (@rangeAppend readyForThird 416 16 11
         coverageChunk26
         coverageChunk27)))))
 
@@ -7855,81 +7869,81 @@ theorem mixedChunk38 : rangeCheck secondMixedTest 439 4 = true := by decide +ker
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem mixedChunkAll : rangeCheck secondMixedTest 0 secondCount = true := by
-  exact (@rangeCheck_append secondMixedTest 0 227 216
-    (@rangeCheck_append secondMixedTest 0 97 130
-     (@rangeCheck_append secondMixedTest 0 50 47
-      (@rangeCheck_append secondMixedTest 0 18 32
-       (@rangeCheck_append secondMixedTest 0 7 11
+  exact (@rangeAppend secondMixedTest 0 227 216
+    (@rangeAppend secondMixedTest 0 97 130
+     (@rangeAppend secondMixedTest 0 50 47
+      (@rangeAppend secondMixedTest 0 18 32
+       (@rangeAppend secondMixedTest 0 7 11
         mixedChunk0
         mixedChunk1)
-       (@rangeCheck_append secondMixedTest 18 16 16
+       (@rangeAppend secondMixedTest 18 16 16
         mixedChunk2
         mixedChunk3))
-      (@rangeCheck_append secondMixedTest 50 19 28
-       (@rangeCheck_append secondMixedTest 50 6 13
+      (@rangeAppend secondMixedTest 50 19 28
+       (@rangeAppend secondMixedTest 50 6 13
         mixedChunk4
         mixedChunk5)
-       (@rangeCheck_append secondMixedTest 69 12 16
+       (@rangeAppend secondMixedTest 69 12 16
         mixedChunk6
-        (@rangeCheck_append secondMixedTest 81 7 9
+        (@rangeAppend secondMixedTest 81 7 9
          mixedChunk7
          mixedChunk8))))
-     (@rangeCheck_append secondMixedTest 97 66 64
-      (@rangeCheck_append secondMixedTest 97 32 34
-       (@rangeCheck_append secondMixedTest 97 16 16
+     (@rangeAppend secondMixedTest 97 66 64
+      (@rangeAppend secondMixedTest 97 32 34
+       (@rangeAppend secondMixedTest 97 16 16
         mixedChunk9
         mixedChunk10)
-       (@rangeCheck_append secondMixedTest 129 9 25
+       (@rangeAppend secondMixedTest 129 9 25
         mixedChunk11
-        (@rangeCheck_append secondMixedTest 138 9 16
+        (@rangeAppend secondMixedTest 138 9 16
          mixedChunk12
          mixedChunk13)))
-      (@rangeCheck_append secondMixedTest 163 32 32
-       (@rangeCheck_append secondMixedTest 163 16 16
+      (@rangeAppend secondMixedTest 163 32 32
+       (@rangeAppend secondMixedTest 163 16 16
         mixedChunk14
         mixedChunk15)
-       (@rangeCheck_append secondMixedTest 195 16 16
+       (@rangeAppend secondMixedTest 195 16 16
         mixedChunk16
-        (@rangeCheck_append secondMixedTest 211 12 4
+        (@rangeAppend secondMixedTest 211 12 4
          mixedChunk17
          mixedChunk18)))))
-    (@rangeCheck_append secondMixedTest 227 120 96
-     (@rangeCheck_append secondMixedTest 227 55 65
-      (@rangeCheck_append secondMixedTest 227 17 38
-       (@rangeCheck_append secondMixedTest 227 10 7
+    (@rangeAppend secondMixedTest 227 120 96
+     (@rangeAppend secondMixedTest 227 55 65
+      (@rangeAppend secondMixedTest 227 17 38
+       (@rangeAppend secondMixedTest 227 10 7
         mixedChunk19
         mixedChunk20)
-       (@rangeCheck_append secondMixedTest 244 6 32
+       (@rangeAppend secondMixedTest 244 6 32
         mixedChunk21
-        (@rangeCheck_append secondMixedTest 250 16 16
+        (@rangeAppend secondMixedTest 250 16 16
          mixedChunk22
          mixedChunk23)))
-      (@rangeCheck_append secondMixedTest 282 32 33
-       (@rangeCheck_append secondMixedTest 282 16 16
+      (@rangeAppend secondMixedTest 282 32 33
+       (@rangeAppend secondMixedTest 282 16 16
         mixedChunk24
         mixedChunk25)
-       (@rangeCheck_append secondMixedTest 314 12 21
+       (@rangeAppend secondMixedTest 314 12 21
         mixedChunk26
-        (@rangeCheck_append secondMixedTest 326 15 6
+        (@rangeAppend secondMixedTest 326 15 6
          mixedChunk27
          mixedChunk28))))
-     (@rangeCheck_append secondMixedTest 347 47 49
-      (@rangeCheck_append secondMixedTest 347 13 34
-       (@rangeCheck_append secondMixedTest 347 6 7
+     (@rangeAppend secondMixedTest 347 47 49
+      (@rangeAppend secondMixedTest 347 13 34
+       (@rangeAppend secondMixedTest 347 6 7
         mixedChunk29
         mixedChunk30)
-       (@rangeCheck_append secondMixedTest 360 16 18
+       (@rangeAppend secondMixedTest 360 16 18
         mixedChunk31
-        (@rangeCheck_append secondMixedTest 376 14 4
+        (@rangeAppend secondMixedTest 376 14 4
          mixedChunk32
          mixedChunk33)))
-      (@rangeCheck_append secondMixedTest 394 29 20
-       (@rangeCheck_append secondMixedTest 394 13 16
+      (@rangeAppend secondMixedTest 394 29 20
+       (@rangeAppend secondMixedTest 394 13 16
         mixedChunk34
         mixedChunk35)
-       (@rangeCheck_append secondMixedTest 423 9 11
+       (@rangeAppend secondMixedTest 423 9 11
         mixedChunk36
-        (@rangeCheck_append secondMixedTest 432 7 4
+        (@rangeAppend secondMixedTest 432 7 4
          mixedChunk37
          mixedChunk38))))))
 
@@ -8096,83 +8110,83 @@ theorem thirdChunk39 : rangeCheck thirdTest 3034 45 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem thirdChunkAll : rangeCheck thirdTest 0 thirdCount = true := by
-  exact (@rangeCheck_append thirdTest 0 1600 1479
-    (@rangeCheck_append thirdTest 0 800 800
-     (@rangeCheck_append thirdTest 0 400 400
-      (@rangeCheck_append thirdTest 0 160 240
-       (@rangeCheck_append thirdTest 0 80 80
+  exact (@rangeAppend thirdTest 0 1600 1479
+    (@rangeAppend thirdTest 0 800 800
+     (@rangeAppend thirdTest 0 400 400
+      (@rangeAppend thirdTest 0 160 240
+       (@rangeAppend thirdTest 0 80 80
         thirdChunk0
         thirdChunk1)
-       (@rangeCheck_append thirdTest 160 80 160
+       (@rangeAppend thirdTest 160 80 160
         thirdChunk2
-        (@rangeCheck_append thirdTest 240 80 80
+        (@rangeAppend thirdTest 240 80 80
          thirdChunk3
          thirdChunk4)))
-      (@rangeCheck_append thirdTest 400 160 240
-       (@rangeCheck_append thirdTest 400 80 80
+      (@rangeAppend thirdTest 400 160 240
+       (@rangeAppend thirdTest 400 80 80
         thirdChunk5
         thirdChunk6)
-       (@rangeCheck_append thirdTest 560 80 160
+       (@rangeAppend thirdTest 560 80 160
         thirdChunk7
-        (@rangeCheck_append thirdTest 640 80 80
+        (@rangeAppend thirdTest 640 80 80
          thirdChunk8
          thirdChunk9))))
-     (@rangeCheck_append thirdTest 800 400 400
-      (@rangeCheck_append thirdTest 800 160 240
-       (@rangeCheck_append thirdTest 800 80 80
+     (@rangeAppend thirdTest 800 400 400
+      (@rangeAppend thirdTest 800 160 240
+       (@rangeAppend thirdTest 800 80 80
         thirdChunk10
         thirdChunk11)
-       (@rangeCheck_append thirdTest 960 80 160
+       (@rangeAppend thirdTest 960 80 160
         thirdChunk12
-        (@rangeCheck_append thirdTest 1040 80 80
+        (@rangeAppend thirdTest 1040 80 80
          thirdChunk13
          thirdChunk14)))
-      (@rangeCheck_append thirdTest 1200 160 240
-       (@rangeCheck_append thirdTest 1200 80 80
+      (@rangeAppend thirdTest 1200 160 240
+       (@rangeAppend thirdTest 1200 80 80
         thirdChunk15
         thirdChunk16)
-       (@rangeCheck_append thirdTest 1360 80 160
+       (@rangeAppend thirdTest 1360 80 160
         thirdChunk17
-        (@rangeCheck_append thirdTest 1440 80 80
+        (@rangeAppend thirdTest 1440 80 80
          thirdChunk18
          thirdChunk19)))))
-    (@rangeCheck_append thirdTest 1600 800 679
-     (@rangeCheck_append thirdTest 1600 400 400
-      (@rangeCheck_append thirdTest 1600 160 240
-       (@rangeCheck_append thirdTest 1600 80 80
+    (@rangeAppend thirdTest 1600 800 679
+     (@rangeAppend thirdTest 1600 400 400
+      (@rangeAppend thirdTest 1600 160 240
+       (@rangeAppend thirdTest 1600 80 80
         thirdChunk20
         thirdChunk21)
-       (@rangeCheck_append thirdTest 1760 80 160
+       (@rangeAppend thirdTest 1760 80 160
         thirdChunk22
-        (@rangeCheck_append thirdTest 1840 80 80
+        (@rangeAppend thirdTest 1840 80 80
          thirdChunk23
          thirdChunk24)))
-      (@rangeCheck_append thirdTest 2000 160 240
-       (@rangeCheck_append thirdTest 2000 80 80
+      (@rangeAppend thirdTest 2000 160 240
+       (@rangeAppend thirdTest 2000 80 80
         thirdChunk25
         thirdChunk26)
-       (@rangeCheck_append thirdTest 2160 80 160
+       (@rangeAppend thirdTest 2160 80 160
         thirdChunk27
-        (@rangeCheck_append thirdTest 2240 80 80
+        (@rangeAppend thirdTest 2240 80 80
          thirdChunk28
          thirdChunk29))))
-     (@rangeCheck_append thirdTest 2400 382 297
-      (@rangeCheck_append thirdTest 2400 142 240
-       (@rangeCheck_append thirdTest 2400 62 80
+     (@rangeAppend thirdTest 2400 382 297
+      (@rangeAppend thirdTest 2400 142 240
+       (@rangeAppend thirdTest 2400 62 80
         thirdChunk30
         thirdChunk31)
-       (@rangeCheck_append thirdTest 2542 80 160
+       (@rangeAppend thirdTest 2542 80 160
         thirdChunk32
-        (@rangeCheck_append thirdTest 2622 80 80
+        (@rangeAppend thirdTest 2622 80 80
          thirdChunk33
          thirdChunk34)))
-      (@rangeCheck_append thirdTest 2782 92 205
-       (@rangeCheck_append thirdTest 2782 47 45
+      (@rangeAppend thirdTest 2782 92 205
+       (@rangeAppend thirdTest 2782 47 45
         thirdChunk35
         thirdChunk36)
-       (@rangeCheck_append thirdTest 2874 80 125
+       (@rangeAppend thirdTest 2874 80 125
         thirdChunk37
-        (@rangeCheck_append thirdTest 2954 80 45
+        (@rangeAppend thirdTest 2954 80 45
          thirdChunk38
          thirdChunk39))))))
 
@@ -9144,17 +9158,17 @@ theorem negCover6 : rangeCheck rawNegCover 96 16 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem negCoverAll : rangeCheck rawNegCover 0 112 = true :=
-  (@rangeCheck_append rawNegCover 0 48 64
-    (@rangeCheck_append rawNegCover 0 16 32
+  (@rangeAppend rawNegCover 0 48 64
+    (@rangeAppend rawNegCover 0 16 32
      negCover0
-     (@rangeCheck_append rawNegCover 16 16 16
+     (@rangeAppend rawNegCover 16 16 16
       negCover1
       negCover2))
-    (@rangeCheck_append rawNegCover 48 32 32
-     (@rangeCheck_append rawNegCover 48 16 16
+    (@rangeAppend rawNegCover 48 32 32
+     (@rangeAppend rawNegCover 48 16 16
       negCover3
       negCover4)
-     (@rangeCheck_append rawNegCover 80 16 16
+     (@rangeAppend rawNegCover 80 16 16
       negCover5
       negCover6)))
 
@@ -9169,7 +9183,7 @@ theorem negMixed1 : rangeCheck rawNegMixedTest 56 56 = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem negMixedAll : rangeCheck rawNegMixedTest 0 112 = true :=
-  (@rangeCheck_append rawNegMixedTest 0 56 56
+  (@rangeAppend rawNegMixedTest 0 56 56
     negMixed0
     negMixed1)
 
@@ -9228,29 +9242,29 @@ theorem negSecond12 : rangeCheck rawNegSecondTest 1152 77 = true := by decide +k
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem negSecondAll : rangeCheck rawNegSecondTest 0 1229 = true :=
-  (@rangeCheck_append rawNegSecondTest 0 576 653
-    (@rangeCheck_append rawNegSecondTest 0 288 288
-     (@rangeCheck_append rawNegSecondTest 0 96 192
+  (@rangeAppend rawNegSecondTest 0 576 653
+    (@rangeAppend rawNegSecondTest 0 288 288
+     (@rangeAppend rawNegSecondTest 0 96 192
       negSecond0
-      (@rangeCheck_append rawNegSecondTest 96 96 96
+      (@rangeAppend rawNegSecondTest 96 96 96
        negSecond1
        negSecond2))
-     (@rangeCheck_append rawNegSecondTest 288 96 192
+     (@rangeAppend rawNegSecondTest 288 96 192
       negSecond3
-      (@rangeCheck_append rawNegSecondTest 384 96 96
+      (@rangeAppend rawNegSecondTest 384 96 96
        negSecond4
        negSecond5)))
-    (@rangeCheck_append rawNegSecondTest 576 288 365
-     (@rangeCheck_append rawNegSecondTest 576 96 192
+    (@rangeAppend rawNegSecondTest 576 288 365
+     (@rangeAppend rawNegSecondTest 576 96 192
       negSecond6
-      (@rangeCheck_append rawNegSecondTest 672 96 96
+      (@rangeAppend rawNegSecondTest 672 96 96
        negSecond7
        negSecond8))
-     (@rangeCheck_append rawNegSecondTest 864 192 173
-      (@rangeCheck_append rawNegSecondTest 864 96 96
+     (@rangeAppend rawNegSecondTest 864 192 173
+      (@rangeAppend rawNegSecondTest 864 96 96
        negSecond9
        negSecond10)
-      (@rangeCheck_append rawNegSecondTest 1056 96 77
+      (@rangeAppend rawNegSecondTest 1056 96 77
        negSecond11
        negSecond12))))
 
