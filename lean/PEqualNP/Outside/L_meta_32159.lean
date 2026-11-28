@@ -5216,1348 +5216,2040 @@ theorem bridge_not (gates : List Gate) (o : ℕ) (hD : FanInTwo ⟨gates, o⟩) 
       change (gates.foldl (fun w g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]) (List.ofFn (row k))).getD o false = f (row k) at h
       rw [h]; exact (f_bit k).symm
   exact ex_sol_not (mz 0) gates init (C (mz 0) (WZ [] 0)) hinit_mem (Or.inr (Set.mem_insert _ _)) (Or.inr (Set.mem_insert_of_mem _ rfl)) hD hu hnot ⟨o, hout⟩
-def rootCases : List (ℕ × ℕ) := [(0x2, 0), (0x10, 0), (0x2000, 0), (0x4000, 0), (0x100000, 0), (0x4000000, 0), (0x20000000, 0), (0x2000000000, 0), (0x40000000000, 0), (0x400000000000, 0), (0x4000000000000, 0), (0x800000000000000, 0), (0x40000000000000000, 0), (0x40000000000000000000, 0), (0x800000000000000000000, 0), (0x800000000000000000000000, 0), (0x1000000000000000000000000000, 0), (0x8000000000000000000000000000, 0), (0x200000000000000000000000000000, 0), (0x400000000000000000000000000000000, 0), (0x400000000000000000000000000000000000000, 0), (0x400000000000000000000000000000000000000000, 0), (0x2000000000000000000000000000000000000000000, 0), (0x4000000000000000000000000000000000000000000000, 0), (0x800000000000000000000000000000000000000000000000, 0), (0x80000000000000000000000000000000000000000000000000, 0), (0x4000000000000000000000000000000000000000000000000000, 0), (0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed, 1)]
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rootCases_full : mFull rootCases = true := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_0_and : chkPairPicked [] rootBounds 0 14 1 0x2 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_0_or_move0 : chkPairNext [] rootBounds 0 14 1 0x2 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_0_or_move1 : chkPairNext [] rootBounds 0 14 1 0x2 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_0_or_move2 : chkPairNext [] rootBounds 0 14 1 0x2 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_0_or_move3 : chkPairNext [] rootBounds 0 14 1 0x2 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_0_or_move4 : chkPairNext [] rootBounds 0 14 1 0x2 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_0_or_move5 : chkPairNext [] rootBounds 0 14 1 0x2 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_0_or_move6 : chkPairNext [] rootBounds 0 14 1 0x2 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_0_or_move7 : chkPairNext [] rootBounds 0 14 1 0x2 0 true 7 = false := by decide +kernel
-lemma rt1_0_or : chkPairPicked [] rootBounds 0 14 1 0x2 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_0_or_move0
-  · exact rt1_0_or_move1
-  · exact rt1_0_or_move2
-  · exact rt1_0_or_move3
-  · exact rt1_0_or_move4
-  · exact rt1_0_or_move5
-  · exact rt1_0_or_move6
-  · exact rt1_0_or_move7
-lemma rt1_0 : chk [] rootBounds 0 14 1 0x2 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_0_and
-  · exact rt1_0_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_1_and : chkPairPicked [] rootBounds 0 14 1 0x10 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_1_or_move0 : chkPairNext [] rootBounds 0 14 1 0x10 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_1_or_move1 : chkPairNext [] rootBounds 0 14 1 0x10 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_1_or_move2 : chkPairNext [] rootBounds 0 14 1 0x10 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_1_or_move3 : chkPairNext [] rootBounds 0 14 1 0x10 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_1_or_move4 : chkPairNext [] rootBounds 0 14 1 0x10 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_1_or_move5 : chkPairNext [] rootBounds 0 14 1 0x10 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_1_or_move6 : chkPairNext [] rootBounds 0 14 1 0x10 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_1_or_move7 : chkPairNext [] rootBounds 0 14 1 0x10 0 true 7 = false := by decide +kernel
-lemma rt1_1_or : chkPairPicked [] rootBounds 0 14 1 0x10 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_1_or_move0
-  · exact rt1_1_or_move1
-  · exact rt1_1_or_move2
-  · exact rt1_1_or_move3
-  · exact rt1_1_or_move4
-  · exact rt1_1_or_move5
-  · exact rt1_1_or_move6
-  · exact rt1_1_or_move7
-lemma rt1_1 : chk [] rootBounds 0 14 1 0x10 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_1_and
-  · exact rt1_1_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_2_and : chkPairPicked [] rootBounds 0 14 1 0x2000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_2_or_move0 : chkPairNext [] rootBounds 0 14 1 0x2000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_2_or_move1 : chkPairNext [] rootBounds 0 14 1 0x2000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_2_or_move2 : chkPairNext [] rootBounds 0 14 1 0x2000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_2_or_move3 : chkPairNext [] rootBounds 0 14 1 0x2000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_2_or_move4 : chkPairNext [] rootBounds 0 14 1 0x2000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_2_or_move5 : chkPairNext [] rootBounds 0 14 1 0x2000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_2_or_move6 : chkPairNext [] rootBounds 0 14 1 0x2000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_2_or_move7 : chkPairNext [] rootBounds 0 14 1 0x2000 0 true 7 = false := by decide +kernel
-lemma rt1_2_or : chkPairPicked [] rootBounds 0 14 1 0x2000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_2_or_move0
-  · exact rt1_2_or_move1
-  · exact rt1_2_or_move2
-  · exact rt1_2_or_move3
-  · exact rt1_2_or_move4
-  · exact rt1_2_or_move5
-  · exact rt1_2_or_move6
-  · exact rt1_2_or_move7
-lemma rt1_2 : chk [] rootBounds 0 14 1 0x2000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_2_and
-  · exact rt1_2_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_3_and : chkPairPicked [] rootBounds 0 14 1 0x4000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_3_or_move0 : chkPairNext [] rootBounds 0 14 1 0x4000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_3_or_move1 : chkPairNext [] rootBounds 0 14 1 0x4000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_3_or_move2 : chkPairNext [] rootBounds 0 14 1 0x4000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_3_or_move3 : chkPairNext [] rootBounds 0 14 1 0x4000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_3_or_move4 : chkPairNext [] rootBounds 0 14 1 0x4000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_3_or_move5 : chkPairNext [] rootBounds 0 14 1 0x4000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_3_or_move6 : chkPairNext [] rootBounds 0 14 1 0x4000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_3_or_move7 : chkPairNext [] rootBounds 0 14 1 0x4000 0 true 7 = false := by decide +kernel
-lemma rt1_3_or : chkPairPicked [] rootBounds 0 14 1 0x4000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_3_or_move0
-  · exact rt1_3_or_move1
-  · exact rt1_3_or_move2
-  · exact rt1_3_or_move3
-  · exact rt1_3_or_move4
-  · exact rt1_3_or_move5
-  · exact rt1_3_or_move6
-  · exact rt1_3_or_move7
-lemma rt1_3 : chk [] rootBounds 0 14 1 0x4000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_3_and
-  · exact rt1_3_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_4_and : chkPairPicked [] rootBounds 0 14 1 0x100000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_4_or_move0 : chkPairNext [] rootBounds 0 14 1 0x100000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_4_or_move1 : chkPairNext [] rootBounds 0 14 1 0x100000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_4_or_move2 : chkPairNext [] rootBounds 0 14 1 0x100000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_4_or_move3 : chkPairNext [] rootBounds 0 14 1 0x100000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_4_or_move4 : chkPairNext [] rootBounds 0 14 1 0x100000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_4_or_move5 : chkPairNext [] rootBounds 0 14 1 0x100000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_4_or_move6 : chkPairNext [] rootBounds 0 14 1 0x100000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_4_or_move7 : chkPairNext [] rootBounds 0 14 1 0x100000 0 true 7 = false := by decide +kernel
-lemma rt1_4_or : chkPairPicked [] rootBounds 0 14 1 0x100000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_4_or_move0
-  · exact rt1_4_or_move1
-  · exact rt1_4_or_move2
-  · exact rt1_4_or_move3
-  · exact rt1_4_or_move4
-  · exact rt1_4_or_move5
-  · exact rt1_4_or_move6
-  · exact rt1_4_or_move7
-lemma rt1_4 : chk [] rootBounds 0 14 1 0x100000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_4_and
-  · exact rt1_4_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_5_and : chkPairPicked [] rootBounds 0 14 1 0x4000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_5_or_move0 : chkPairNext [] rootBounds 0 14 1 0x4000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_5_or_move1 : chkPairNext [] rootBounds 0 14 1 0x4000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_5_or_move2 : chkPairNext [] rootBounds 0 14 1 0x4000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_5_or_move3 : chkPairNext [] rootBounds 0 14 1 0x4000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_5_or_move4 : chkPairNext [] rootBounds 0 14 1 0x4000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_5_or_move5 : chkPairNext [] rootBounds 0 14 1 0x4000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_5_or_move6 : chkPairNext [] rootBounds 0 14 1 0x4000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_5_or_move7 : chkPairNext [] rootBounds 0 14 1 0x4000000 0 true 7 = false := by decide +kernel
-lemma rt1_5_or : chkPairPicked [] rootBounds 0 14 1 0x4000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_5_or_move0
-  · exact rt1_5_or_move1
-  · exact rt1_5_or_move2
-  · exact rt1_5_or_move3
-  · exact rt1_5_or_move4
-  · exact rt1_5_or_move5
-  · exact rt1_5_or_move6
-  · exact rt1_5_or_move7
-lemma rt1_5 : chk [] rootBounds 0 14 1 0x4000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_5_and
-  · exact rt1_5_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_6_and : chkPairPicked [] rootBounds 0 14 1 0x20000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_6_or_move0 : chkPairNext [] rootBounds 0 14 1 0x20000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_6_or_move1 : chkPairNext [] rootBounds 0 14 1 0x20000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_6_or_move2 : chkPairNext [] rootBounds 0 14 1 0x20000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_6_or_move3 : chkPairNext [] rootBounds 0 14 1 0x20000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_6_or_move4 : chkPairNext [] rootBounds 0 14 1 0x20000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_6_or_move5 : chkPairNext [] rootBounds 0 14 1 0x20000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_6_or_move6 : chkPairNext [] rootBounds 0 14 1 0x20000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_6_or_move7 : chkPairNext [] rootBounds 0 14 1 0x20000000 0 true 7 = false := by decide +kernel
-lemma rt1_6_or : chkPairPicked [] rootBounds 0 14 1 0x20000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_6_or_move0
-  · exact rt1_6_or_move1
-  · exact rt1_6_or_move2
-  · exact rt1_6_or_move3
-  · exact rt1_6_or_move4
-  · exact rt1_6_or_move5
-  · exact rt1_6_or_move6
-  · exact rt1_6_or_move7
-lemma rt1_6 : chk [] rootBounds 0 14 1 0x20000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_6_and
-  · exact rt1_6_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_7_and : chkPairPicked [] rootBounds 0 14 1 0x2000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_7_or_move0 : chkPairNext [] rootBounds 0 14 1 0x2000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_7_or_move1 : chkPairNext [] rootBounds 0 14 1 0x2000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_7_or_move2 : chkPairNext [] rootBounds 0 14 1 0x2000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_7_or_move3 : chkPairNext [] rootBounds 0 14 1 0x2000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_7_or_move4 : chkPairNext [] rootBounds 0 14 1 0x2000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_7_or_move5 : chkPairNext [] rootBounds 0 14 1 0x2000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_7_or_move6 : chkPairNext [] rootBounds 0 14 1 0x2000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_7_or_move7 : chkPairNext [] rootBounds 0 14 1 0x2000000000 0 true 7 = false := by decide +kernel
-lemma rt1_7_or : chkPairPicked [] rootBounds 0 14 1 0x2000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_7_or_move0
-  · exact rt1_7_or_move1
-  · exact rt1_7_or_move2
-  · exact rt1_7_or_move3
-  · exact rt1_7_or_move4
-  · exact rt1_7_or_move5
-  · exact rt1_7_or_move6
-  · exact rt1_7_or_move7
-lemma rt1_7 : chk [] rootBounds 0 14 1 0x2000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_7_and
-  · exact rt1_7_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_8_and : chkPairPicked [] rootBounds 0 14 1 0x40000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_8_or_move0 : chkPairNext [] rootBounds 0 14 1 0x40000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_8_or_move1 : chkPairNext [] rootBounds 0 14 1 0x40000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_8_or_move2 : chkPairNext [] rootBounds 0 14 1 0x40000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_8_or_move3 : chkPairNext [] rootBounds 0 14 1 0x40000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_8_or_move4 : chkPairNext [] rootBounds 0 14 1 0x40000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_8_or_move5 : chkPairNext [] rootBounds 0 14 1 0x40000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_8_or_move6 : chkPairNext [] rootBounds 0 14 1 0x40000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_8_or_move7 : chkPairNext [] rootBounds 0 14 1 0x40000000000 0 true 7 = false := by decide +kernel
-lemma rt1_8_or : chkPairPicked [] rootBounds 0 14 1 0x40000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_8_or_move0
-  · exact rt1_8_or_move1
-  · exact rt1_8_or_move2
-  · exact rt1_8_or_move3
-  · exact rt1_8_or_move4
-  · exact rt1_8_or_move5
-  · exact rt1_8_or_move6
-  · exact rt1_8_or_move7
-lemma rt1_8 : chk [] rootBounds 0 14 1 0x40000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_8_and
-  · exact rt1_8_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_9_and : chkPairPicked [] rootBounds 0 14 1 0x400000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_9_or_move0 : chkPairNext [] rootBounds 0 14 1 0x400000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_9_or_move1 : chkPairNext [] rootBounds 0 14 1 0x400000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_9_or_move2 : chkPairNext [] rootBounds 0 14 1 0x400000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_9_or_move3 : chkPairNext [] rootBounds 0 14 1 0x400000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_9_or_move4 : chkPairNext [] rootBounds 0 14 1 0x400000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_9_or_move5 : chkPairNext [] rootBounds 0 14 1 0x400000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_9_or_move6 : chkPairNext [] rootBounds 0 14 1 0x400000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_9_or_move7 : chkPairNext [] rootBounds 0 14 1 0x400000000000 0 true 7 = false := by decide +kernel
-lemma rt1_9_or : chkPairPicked [] rootBounds 0 14 1 0x400000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_9_or_move0
-  · exact rt1_9_or_move1
-  · exact rt1_9_or_move2
-  · exact rt1_9_or_move3
-  · exact rt1_9_or_move4
-  · exact rt1_9_or_move5
-  · exact rt1_9_or_move6
-  · exact rt1_9_or_move7
-lemma rt1_9 : chk [] rootBounds 0 14 1 0x400000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_9_and
-  · exact rt1_9_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_10_and : chkPairPicked [] rootBounds 0 14 1 0x4000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_10_or_move0 : chkPairNext [] rootBounds 0 14 1 0x4000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_10_or_move1 : chkPairNext [] rootBounds 0 14 1 0x4000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_10_or_move2 : chkPairNext [] rootBounds 0 14 1 0x4000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_10_or_move3 : chkPairNext [] rootBounds 0 14 1 0x4000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_10_or_move4 : chkPairNext [] rootBounds 0 14 1 0x4000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_10_or_move5 : chkPairNext [] rootBounds 0 14 1 0x4000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_10_or_move6 : chkPairNext [] rootBounds 0 14 1 0x4000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_10_or_move7 : chkPairNext [] rootBounds 0 14 1 0x4000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_10_or : chkPairPicked [] rootBounds 0 14 1 0x4000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_10_or_move0
-  · exact rt1_10_or_move1
-  · exact rt1_10_or_move2
-  · exact rt1_10_or_move3
-  · exact rt1_10_or_move4
-  · exact rt1_10_or_move5
-  · exact rt1_10_or_move6
-  · exact rt1_10_or_move7
-lemma rt1_10 : chk [] rootBounds 0 14 1 0x4000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_10_and
-  · exact rt1_10_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_11_and : chkPairPicked [] rootBounds 0 14 1 0x800000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_11_or_move0 : chkPairNext [] rootBounds 0 14 1 0x800000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_11_or_move1 : chkPairNext [] rootBounds 0 14 1 0x800000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_11_or_move2 : chkPairNext [] rootBounds 0 14 1 0x800000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_11_or_move3 : chkPairNext [] rootBounds 0 14 1 0x800000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_11_or_move4 : chkPairNext [] rootBounds 0 14 1 0x800000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_11_or_move5 : chkPairNext [] rootBounds 0 14 1 0x800000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_11_or_move6 : chkPairNext [] rootBounds 0 14 1 0x800000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_11_or_move7 : chkPairNext [] rootBounds 0 14 1 0x800000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_11_or : chkPairPicked [] rootBounds 0 14 1 0x800000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_11_or_move0
-  · exact rt1_11_or_move1
-  · exact rt1_11_or_move2
-  · exact rt1_11_or_move3
-  · exact rt1_11_or_move4
-  · exact rt1_11_or_move5
-  · exact rt1_11_or_move6
-  · exact rt1_11_or_move7
-lemma rt1_11 : chk [] rootBounds 0 14 1 0x800000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_11_and
-  · exact rt1_11_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_12_and : chkPairPicked [] rootBounds 0 14 1 0x40000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_12_or_move0 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_12_or_move1 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_12_or_move2 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_12_or_move3 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_12_or_move4 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_12_or_move5 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_12_or_move6 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_12_or_move7 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_12_or : chkPairPicked [] rootBounds 0 14 1 0x40000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_12_or_move0
-  · exact rt1_12_or_move1
-  · exact rt1_12_or_move2
-  · exact rt1_12_or_move3
-  · exact rt1_12_or_move4
-  · exact rt1_12_or_move5
-  · exact rt1_12_or_move6
-  · exact rt1_12_or_move7
-lemma rt1_12 : chk [] rootBounds 0 14 1 0x40000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_12_and
-  · exact rt1_12_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_13_and : chkPairPicked [] rootBounds 0 14 1 0x40000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_13_or_move0 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_13_or_move1 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_13_or_move2 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_13_or_move3 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_13_or_move4 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_13_or_move5 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_13_or_move6 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_13_or_move7 : chkPairNext [] rootBounds 0 14 1 0x40000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_13_or : chkPairPicked [] rootBounds 0 14 1 0x40000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_13_or_move0
-  · exact rt1_13_or_move1
-  · exact rt1_13_or_move2
-  · exact rt1_13_or_move3
-  · exact rt1_13_or_move4
-  · exact rt1_13_or_move5
-  · exact rt1_13_or_move6
-  · exact rt1_13_or_move7
-lemma rt1_13 : chk [] rootBounds 0 14 1 0x40000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_13_and
-  · exact rt1_13_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_14_and : chkPairPicked [] rootBounds 0 14 1 0x800000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_14_or_move0 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_14_or_move1 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_14_or_move2 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_14_or_move3 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_14_or_move4 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_14_or_move5 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_14_or_move6 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_14_or_move7 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_14_or : chkPairPicked [] rootBounds 0 14 1 0x800000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_14_or_move0
-  · exact rt1_14_or_move1
-  · exact rt1_14_or_move2
-  · exact rt1_14_or_move3
-  · exact rt1_14_or_move4
-  · exact rt1_14_or_move5
-  · exact rt1_14_or_move6
-  · exact rt1_14_or_move7
-lemma rt1_14 : chk [] rootBounds 0 14 1 0x800000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_14_and
-  · exact rt1_14_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_15_and : chkPairPicked [] rootBounds 0 14 1 0x800000000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_15_or_move0 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_15_or_move1 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_15_or_move2 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_15_or_move3 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_15_or_move4 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_15_or_move5 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_15_or_move6 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_15_or_move7 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_15_or : chkPairPicked [] rootBounds 0 14 1 0x800000000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_15_or_move0
-  · exact rt1_15_or_move1
-  · exact rt1_15_or_move2
-  · exact rt1_15_or_move3
-  · exact rt1_15_or_move4
-  · exact rt1_15_or_move5
-  · exact rt1_15_or_move6
-  · exact rt1_15_or_move7
-lemma rt1_15 : chk [] rootBounds 0 14 1 0x800000000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_15_and
-  · exact rt1_15_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_16_and : chkPairPicked [] rootBounds 0 14 1 0x1000000000000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_16_or_move0 : chkPairNext [] rootBounds 0 14 1 0x1000000000000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_16_or_move1 : chkPairNext [] rootBounds 0 14 1 0x1000000000000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_16_or_move2 : chkPairNext [] rootBounds 0 14 1 0x1000000000000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_16_or_move3 : chkPairNext [] rootBounds 0 14 1 0x1000000000000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_16_or_move4 : chkPairNext [] rootBounds 0 14 1 0x1000000000000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_16_or_move5 : chkPairNext [] rootBounds 0 14 1 0x1000000000000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_16_or_move6 : chkPairNext [] rootBounds 0 14 1 0x1000000000000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_16_or_move7 : chkPairNext [] rootBounds 0 14 1 0x1000000000000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_16_or : chkPairPicked [] rootBounds 0 14 1 0x1000000000000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_16_or_move0
-  · exact rt1_16_or_move1
-  · exact rt1_16_or_move2
-  · exact rt1_16_or_move3
-  · exact rt1_16_or_move4
-  · exact rt1_16_or_move5
-  · exact rt1_16_or_move6
-  · exact rt1_16_or_move7
-lemma rt1_16 : chk [] rootBounds 0 14 1 0x1000000000000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_16_and
-  · exact rt1_16_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_17_and : chkPairPicked [] rootBounds 0 14 1 0x8000000000000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_17_or_move0 : chkPairNext [] rootBounds 0 14 1 0x8000000000000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_17_or_move1 : chkPairNext [] rootBounds 0 14 1 0x8000000000000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_17_or_move2 : chkPairNext [] rootBounds 0 14 1 0x8000000000000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_17_or_move3 : chkPairNext [] rootBounds 0 14 1 0x8000000000000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_17_or_move4 : chkPairNext [] rootBounds 0 14 1 0x8000000000000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_17_or_move5 : chkPairNext [] rootBounds 0 14 1 0x8000000000000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_17_or_move6 : chkPairNext [] rootBounds 0 14 1 0x8000000000000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_17_or_move7 : chkPairNext [] rootBounds 0 14 1 0x8000000000000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_17_or : chkPairPicked [] rootBounds 0 14 1 0x8000000000000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_17_or_move0
-  · exact rt1_17_or_move1
-  · exact rt1_17_or_move2
-  · exact rt1_17_or_move3
-  · exact rt1_17_or_move4
-  · exact rt1_17_or_move5
-  · exact rt1_17_or_move6
-  · exact rt1_17_or_move7
-lemma rt1_17 : chk [] rootBounds 0 14 1 0x8000000000000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_17_and
-  · exact rt1_17_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_18_and : chkPairPicked [] rootBounds 0 14 1 0x200000000000000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_18_or_move0 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_18_or_move1 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_18_or_move2 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_18_or_move3 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_18_or_move4 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_18_or_move5 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_18_or_move6 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_18_or_move7 : chkPairNext [] rootBounds 0 14 1 0x200000000000000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_18_or : chkPairPicked [] rootBounds 0 14 1 0x200000000000000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_18_or_move0
-  · exact rt1_18_or_move1
-  · exact rt1_18_or_move2
-  · exact rt1_18_or_move3
-  · exact rt1_18_or_move4
-  · exact rt1_18_or_move5
-  · exact rt1_18_or_move6
-  · exact rt1_18_or_move7
-lemma rt1_18 : chk [] rootBounds 0 14 1 0x200000000000000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_18_and
-  · exact rt1_18_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_19_and : chkPairPicked [] rootBounds 0 14 1 0x400000000000000000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_19_or_move0 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_19_or_move1 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_19_or_move2 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_19_or_move3 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_19_or_move4 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_19_or_move5 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_19_or_move6 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_19_or_move7 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_19_or : chkPairPicked [] rootBounds 0 14 1 0x400000000000000000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_19_or_move0
-  · exact rt1_19_or_move1
-  · exact rt1_19_or_move2
-  · exact rt1_19_or_move3
-  · exact rt1_19_or_move4
-  · exact rt1_19_or_move5
-  · exact rt1_19_or_move6
-  · exact rt1_19_or_move7
-lemma rt1_19 : chk [] rootBounds 0 14 1 0x400000000000000000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_19_and
-  · exact rt1_19_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_20_and : chkPairPicked [] rootBounds 0 14 1 0x400000000000000000000000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_20_or_move0 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_20_or_move1 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_20_or_move2 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_20_or_move3 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_20_or_move4 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_20_or_move5 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_20_or_move6 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_20_or_move7 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_20_or : chkPairPicked [] rootBounds 0 14 1 0x400000000000000000000000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_20_or_move0
-  · exact rt1_20_or_move1
-  · exact rt1_20_or_move2
-  · exact rt1_20_or_move3
-  · exact rt1_20_or_move4
-  · exact rt1_20_or_move5
-  · exact rt1_20_or_move6
-  · exact rt1_20_or_move7
-lemma rt1_20 : chk [] rootBounds 0 14 1 0x400000000000000000000000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_20_and
-  · exact rt1_20_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_21_and : chkPairPicked [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_21_or_move0 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_21_or_move1 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_21_or_move2 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_21_or_move3 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_21_or_move4 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_21_or_move5 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_21_or_move6 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_21_or_move7 : chkPairNext [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_21_or : chkPairPicked [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_21_or_move0
-  · exact rt1_21_or_move1
-  · exact rt1_21_or_move2
-  · exact rt1_21_or_move3
-  · exact rt1_21_or_move4
-  · exact rt1_21_or_move5
-  · exact rt1_21_or_move6
-  · exact rt1_21_or_move7
-lemma rt1_21 : chk [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_21_and
-  · exact rt1_21_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_22_and : chkPairPicked [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_22_or_move0 : chkPairNext [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_22_or_move1 : chkPairNext [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_22_or_move2 : chkPairNext [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_22_or_move3 : chkPairNext [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_22_or_move4 : chkPairNext [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_22_or_move5 : chkPairNext [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_22_or_move6 : chkPairNext [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_22_or_move7 : chkPairNext [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_22_or : chkPairPicked [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_22_or_move0
-  · exact rt1_22_or_move1
-  · exact rt1_22_or_move2
-  · exact rt1_22_or_move3
-  · exact rt1_22_or_move4
-  · exact rt1_22_or_move5
-  · exact rt1_22_or_move6
-  · exact rt1_22_or_move7
-lemma rt1_22 : chk [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_22_and
-  · exact rt1_22_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_23_and : chkPairPicked [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_23_or_move0 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_23_or_move1 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_23_or_move2 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_23_or_move3 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_23_or_move4 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_23_or_move5 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_23_or_move6 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_23_or_move7 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_23_or : chkPairPicked [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_23_or_move0
-  · exact rt1_23_or_move1
-  · exact rt1_23_or_move2
-  · exact rt1_23_or_move3
-  · exact rt1_23_or_move4
-  · exact rt1_23_or_move5
-  · exact rt1_23_or_move6
-  · exact rt1_23_or_move7
-lemma rt1_23 : chk [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_23_and
-  · exact rt1_23_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_24_and : chkPairPicked [] rootBounds 0 14 1 0x800000000000000000000000000000000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_24_or_move0 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_24_or_move1 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_24_or_move2 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_24_or_move3 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_24_or_move4 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_24_or_move5 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_24_or_move6 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_24_or_move7 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_24_or : chkPairPicked [] rootBounds 0 14 1 0x800000000000000000000000000000000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_24_or_move0
-  · exact rt1_24_or_move1
-  · exact rt1_24_or_move2
-  · exact rt1_24_or_move3
-  · exact rt1_24_or_move4
-  · exact rt1_24_or_move5
-  · exact rt1_24_or_move6
-  · exact rt1_24_or_move7
-lemma rt1_24 : chk [] rootBounds 0 14 1 0x800000000000000000000000000000000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_24_and
-  · exact rt1_24_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_25_and : chkPairPicked [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_25_or_move0 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_25_or_move1 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_25_or_move2 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_25_or_move3 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_25_or_move4 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_25_or_move5 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_25_or_move6 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_25_or_move7 : chkPairNext [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_25_or : chkPairPicked [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_25_or_move0
-  · exact rt1_25_or_move1
-  · exact rt1_25_or_move2
-  · exact rt1_25_or_move3
-  · exact rt1_25_or_move4
-  · exact rt1_25_or_move5
-  · exact rt1_25_or_move6
-  · exact rt1_25_or_move7
-lemma rt1_25 : chk [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_25_and
-  · exact rt1_25_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_26_and : chkPairPicked [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 false = false := by
-  rw [← chkPairFast_eq]
-  decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_26_or_move0 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 true 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_26_or_move1 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 true 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_26_or_move2 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 true 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_26_or_move3 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 true 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_26_or_move4 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 true 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_26_or_move5 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 true 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_26_or_move6 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 true 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_26_or_move7 : chkPairNext [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 true 7 = false := by decide +kernel
-lemma rt1_26_or : chkPairPicked [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 true = false := by
-  apply chkPair_next
-  intro b
-  fin_cases b
-  · exact rt1_26_or_move0
-  · exact rt1_26_or_move1
-  · exact rt1_26_or_move2
-  · exact rt1_26_or_move3
-  · exact rt1_26_or_move4
-  · exact rt1_26_or_move5
-  · exact rt1_26_or_move6
-  · exact rt1_26_or_move7
-lemma rt1_26 : chk [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 = false := by
-  apply chkPair_picked
-  intro op
-  cases op
-  · exact rt1_26_and
-  · exact rt1_26_or
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_27_0 : chkPicked [] rootBounds 0 14 1 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_27_1 : chkPicked [] rootBounds 0 14 1 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_27_2 : chkPicked [] rootBounds 0 14 1 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 2 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_27_3 : chkPicked [] rootBounds 0 14 1 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 3 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_27_4 : chkPicked [] rootBounds 0 14 1 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 4 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_27_5 : chkPicked [] rootBounds 0 14 1 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 5 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_27_6 : chkPicked [] rootBounds 0 14 1 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 6 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-lemma rt1_27_7 : chkPicked [] rootBounds 0 14 1 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 7 = false := by decide +kernel
-lemma rt1_27 : chk [] rootBounds 0 14 1 0x3fbf7f7fbffdbffbfffffbffdf6fff7ff7bffbf7fbbbdfdbef9fed 1 = false := by
+
+def allInputsNeeded (nn : ℕ) (d : Bool) (l : ℕ) (v : List W) : ℕ → Bool :=
+  List.rec (motive := fun _ => ℕ → Bool) (fun _ => true)
+    (fun w ws rest bits =>
+      !Nat.beq (Nat.lor bits (covC nn d l ws)) l &&
+        rest (Nat.lor bits (spC nn d l w.s))) v
+
+lemma anySub_allInputs {nn : ℕ} {d : Bool} {l : ℕ} {v : List W} {bits : ℕ}
+    (needed : allInputsNeeded nn d l v bits = true) (test : List W → Bool) :
+    anySubC nn d l v bits test = test v := by
+  induction v generalizing bits test with
+  | nil => rfl
+  | cons w ws ih =>
+    let included := Nat.lor bits (spC nn d l w.s)
+    let skip := Nat.beq (Nat.lor bits (covC nn d l ws)) l
+    change (!skip && allInputsNeeded nn d l ws included) = true at needed
+    simp only [Bool.and_eq_true] at needed
+    have mustKeep : skip = false := Bool.eq_false_iff.mpr (fun h => by rw [h] at needed; simp at needed)
+    change Bool.rec (motive := fun _ => Bool)
+      (Bool.rec (motive := fun _ => Bool) false (anySubC nn d l ws bits test) skip)
+      true (st included (fun c => anySubC nn d l ws c (fun r => test (w :: r)))) = _
+    rw [st_eq, ih needed.2, mustKeep]
+    cases test (w :: ws) <;> rfl
+
+
+def rootPreparedWords : List W := [
+  ⟨0x1ffffdffffdffffde00000000000000000000000000000000000000000000000000000000004d2d10bc00213409e0010f002780000000070000001c001c007000000003800003800e00000001c000038000000000000000000ffc00ffc00ffc00f7c0007c00003e00041043e00041f0002201f00021047c0008424010f0036d6ad5fff5adb56fffad7ffdbffe000000000000000000000000000000000000000000000000000000000026863f83919372c7, 0x1000000002000000004000000100000000000000008000000000000000001084000000000000000210800008421080000000000000084000000000001080000000000001084010800000021084200000000001084210842108421084200000000000000000000000000000000000000000084210842000000000000000000000000000800000000, 0x4000000108400000000842108420000000000000000000000000000000000000000000001084210800000000000000000000000000000000000000000000000000000000010842000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, 0x4000000108400000000842108421000000002000000004000000100000000000000008001084210800000001084000000000000000210800008421080000000000000084010842000001080000000000001084010800000021084200000000001084210842108421084200000000000000000000000000000000000000000084210842000000000000000000000000000800000000, 3⟩,
+  ⟨0x1ffffc00000000000ffffeffffef0000000000000000000000000000000000000000000000069a9002300000001180008c0046004d28804e00490138013804e000000026000026009800000013000026000000000000000000fc3c0803c0803c0043fe043fe0781f00208001f00200f8011080f80108003e0042121080f036d68000000000000000000000000b6d56abffeb6aafffafffbffe000000000000000000000000000000000a4cf9b63b5396fa1, 0x800000000000000000100000000000000008000000200000000400000000000000001000210842000000000000000008000004210802108000080200000000001004210842100000000010042108020000010842108001080000000000000000010842108421084210000000000000000000000000080000000108421080000000000000000000040000000, 0x200000100021000000000000001084210840000000000000000000000000000000000000000000042108420000000000000000000000000000000000000000000000000000000108420000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, 0x200000100021000000800000001084210840100000000000000008000000200000000400000000042108421000210842000000000000000008000004210802108000080200000108421004210842100000000010042108020000010842108001080000000000000000010842108421084210000000000000000000000000080000000108421080000000000000000000040000000, 3⟩,
+  ⟨0x1ffffc000000000000000007fffef8007fffefbffff77d80000000000000000000000004005810b0b5a60087000438021c120025521e00000870087021c1b5ac01160001160458269a488f00011c0000000000000000040204de20410204002102018024218e27c001188e7c8c473bec0806002002018100084008106002c00005adb000000000000000b0016abffe000000000000000dad6000000000000001b6db6fff800000d13f6ca4c6a68f91, 0x2000000004000000000000000010000000020000000800000000000000042100000000000000000000000000000000400004000040100401000000000108400000000000000000000010842008420004010842108421004000002108400000010002108400000000842100000000210842100000000200000008000004000002108400000000000100000, 0x10000008000080000000000000000000002108421080000000000000000000000008420000000000000001084210842108421084000000000000000000000000000084200000000001084210842108420000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, 0x10000008000080000002000000004000002108421080010000000020000000800008420000000042100001084210842108421084000000000400004000040100401084200000108401084210842108420000010842008420004010842108421004000002108400000010002108400000000842100000000210842100000000200000008000004000002108400000000000100000, 3⟩,
+  ⟨0x1ffffc000000000000000000000000000000000003ffff03e0ffffde00fb80000000400880c00108c40a58206310300000001019045040c440e103000010881490881c20610412440e61882800000000000000000809404094da89400044a0024a10024a08210022a0801130824855701f0114dcf007dc002500060040000018460002c00018000001000000086280002fff8000021084000585fff0001861b6fffb0c000fbc3fe9e6595ce57, 0x400000000800000001000000040000000080000000000020000000002008020004000040008021004000000000001000010040000000004200000100420080200840108420000000840000000004010042008420000000800008001004000040008001004010002000401004010040108021000000040000001000000800008001004010000000020, 0x2000400000200000000000000000000000000000000000000000000210842100000000000000000000000000000000000000000000000000000000002108421000000000000000000000000000000000000002108400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, 0x2000400000200000000400000000800000001000000040000000080210842100020000000002008020004000040008021004000000000001000010042108421004200000100420080200840108420000000842108400004010042008420000000800008001004000040008001004010002000401004010040108021000000040000001000000800008001004010000000020, 3⟩,
+  ⟨0xffffe0000007fffefbef0000000000000000000000000000000000000020004a02c0000000140000a00050169a80009000000240024009012528405802405801600000002800005000000000000000000820386003860038863e1c2201c0310fc7df7a00f0110078008100780842401e0210108480e30002d5fff0000000000000000000b6d4000000000000000000000dad6b5fff5b5fff7ffc00000000000000043f7419e9fb1f0e, 0x40000000080000000008000000200000000400000010000000001084000000000000000200000108000000200042000000000000002000420000010840000000004200000008001080200002100401080010000000400004210840000000000010840000000000000842108421084000000000000004000000100000004210840000000000000002000000, 0x20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, 0x20000000040000000080000000008000000200000000400000010000000001084000000000000000200000108000000200042000000000000002000420000010840000000004200000008001080200002100401080010000000400004210840000000000010840000000000000842108421084000000000000004000000100000004210840000000000000002000000, 3⟩,
+  ⟨0xffffe00000000007fffef800000003ffff7bee00000000000000000800001289000a40ac00054002a00402c004916d00128012804a090012825800025009434d0001484902b0000000000000000021022110220c022411011537110080911042190cd7c40248040c465bdf720106008040240880c0000000580056fff80000000000601600000b68000000000000d800b5fff0000000001b6c0000036dffffcfa7fed0a0bad0c, 0x100000000200000000400000000000000001000000040000001000210000000000000010000000420000000000000020000200000000000000010802000000000010800000400000000000000001080200840000020000200002000021080000002000021080000800008420000210800008420000010000000400000200002000021080000000008000, 0x800000001004000000000000000000000000000004210842000000000000000000000000000000000000000000000000000000210842100000000000000000000000000000000000000000000000001084200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, 0x800000001004000000100000000200000000400004210842000001000000040000001000210000000000000010000000420000210842100020000200000000000000010802000000000010800000401084200000000001080200840000020000200002000021080000002000021080000800008420000210800008420000010000000400000200002000021080000000008000, 3⟩,
+  ⟨0x7fffe03e07fffe03ffff7003ffff7800ffffdef6000000000004200bc8480a007a4a03f001f100821401d9205407e007c01f1858160174b6017805e3603600ec6c01e80000000000000000109000890003100208880084802254e001f01548c00aa463800a6453c0019894f7b0000240001021000042c0500002d7ffc000080c10a0000b02afff80000000c2c0b00005b00000001b01b0000360000b8e2fd0cd6e4697f, 0x8000000010000000020000000800000000000000002000000080200840008400080000800100401080010040100000000000000008021000010042108021084010042008421004200000108421004200802100420080010000100020004200800100020004200040008001080200042008401000000800000020000010000100020004200000000400, 0x40000000084210000000000000000000000000000000000108421084000000008420000000000000000000000000000000000000000008421084210840000000084200000000000000000000000000000010840000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, 0x40000000084210000008000000010000000020000000800108421084000002008420080200840008400080000800100401080010040108421084210840008021084210042108021084010042008421004210840108421004200802100420080010000100020004200800100020004200040008001080200042008401000000800000020000010000100020004200000000400, 3⟩,
+  ⟨0x3ffff07c000000000ffffc0f0f83c00000000000140402000124200a10058000011004800440144014005800840002482802800b020b0c02424804c00000000000000000444a0244a00c4a104225041250821250410821150498ce83e010898411152b60787c1e1128000800000020300000210001bffe000408800000a200020003ffe00c6000004340007ffc30d8600036dffffa7b7179dbe71baf, 0x20000000040000000080000002000000004000000100000004010800100420000000002000000084000802100000080000800000000000000842008420000000002100020084200000000000080200000108000000000040000400080200000000400080210000100020084000802100421000000002000000080000040000400080210000000001, 0x10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000, 0x10000000020000000040000000080000002000000004000000100000004010800100420000000002000000084000802100000080000800000000000000842008420000000002100020084200000000000080200000108000000000040000400080200000000400080210000100020084000802100421000000002000000080000040000400080210000000001, 3⟩]
+def rootPreparedMask : ℕ := 0x1ffffdffffdffffdeffffeffffef7fffefbef7fffefbffff77dbffff7beeffffdef6fbbdfff6dad5abffeb5b6adfff5afffb7ffd6daad57ffd6d55fff5fff7ffdb5ad6bffeb6bffefffb6db6dfff6dbffe0000000000000000ffffeffffeffffef7ffff7ffff7bffff7df7bffff7dffffbbedffffbdf77fffef7b7ddefffb6d6ad5fff5adb56fffad7ffdbffeb6d56abffeb6aafffafffbffedad6b5fff5b5fff7ffdb6db6fffb6dfffffffffffffffffff
+def rootPreparedSlots : ℕ := 0x42108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210842108421084210
+def rootPreparedBudget : ℕ := 0x5ad4b56d9ce739be739cdf37be6f9cdf37bdf15bdeb5bdef9be6f6b66f8c62f7be6f9c6318c6318c6318c6319c6718b5b18c6316c6318c6318be339ce339ce318c6318ce739ce739ce739ce739cdf39ce739ce739ce739ce739ce739ce6f9ce739be717ce738be719c5ef9c6716b62f9cdef9cdf19be6f7c6718bdaf7bdf38bdad6adad7ada96b5ad4b5ab5ad6b6ad2969ce7294a72
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma rootPreparedWords_eq : avl (PZ rootBounds) (mz 0) (rawL []) = rootPreparedWords :=
+  Eq.refl rootPreparedWords
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma rootPreparedMask_eq : mz 0 = rootPreparedMask := Eq.refl rootPreparedMask
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma rootPreparedSlots_eq : pL (rootBounds.map fun _ => 16) = rootPreparedSlots := Eq.refl rootPreparedSlots
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma rootPreparedBudget_eq : pL (rootBounds.map fun e => 16 + (14 - e.2)) = rootPreparedBudget :=
+  Eq.refl rootPreparedBudget
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma rootPreparedL_eq : lz 0 = I.AA := Eq.refl I.AA
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma allRootInputsNeeded (d : Bool) :
+    allInputsNeeded I.NN d I.AA rootPreparedWords 0 = true := by
+  cases d <;> decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma searchInputs_atRoot (t H ph : ℕ)
+    (test : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → List W → Bool) :
+    searchInputs [] rootBounds 0 14 t H ph test =
+      guardStart t H ph (test I.NN I.AA I.HX I.HY I.AA rootPreparedMask
+        rootPreparedSlots rootPreparedBudget 0) rootPreparedWords := by
+  simp only [searchInputs, frc_eq, st_eq, rootPreparedWords_eq, rootPreparedMask_eq,
+    rootPreparedSlots_eq, rootPreparedBudget_eq, rootPreparedL_eq]
+  change anySubC I.NN (pos t) I.AA rootPreparedWords 0 _ = _
+  rw [anySub_allInputs (allRootInputsNeeded (pos t))]
+  rfl
+
+
+
+
+lemma pair_distribute {f : W → W → ℕ → ℕ → ℕ → ℕ → ℕ → Bool}
+    {g : Fin 8 → W → W → ℕ → ℕ → ℕ → ℕ → ℕ → Bool}
+    (h : ∀ a c da dc s x y, f a c da dc s x y = true → ∃ b, g b a c da dc s x y = true)
+    (a c : XW) : pair f a c = true → ∃ b, pair (g b) a c = true := by
+  obtain ⟨w,s,q,u⟩ := a
+  obtain ⟨w',s',q',u'⟩ := c
+  simp only [pair,bR]
+  cases hb : f w w' (Nat.xor (Nat.land u s') u) (Nat.xor (Nat.land u' s) u')
+      (Nat.land s s') (Nat.lor w.a w'.a) (Nat.land w.b w'.b)
+  · simp only [hb,Bool.cond_false]
+    intro hor
+    obtain ⟨b,hb⟩ := h _ _ _ _ _ _ _ hor
+    refine ⟨b, ?_⟩
+    rw [hb]
+    simp
+  · intro _
+    obtain ⟨b,hb⟩ := h _ _ _ _ _ _ _ hb
+    exact ⟨b,by rw [hb]; rfl⟩
+
+
+
+noncomputable def initialBinary (H : ℕ) (kind : Bool) (f : ℕ → List W → Bool) : Bool :=
+  nodePicked I.NN f true I.AA rootPreparedMask rootPreparedSlots 13 8
+    (Nat.sub rootPreparedBudget (sumc rootPreparedWords)) rootPreparedWords H kind
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma rootStart_eq (H : ℕ) (kind : Bool) :
+    startPairPicked I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots rootPreparedBudget
+      14 1 0 H 0 rootPreparedWords kind =
+    initialBinary H kind (look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 14 13 1) := by
+  have haveRequired : hasP 0 rootPreparedWords = true := by decide +kernel
+  have len : rootPreparedWords.length = 8 := rfl
+  have budget : Nat.beq
+      (Nat.land (Nat.sub rootPreparedBudget (sumc rootPreparedWords)) rootPreparedSlots) rootPreparedSlots = true := by decide +kernel
+  simp only [startPairPicked, child, st_eq, topPairPicked, bR, haveRequired, len, budget,
+    show Nat.ble 8 (Nat.sub 15 1) = true from rfl, show Nat.ble 8 1 = false from rfl,
+    Bool.cond_true, Bool.cond_false]
+  change (bif initialBinary H kind (look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots
+      14 14 13 1) then true else false) = _
+  cases initialBinary H kind (look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots
+      14 14 13 1) <;> rfl
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma initialBinary_of_check (H : ℕ) (kind : Bool)
+    (h : chkPairPicked [] rootBounds 0 14 1 H 0 kind = true) :
+    initialBinary H kind
+      (look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 14 13 1) = true := by
+  rw [← chkPairFast_eq, chkPairFast, searchInputs_atRoot] at h
+  simp only [guardStart, rootStart_eq, bR] at h
+  cases hp : relevantStart 1 H 0 rootPreparedWords
+  · simp [hp] at h
+  · simpa [hp] using h
+
+def wordEquals (a b : W) : Bool :=
+  (a.s == b.s) && (a.a == b.a) && (a.b == b.b) && (a.c == b.c) && (a.r == b.r)
+
+lemma wordEquals_spec {a b : W} (h : wordEquals a b = true) : a = b := by
+  cases a
+  cases b
+  simp [wordEquals, Bool.and_eq_true] at h ⊢
+  rcases h with ⟨⟨⟨⟨hs, ha⟩, hb⟩, hc⟩, hr⟩
+  exact ⟨hs, ha, hb, hc, hr⟩
+
+def frontierMissing (states : List (ℕ × List W)) (z : ℕ) (v : List W) : Bool :=
+  !(states.any fun state => (z == state.1) && List.isEqv v state.2 wordEquals)
+
+noncomputable def rootWithGate (i j mask : ℕ) (kind : Bool) : List W :=
+  let zero : W := ⟨0, 0, 0, 0, 3⟩
+  let a := rootPreparedWords.getD i zero
+  let b := rootPreparedWords.getD j zero
+  let keep := (rootPreparedWords.zipIdx.filter fun e => mask.testBit e.2).map Prod.fst
+  addS (opW kind a b) keep
+
+lemma frontierMissing_false {states : List (ℕ × List W)} {z : ℕ} {v : List W}
+    (h : frontierMissing states z v = false) : (z, v) ∈ states := by
+  simp only [frontierMissing, Bool.not_eq_false', List.any_eq_true, Bool.and_eq_true, beq_iff_eq] at h
+  obtain ⟨⟨j, w⟩, membership, rfl, he⟩ := h
+  have hw : v = w := by
+    clear membership
+    induction v generalizing w with
+    | nil => cases w <;> simp_all [List.isEqv]
+    | cons a v ih =>
+      cases w with
+      | nil => simp [List.isEqv] at he
+      | cons b w =>
+        simp only [List.isEqv, Bool.and_eq_true] at he
+        rw [wordEquals_spec he.1, ih w he.2]
+  rwa [hw]
+
+lemma initialBinary_from_frontier (H : ℕ) (kind : Bool) (states : List (ℕ × List W))
+    (complete : initialBinary H kind (frontierMissing states) = false)
+    (checked : ∀ state ∈ states,
+      look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 14 13 1 state.1 state.2 = false) :
+    chkPairPicked [] rootBounds 0 14 1 H 0 kind = false := by
+  refine Bool.eq_false_iff.mpr fun h => ?_
+  have original := initialBinary_of_check H kind h
+  unfold initialBinary at original complete
+  obtain ⟨_, hit⟩ := nodePicked_distribute
+    (branches := fun _ => frontierMissing states)
+    I.NN true I.AA rootPreparedMask rootPreparedSlots 13 8
+    (Nat.sub rootPreparedBudget (sumc rootPreparedWords)) rootPreparedWords H kind
+    (fun z v hit => by
+      refine ⟨0, ?_⟩
+      cases hm : frontierMissing states z v
+      · exact Bool.noConfusion ((checked (z,v) (frontierMissing_false hm)).symm.trans hit)
+      · exact hm)
+    original
+  exact Bool.noConfusion (complete.symm.trans hit)
+
+abbrev SearchState := ℕ × List W
+
+noncomputable def pureAt (e : ℕ) (state : SearchState) (f : ℕ → List W → Bool) : Bool :=
+  nodeC I.NN f true I.AA rootPreparedMask rootPreparedSlots e state.2.length state.1 state.2 pairsS
+
+noncomputable def pureSecond (state : SearchState) (f : ℕ → List W → Bool) : Bool :=
+  pureAt 12 state f
+
+noncomputable def mixedSecond (state : SearchState) : Bool :=
+  frc state.2 (fun v => st state.1 (fun z =>
+    mvC I.NN I.AA I.HX I.HY
+      (lookC I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14)
+      I.AA rootPreparedMask rootPreparedSlots 13 1 z v 0))
+
+noncomputable def afterSecond (state : SearchState) : Bool :=
+  frc state.2 (fun v => st state.1 (fun z =>
+    look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 13 12 1 z v))
+
+lemma pureAt_from_frontier (e : ℕ) (state : SearchState) (states : List SearchState)
+    (remaining : SearchState → Bool)
+    (complete : pureAt e state (frontierMissing states) = false)
+    (checked : ∀ x ∈ states, remaining x = false) :
+    pureAt e state (fun z v => remaining (z,v)) = false := by
+  refine Bool.eq_false_iff.mpr fun found => ?_
+  simp only [pureAt, nodeC_as_mode, pairsS] at found complete
+  have hp := pairs_distribute _ _ (fun a c =>
+    pair_distribute (fun left right da dc signal x y =>
+      mode_distribute rootPreparedMask rootPreparedSlots e state.2.length state.1 state.2
+      left right da dc signal x y
+      (g := fun _ => frontierMissing states)
+      (fun z v hit => by
+        refine ⟨0, ?_⟩
+        cases missed : frontierMissing states z v
+        · exact Bool.noConfusion ((checked _ (frontierMissing_false missed)).symm.trans hit)
+        · exact missed))
+    a c) _ found
+  obtain ⟨_, hh⟩ := hp
+  exact Bool.noConfusion (complete.symm.trans hh)
+
+lemma pureSecond_from_frontier (state : SearchState) (states : List SearchState)
+    (complete : pureSecond state (frontierMissing states) = false)
+    (checked : ∀ x ∈ states, afterSecond x = false) :
+    pureSecond state (fun z v => afterSecond (z,v)) = false :=
+  pureAt_from_frontier 12 state states afterSecond complete checked
+
+lemma afterFirst_false (state : SearchState)
+    (two : 1 < state.2.length) (small : state.2.length < 12)
+    (mixed : mixedSecond state = false)
+    (pure : pureSecond state (fun z v => afterSecond (z,v)) = false) :
+    look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 14 13 1 state.1 state.2 = false := by
+  have lengthOkay : Nat.ble state.2.length 1 = false := by
+    cases h : Nat.ble state.2.length 1
+    · rfl
+    · exact absurd (Nat.le_of_ble_eq_true h) (Nat.not_le_of_gt two)
+  have choose0 (F : ℕ → Bool) : tstC I.NN I.AA I.HX I.HY true I.AA 13 state.2 F = F 0 := by
+    have h0 : Nat.beq state.2.length 13 = false := beq_f (by omega)
+    have h1 : Nat.beq state.2.length.succ 13 = false := beq_f (by omega)
+    simp only [tstC, bR, h0, h1, Bool.cond_false]
+  rw [show (14 : ℕ) = Nat.succ 13 from rfl, look1C_step, lengthOkay, Bool.cond_false]
+  change cvC I.NN (pos 1) I.AA state.2 (tstC I.NN I.AA I.HX I.HY true I.AA 13 state.2 _) = _
+  rw [choose0]
+  simp only [afterSecond, frc_eq, st_eq] at pure
+  simp only [mixedSecond, frc_eq, st_eq] at mixed
+  change cvC I.NN (pos 1) I.AA state.2 (bif pureSecond state
+      (look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 13 12 1)
+    then true else _) = _
+  rw [pure, mixed]
+  simp [cvC, bR]
+
+noncomputable def secondTransition (state : SearchState) (i j kept : ℕ) (kind : Bool) : SearchState :=
+  let zero : W := ⟨0, 0, 0, 0, 3⟩
+  let a := state.2.getD i zero
+  let b := state.2.getD j zero
+  let word := opW kind a b
+  let keptWords := (state.2.zipIdx.filter fun e => kept.testBit e.2).map Prod.fst
+  let budget := Nat.sub (Nat.add state.1 (Nat.land a.c b.c)) word.c
+  let usedA := if kept.testBit i then a.c else 0
+  let usedB := if kept.testBit j then b.c else 0
+  (Nat.sub (Nat.sub budget usedA) usedB, addS word keptWords)
+
+noncomputable def firstStates : List SearchState := [
+  ⟨0x5293ad2b5b5ad6adef7ad2d4a5a95b52d4a5291ad673aceb7adeb295eb6b5a75adeb79ceb4a5294a5294a52949d2738c675ad6b3ad6739d6b594e94a4e94a56739d6b59ce74a5294a52939ce739c673ad6b39ceb39ce739d6739ce739ce339d6b495272a5293952749ca549d2718ce54a4a54b52b6a5a94adab5a4e94a52d59ca528ca538ca1295292a52739ce749ca54842518c651, rootWithGate 0 1 255 false⟩,
+  ⟨0x4e73ad2b5ad6b5adef7aceb39d675aceb39ceb2ad673ad2b7adeb39deb6b5a95adeb7a52b39ce739ce739ce74a569494a95ad6b3ad694a56b5952b5ad2b5ad694a56b59d2939ce739ce73a5294a4a94ad6b4a52b3a5294a5674a5294a5254a56b495693ad6b49d695a4e75a569295275ace75b52b6a5a94adab5a4e94a52d59ce7394e7494e339d292a52739ce749ca548c6518c651, rootWithGate 0 1 255 true⟩,
+  ⟨0x4eb1ad2b5ad6f79def7aceb39d676bd2f5ad6919ce319d2b6adeb3a5e96b5ab5a5eb79ce739ce739d294ad6b49d2738c6739ce719ce94a56b59ceb5ad2d6b52b4ad2b49ce739ce74a52b39ce739c6739ce74a52b39d295a5274a4e94a5254a52949d293ad69395295a4e75ada9295296b5296ace95a5a94ada949ca73a52d5a4e5394e7595254a4e92a525294a749ca548ca508c651, rootWithGate 0 2 255 true⟩,
+  ⟨0x52b3ad296b56f7aded7b52d4a5695bd6f59d693ad671aceb7ad6b2a5eb6a5a94a5a969d674a5294a56759d6749d2b59c6b59d671ace739d6b594e94a56d4b4e94a52949ce74a5293ace739d6759c6b39ce739ceb39ce94a52739ce73ace359ce7495272a5293952749ca56ad2b38d694b4a94b5276a5292ad2b3a4692952939ca528ca559d252a5292952738ce729c25284a518c611, rootWithGate 0 3 255 false⟩,
+  ⟨0x4eb3ad275ad6f7adeb7aceb39d676bd6f5a56b3ad672ad2b7adab3a5eb6ada739d675a56939ce739d695a5695a52b59cab5a5692ad294a56b59d2b4ad6d5b52739ce73a4e939ce74ad2949d695a4ab4a5294a52b49d2739ce94a4e94ad255a52959d693a56b495694a4a76ad6b395695b4e95b5296a5693ad6b4a4a939d2b4a4e7394a759d253a52929d27394e739c6538ca518c631, rootWithGate 0 3 255 true⟩,
+  ⟨0x52b3ad2b6b5ad7adef7b4ed4a5a95ad6f5ad6939d673ace77adeb2a56b6b5ab3adeb79d6b39ce94a56b5ad6b49d2759ceb39d6b3ad6739ce7594e94a56d6b5675ace759ceb39ce95ad6b39ce75aceb59d6b39ce739d673ace739ce73ad675aceb495272a5293952749ca549d2b39d696b5296a4a74952529d2b5a4e94a52d59ca528ca539d254a4a5094a739ce749ca5484a118c651, rootWithGate 0 4 255 false⟩,
+  ⟨0x4eb3ad2b5ad6b7adef7aceb39d676b56f5ad6b3a5673ad297adeb3a5ab6b5ab4adeb7a56b39ce739d6b5ad6b5a56959ceb4a56b3ad674a52959d2b5ad6d6b5695ad295a52b39ce75ad6b4a5295aceb5a56b39d294a5694ad2939d294ad675ad2b59d272a52b49d695a4e75a56b39d696b5296ace959d673a56b5a4e94a52d5a4a7394e749d254a4e719ce739ce749ca548ca318c651, rootWithGate 0 4 255 true⟩,
+  ⟨0x4eb39d2b5ad6f5ad6f7aceb39d676bd6d5ad6b3ad273ace759d673a5eb5b5ab5adab7a56b39ce739d6b5ad6b5a56b49ceb5ad293ad6739ce739d295ad6b6b56b5ad6b5a52b39ce75ad6b4a56b4a4eb5ad2b39ce74a56b5ad6939d275a5275ad6959d673ad6949d6749ce76ada939d675ad296ad2b69d674ada949ce949ceb5a4e7294e759ce54a5272a52539ce5394a548ca5184651, rootWithGate 0 5 255 true⟩,
+  ⟨0x4eb3acab5ad6f79d6b5aceb39d676bd6f4ad6b3ad653ad2b7a5eb295674a52b5ade979ce739ce739d2b5a52b59d6b594eb4ad2b2a5693a52b494e94a4e94a4eb5a56949ce739ce74a56939d2b4aca95a5293a4e939ceb4a5273a4e75a5654ad29595692ad6b39d675a4a56a5ab29d676b4e76b4eb69da93a5a95a4a749ced4a4e738ce759d234a5291a52729ce549c6348ca518c251, rootWithGate 0 6 255 true⟩,
+  ⟨0x4eb3ad2b5ad6f7adef5aceb39d676bd6f5ad2b3ad673a52b7ade93a5eb6b56b5adeb6a56b39ce739d6b4ad295a56b59ce95ad6b3a52949d6949d2b5a56d6ad6b5ad6b5a52b39ce75a5294a56b5ace94ad6949ce94a56b5ad6949d275ad674a56b59d693ad2b49d2959ce56adab39d296ad275b52b5a5a74a56b59ce73a4eb4a4e7394e559d2549d292a4e739ca7494a338ca518c650, rootWithGate 0 7 255 true⟩,
+  ⟨0x5671ad2b5adeb59def7b56d5adeb5aceb39ce919ce319d6b6adeb49de96b5a95a5eb79ce75ad6b5ace739ce749d2738c6739ce719ceb5ad6b59d2d6b4eb5ad293a52b49ce75ad6b39ce739ce739c6739ce75ad6b3a4e749d275ad2b39ce339d2949d6b4b5ab49d6b6ad294a56718ce75ace75ace95a5a94ada949ca73a52d5a52749d2948ce339ce92a525294a749ca54946508c651, rootWithGate 1 2 255 true⟩,
+  ⟨0x5693ad296bdad6aded7ad6f5ad6b6b52d49d2d1ad671ad6b7ad6b495eb6a5a74a5a96ace75ad6b5ad2749d274ad2738c6759d671aceb5ad6b5956d4b4e94a4e739d2949ce75ad6b3a4e739ce739c6739ce75ad6b39ce739d275aceb39ce339ce7495ab4a5ad595ab4aca949d2718ce54a4a54b5276a5292ad2b3a4692952939d2949ca938ca1295292952738ce729c252942518c611, rootWithGate 1 3 255 false⟩,
+  ⟨0x5673ad275bd6b5adeb7b56f5adab5aceb39ced2ad672ad6b7adab49deb6ada739d675ad295ad6b5ace739ce75ad69494695a5692ad2b5ad6b59d6d5b52b4ad2739ce73a5275ad6b39ce74a52749c693a5295ad6b4a4e739ce95ad2b3a4e349d2959dab4adad59dab5ace95a52928d274aca74b5296a5693ad6b4a4a939d2b4a52949ce9494e329d2929d27394e739c653946518c631, rootWithGate 1 3 255 true⟩,
+  ⟨0x5693ad2b6bdeb6adef7acef5adeb6ad2d4a52d19d673ad677adeb4956b6b5a73adeb7aceb39ceb5ad294a5294ada738c6739d6b3ad675ace75956d6b4e94a56739ce759d6739ceb4a5293ace739c6739d6b39d673ace739ce739d6b39ce339ceb495272a52d5a5ab6ad2949d2718ce54a4a54a4a74952529d2b5a4e94a52d59ca949d2938ca1294a5094a739ce749ca54942118c651, rootWithGate 1 4 255 false⟩,
+  ⟨0x5673ad2b5bdeb5adef7b52f5adeb5aceb39ced2a5673ad697adeb49dab6b5a94adeb7ad2b4a52b5ace739ce75ada7494a94a56b3ad695ad2959d6d6b52b5ad674a5295a5694a52b39ce74ace74a4a94a56b4a5694ad273a5294a56b3a5254a52b59d693ad6d5a5ab6ad2949d29295275ace75ace959d673a56b5a4e94a52d5a4e949d29394e339ce719ce739ce749ca54946318c651, rootWithGate 1 4 255 true⟩,
+  ⟨0x56739d2b5bdeb5ad6f7b56f4adeb5aceb39ced2ad273ace759d6749deb5b5a95adab7ad2b4ad694ace739ce75ada9394a95ad293ad6739ce739d6b6b5295ad694a56b5a5694a56939ce74ad2939ca94ad2b39ce74ad294a5694a56949ce54a56959da94b5ab5a5a95a5295a567295254a4e75ad2b69d674ada949ce949ceb5a52939d29494a339d272a52539ce5394a549465184651, rootWithGate 1 5 255 true⟩,
+  ⟨0x5673acab5bdeb59d6b5b56f5a5eb5aceb39ced2ad653ad6b7a5eb295674a5295ade979ce75a5695a4e739ce75a5a948ca94ad2b2a56b4ad2b494e94a4e94a4e949d6949ce74ad2939ce73a4e93a4674a5294ad2939ce939d274ad2949d233a529595ab3b5ad4a5a96ace759d69195255aca55b4eb69da93a5a95a4a749ced4a52949529494e139d291a52729ce549c634946518c251, rootWithGate 1 6 255 true⟩,
+  ⟨0x5673ad2b5bdeb5adef5b56f5ade95aceb39ced2ad673a56b7ade949deb6b5695adeb6ad2b5ad2b4a4e739ce75ada9494a75ad6b3a52b5a56949d6d6ad2b5a5694a56b5a5695a52939ce74ad294a4a73ad695a5294ad294a5695a5694a52539d6b59dab4b56d5a56b6a5275a569294e75a4e54b52b5a5a74a56b59ce73a4eb4a52949d27494e3395292a4e739ca7494a33946518c650, rootWithGate 1 7 255 true⟩,
+  ⟨0x56b1ad277ad6f79deb7bd6d5adab7bd2f5a56919ce319d6b6adab4a5e96ada739d6759ce75ad6b5ad274a56949d2738c6739ce719ceb5ad6b5a52d5b52d5b4e739ce739ce75ad6b3a4e939ce739c6739ce75ad6b49ce739ce95aceb3a4e349ce75a56b4adab4956b5ace95ad6928d295b4e95ace75a5693ad6939c6729d2b4ad2749ce9595253a4e929d2528ca739c65394a508c631, rootWithGate 2 3 255 true⟩,
+  ⟨0x56b1ad2b7adeb79def7bd2d5adeb7b52f5ad6919ce319d696adeb4a5a96b5ab4a5eb79ce74a52b5ad294ad6b49d2738c6739ce719ce95ad295a52d6b52d6b5294ace949ce74a52b4a52b39ce739c6739ce74a5694a5274a4e94a52b3a5254a4e95a5293ad6b49d6b6ad294a569295296b5296a4a749d673a56949ca73a52d5ace749d29495254a4a719ce5294a749ca5494a308c651, rootWithGate 2 4 255 true⟩,
+  ⟨0x56b19d2b7adef59d6f7bd6d4adeb7bd2d5ad6919ce319ce759d674a5e95b5ab5a5ab79ce74ad694ad294ad6b49d2738c6739ce719ce739ce73a52b6b52b6b52b4ad2b49ce74a5694a52b39ce739c6739ce739ce74a5295a5294a52949ce54a5275a5694b5a949d695a5295ada7295275ad296a4e959d674ada7394a739ceb5ad2739d29594e54a4e72a523294a5394a5494a5084651, rootWithGate 2 5 255 true⟩,
+  ⟨0x56b1acab7adef79d6b5bd6d5a5eb7bd2f4ad6919ce319d6b6a5eb295674a52b5a5e979ce75a5695a4e94a52b49d2738c6739ce719ceb4ad2b494e94a4e94a4eb4a52939ce74ad2939d2939ce739c6739ce74ad2939ce949ce74ace949d233a4e759d6b3b5ab39d696ace75a5a9195276b4e76aca959da93a5a749c6539ced4ad2749529595234a4e91a525194a549c63494a508c251, rootWithGate 2 6 255 true⟩,
+  ⟨0x56b1ad2b7adef79def5bd6d5ade97bd2f5ad2919ce319d6b6ade94a5e96b56b5a5eb69ce75ad2b4a5293ad2949d2738c6739ce719ceb5a5694a52d6ad2d6ad2b4ad2b49ce75a52949ce939ce739c6739ce75a5294a5295a5295a5294a52539d295a56b4b56b49d2b6a5275ada9294e96ad275ace94a5a74a569494a52a4eb4ad2749d275952549ce92a4e529467494a3394a508c650, rootWithGate 2 7 255 true⟩,
+  ⟨0x56b3ad297bdad7aded7bcef5ad6b7ad6f59d6d39d671ad677ad6b4a56b6a5a93a5a96ad6739ceb5ad6759d676ad2759c6b39d671ace75ace75a56d4b56d4b4e74a4e74ace739ceb3ace759ce759c6b39ce739d6759ce73a4eb39ceb3ace359ce76a5272a52d595ab4aca949d2b38d694b4a94a4a74952529d2b3a469295293aca949ca939d252a4a5094a738ce729c25294a118c611, rootWithGate 3 4 255 false⟩,
+  ⟨0x56b3ad277bd6b7adeb7bd2f5adab7b56f5a56d3a5672ad697adab4a5ab6ada739d675ad694a52b5ad695a5696ad6959cab49d692ad295ad295a56d5b56d5b52739ce73ad294a52b4ad295a5275a4ab49d294a5695a52739ceb4a52b3ad255a4e96a5693a56d59dab5ace95a52b395695b4e95ace759d272a52b4a4a939d2b4ace949ce949d253a4e7194e7394e739c65394a318c631, rootWithGate 3 4 255 true⟩,
+  ⟨0x56b39d277bd6f5ad6b7bd6f4adab7bd6d5a56d3ad272ace759d674a5eb5ada739d675ad694ad694ad695a5696ad6b49cab5a5272ad2739ce73a56b5b56b5b52739ce73ad294a5694ad295a56949cab4a4e939ce75a52739ceb4a5294a4e55a5276a5a94adab59da94a4e96ad69395674ace95ad2969d273ad6939ca9394e94ad2939ce959ce53a52729d25394e529465394a5184631, rootWithGate 3 5 255 true⟩,
+  ⟨0x56b3aca77bd6f79d6b5bd6f5a5ab7bd6f4a56d3ad652ad6b7a5ab295674a52739d6759ce75a5695a52959d296a56b594ab4a5291a52b4ad2b494e94a4e94a4e739ce739ce74ad293a52749d294a46949ce74ad2939ce739ce94ace94a5234a4e769dab3adad49da95aca76a56b295675b4a75b4e969d692a5694a467394eb3ad29494e959d233a52919d27294e539c23394a518c231, rootWithGate 3 6 255 true⟩,
+  ⟨0x56b3ad277bd6f7adeb5bd6f5ada97bd6f5a52d3ad672a56b7ada94a5eb6ad6739d675ad695ad2b4a5694a5276ad6b59ca95a5692a4eb5a5694a56d5ad6d5ad2739ce73ad295a5294a4e75a5695a4a93a5275a5295a52739ceb5a5294ad2549d296a5ab4ad6d59d6b5a4e76ad6b395295ace74b5295a5673a52b49ca729ce93ad2949ce759d2539d2929ce7394a739463294a518c630, rootWithGate 3 7 255 true⟩,
+  ⟨0x56b39d2b7bdeb5ad6f7bd2f4adeb7b56d5ad6d3a5273ace759d674a5ab5b5ab4adab7ad6b3a5294ad6b5ad6b6ada949ceb4a5293ad6739ce73a56b6b56b6b5695ad295ad6b39d295ad6b5ad294a4eb5a52b39ce75ad694ad2b39d694a5275ad296a5673ad6b5a5a95a5295a56939d675ad296a4e9595253a56949ce949ceb5ace939d2949ce54a4e519ce539ce5394a5494a3184651, rootWithGate 4 5 255 true⟩,
+  ⟨0x56b3acab7bdeb79d6b5bd2f5a5eb7b56f4ad6d3a5653ad697a5eb295674a52b4ade979ce749d295a52b5a52b6a5a9594eb3a52b2a5694ace9494e94a4e94a4e95a52749ce73a4e94a5694a4e94aca959d293a52739ce93a4e93a5294a5654ace969d692ad6d4a5a96ace759d6b29d676b4e76aca95956729d695a4a749ced4ace94952949d234a4e709ce729ce549c63494a318c251, rootWithGate 4 6 255 true⟩,
+  ⟨0x56b3ad2b7bdeb7adef5bd2f5ade97b56f5ad2d3a5673a5697ade94a5ab6b56b4adeb6ad6b4a4eb4a56b4ad296ada959ce94a56b3a5295a5274a56d6ad6d6ad695ad295ad6b49ce95a5295ad295ace94a56949d275ad694ad2b49d694ad674a52b6a5693ad2d5a56b6a5275a56b39d296ad275ace949d6539d2b59ce73a4eb4ace949d2749d2549ce719ca739ca7494a3394a318c650, rootWithGate 4 7 255 true⟩,
+  ⟨0x56b39cab7bdef59d6b5bd6f4a5eb7bd6d4ad6d3ad253ace759d67295674a52b5ada979ce74a5674a52b5a52b6a5ab494eb4ace92a56739ce7394e94a4e94a4eb5a56949ce73a5274a5694a52b3a4a95a4e939ce739ceb4a5293a52759d254ad2769da93b5ab4a5a75a4e76a5a929d655ace76aceb695673a5a749ca7494ab4ad293952959ce34a5271a52529ce339463494a5184251, rootWithGate 5 6 255 true⟩,
+  ⟨0x56b39d2b7bdef5ad6f5bd6f4ade97bd6d5ad2d3ad273a4e759d674a5eb5b56b5adab6ad6b4ad293a56b4ad296adab49ce95ad293a52739ce73a56b6ad6b6ad6b5ad6b5ad6b49d275a5295ad6b4a4e94ad2939ce75ad6b5ad6b49d675a5274a5696a5a94b56b5a56959d276ada939d275a5275ad2b59d654a569494e739ca94ad2939d2759ce549d272a4e539ca538ca3394a5184650, rootWithGate 5 7 255 true⟩,
+  ⟨0x56b3acab7bdef79d6b5bd6f5a5e97bd6f4ad2d3ad653a56b7a5e9295674a52b5ade969ce75a52949d2b4a4e96a5ab594e94ad2b29d2b4a529394e94a4e94a4eb5a56949ce74a4e749d274a52b4aca74a5274a4e739ceb4a5294a5275a5653a52969dab3b56d4a5696a4e56a5ab29d276ace55b4eb59da739d6959ca539cab3ad294952759d2349d291a4e729ca549461394a518c250, rootWithGate 6 7 255 true⟩,
+  ⟨0x56b3aceb7bdef7a5ad6bd6f5ade97bd6f5ad2d3ad673a56b7ade939da95ad6b5adeb6a5295ad2b4a56b4ad296adab59ce95ad6b3a52b5a56949d2b5ad2b5ad2b5ad6b5a5295a5295a5295ad6b5ace94ad695a5294a52b5ad6b5a5695ad674a56b6a5ab4b56d5a56b6a5276adab39d296ad275b52b5a5a74a56b59ce73a4eb4ad2949d2759d2549d292a4e739ca7494a3394a518c650, rootWithGate 6 7 191 true⟩]
+
+def firstCount : ℕ := 35
+
+noncomputable def firstAt (i : ℕ) : SearchState := firstStates.getD i (0, [])
+
+noncomputable def decodeStep (width : ℕ) (parent : ℕ → SearchState) (entry : ℕ) : SearchState :=
+  let before := parent (entry % 2 ^ width)
+  let left := (entry >>> width) % 16
+  let right := (entry >>> (width + 4)) % 16
+  let dropLeft := if entry.testBit (width + 8) then 2 ^ left else 0
+  let dropRight := if entry.testBit (width + 9) then 2 ^ right else 0
+  let kept := 2 ^ before.2.length - 1 - dropLeft - dropRight
+  secondTransition before left right kept (entry.testBit (width + 10))
+
+
+def secondCount : ℕ := 413
+
+def secondCodes : List ℕ := [0x9060c7306318314c18860d820641035c81ac40c6206a90314818840c3206c0832041ae20c710630831441a820c410698830c41b0e048602428119409080464022a01c400, 0x8ec14850a3a85194290814640a2a0560c2ae615630aa98520828c414520a40851c428c214510aa0851042b0e0c870643031d8190a0c7506328321018e80c64062a021501, 0xac8246412aa091504906247312318914c4886248212390918848a420521221090c84902247112308954448a225870e430721438ca1c810e30871443e601d870a43852182, 0x8a4344218210d0c86b0234811a388d58468c23576163a8b1cc58a62c7216290b0c858e22c5116188a0c458422f4016c38921c490c24761242891d448ca25841242095d04, 0x8863c821e390f14870a43c421c210f0c87b023c811e388f61c690e34861a3b0d614690a35751ab28d194690834741a320d150690634731a318d14c688634821a390d1886, 0x90c46762242919d488ca44842232111508906446322299110c890444622229111088864448122c38f21c7b0c3d761e428f1d47cca3c841e3a0f15070a83c831e398f14c7, 0x8c854542ac1955ccaa8654822a3115148aa845787274393a1898ec4e85263a9319498e84c64262a1215098e64c6326299310c98e44c622629121489884484226191361c8, 0x8c66f4136c39921cc90c64763242991d4c8ca65843242195d0c8c86454332199208c8c465523229195d8b8ea5c742e2a17cc4bb0e54872a43151d8a90a54752a3295210a, 0x8e67e633e299f10cfb047c823ec39d21ce90c74763ac29d214eaea74653a421d1d0e8c876543a2a1d20ce8e674633b299d14ce88675823a411d588e8c4758736431b20cd, 0x8ca8e84463a2319118a888544741a31cd18c68c534621a361d090c84854232a12110ce88464422a219cd0b0e7c873ec31f5d8f90a7c753e421f1d0fcc87c543c2a1f20cf, 0x908a664522a2960d4b0e9c874e43271d9390a9c654e42271913ca89c544ec1a75cd3ac69d874a43a521928ec94854a3aa5195290894644a2a2554d2f0e8e87463b231d51, 0x90ec486623b3121588cac58462423159188c8c5765e3aafd0d78ecb4755a32ada1168c8b4545ac3ab2195cecac85573aab1955908ae7456322b1515b0ea4875242a91d54, 0x161dfd0cf4767ac3bb219dceced877243b9619cb0ae485723b37a15b8eadc656ec3b5219acecd4856b3ab5195ab0ecc876642b31d59ccacd8466423361d8]
+
+noncomputable def secondAt (i : ℕ) : SearchState :=
+  let block := secondCodes.getD (i / 32) 0
+  decodeStep 6 firstAt ((block >>> (17 * (i % 32))) % 131072)
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+def secondSuccessorsList : List (List ℕ) := [
+  [0, 1, 2, 3, 4, 5, 6, 7],
+  [0, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43],
+  [8, 9, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66],
+  [67, 68, 69, 70, 71, 72, 73, 74],
+  [10, 11, 44, 45, 67, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105],
+  [106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118],
+  [12, 46, 75, 76, 106, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148],
+  [13, 47, 77, 119, 120, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173],
+  [14, 15, 48, 78, 121, 149, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192],
+  [16, 17, 49, 79, 122, 123, 150, 151, 174, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214],
+  [18, 80, 107, 124, 152, 175, 193, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231],
+  [108, 125, 153, 194, 232, 233, 234, 235, 236],
+  [19, 81, 109, 126, 154, 176, 195, 215, 232, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253],
+  [82, 155, 196, 254, 255, 256, 257, 258],
+  [20, 21, 50, 68, 83, 127, 156, 177, 197, 216, 237, 238, 254, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281],
+  [22, 23, 51, 69, 84, 110, 128, 178, 198, 217, 239, 259, 260, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299],
+  [24, 85, 129, 157, 199, 300, 301, 302, 303, 304, 305, 306, 307, 308],
+  [25, 26, 52, 70, 86, 111, 130, 158, 179, 218, 240, 261, 262, 282, 283, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323],
+  [27, 87, 112, 131, 159, 180, 200, 219, 241, 263, 284, 309, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334],
+  [28, 53, 88, 132, 160, 181, 201, 264, 265, 285, 310, 324, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347],
+  [29, 54, 89, 113, 133, 182, 202, 266, 286, 311, 335, 348, 349, 350, 351, 352, 353, 354, 355],
+  [30, 55, 90, 134, 161, 203, 220, 267, 287, 300, 312, 336, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365],
+  [31, 56, 91, 114, 135, 162, 183, 221, 268, 288, 313, 337, 348, 366, 367, 368, 369, 370, 371],
+  [32, 163, 204, 289, 314, 372, 373, 374],
+  [1, 33, 57, 92, 93, 136, 164, 184, 205, 222, 242, 269, 270, 290, 301, 315, 325, 338, 339, 349, 356, 366, 372, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384],
+  [2, 34, 58, 94, 95, 115, 137, 185, 206, 223, 243, 255, 271, 291, 302, 316, 326, 340, 350, 357, 367, 375, 376, 385, 386, 387, 388, 389, 390, 391],
+  [35, 96, 138, 165, 207, 244, 272, 292, 303, 317, 358, 392, 393, 394, 395, 396, 397],
+  [3, 36, 59, 97, 98, 116, 139, 166, 186, 224, 245, 246, 256, 273, 293, 304, 318, 327, 341, 351, 359, 368, 377, 378, 385, 386, 398, 399, 400, 401],
+  [4, 37, 60, 71, 99, 140, 141, 167, 187, 208, 225, 233, 247, 274, 305, 319, 328, 342, 360, 369, 379, 387, 392, 398, 402, 403, 404, 405, 406],
+  [38, 61, 100, 142, 168, 188, 209, 226, 248, 275, 294, 320, 329, 352, 361, 370, 388, 393, 399, 407, 408, 409],
+  [5, 39, 62, 72, 101, 143, 144, 169, 189, 210, 227, 234, 249, 276, 277, 295, 306, 330, 343, 353, 362, 380, 389, 394, 400, 402, 403, 410, 411],
+  [40, 63, 102, 145, 170, 190, 211, 228, 250, 278, 296, 321, 331, 344, 363, 371, 381, 395, 401, 407, 410, 412],
+  [6, 41, 64, 73, 103, 117, 146, 171, 191, 212, 229, 235, 251, 257, 279, 297, 307, 332, 345, 364, 373, 382, 396, 404, 408, 411],
+  [42, 65, 104, 147, 172, 192, 213, 230, 252, 280, 298, 308, 322, 333, 346, 354, 365, 383, 390, 397, 405, 409, 412],
+  [7, 43, 66, 74, 105, 118, 148, 173, 214, 231, 236, 253, 258, 281, 299, 323, 334, 347, 355, 374, 384, 391, 406]]
+
+def secondSuccessors (i : ℕ) : List ℕ := secondSuccessorsList.getD i []
+
+def thirdCount : ℕ := 1943
+
+def thirdCodes : List ℕ := [0xb0409ac409aa409b3008b2608ae608ac608b2408ae408ac408d2e05b3004b2e04b2c04d2c038ec03b3002cec02b2a02b300192e0192c018ec01b2a01aea01aec008ea008e8008a8008e6008a60088600, 0x8c80baa80b8a80bb040b9040bae40bac40b8c40baa40b8a40bb300ab2a0a92a0aaea0a8ea0aaca0a8ca0ab260a9260ab060aae60a8e60aac60a8c60ab240ab040aae40aac40ab0e0990c0990a098ca09, 0xb2c0caec0c92a0c8ea0c8ca0c9280c8e80c8c80c8a80cb260c9260cb060cae60c8e60cac60c8c60c8a60c8860cb240cb040cae40cb0e0b90e0b90c0b8ec0b90a0b8ea0b8ca0bb080b9080bae80bac80b, 0x8ca0f9080f8c80f8a80fb040fac40faa40f92a0e8ea0e8ca0eb260eae60eac60eb240eb300db2e0dcec0d92a0d8ca0d9280d8c80d8a80db260d9260db060dac60d8c60d8a60d8860db240db040db300c, 0xa8118e6118c6118a61188611ae411ac4118c411aa4118a4118841186411f3010d2e10d2c108ea108ca108e8108c8108a810b0610ae6108e610ac6108c6108a61088610b0e0f90c0fcec0f90a0fcea0f, 0x92c148ec148ea14cca148ca14b2614ae614b301392e1392c138ec13b2a13b2613ae613ac613b301292e1292c128ec12b2612ae612ac612f0e11d0e11d0c118ec11d0a118ea118ca118e8118c8118a811, 0x8e617cc6178a61788617b3016b2e1692c16cea168ca16b2616b0e1590e1590c158ec15b0a1590a15aea158ca15908158e8158c815ca8158a815906158e6158c615ca6158a61588615b301492e14b2c14, 0xa81ad061a8e61a8c61a8a61a8861af30198ec19d2a198ea198ca19b0e1890c1890a188ca1890818ce8188c8188a818ce618b0e1790e17b0c17aec1790a178ea17908178e817cc8178a8170a81790617, 0x90e2192c218ec21b2a2192a21aea218ea21b0e20ea8208ec1f92e1e92c1e8ec1eb301d92c1db301c92e1c92c1c8ec1cb301b92e1b92c1b8ec1bf0e1ad0e1a8ec1a8ea1a8ca1ad081a8e81a8c81a8a81a, 0xaa82db302cb2a2caea2caca2cb242cae42cac42cd2e2790e2792e26b302593025b2e25b2c2590e24d2c2490c248ec2492e2392c238ec23b30229302292c2290c22cec22b2a2292a22b30219302192e21, 0xb0e2fcec2f92a2f8ca2fb282fb082fac82f9262f8c62fb242fb302eb2c2eb0c2eaec2e92a2e8ea2e8ca2eb282eb082eae82eac82e9262e8e62e8c62eb242eae42eb0e2d90c2d90a2d8ca2db082dac82d, 0x90c3590a358ca35f30348ec34b3033b2e3392c33b2633b303292e32b2c3292c328ec32b2632ae632f3031d3031d2e31d2c318ea318ca31b0831ae831ac8318e6318c631b3030d0e30d0c30b302fb2e2f, 0xb303fd2e3e90e3eb303d92e3dd0e3db303c9303cb2e3cb2c3cd2c3b8ec3bb303a92c3acec3ab2a3ab303992e3992c398ec39b2a39aea398ca38b0e3790c37cec3790a37cea378ca37b0e3690a36b0e35, 0x9264b9064b8e64b8c64b8a64b8864bb244bb044bae44be604ad2e48b3047b2e47b2c47f30468ec46b3045b2e45b2445b304492e44b2c4492c448ec44b2444ae4448ea438e8438a8438e2438a24388243, 0x9084cae84cac84c8c84caa84c8a84c9064c8e64c8c64c8a64c8864c9044c8e44c8c44c8a44c8844c8644cb304bb2c4bb0c4baec4bb2a4b92a4bb0a4baea4b8ea4baca4b8ca4b9284b9084b8e84b8c84b, 0xaca4e9264e8e64e8c64eb304db2e4db0e4dcec4db2a4d92a4db0a4daca4d8ca4d9284d9084d8c84d9264d9064d8c64d8a64d8864db244db0e4c90e4c90c4c8ec4cb0a4c90a4caea4caca4c8ca4cb084c, 0xaea51aca51ac651b305092e5092c508ec50b2a50aea50aca50f304fd304fd2e4fd2c4fb0a4faea4f8ea4faca4f8ca4f9084f8e84f8c84f9064f8e64f8c64f8a64f8864fb304ed0e4ed0c4eb2a4eaea4e, 0xcea54aca548ca54b265492654b30539305392e5390e53b2c5392c53b0c538ec53b2a53b0a53aea53eca53aca53cca53b265392653ae6538e653b3052b2852ae852ea452b305192e5192c518ec51b2a51, 0xaea57aca57f3056d305690e5690c568ec56f2a56d2a56b0a56aea568ea56aca568ca56b305592e5592c558ec55b2a55f0a55aea55aca55b305493054b2e54b0e5492c5490c54b2a5492a54b0a54eea54, 0x8ec5bf2a5baea5baca5bb305a92e5ad0e5a92c5ad0c5a8ec5ab2a5af0a5aaea5aaca5ab305992c59b2a59eea59aca59b305892e5892c588ec58b2a58aea58eca58aca58b305792e5792c578ec57b2a57, 0xd0a628ea628ca62d2c618ec61b0e6090c60cec6090a60cea608ca60b0e5f90e5f90a5f8ea5fcca5fb305e92c5ecec5eb2a5eb0e5d90e5d90c5d8ec5d90a5d8ca5db305c92e5c92c5c8ec5cb2a5caea5c, 0x8ea6ce626cb0e6b90c6bb066ba866b9046b8c46ba846baca6a8c86a8c66a8866a8c46a8846a8646a8c26a8826a8626a0626a8426ab3066d2e6590e65b306492e64d0e64b306393063b2e63b2c638ec62, 0xb0477b0e73b0873d08728c872b0e7190871cc871b0671b0e7090c70f0e6fd086f8c86fd066f8c66f8866fb0e6eb0c6e9086ecc86e9066ecc66e8866eb046e9046eb0e6d90c6db086dc866d9046d8c46d, 0x8a878906788e6788a67888678904788e4788a478884780847886478b3077b2e77b0e77b2c77b0c77eec77cec7792a7790a778ca7792877908778c8778a87792677906778c6778a6770a67788677b2477, 0x8ca7a9087a8c87a8a87a9067a8c67a8a67a0a67a8867ab3079d0e79b2c79f0c79aec7992a79928798a879926798a67988679b2479b0e7890e78b0c78aec78b0a7890a78aea78eca78cca78908788e878, 0x8c67caa67cf0e7bd0e7bd0c7b8ec7bf0a7bd0a7baea7baca7b8ca7b8e87b8c87b8a87b8e67b8c67b8a67b8867b8e47b8c47b8a47b8847b0847b8647bf307ad307ad2e7af2c7ad2c7ab0c7aaec7a90a7a, 0xb0a7e8ea7e8ca7eca87e9267e8e67eac67e8c67eb0e7d90c7db0a7d90a7daca7d8ca7de847db307c9307c92e7c90e7cb2c7c92c7cb0c7caec7c8ec7c92a7c8ea7c8ca7cb287cb087caa87c9267c8e67c, 0x90880ce8808c8808a880b268092680b307f92e7fb2c7faec7f92a7f8ea7fcca7f9287f8e87fcc87f8a87fb267f9267fae67f8e67fb307e9307e92e7e90e7eb2c7e92c7eb0c7eaec7e8ec7eb2a7e92a7e, 0x90e82b0c82aec828ec82d2a8290a828ea828ca82d2882908828e8828c8828a882b308192e81b2c81aec8192a81d0a818ea81d0881b308093080b2e80b0e80b2c80b0c8092a8090a80cea808ca8092880, 0xb308593085b2c85b0c8592a85cea858ca85b2885b308492e84b2c84aec8492a848ea84cca84b2884ae884b30839308392e8390e83b2c8392c83b0c83aec838ec8392a838ea838ca83ac883f3082d3082, 0xb308993089b2c89b0c89eec89cec89b2a8992a89b308892e88b2c88aec88b2a8892a88aea888ea8890e87b0c87aec878ec87d2a878ea878ca87b308692e86d0e86b2c86f0c86aec8692a86d0a868ea86, 0x8c8958a895926958c6958a69588695b2495b3091d0c908ec90d2e8fb0e8e90c8ecec8eb0e8d90e8db0c8db308cb2e8cb2c8c90e8bf2c8bd2c8bb0c8baec8b8ec8bb308a92e8ad0e8ab2c8af0c8aaec8a, 0x8a697886978e4978a4970a497884970849786497f3096d3096f2e96b0e96d2c96cec9690a968ca96908968c8968a896906968c6968a6960a69688696b3095b2e95f0e95d0c95cec9592a958ca9592895, 0x8c69ab0e99b0c9990a99cca99e8499b309893098b2e98b0e9892c9890c98cec9892a988ca98b2898b0898aa898926988c698aa698f0e97d0e97f0c97aec97d0a978ea97cca978e8978a8970a8978e697, 0x92c9cb0c9ccec9c92a9c90a9ccca9c8ca9c9289c9089ccc89c8c89c8a89cb269c9269cb309bb2e9b9289bea49bb309a9309ab2e9ab0e9a92c9a90c9acec9ab2a9a92a9ab0a9a8ca9aca89a9269aac69a, 0x92c9f90c9fcec9f92a9f8ca9fac89ff309ed309eb0e9e90c9ecec9ed2a9e90a9e8ca9e0ca9ed289e9089e8c89e8a89eb309db2e9d92c9dcec9d92a9dd0a9d8ca9dd089db309c9309cb2e9cb0e9cb2c9c, 0xb0ea3b0ca3ea8a3b0ea290ca2ceca2d2aa28caa2b30a1b2ea1f0ea192ca1d0ca1ceca192aa1d0aa18caa1b30a0930a0b2ea0b0ea092ca0ceca092aa0ccaa08caa0b28a0b08a0b309f9309fb2e9fb0e9f, 0x8a8ae8c6ae8a6ae886aeb0eaaf2ea9b0ea9b30a8b2ea8f0ea8b0ea790ea7b0ca790ca7b0ea6d2ca690ca6ceca6b30a5b2ea5f0ea592ca5d0ca5ceca5b30a4930a4b2ea4b0ea492ca4ceca4b2aa492aa4, 0xb26b2b30b192eb1d0eb1b2cb1f0cb192ab18eab1ccab1b26b1ae6b1b30b092eb0d0eb092cb0d0cb08ecb0b2ab0ac6b0b30af92eafd0eaf92cafd0caf8ecaff30aed2eaed0eaed2caed0cae8caae8c8ae, 0xb2ab8aeab8d0eb7d0cb78ecb7b30b692cb6d0cb6b30b592eb5d0eb5b30b492eb4d0eb492cb4d0cb48ecb4f30b3d0eb3d0cb38ecb3d2ab38eab38cab3b30b2b2eb2f0eb292cb2d0cb292ab2ceab28cab2, 0xf30c1d30c1d2ec190ec1d2cc190cc18ecc18eac18cac1b08c1aa8c18e6c18c6c1aa6c1d2ebdd0ebd90ebcb30bbb2ebbb2cbbd0ebad2cbad0cba8ecbab30b992cb9d0cb9cecb9b2ab9b30b892eb8d0eb8, 0x8eac5ccac58cac5908c58e8c5cc8c58c8c58a8c5ae6c58e6c5f30c4d2ec4ea4c4f30c3d30c3d2ec390ec3d2cc390cc38ecc3b0ac38eac38cac3ca8c38e6c3ac6c38c6c3f0ec2d0cc2d0ac28cac2e84c2, 0x8cac8ac8c8f30c7d2ec7d2cc78ecc7d0ac78eac78cac7d08c7f30c6d30c6f2ec6b0ec6d2cc690cc690ac6ceac68cac6908c6ce8c68c8c68a8c6f30c5d30c5d2ec590ec5f2cc5d2cc5b0cc58ecc590ac5, 0xd0ecbd2ccbd0ccb8eccbd0acb8eacb8cacbf30cad30cad2cca90ccaceaca8cacaf30c9d30c9d2ec990ec9d2cc98ecc98eac9ccac98cac9b08c9ae8c9f30c8d30c8d2ec890ec8d2cc890cc88ecc88eac8, 0xf30d1d2ed1d0ed1f30d0d30d0f2ed0f2cd0d2cd0f30cfd2ecfd0ecfd2ccfd0ccf8eccff30ced30ced2cce90ccececcef30cdd30cdd2ecd90ecdd2ccd8eccdaeacd8eacdf0eccd0cccea8ccf30cbd2ecb, 0x8caddb0edc90cdccecdc90adcceadc8cadcb0edb90cdb90adb8cadbf30da8ecdab30d9b2ed992cd9b26d9b30d892ed8b2cd892cd88ecd8b26d8ae6d8b0ed790cd790ad78cad7b08d7e86d7f30d390ed2, 0xe62ecd0ceab0ee9b0ce9b0ae990ae98c8e88c6e8886e8b30e4d2ee390ee3b30e292ee2d0ee2b30e1930e1b2ee1b2ce192ce1d2ce08ece0b30df92cdfcecdfb2adfb30de92ede92cde8ecdeb2adeaeade, 0x8caf1f30f08ecf0f2af0b30efb2eef92cefb2aefb26efb0eee90eee90cee8eceeb0aee90aeeaeaee8caeeb08ee908eeae8ee8c8eeca8ee8a8eec86eeb30ed92eedb2ced92ced8ecedb2aedb26edae6ed, 0x92ef8d0ef8b30f7930f7b2ef7b2cf792cf78ecf6d0af68eaf68caf6d2cf58ecf5b0ef490cf4cecf490af4ceaf48caf4b30f392cf3cecf3b2af3b30f292ef292cf28ecf2b2af2aeaf2b0ef190cf190af1, 0xb0b0490b04aeb04909048e904cc904ca9048a904907048e704cc704ca7048a70488704b3103b2f03b2d0392d03ceb03ccb038cb03b2703b30ffb28ffaecfe8eafe8e6fe8a6feb30fad2ef990ef9b30f8, 0xaed08b310792f07b2d0792d078ed07f0f06d0f068ed06aeb068cb06d09068e9068c906ca9068a906d07068e7068c706ca7068a70688706f31058ed05d2b058eb05ccb058cb05b0f0490f04b0d04aed04, 0x92d0fb0d0fced0fb2b0fb0f0e90f0e90d0e8ed0eb0b0e90b0eacb0e8cb0eb310d92f0db2d0daed0db2b0daeb0d8ed0cb310b92f0bd0f0bb2d0bf0d0bb310ab2d0a92d0ab0f0990d09b310892f08b2d08, 0xd071b8e71bcc71b8a71b8871bf311ad2b1aceb1a8cb1ab3116d0d158ed15d2f14b0f1390d13ced13b3112b2f12b2d1290f11f2d11d2d11b0d118ed11b311092f10d0f10b2d10f0d10b310f9310fb2d0f, 0xb2f22b0f2292d22b2b2292b22eeb22ceb22b0f21b0d21ea921b311fb2f1ff0f1f92d1fd0d1fb0f1e90d1eb311db2f1d92d1db311cb2f1c92d1cf0f1bd0f1baed1b8eb1bd091b8e91bcc91b8a91b0a91b, 0x92d2eced2eb2b2eb312d92f2db2b2daeb2d90f2c90d2c8ed2cb0f28f2f27b0f27b3126b2f26f0f26b0f25d2d2590d25b3124b2f24f0f2492d24d0d24b0f2390f2390d238ed23b0b2390b23b312293122, 0xf2b3cd2b3cf313bd313b90f3b8ed3bf2b3bd2b3baeb3b8eb3bf0f3aea93a8ed39f3138d0f38d0d388ed38f3137f31368ed36f31358ed35d2f32b3131b2f31b2d31d2d308ed3090f2f90d2f8ed2fb312e, 0xd2d478ed47b314692d46ced46b2b46b314592f4592d458ed45b2b45aeb45b0f4490d4490b448cb44f3141f3140d0f40f313fd313f90f3e90d3e8ed3ef313dd0f3dd0d3d8ed3df313cd313c90d3cced3c, 0x8ed55b315492d54ced54b2b54b0f5390d53b0b53acb53b315292f52b2d52aed52b2b52aeb528cb51b0f5090d50ced50b0f4f90b4fb314bd2f4a90f4ab314992f49d0f49b314893148b2f48b2d4892d48, 0xd0f67d2d67d0d678ed6790f6690d668ed66b316592d65d0d65ced65b2b65b316492f64d0f64b2b64aeb64b3160d2d5fb0f5e90d5eb0b5eb315d92d5db2b5deeb5db3158d2f57b3156b2f56b2d56d2d55, 0xd2f7cb317bb2f7bb2d7b8ed7ad0b7a8cb7ad2d798ed79b0f7890f7890b78ccb78b317792d77ced77b2b77e87768c974d0f728ed70ced6ff2b6f8ed6ef2b6eaeb6ed2f6ad0f6a90f69b3168b2f68b2d68, 0xf0d93f2f9290f90d0f8ff2d8ed2d8ed2f8ad0f8a90f89b3188b2f88b2d88b3184b0f8390f83b0d8390d83d0b828eb82ccb82d2d81ced81b317d]
+
+noncomputable def thirdAt (i : ℕ) : SearchState :=
+  let block := thirdCodes.getD (i / 32) 0
+  decodeStep 9 secondAt ((block >>> (20 * (i % 32))) % 1048576)
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+def thirdSuccessorsList : List (List ℕ) := [
+  [0, 1, 2, 3, 4, 5, 6],
+  [0, 7, 8, 9, 10, 11, 12],
+  [1, 7, 13, 14, 15],
+  [2, 8, 13, 16, 17],
+  [3, 9, 14, 16, 18, 19, 20],
+  [4, 10, 17, 18, 21],
+  [5, 11, 19, 21],
+  [6, 12, 15, 20],
+  [22, 23, 24, 25, 26, 27, 28],
+  [29, 30, 31, 32, 33, 34, 35],
+  [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53],
+  [54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74],
+  [22, 36, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96],
+  [23, 37, 75, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113],
+  [38, 76, 97, 114, 115, 116, 117, 118, 119, 120],
+  [121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132],
+  [24, 39, 77, 98, 114, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147],
+  [148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169],
+  [78, 99, 133, 148, 170, 171, 172, 173, 174, 175, 176],
+  [79, 100, 134, 149, 177, 178, 179, 180, 181, 182, 183, 184],
+  [40, 54, 80, 101, 135, 150, 170, 177, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194],
+  [25, 29, 41, 55, 81, 102, 115, 121, 136, 151, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213],
+  [42, 56, 82, 137, 152, 171, 178, 185, 214, 215, 216, 217, 218, 219],
+  [26, 30, 43, 57, 83, 116, 122, 138, 153, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235],
+  [44, 58, 84, 103, 139, 154, 236, 237, 238, 239, 240, 241, 242, 243, 244],
+  [45, 59, 85, 104, 172, 179, 186, 214, 245, 246, 247, 248, 249],
+  [27, 31, 46, 60, 86, 105, 117, 123, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264],
+  [87, 106, 140, 155, 195, 220, 250, 265, 266, 267, 268],
+  [88, 107, 141, 156, 196, 197, 221, 251, 269, 270, 271, 272],
+  [89, 142, 157, 198, 222, 252, 273, 274],
+  [158, 199, 223, 236, 253, 275, 276, 277],
+  [90, 108, 200, 224, 254, 278],
+  [159, 225, 255, 279, 280],
+  [0, 47, 48, 61, 62, 91, 109, 118, 124, 143, 160, 187, 188, 201, 202, 215, 226, 237, 245, 256, 279, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290],
+  [1, 49, 50, 63, 64, 92, 119, 125, 144, 161, 189, 203, 216, 227, 238, 246, 257, 281, 282, 291, 292, 293, 294, 295, 296, 297],
+  [65, 162, 204, 228, 239, 258, 298, 299, 300],
+  [2, 51, 52, 66, 67, 93, 110, 120, 126, 180, 205, 229, 240, 247, 259, 283, 284, 291, 292, 301, 302, 303, 304],
+  [3, 32, 68, 94, 111, 127, 163, 173, 181, 190, 206, 241, 248, 260, 265, 269, 275, 278, 285, 293, 298, 301, 305, 306, 307, 308],
+  [69, 128, 164, 207, 230, 261, 294, 302, 309],
+  [4, 33, 70, 95, 129, 145, 165, 174, 182, 191, 192, 208, 209, 217, 231, 242, 266, 270, 273, 276, 286, 295, 299, 303, 305, 310, 311],
+  [71, 130, 166, 210, 232, 262, 287, 304, 310],
+  [5, 34, 72, 112, 131, 146, 167, 175, 183, 193, 211, 218, 233, 243, 267, 271, 277, 288, 300, 306, 309, 311],
+  [73, 132, 168, 212, 234, 244, 263, 289, 296, 307],
+  [6, 28, 35, 53, 74, 96, 113, 147, 169, 176, 184, 194, 213, 219, 235, 249, 264, 268, 272, 274, 280, 290, 297, 308],
+  [312, 313, 314, 315, 316, 317, 318],
+  [319, 320, 321, 322, 323, 324, 325],
+  [22, 312, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341],
+  [23, 313, 326, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353],
+  [354, 355, 356],
+  [24, 314, 327, 342, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367],
+  [25, 29, 328, 343, 357, 368, 369, 370, 371, 372, 373, 374],
+  [26, 30, 329, 358, 368, 375, 376, 377, 378],
+  [27, 31, 330, 344, 369, 375, 379, 380],
+  [331, 345, 359, 381, 382, 383, 384],
+  [332, 360, 385, 386],
+  [333, 346, 361, 387, 388, 389, 390, 391, 392],
+  [334, 347, 393],
+  [315, 319, 335, 348, 362, 394, 395, 396, 397, 398, 399],
+  [316, 320, 336, 363, 394, 400, 401, 402, 403],
+  [317, 321, 337, 349, 395, 400, 404, 405],
+  [32, 322, 338, 350, 370, 379, 381, 387, 393, 396, 401, 404, 406, 407, 408, 409],
+  [339, 354, 388, 410, 411, 412],
+  [33, 323, 340, 364, 371, 372, 376, 382, 385, 389, 397, 402, 405, 406, 413, 414],
+  [351, 355, 390, 410, 413, 415],
+  [34, 324, 352, 365, 373, 377, 383, 391, 398, 407, 411, 414],
+  [356, 366, 392, 408, 412, 415],
+  [28, 35, 318, 325, 341, 353, 367, 374, 378, 380, 384, 386, 399, 403, 409],
+  [416, 417, 418, 419, 420, 421],
+  [416, 422, 423, 424, 425, 426, 427, 428],
+  [417, 422, 429, 430, 431],
+  [418, 423, 429, 432, 433],
+  [419, 424, 432, 434, 435, 436],
+  [420, 425, 426, 434, 437],
+  [421, 427, 430, 435, 437],
+  [428, 431, 433, 436, 438],
+  [36, 312, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, 453, 454, 455, 456, 457, 458, 459, 460, 461, 462],
+  [463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489],
+  [37, 313, 439, 490, 491, 492, 493, 494, 495, 496, 497, 498, 499, 500, 501, 502, 503, 504, 505, 506, 507],
+  [38, 440, 508, 509, 510, 511, 512, 513, 514, 515, 516],
+  [39, 314, 441, 490, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533],
+  [442, 463, 491, 517, 534, 535, 536, 537, 538, 539, 540],
+  [443, 464, 492, 518, 541, 542, 543, 544, 545, 546, 547, 548],
+  [549, 550, 551, 552],
+  [40, 41, 54, 55, 416, 444, 465, 493, 508, 519, 541, 549, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570],
+  [42, 43, 56, 57, 417, 445, 466, 509, 520, 553, 554, 571, 572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585],
+  [44, 58, 446, 467, 494, 521, 586, 587, 588, 589, 590, 591, 592, 593],
+  [45, 46, 59, 60, 418, 447, 468, 495, 510, 555, 556, 571, 572, 594, 595, 596, 597, 598, 599, 600, 601, 602, 603, 604, 605],
+  [469, 606, 607, 608, 609, 610, 611, 612],
+  [448, 470, 496, 522, 613, 614, 615, 616, 617, 618, 619, 620],
+  [449, 471, 523, 621, 622, 623, 624, 625],
+  [450, 472, 497, 524, 626, 627, 628, 629, 630, 631, 632, 633, 634, 635],
+  [451, 473, 498, 636, 637, 638, 639],
+  [47, 61, 452, 474, 499, 525, 542, 557, 573, 594, 606, 640, 641, 642, 643, 644, 645],
+  [48, 62, 315, 319, 453, 475, 500, 511, 526, 534, 558, 559, 574, 586, 595, 613, 614, 621, 626, 636, 646, 647, 648, 649, 650, 651],
+  [49, 63, 454, 476, 527, 543, 575, 596, 607, 640, 652, 653, 654, 655],
+  [50, 64, 316, 320, 455, 477, 512, 528, 535, 550, 560, 576, 587, 597, 615, 622, 627, 637, 656, 657, 658, 659, 660],
+  [65, 456, 478, 501, 529, 561, 577, 588, 598, 628, 661, 662, 663, 664, 665, 666],
+  [51, 66, 457, 479, 502, 544, 578, 599, 608, 641, 652, 667, 668],
+  [52, 67, 317, 321, 458, 480, 503, 513, 536, 551, 562, 579, 589, 600, 616, 623, 629, 638, 669, 670, 671, 672],
+  [68, 322, 419, 459, 481, 482, 504, 537, 545, 563, 590, 601, 609, 617, 630, 639, 642, 646, 653, 656, 661, 667, 669, 673, 674, 675, 676],
+  [69, 460, 483, 514, 564, 580, 602, 631, 657, 662, 670, 677, 678, 679],
+  [70, 323, 420, 461, 484, 485, 530, 538, 546, 565, 566, 581, 591, 610, 618, 624, 632, 643, 647, 654, 658, 663, 668, 671, 673, 680, 681],
+  [71, 486, 505, 515, 567, 582, 603, 633, 648, 664, 672, 677, 680, 682],
+  [72, 324, 421, 487, 506, 531, 539, 547, 568, 583, 592, 611, 619, 634, 644, 649, 665, 674, 678, 681],
+  [73, 488, 516, 532, 569, 584, 593, 604, 635, 650, 659, 666, 675, 679, 682],
+  [53, 74, 318, 325, 438, 462, 489, 507, 533, 540, 548, 552, 570, 585, 605, 612, 620, 625, 645, 651, 655, 660, 676],
+  [683, 684, 685, 686, 687, 688, 689, 690, 691, 692, 693, 694],
+  [683, 695, 696, 697, 698, 699, 700, 701],
+  [684, 702, 703],
+  [685, 695, 702, 704, 705, 706, 707, 708, 709],
+  [686, 696, 704, 710, 711, 712, 713, 714, 715, 716, 717, 718],
+  [687, 697, 705, 710, 711, 719, 720, 721, 722, 723, 724],
+  [688, 698, 706, 712, 719, 725, 726],
+  [689, 713, 720, 727, 728, 729, 730],
+  [690, 699, 714, 721, 727, 731, 732],
+  [691, 715, 722, 728, 731, 733, 734],
+  [692, 707, 716, 723, 729, 732, 733],
+  [693, 700, 703, 708, 717, 725],
+  [694, 701, 709, 718, 724, 726, 730, 734],
+  [75, 326, 439, 735, 736, 737, 738, 739, 740, 741, 742, 743, 744, 745, 746, 747, 748, 749, 750, 751, 752, 753, 754, 755, 756],
+  [757, 758, 759, 760, 761, 762, 763, 764, 765, 766, 767, 768, 769, 770, 771, 772, 773, 774, 775, 776, 777, 778],
+  [76, 440, 735, 779, 780, 781, 782, 783, 784, 785, 786, 787, 788, 789, 790],
+  [77, 327, 441, 736, 779, 791, 792, 793, 794, 795, 796, 797, 798, 799, 800, 801, 802, 803, 804, 805, 806, 807],
+  [808, 809, 810, 811, 812, 813, 814, 815, 816, 817, 818, 819, 820, 821, 822, 823, 824, 825, 826, 827, 828, 829],
+  [78, 442, 463, 683, 737, 757, 780, 791, 808, 830, 831, 832, 833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848],
+  [684, 738, 758, 792, 809, 849, 850, 851, 852, 853, 854, 855],
+  [79, 443, 464, 685, 739, 759, 781, 793, 810, 830, 849, 856, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872, 873, 874],
+  [80, 81, 328, 444, 465, 740, 760, 794, 811, 831, 856, 857, 875, 876, 877, 878, 879, 880, 881, 882, 883, 884, 885, 886, 887, 888, 889],
+  [82, 83, 329, 445, 466, 686, 812, 832, 858, 875, 876, 890, 891, 892, 893, 894, 895, 896, 897, 898, 899, 900, 901, 902, 903, 904, 905, 906],
+  [84, 446, 467, 741, 761, 795, 813, 907, 908, 909, 910, 911, 912, 913, 914],
+  [85, 86, 330, 447, 468, 687, 742, 762, 782, 833, 859, 877, 878, 890, 891, 915, 916, 917, 918, 919, 920, 921, 922, 923, 924, 925, 926, 927, 928, 929],
+  [87, 469, 688, 743, 763, 783, 796, 814, 834, 860, 879, 892, 915, 930, 931, 932, 933, 934, 935, 936, 937, 938, 939, 940, 941, 942],
+  [88, 331, 448, 470, 744, 764, 797, 815, 880, 893, 916, 930, 943, 944, 945, 946, 947, 948, 949, 950, 951],
+  [89, 332, 449, 471, 689, 816, 881, 894, 917, 943, 952, 953, 954, 955, 956, 957, 958, 959],
+  [333, 450, 472, 745, 765, 798, 817, 835, 895, 907, 918, 960, 961, 962, 963, 964, 965, 966, 967, 968],
+  [90, 334, 451, 473, 690, 746, 766, 784, 836, 882, 896, 919, 944, 952, 969, 970, 971, 972, 973, 974, 975],
+  [91, 335, 452, 453, 474, 475, 747, 767, 799, 818, 837, 861, 883, 897, 920, 931, 945, 953, 969, 976, 977, 978, 979, 980, 981, 982, 983],
+  [92, 336, 454, 455, 476, 477, 691, 819, 838, 862, 884, 898, 908, 921, 932, 946, 954, 960, 970, 976, 977, 984, 985, 986, 987, 988, 989, 990, 991],
+  [456, 478, 748, 768, 800, 820, 863, 899, 909, 922, 961, 992, 993, 994, 995, 996, 997],
+  [93, 337, 457, 458, 479, 480, 692, 749, 769, 785, 839, 864, 865, 885, 900, 910, 923, 933, 947, 955, 962, 971, 978, 979, 984, 985, 998, 999, 1000, 1001, 1002, 1003],
+  [481, 750, 770, 821, 840, 850, 866, 886, 924, 934, 948, 972, 980, 986, 998, 1004, 1005, 1006],
+  [94, 338, 459, 482, 751, 771, 786, 801, 822, 841, 851, 867, 911, 925, 935, 963, 973, 987, 992, 999, 1007, 1008, 1009],
+  [339, 460, 483, 752, 772, 787, 802, 823, 842, 868, 901, 926, 936, 956, 964, 974, 988, 993, 1000, 1010, 1011, 1012],
+  [484, 773, 803, 824, 843, 852, 869, 887, 937, 949, 981, 1001, 1004, 1013],
+  [95, 340, 461, 485, 753, 774, 788, 804, 825, 844, 853, 870, 902, 912, 938, 957, 965, 989, 994, 1002, 1014, 1015],
+  [486, 754, 775, 789, 826, 845, 871, 903, 927, 939, 966, 975, 995, 1003, 1010, 1014, 1016],
+  [487, 693, 755, 776, 805, 827, 846, 854, 872, 888, 904, 913, 940, 950, 967, 982, 996, 1005, 1007, 1011, 1013, 1015],
+  [488, 777, 790, 806, 828, 847, 873, 905, 914, 928, 941, 958, 968, 990, 997, 1008, 1012, 1016],
+  [96, 341, 462, 489, 694, 756, 778, 807, 829, 848, 855, 874, 889, 906, 929, 942, 951, 959, 983, 991, 1006, 1009],
+  [97, 735, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025, 1026, 1027, 1028, 1029, 1030, 1031],
+  [98, 342, 490, 736, 1017, 1032, 1033, 1034, 1035, 1036, 1037, 1038, 1039, 1040, 1041, 1042, 1043, 1044, 1045, 1046, 1047],
+  [1048, 1049, 1050, 1051, 1052, 1053, 1054, 1055, 1056, 1057, 1058, 1059, 1060, 1061, 1062, 1063, 1064, 1065, 1066],
+  [99, 491, 737, 757, 1018, 1032, 1048, 1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074, 1075, 1076, 1077, 1078, 1079, 1080, 1081],
+  [738, 758, 1033, 1049, 1082, 1083, 1084, 1085, 1086],
+  [100, 492, 739, 759, 1019, 1034, 1050, 1067, 1082, 1087, 1088, 1089, 1090, 1091, 1092, 1093, 1094, 1095, 1096, 1097, 1098, 1099, 1100, 1101],
+  [1051, 1102, 1103, 1104, 1105],
+  [101, 102, 343, 493, 740, 760, 1020, 1035, 1052, 1068, 1087, 1088, 1102, 1106, 1107, 1108, 1109, 1110, 1111, 1112, 1113, 1114, 1115, 1116, 1117, 1118, 1119, 1120, 1121, 1122, 1123, 1124],
+  [103, 494, 741, 761, 1036, 1053, 1125, 1126, 1127, 1128, 1129, 1130, 1131, 1132],
+  [104, 105, 344, 495, 742, 762, 1021, 1069, 1089, 1106, 1107, 1133, 1134, 1135, 1136, 1137, 1138, 1139, 1140, 1141, 1142, 1143, 1144, 1145],
+  [106, 743, 763, 1022, 1037, 1054, 1070, 1090, 1108, 1133, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155],
+  [107, 345, 496, 744, 764, 1023, 1038, 1055, 1109, 1110, 1134, 1146, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163, 1164, 1165, 1166],
+  [346, 497, 745, 765, 1039, 1056, 1071, 1111, 1125, 1135, 1156, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1175],
+  [108, 347, 498, 746, 766, 1024, 1072, 1112, 1136, 1157, 1176, 1177, 1178, 1179, 1180],
+  [1057, 1137, 1181, 1182, 1183],
+  [109, 348, 499, 500, 747, 767, 1025, 1040, 1058, 1073, 1091, 1113, 1114, 1126, 1138, 1147, 1158, 1159, 1167, 1176, 1181, 1184, 1185, 1186, 1187, 1188, 1189, 1190, 1191],
+  [501, 748, 768, 1041, 1059, 1092, 1115, 1127, 1139, 1168, 1192, 1193, 1194, 1195, 1196, 1197],
+  [110, 349, 502, 503, 749, 769, 1026, 1074, 1093, 1094, 1103, 1116, 1128, 1140, 1148, 1160, 1169, 1177, 1184, 1185, 1198, 1199, 1200, 1201],
+  [111, 350, 504, 750, 751, 770, 771, 1027, 1042, 1060, 1075, 1083, 1095, 1117, 1129, 1141, 1149, 1161, 1170, 1178, 1186, 1192, 1198, 1202, 1203, 1204, 1205],
+  [752, 772, 1028, 1061, 1076, 1096, 1118, 1142, 1150, 1171, 1179, 1193, 1199, 1206, 1207, 1208],
+  [753, 773, 774, 1043, 1062, 1077, 1084, 1097, 1119, 1120, 1130, 1151, 1162, 1172, 1187, 1194, 1200, 1202, 1203, 1209, 1210],
+  [351, 505, 754, 775, 1029, 1044, 1063, 1078, 1098, 1121, 1143, 1152, 1163, 1173, 1180, 1188, 1195, 1201, 1206, 1209, 1211],
+  [112, 352, 506, 755, 776, 1030, 1045, 1064, 1079, 1085, 1099, 1104, 1122, 1131, 1153, 1164, 1174, 1182, 1189, 1196, 1207, 1210],
+  [777, 1031, 1046, 1065, 1080, 1100, 1123, 1132, 1144, 1154, 1165, 1175, 1190, 1197, 1204, 1208, 1211],
+  [113, 353, 507, 756, 778, 1047, 1066, 1081, 1086, 1101, 1105, 1124, 1145, 1155, 1166, 1183, 1191, 1205],
+  [114, 779, 1017, 1212, 1213, 1214, 1215, 1216, 1217, 1218, 1219, 1220, 1221, 1222],
+  [780, 1018, 1212, 1223, 1224, 1225, 1226, 1227, 1228],
+  [781, 1019, 1213, 1229, 1230, 1231, 1232, 1233, 1234, 1235, 1236],
+  [115, 121, 508, 1020, 1214, 1229, 1237, 1238, 1239, 1240, 1241, 1242, 1243, 1244, 1245, 1246],
+  [116, 122, 509, 1237, 1247, 1248, 1249, 1250, 1251, 1252, 1253, 1254, 1255],
+  [117, 123, 510, 782, 1021, 1238, 1247, 1256, 1257, 1258, 1259, 1260, 1261, 1262],
+  [783, 1022, 1215, 1263, 1264, 1265, 1266, 1267, 1268],
+  [1023, 1216, 1269, 1270, 1271],
+  [1272, 1273, 1274],
+  [784, 1024, 1275, 1276, 1277],
+  [118, 124, 511, 1025, 1217, 1239, 1248, 1256, 1278, 1279, 1280, 1281, 1282],
+  [119, 125, 512, 1240, 1249, 1257, 1278, 1283, 1284, 1285, 1286, 1287],
+  [120, 126, 513, 785, 1026, 1230, 1241, 1250, 1258, 1279, 1283, 1288, 1289, 1290, 1291],
+  [127, 786, 1027, 1223, 1231, 1259, 1263, 1275, 1284, 1288, 1292, 1293, 1294],
+  [128, 354, 514, 787, 1028, 1218, 1224, 1232, 1242, 1251, 1260, 1264, 1272, 1276, 1285, 1289, 1295],
+  [129, 788, 1219, 1225, 1233, 1243, 1252, 1265, 1273, 1286, 1290, 1292, 1296, 1297],
+  [130, 355, 515, 789, 1029, 1220, 1226, 1234, 1244, 1253, 1261, 1266, 1269, 1277, 1280, 1291, 1296],
+  [131, 1030, 1221, 1227, 1235, 1245, 1254, 1267, 1270, 1281, 1293, 1295, 1297],
+  [132, 356, 516, 790, 1031, 1222, 1228, 1236, 1246, 1255, 1262, 1268, 1271, 1274, 1282, 1287, 1294],
+  [133, 148, 517, 791, 808, 1032, 1048, 1212, 1298, 1299, 1300, 1301, 1302, 1303, 1304, 1305, 1306, 1307, 1308, 1309, 1310, 1311],
+  [792, 809, 1033, 1049, 1312, 1313, 1314, 1315, 1316],
+  [134, 149, 518, 793, 810, 1034, 1050, 1213, 1298, 1312, 1317, 1318, 1319, 1320, 1321, 1322, 1323, 1324, 1325, 1326, 1327, 1328, 1329, 1330],
+  [1051, 1331, 1332, 1333],
+  [135, 136, 150, 151, 357, 519, 794, 811, 1035, 1052, 1214, 1299, 1317, 1318, 1331, 1334, 1335, 1336, 1337, 1338, 1339, 1340, 1341, 1342, 1343, 1344, 1345, 1346, 1347, 1348, 1349, 1350, 1351, 1352],
+  [137, 138, 152, 153, 358, 520, 812, 1300, 1319, 1334, 1335, 1353, 1354, 1355, 1356, 1357, 1358, 1359, 1360, 1361, 1362, 1363, 1364, 1365],
+  [139, 154, 521, 795, 813, 1036, 1053, 1366, 1367, 1368, 1369, 1370, 1371, 1372, 1373],
+  [140, 155, 796, 814, 1037, 1054, 1215, 1301, 1320, 1336, 1353, 1374, 1375, 1376, 1377, 1378, 1379, 1380, 1381, 1382, 1383],
+  [141, 156, 359, 522, 797, 815, 1038, 1055, 1216, 1337, 1338, 1354, 1374, 1384, 1385, 1386, 1387, 1388, 1389, 1390, 1391, 1392, 1393, 1394],
+  [142, 157, 360, 523, 816, 1339, 1355, 1384, 1395, 1396, 1397, 1398, 1399, 1400],
+  [158, 361, 524, 798, 817, 1039, 1056, 1302, 1340, 1356, 1366, 1385, 1401, 1402, 1403, 1404, 1405, 1406, 1407, 1408, 1409],
+  [159, 1057, 1410, 1411, 1412],
+  [143, 160, 362, 525, 526, 799, 818, 1040, 1058, 1217, 1303, 1321, 1341, 1342, 1357, 1367, 1375, 1386, 1387, 1395, 1401, 1410, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420],
+  [144, 161, 363, 527, 528, 819, 1304, 1322, 1343, 1358, 1368, 1376, 1388, 1396, 1402, 1413, 1414, 1421, 1422, 1423, 1424, 1425],
+  [162, 529, 800, 820, 1041, 1059, 1323, 1344, 1359, 1369, 1403, 1426, 1427, 1428, 1429, 1430, 1431],
+  [163, 801, 821, 822, 1042, 1060, 1305, 1313, 1324, 1345, 1370, 1377, 1389, 1404, 1415, 1421, 1426, 1432, 1433, 1434, 1435, 1436],
+  [164, 802, 823, 1061, 1218, 1306, 1325, 1346, 1360, 1378, 1397, 1405, 1422, 1427, 1437, 1438, 1439],
+  [145, 165, 364, 530, 803, 804, 824, 825, 1043, 1062, 1219, 1307, 1314, 1326, 1347, 1348, 1361, 1371, 1379, 1390, 1398, 1406, 1416, 1423, 1428, 1432, 1433, 1440],
+  [166, 826, 1044, 1063, 1220, 1308, 1327, 1349, 1362, 1380, 1391, 1407, 1417, 1429, 1437, 1440, 1441],
+  [146, 167, 365, 531, 805, 827, 1045, 1064, 1221, 1309, 1315, 1328, 1332, 1350, 1363, 1372, 1381, 1392, 1408, 1411, 1418, 1430, 1434, 1438],
+  [168, 366, 532, 806, 828, 1046, 1065, 1222, 1310, 1329, 1351, 1364, 1373, 1382, 1393, 1399, 1409, 1419, 1424, 1431, 1435, 1439, 1441],
+  [147, 169, 367, 533, 807, 829, 1047, 1066, 1311, 1316, 1330, 1333, 1352, 1365, 1383, 1394, 1400, 1412, 1420, 1425, 1436],
+  [695, 830, 1067, 1298, 1442, 1443, 1444, 1445, 1446, 1447],
+  [170, 831, 1068, 1299, 1448, 1449, 1450, 1451, 1452, 1453, 1454],
+  [171, 696, 832, 1300, 1448, 1455, 1456, 1457, 1458],
+  [172, 697, 833, 1069, 1449, 1455, 1459, 1460],
+  [698, 834, 1070, 1301, 1442, 1461, 1462, 1463, 1464],
+  [835, 1071, 1302, 1465, 1466, 1467, 1468, 1469, 1470],
+  [699, 836, 1072, 1471],
+  [534, 837, 1073, 1303, 1472, 1473, 1474, 1475, 1476, 1477],
+  [535, 838, 1304, 1472, 1478, 1479, 1480, 1481],
+  [536, 839, 1074, 1443, 1473, 1478, 1482, 1483],
+  [173, 537, 840, 841, 1075, 1223, 1305, 1444, 1450, 1459, 1461, 1465, 1471, 1474, 1479, 1482, 1484, 1485, 1486, 1487, 1488],
+  [842, 1076, 1224, 1306, 1466, 1489, 1490, 1491],
+  [174, 538, 843, 844, 1077, 1225, 1307, 1445, 1451, 1452, 1456, 1462, 1467, 1475, 1480, 1483, 1484, 1485, 1492, 1493],
+  [845, 1078, 1226, 1308, 1468, 1489, 1492, 1494],
+  [175, 539, 700, 846, 1079, 1227, 1309, 1446, 1453, 1457, 1463, 1469, 1476, 1486, 1490, 1493],
+  [847, 1080, 1228, 1310, 1470, 1487, 1491, 1494],
+  [176, 540, 701, 848, 1081, 1311, 1447, 1454, 1458, 1460, 1464, 1477, 1481, 1488],
+  [702, 849, 1082, 1312, 1495, 1496, 1497],
+  [850, 851, 1083, 1313, 1495, 1498, 1499, 1500, 1501],
+  [852, 853, 1084, 1314, 1496, 1498, 1499, 1502],
+  [703, 854, 1085, 1315, 1497, 1500, 1502],
+  [855, 1086, 1316, 1501, 1503],
+  [177, 856, 1087, 1317, 1504, 1505, 1506, 1507, 1508, 1509, 1510, 1511],
+  [541, 857, 1088, 1229, 1318, 1512, 1513, 1514, 1515, 1516, 1517, 1518, 1519, 1520, 1521, 1522, 1523, 1524, 1525, 1526],
+  [178, 704, 858, 1319, 1504, 1527, 1528, 1529, 1530, 1531],
+  [179, 705, 859, 1089, 1505, 1527, 1532, 1533, 1534],
+  [706, 860, 1090, 1320, 1442, 1512, 1535, 1536, 1537, 1538],
+  [542, 861, 1091, 1321, 1513, 1514, 1539, 1540, 1541, 1542, 1543, 1544],
+  [543, 862, 1322, 1515, 1539, 1545, 1546, 1547, 1548],
+  [863, 1092, 1323, 1516, 1549, 1550, 1551, 1552, 1553, 1554],
+  [544, 864, 1093, 1517, 1540, 1545, 1555, 1556],
+  [180, 707, 865, 1094, 1230, 1443, 1506, 1518, 1528, 1532, 1557, 1558, 1559, 1560],
+  [181, 545, 866, 867, 1095, 1231, 1324, 1444, 1495, 1507, 1519, 1533, 1535, 1541, 1546, 1549, 1555, 1557, 1561, 1562, 1563, 1564, 1565],
+  [868, 1096, 1232, 1325, 1520, 1550, 1558, 1566, 1567, 1568],
+  [182, 546, 869, 870, 1097, 1233, 1326, 1445, 1496, 1508, 1509, 1521, 1522, 1529, 1536, 1542, 1547, 1551, 1556, 1559, 1561, 1562, 1569, 1570],
+  [871, 1098, 1234, 1327, 1523, 1552, 1560, 1566, 1569, 1571],
+  [183, 547, 708, 872, 1099, 1235, 1328, 1446, 1497, 1510, 1524, 1530, 1537, 1543, 1553, 1563, 1567, 1570],
+  [873, 1100, 1236, 1329, 1525, 1554, 1564, 1568, 1571],
+  [184, 548, 709, 874, 1101, 1330, 1447, 1503, 1511, 1526, 1531, 1534, 1538, 1544, 1548, 1565],
+  [549, 1102, 1331, 1572, 1573, 1574, 1575],
+  [550, 1572, 1576, 1577],
+  [551, 1103, 1573, 1576],
+  [1104, 1332, 1574],
+  [552, 1105, 1333, 1575, 1577],
+  [185, 553, 875, 1334, 1448, 1504, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585],
+  [368, 422, 554, 876, 1237, 1335, 1586, 1587, 1588, 1589, 1590, 1591, 1592, 1593, 1594, 1595, 1596, 1597, 1598, 1599, 1600, 1601, 1602, 1603],
+  [186, 555, 877, 1106, 1449, 1505, 1578, 1604, 1605, 1606, 1607, 1608, 1609],
+  [369, 423, 556, 878, 1107, 1238, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625],
+  [195, 879, 1108, 1336, 1512, 1586, 1610, 1626, 1627, 1628, 1629, 1630],
+  [196, 880, 1109, 1337, 1587, 1611, 1631, 1632, 1633, 1634],
+  [197, 1110, 1338, 1588, 1612, 1635, 1636],
+  [198, 881, 1339, 1589, 1613, 1637, 1638, 1639],
+  [199, 1111, 1340, 1590, 1614, 1640, 1641, 1642, 1643, 1644],
+  [200, 882, 1112, 1591, 1615, 1645],
+  [187, 201, 558, 883, 1113, 1341, 1513, 1579, 1592, 1604, 1616, 1646, 1647, 1648, 1649, 1650, 1651],
+  [188, 202, 557, 559, 1114, 1239, 1342, 1514, 1580, 1593, 1605, 1617, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659],
+  [189, 203, 560, 884, 1240, 1343, 1515, 1572, 1581, 1594, 1606, 1618, 1646, 1652, 1653, 1660, 1661, 1662, 1663, 1664, 1665, 1666],
+  [204, 561, 1115, 1344, 1516, 1595, 1619, 1667, 1668, 1669, 1670, 1671],
+  [205, 562, 885, 1116, 1241, 1506, 1517, 1518, 1573, 1596, 1607, 1620, 1647, 1654, 1655, 1660, 1672, 1673, 1674, 1675, 1676],
+  [190, 206, 370, 424, 563, 886, 1117, 1345, 1450, 1507, 1519, 1608, 1621, 1626, 1631, 1645, 1648, 1661, 1672, 1677, 1678, 1679],
+  [207, 564, 1118, 1242, 1346, 1520, 1597, 1622, 1640, 1662, 1667, 1673, 1680, 1681, 1682],
+  [191, 208, 371, 425, 565, 887, 1119, 1347, 1451, 1508, 1521, 1582, 1598, 1627, 1632, 1637, 1649, 1663, 1674, 1677, 1683],
+  [192, 209, 372, 426, 566, 1120, 1243, 1348, 1452, 1509, 1522, 1583, 1599, 1628, 1638, 1641, 1664, 1668, 1675, 1684, 1685],
+  [210, 567, 1121, 1244, 1349, 1523, 1600, 1623, 1642, 1656, 1669, 1676, 1680, 1684, 1686],
+  [193, 211, 373, 427, 568, 888, 1122, 1245, 1350, 1453, 1510, 1524, 1574, 1584, 1601, 1629, 1633, 1635, 1643, 1650, 1657, 1670, 1678, 1681, 1683, 1685],
+  [212, 569, 1123, 1246, 1351, 1525, 1602, 1624, 1644, 1658, 1665, 1671, 1682, 1686],
+  [194, 213, 374, 428, 570, 889, 1124, 1352, 1454, 1511, 1526, 1575, 1585, 1603, 1609, 1625, 1630, 1634, 1636, 1639, 1651, 1659, 1666, 1679],
+  [214, 571, 710, 890, 1455, 1527, 1578, 1687, 1688, 1689, 1690],
+  [375, 429, 572, 711, 891, 1247, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1704],
+  [220, 712, 892, 1353, 1586, 1691, 1705, 1706, 1707],
+  [221, 893, 1354, 1587, 1588, 1692, 1708, 1709, 1710],
+  [222, 713, 894, 1355, 1589, 1693, 1711, 1712],
+  [223, 895, 1356, 1590, 1694, 1713, 1714, 1715, 1716, 1717],
+  [224, 714, 896, 1591, 1695],
+  [225, 1696, 1718, 1719, 1720],
+  [215, 226, 573, 574, 897, 1248, 1357, 1579, 1580, 1592, 1593, 1687, 1697, 1718, 1721, 1722, 1723, 1724, 1725, 1726, 1727, 1728, 1729],
+  [216, 227, 575, 576, 715, 898, 1249, 1358, 1581, 1594, 1688, 1698, 1721, 1722, 1730, 1731, 1732, 1733, 1734, 1735],
+  [228, 577, 899, 1359, 1595, 1699, 1736, 1737, 1738, 1739, 1740],
+  [229, 578, 579, 716, 900, 1250, 1528, 1596, 1689, 1700, 1723, 1724, 1730, 1731, 1741, 1742, 1743],
+  [230, 580, 901, 1251, 1360, 1597, 1701, 1713, 1732, 1736, 1741, 1744, 1745, 1746],
+  [217, 231, 376, 581, 902, 1252, 1361, 1456, 1529, 1582, 1583, 1598, 1599, 1705, 1708, 1711, 1714, 1725, 1733, 1737, 1742, 1747, 1748],
+  [232, 582, 903, 1253, 1362, 1600, 1702, 1715, 1726, 1738, 1743, 1744, 1747, 1749],
+  [218, 233, 377, 430, 583, 717, 904, 1254, 1363, 1457, 1530, 1584, 1601, 1706, 1709, 1716, 1719, 1727, 1739, 1745, 1748],
+  [234, 584, 905, 1255, 1364, 1602, 1703, 1717, 1728, 1734, 1740, 1746, 1749],
+  [219, 235, 378, 431, 585, 718, 906, 1365, 1458, 1531, 1585, 1603, 1690, 1704, 1707, 1710, 1712, 1720, 1729, 1735],
+  [236, 907, 1125, 1366, 1750, 1751, 1752],
+  [237, 586, 1126, 1367, 1753, 1754, 1755, 1756],
+  [238, 587, 908, 1368, 1753, 1757, 1758, 1759, 1760],
+  [239, 588, 909, 1127, 1369, 1761, 1762, 1763],
+  [240, 589, 910, 1128, 1754, 1757, 1764, 1765],
+  [241, 590, 911, 1129, 1370, 1750, 1758, 1761, 1764, 1766, 1767, 1768],
+  [242, 591, 912, 1130, 1371, 1751, 1759, 1762, 1765, 1766, 1769],
+  [243, 592, 913, 1131, 1372, 1752, 1755, 1763, 1767, 1769],
+  [244, 593, 914, 1132, 1373, 1756, 1760, 1768],
+  [250, 719, 915, 1133, 1610, 1691, 1770, 1771],
+  [251, 916, 1134, 1611, 1612, 1692, 1772, 1773],
+  [252, 720, 917, 1613, 1693, 1774],
+  [253, 918, 1135, 1614, 1694, 1775, 1776, 1777, 1778],
+  [254, 721, 919, 1136, 1615, 1695, 1779],
+  [255, 1137, 1696, 1780, 1781],
+  [245, 256, 594, 595, 920, 1138, 1256, 1604, 1605, 1616, 1617, 1687, 1697, 1780, 1782, 1783, 1784, 1785, 1786, 1787, 1788, 1789],
+  [246, 257, 596, 597, 722, 921, 1257, 1606, 1618, 1688, 1698, 1782, 1783, 1790, 1791, 1792, 1793, 1794, 1795],
+  [258, 598, 922, 1139, 1619, 1699, 1796, 1797, 1798, 1799],
+  [247, 259, 599, 600, 723, 923, 1140, 1258, 1532, 1607, 1620, 1689, 1700, 1784, 1785, 1790, 1791, 1800, 1801, 1802],
+  [248, 260, 379, 432, 601, 924, 925, 1141, 1259, 1459, 1533, 1608, 1621, 1770, 1772, 1775, 1779, 1786, 1792, 1796, 1800, 1803, 1804],
+  [261, 602, 926, 1142, 1260, 1622, 1701, 1776, 1793, 1797, 1801, 1805, 1806],
+  [262, 603, 927, 1143, 1261, 1623, 1702, 1777, 1787, 1798, 1802, 1805, 1807],
+  [263, 604, 928, 1144, 1262, 1624, 1703, 1778, 1788, 1794, 1799, 1803, 1806, 1807],
+  [249, 264, 380, 433, 605, 724, 929, 1145, 1460, 1534, 1609, 1625, 1690, 1704, 1771, 1773, 1774, 1781, 1789, 1795, 1804],
+  [930, 1146, 1374, 1808, 1809, 1810, 1811],
+  [606, 931, 1147, 1375, 1812, 1813, 1814, 1815, 1816, 1817],
+  [607, 932, 1376, 1812, 1818, 1819, 1820, 1821],
+  [608, 933, 1148, 1813, 1818, 1822, 1823],
+  [265, 609, 934, 935, 1149, 1263, 1377, 1461, 1535, 1626, 1770, 1808, 1814, 1819, 1822, 1824, 1825, 1826, 1827, 1828],
+  [936, 1150, 1264, 1378, 1829, 1830, 1831],
+  [266, 610, 937, 938, 1151, 1265, 1379, 1462, 1536, 1627, 1628, 1705, 1809, 1815, 1820, 1823, 1824, 1825, 1832, 1833],
+  [939, 1152, 1266, 1380, 1829, 1832, 1834],
+  [267, 611, 725, 940, 1153, 1267, 1381, 1463, 1537, 1629, 1706, 1810, 1816, 1826, 1830, 1833],
+  [941, 1154, 1268, 1382, 1827, 1831, 1834],
+  [268, 612, 726, 942, 1155, 1383, 1464, 1538, 1630, 1707, 1771, 1811, 1817, 1821, 1828],
+  [943, 1384, 1835, 1836],
+  [1156, 1385, 1837, 1838, 1839],
+  [944, 1157, 1840],
+  [613, 945, 1158, 1386, 1841, 1842, 1843, 1844, 1845, 1846],
+  [614, 1159, 1387, 1847, 1848, 1849, 1850],
+  [615, 946, 1388, 1841, 1847, 1851, 1852, 1853, 1854],
+  [616, 947, 1160, 1842, 1848, 1851, 1855, 1856],
+  [269, 381, 617, 948, 1161, 1389, 1631, 1772, 1808, 1840, 1843, 1852, 1855, 1857, 1858, 1859],
+  [270, 382, 618, 949, 1162, 1390, 1632, 1708, 1809, 1835, 1844, 1853, 1856, 1857, 1860],
+  [1163, 1269, 1391, 1837, 1861],
+  [271, 383, 619, 950, 1164, 1270, 1392, 1633, 1635, 1709, 1810, 1838, 1845, 1849, 1858, 1860],
+  [1165, 1271, 1393, 1839, 1861],
+  [272, 384, 620, 951, 1166, 1394, 1634, 1636, 1710, 1773, 1811, 1836, 1846, 1850, 1854, 1859],
+  [727, 952],
+  [621, 953, 1395, 1862, 1863, 1864, 1865],
+  [622, 728, 954, 1396, 1862, 1866, 1867, 1868],
+  [623, 729, 955, 1863, 1866, 1869],
+  [956, 1272, 1397, 1870],
+  [273, 385, 624, 957, 1273, 1398, 1637, 1638, 1711, 1835, 1864, 1867, 1869],
+  [958, 1274, 1399, 1870],
+  [274, 386, 625, 730, 959, 1400, 1639, 1712, 1774, 1836, 1865, 1868],
+  [626, 1167, 1401, 1871, 1872, 1873, 1874, 1875],
+  [627, 960, 1402, 1871, 1876, 1877, 1878, 1879, 1880],
+  [628, 961, 1168, 1403, 1881, 1882, 1883],
+  [629, 962, 1169, 1872, 1876, 1884, 1885, 1886, 1887],
+  [275, 387, 630, 963, 1170, 1404, 1465, 1750, 1775, 1877, 1881, 1884, 1888, 1889, 1890],
+  [388, 631, 964, 1171, 1405, 1466, 1640, 1713, 1776, 1878, 1885, 1891],
+  [276, 389, 632, 965, 1172, 1406, 1467, 1641, 1714, 1751, 1879, 1882, 1886, 1888, 1892, 1893],
+  [390, 633, 966, 1173, 1407, 1468, 1642, 1715, 1777, 1837, 1873, 1887, 1892],
+  [277, 391, 634, 967, 1174, 1408, 1469, 1643, 1716, 1752, 1838, 1874, 1883, 1889, 1891, 1893],
+  [392, 635, 968, 1175, 1409, 1470, 1644, 1717, 1778, 1839, 1875, 1880, 1890],
+  [636, 969, 1176, 1894, 1895, 1896],
+  [637, 731, 970, 1894, 1897, 1898],
+  [638, 732, 971, 1177, 1895, 1897, 1899],
+  [278, 393, 639, 972, 973, 1178, 1275, 1471, 1645, 1779, 1840, 1896, 1898, 1899],
+  [974, 1179, 1276, 1900],
+  [975, 1180, 1277, 1900],
+  [279, 1181, 1410, 1718, 1780, 1901],
+  [1182, 1411, 1719, 1901],
+  [280, 1183, 1412, 1720, 1781, 1902],
+  [281, 640, 976, 1413, 1539, 1652, 1721, 1782, 1812, 1903, 1904, 1905, 1906],
+  [7, 282, 394, 977, 1278, 1414, 1472, 1646, 1653, 1722, 1753, 1783, 1841, 1847, 1862, 1871, 1894, 1907, 1908, 1909, 1910],
+  [283, 641, 978, 1184, 1540, 1654, 1723, 1784, 1813, 1903, 1911, 1912],
+  [8, 284, 395, 979, 1185, 1279, 1473, 1647, 1655, 1724, 1754, 1785, 1842, 1848, 1863, 1872, 1895, 1913, 1914, 1915],
+  [9, 285, 396, 642, 646, 980, 1186, 1415, 1474, 1541, 1648, 1786, 1814, 1843, 1896, 1904, 1907, 1911, 1913, 1916, 1917, 1918],
+  [10, 286, 397, 643, 647, 981, 1187, 1416, 1475, 1542, 1649, 1725, 1815, 1844, 1864, 1905, 1908, 1912, 1914, 1916, 1919],
+  [287, 648, 1188, 1280, 1417, 1656, 1726, 1787, 1873, 1915, 1920],
+  [11, 288, 398, 644, 649, 982, 1189, 1281, 1418, 1476, 1543, 1650, 1657, 1727, 1755, 1816, 1845, 1849, 1874, 1901, 1917, 1919],
+  [289, 650, 1190, 1282, 1419, 1658, 1728, 1756, 1788, 1875, 1909, 1920],
+  [12, 290, 399, 645, 651, 983, 1191, 1420, 1477, 1544, 1651, 1659, 1729, 1789, 1817, 1846, 1850, 1865, 1902, 1906, 1910, 1918],
+  [291, 652, 984, 1545, 1730, 1790, 1818, 1903, 1921, 1922],
+  [13, 292, 400, 733, 985, 1283, 1478, 1576, 1660, 1731, 1757, 1791, 1851, 1866, 1876, 1897, 1923, 1924, 1925],
+  [14, 293, 401, 653, 656, 986, 987, 1284, 1421, 1479, 1546, 1661, 1758, 1792, 1819, 1852, 1877, 1898, 1904, 1907, 1921, 1923, 1926, 1927, 1928, 1929],
+  [294, 657, 988, 1285, 1422, 1662, 1732, 1793, 1878, 1924, 1930],
+  [295, 402, 654, 658, 989, 1286, 1423, 1480, 1547, 1663, 1664, 1733, 1759, 1820, 1853, 1867, 1879, 1905, 1908, 1922, 1925, 1926, 1927],
+  [296, 659, 990, 1287, 1424, 1665, 1734, 1760, 1794, 1880, 1909, 1928, 1930],
+  [15, 297, 403, 655, 660, 734, 991, 1425, 1481, 1548, 1577, 1666, 1735, 1795, 1821, 1854, 1868, 1906, 1910, 1929],
+  [298, 661, 992, 1192, 1426, 1549, 1761, 1796, 1881, 1931, 1932, 1933],
+  [662, 993, 1193, 1427, 1550, 1667, 1736, 1797, 1934],
+  [299, 663, 994, 1194, 1428, 1551, 1668, 1737, 1762, 1882, 1931, 1935, 1936],
+  [664, 995, 1195, 1429, 1552, 1669, 1738, 1798, 1935],
+  [300, 665, 996, 1196, 1430, 1553, 1670, 1739, 1763, 1883, 1932, 1934, 1936],
+  [666, 997, 1197, 1431, 1554, 1671, 1740, 1799, 1933],
+  [16, 301, 404, 667, 669, 998, 999, 1198, 1288, 1482, 1555, 1557, 1672, 1764, 1800, 1822, 1855, 1884, 1899, 1911, 1913, 1921, 1923, 1937, 1938],
+  [302, 670, 1000, 1199, 1289, 1558, 1673, 1741, 1801, 1885, 1924, 1939],
+  [17, 303, 405, 668, 671, 1001, 1002, 1200, 1290, 1483, 1556, 1559, 1674, 1675, 1742, 1765, 1823, 1856, 1869, 1886, 1912, 1914, 1922, 1925, 1937, 1938, 1940],
+  [304, 672, 1003, 1201, 1291, 1560, 1676, 1743, 1802, 1887, 1915, 1939, 1940],
+  [1004, 1202, 1432, 1484, 1498, 1561, 1677, 1824, 1857, 1916, 1926, 1937, 1941],
+  [18, 305, 406, 434, 673, 1203, 1292, 1433, 1485, 1499, 1562, 1766, 1825, 1888, 1927, 1931, 1938, 1942],
+  [19, 306, 407, 435, 674, 1005, 1007, 1293, 1434, 1486, 1500, 1563, 1678, 1767, 1826, 1858, 1889, 1917, 1932, 1941, 1942],
+  [307, 408, 675, 1008, 1204, 1294, 1435, 1487, 1564, 1768, 1803, 1827, 1890, 1928, 1933],
+  [20, 308, 409, 436, 676, 1006, 1009, 1205, 1436, 1488, 1501, 1565, 1679, 1804, 1828, 1859, 1918, 1929],
+  [410, 677, 1010, 1206, 1437, 1489, 1566, 1680, 1744, 1805, 1829, 1900, 1939],
+  [309, 411, 678, 1011, 1207, 1295, 1438, 1490, 1567, 1681, 1745, 1830, 1891, 1934],
+  [412, 679, 1012, 1208, 1439, 1491, 1568, 1682, 1746, 1806, 1831, 1870, 1930],
+  [310, 413, 680, 1014, 1209, 1296, 1440, 1492, 1569, 1684, 1747, 1832, 1892, 1935, 1940],
+  [21, 311, 414, 437, 681, 1013, 1015, 1210, 1297, 1493, 1502, 1570, 1683, 1685, 1748, 1769, 1833, 1860, 1893, 1919, 1936, 1941, 1942],
+  [415, 682, 1016, 1211, 1441, 1494, 1571, 1686, 1749, 1807, 1834, 1861, 1920]]
+
+def thirdSuccessors (i : ℕ) : List ℕ := thirdSuccessorsList.getD i []
+
+noncomputable def mixedFromSecond (state : SearchState) : Bool :=
+  frc state.2 (fun v => st state.1 (fun z =>
+    mvC I.NN I.AA I.HX I.HY
+      (lookC I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14)
+      I.AA rootPreparedMask rootPreparedSlots 12 1 z v 0))
+
+noncomputable def afterThird (state : SearchState) : Bool :=
+  frc state.2 (fun v => st state.1 (fun z =>
+    look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 12 11 1 z v))
+
+lemma afterSecond_false (state : SearchState)
+    (two : 1 < state.2.length) (small : state.2.length < 11)
+    (mixed : mixedFromSecond state = false)
+    (pure : pureAt 11 state (fun z v => afterThird (z,v)) = false) :
+    afterSecond state = false := by
+  have lengthOkay : Nat.ble state.2.length 1 = false := by
+    cases h : Nat.ble state.2.length 1
+    · rfl
+    · exact absurd (Nat.le_of_ble_eq_true h) (Nat.not_le_of_gt two)
+  have choose0 (F : ℕ → Bool) : tstC I.NN I.AA I.HX I.HY true I.AA 12 state.2 F = F 0 := by
+    have h0 : Nat.beq state.2.length 12 = false := beq_f (by omega)
+    have h1 : Nat.beq state.2.length.succ 12 = false := beq_f (by omega)
+    simp only [tstC, bR, h0, h1, Bool.cond_false]
+  rw [afterSecond, frc_eq, st_eq, show (13 : ℕ) = Nat.succ 12 from rfl, look1C_step,
+    lengthOkay, Bool.cond_false]
+  change cvC I.NN (pos 1) I.AA state.2 (tstC I.NN I.AA I.HX I.HY true I.AA 12 state.2 _) = _
+  rw [choose0]
+  simp only [afterThird, frc_eq, st_eq] at pure
+  simp only [mixedFromSecond, frc_eq, st_eq] at mixed
+  change cvC I.NN (pos 1) I.AA state.2 (bif pureAt 11 state
+      (look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 12 11 1)
+    then true else _) = _
+  rw [pure, mixed]
+  simp [cvC, bR]
+
+def rangeCheck (test : ℕ → Bool) (start count : ℕ) : Bool :=
+  (List.range' start count).all test
+
+lemma rangeCheck_append (test : ℕ → Bool) {s a b : ℕ}
+    (left : rangeCheck test s a = true) (right : rangeCheck test (s+a) b = true) :
+    rangeCheck test s (a+b) = true := by
+  unfold rangeCheck at *
+  rw [← List.range'_append_1, List.all_append, left, right]
+  rfl
+
+lemma rangeCheck_at {test : ℕ → Bool} {n i : ℕ} (checked : rangeCheck test 0 n = true) (hi : i < n) :
+    test i = true :=
+  List.all_eq_true.mp checked _ (List.mem_range'_1.mpr ⟨Nat.zero_le _, by simpa using hi⟩)
+
+lemma boolOfNeg {b : Bool} (h : (!b) = true) : b = false := by cases b <;> simp_all
+
+noncomputable def readyForThird (i : ℕ) : Bool :=
+  let state := secondAt i
+  let ids := thirdSuccessors i
+  (!pureAt 11 state (frontierMissing (ids.map thirdAt))) &&
+    ((ids.all fun j => decide (j < thirdCount)) &&
+      (decide (1 < state.2.length) && decide (state.2.length < 11)))
+
+noncomputable def thirdTest (j : ℕ) : Bool := !afterThird (thirdAt j)
+noncomputable def secondMixedTest (j : ℕ) : Bool := !mixedFromSecond (secondAt j)
+
+lemma checkedAfterSecond (i : ℕ) (hi : i < secondCount)
+    (ready : rangeCheck readyForThird 0 secondCount = true)
+    (mixed : rangeCheck secondMixedTest 0 secondCount = true)
+    (third : rangeCheck thirdTest 0 thirdCount = true) :
+    afterSecond (secondAt i) = false := by
+  have h := rangeCheck_at ready hi
+  simp only [readyForThird, Bool.and_eq_true, decide_eq_true_eq] at h
+  obtain ⟨hc, hvalid, htwo, hsmall⟩ := h
+  refine afterSecond_false (secondAt i) htwo hsmall (boolOfNeg (rangeCheck_at mixed hi)) ?_
+  refine pureAt_from_frontier 11 (secondAt i) ((thirdSuccessors i).map thirdAt) afterThird (boolOfNeg hc) ?_
+  intro state membership
+  obtain ⟨j, hj, rfl⟩ := List.mem_map.mp membership
+  have hj' : j < thirdCount := of_decide_eq_true (List.all_eq_true.mp hvalid j hj)
+  exact boolOfNeg (rangeCheck_at third hj')
+
+
+noncomputable def readyForSecond (i : ℕ) : Bool :=
+  let state := firstAt i
+  let ids := secondSuccessors i
+  (!pureSecond state (frontierMissing (ids.map secondAt))) &&
+    ((ids.all fun j => decide (j < secondCount)) &&
+      (decide (1 < state.2.length) && decide (state.2.length < 12)))
+
+noncomputable def firstMixedTest (i : ℕ) : Bool := !mixedSecond (firstAt i)
+
+lemma checkedAfterFirst (i : ℕ) (hi : i < firstCount)
+    (ready : rangeCheck readyForSecond 0 firstCount = true)
+    (mixed : rangeCheck firstMixedTest 0 firstCount = true)
+    (next : ∀ j < secondCount, afterSecond (secondAt j) = false) :
+    look1C I.NN I.AA I.HX I.HY I.AA rootPreparedMask rootPreparedSlots 14 14 13 1
+      (firstAt i).1 (firstAt i).2 = false := by
+  have h := rangeCheck_at ready hi
+  simp only [readyForSecond, Bool.and_eq_true, decide_eq_true_eq] at h
+  obtain ⟨hc, hvalid, htwo, hsmall⟩ := h
+  refine afterFirst_false (firstAt i) htwo hsmall (boolOfNeg (rangeCheck_at mixed hi)) ?_
+  refine pureSecond_from_frontier (firstAt i) ((secondSuccessors i).map secondAt) (boolOfNeg hc) ?_
+  intro state membership
+  obtain ⟨j, hj, rfl⟩ := List.mem_map.mp membership
+  have hj' : j < secondCount := of_decide_eq_true (List.all_eq_true.mp hvalid j hj)
+  exact next j hj'
+
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverageChunk0 : rangeCheck readyForSecond 0 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverageChunk1 : rangeCheck readyForSecond 3 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverageChunk2 : rangeCheck readyForSecond 6 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverageChunk3 : rangeCheck readyForSecond 9 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverageChunk4 : rangeCheck readyForSecond 12 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverageChunk5 : rangeCheck readyForSecond 15 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverageChunk6 : rangeCheck readyForSecond 18 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverageChunk7 : rangeCheck readyForSecond 21 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverageChunk8 : rangeCheck readyForSecond 24 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverageChunk9 : rangeCheck readyForSecond 27 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverageChunk10 : rangeCheck readyForSecond 30 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverageChunk11 : rangeCheck readyForSecond 33 2 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstCoverage_all : rangeCheck readyForSecond 0 firstCount = true := by
+  exact (@rangeCheck_append readyForSecond 0 18 17
+    (@rangeCheck_append readyForSecond 0 9 9
+    (@rangeCheck_append readyForSecond 0 3 6
+    firstCoverageChunk0 (@rangeCheck_append readyForSecond 3 3 3
+    firstCoverageChunk1 firstCoverageChunk2)) (@rangeCheck_append readyForSecond 9 3 6
+    firstCoverageChunk3 (@rangeCheck_append readyForSecond 12 3 3
+    firstCoverageChunk4 firstCoverageChunk5))) (@rangeCheck_append readyForSecond 18 9 8
+    (@rangeCheck_append readyForSecond 18 3 6
+    firstCoverageChunk6 (@rangeCheck_append readyForSecond 21 3 3
+    firstCoverageChunk7 firstCoverageChunk8)) (@rangeCheck_append readyForSecond 27 3 5
+    firstCoverageChunk9 (@rangeCheck_append readyForSecond 30 3 2
+    firstCoverageChunk10 firstCoverageChunk11))))
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk0 : rangeCheck firstMixedTest 0 2 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk1 : rangeCheck firstMixedTest 2 3 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk2 : rangeCheck firstMixedTest 5 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk3 : rangeCheck firstMixedTest 6 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk4 : rangeCheck firstMixedTest 7 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk5 : rangeCheck firstMixedTest 8 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk6 : rangeCheck firstMixedTest 9 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk7 : rangeCheck firstMixedTest 10 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk8 : rangeCheck firstMixedTest 11 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk9 : rangeCheck firstMixedTest 12 2 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk10 : rangeCheck firstMixedTest 14 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk11 : rangeCheck firstMixedTest 15 2 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk12 : rangeCheck firstMixedTest 17 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk13 : rangeCheck firstMixedTest 18 6 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk14 : rangeCheck firstMixedTest 24 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk15 : rangeCheck firstMixedTest 25 2 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk16 : rangeCheck firstMixedTest 27 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk17 : rangeCheck firstMixedTest 28 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk18 : rangeCheck firstMixedTest 29 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk19 : rangeCheck firstMixedTest 30 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk20 : rangeCheck firstMixedTest 31 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk21 : rangeCheck firstMixedTest 32 1 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixedChunk22 : rangeCheck firstMixedTest 33 2 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma firstMixed_all : rangeCheck firstMixedTest 0 firstCount = true := by
+  exact (@rangeCheck_append firstMixedTest 0 15 20
+    (@rangeCheck_append firstMixedTest 0 8 7
+    (@rangeCheck_append firstMixedTest 0 5 3
+    (@rangeCheck_append firstMixedTest 0 2 3
+    firstMixedChunk0 firstMixedChunk1) (@rangeCheck_append firstMixedTest 5 1 2
+    firstMixedChunk2 (@rangeCheck_append firstMixedTest 6 1 1
+    firstMixedChunk3 firstMixedChunk4))) (@rangeCheck_append firstMixedTest 8 3 4
+    (@rangeCheck_append firstMixedTest 8 1 2
+    firstMixedChunk5 (@rangeCheck_append firstMixedTest 9 1 1
+    firstMixedChunk6 firstMixedChunk7)) (@rangeCheck_append firstMixedTest 11 1 3
+    firstMixedChunk8 (@rangeCheck_append firstMixedTest 12 2 1
+    firstMixedChunk9 firstMixedChunk10)))) (@rangeCheck_append firstMixedTest 15 13 7
+    (@rangeCheck_append firstMixedTest 15 9 4
+    (@rangeCheck_append firstMixedTest 15 2 7
+    firstMixedChunk11 (@rangeCheck_append firstMixedTest 17 1 6
+    firstMixedChunk12 firstMixedChunk13)) (@rangeCheck_append firstMixedTest 24 1 3
+    firstMixedChunk14 (@rangeCheck_append firstMixedTest 25 2 1
+    firstMixedChunk15 firstMixedChunk16))) (@rangeCheck_append firstMixedTest 28 3 4
+    (@rangeCheck_append firstMixedTest 28 1 2
+    firstMixedChunk17 (@rangeCheck_append firstMixedTest 29 1 1
+    firstMixedChunk18 firstMixedChunk19)) (@rangeCheck_append firstMixedTest 31 1 3
+    firstMixedChunk20 (@rangeCheck_append firstMixedTest 32 1 2
+    firstMixedChunk21 firstMixedChunk22)))))
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk0 : rangeCheck readyForThird 0 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk1 : rangeCheck readyForThird 8 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk2 : rangeCheck readyForThird 16 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk3 : rangeCheck readyForThird 24 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk4 : rangeCheck readyForThird 32 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk5 : rangeCheck readyForThird 40 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk6 : rangeCheck readyForThird 48 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk7 : rangeCheck readyForThird 56 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk8 : rangeCheck readyForThird 64 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk9 : rangeCheck readyForThird 72 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk10 : rangeCheck readyForThird 80 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk11 : rangeCheck readyForThird 88 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk12 : rangeCheck readyForThird 96 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk13 : rangeCheck readyForThird 104 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk14 : rangeCheck readyForThird 112 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk15 : rangeCheck readyForThird 120 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk16 : rangeCheck readyForThird 128 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk17 : rangeCheck readyForThird 136 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk18 : rangeCheck readyForThird 144 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk19 : rangeCheck readyForThird 152 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk20 : rangeCheck readyForThird 160 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk21 : rangeCheck readyForThird 168 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk22 : rangeCheck readyForThird 176 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk23 : rangeCheck readyForThird 184 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk24 : rangeCheck readyForThird 192 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk25 : rangeCheck readyForThird 200 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk26 : rangeCheck readyForThird 208 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk27 : rangeCheck readyForThird 216 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk28 : rangeCheck readyForThird 224 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk29 : rangeCheck readyForThird 232 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk30 : rangeCheck readyForThird 240 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk31 : rangeCheck readyForThird 248 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk32 : rangeCheck readyForThird 256 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk33 : rangeCheck readyForThird 264 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk34 : rangeCheck readyForThird 272 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk35 : rangeCheck readyForThird 280 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk36 : rangeCheck readyForThird 288 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk37 : rangeCheck readyForThird 296 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk38 : rangeCheck readyForThird 304 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk39 : rangeCheck readyForThird 312 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk40 : rangeCheck readyForThird 320 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk41 : rangeCheck readyForThird 328 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk42 : rangeCheck readyForThird 336 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk43 : rangeCheck readyForThird 344 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk44 : rangeCheck readyForThird 352 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk45 : rangeCheck readyForThird 360 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk46 : rangeCheck readyForThird 368 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk47 : rangeCheck readyForThird 376 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk48 : rangeCheck readyForThird 384 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk49 : rangeCheck readyForThird 392 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk50 : rangeCheck readyForThird 400 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverageChunk51 : rangeCheck readyForThird 408 5 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondCoverage_all : rangeCheck readyForThird 0 secondCount = true := by
+  exact (@rangeCheck_append readyForThird 0 208 205
+    (@rangeCheck_append readyForThird 0 104 104
+    (@rangeCheck_append readyForThird 0 48 56
+    (@rangeCheck_append readyForThird 0 24 24
+    (@rangeCheck_append readyForThird 0 8 16
+    secondCoverageChunk0 (@rangeCheck_append readyForThird 8 8 8
+    secondCoverageChunk1 secondCoverageChunk2)) (@rangeCheck_append readyForThird 24 8 16
+    secondCoverageChunk3 (@rangeCheck_append readyForThird 32 8 8
+    secondCoverageChunk4 secondCoverageChunk5))) (@rangeCheck_append readyForThird 48 24 32
+    (@rangeCheck_append readyForThird 48 8 16
+    secondCoverageChunk6 (@rangeCheck_append readyForThird 56 8 8
+    secondCoverageChunk7 secondCoverageChunk8)) (@rangeCheck_append readyForThird 72 16 16
+    (@rangeCheck_append readyForThird 72 8 8
+    secondCoverageChunk9 secondCoverageChunk10) (@rangeCheck_append readyForThird 88 8 8
+    secondCoverageChunk11 secondCoverageChunk12)))) (@rangeCheck_append readyForThird 104 48 56
+    (@rangeCheck_append readyForThird 104 24 24
+    (@rangeCheck_append readyForThird 104 8 16
+    secondCoverageChunk13 (@rangeCheck_append readyForThird 112 8 8
+    secondCoverageChunk14 secondCoverageChunk15)) (@rangeCheck_append readyForThird 128 8 16
+    secondCoverageChunk16 (@rangeCheck_append readyForThird 136 8 8
+    secondCoverageChunk17 secondCoverageChunk18))) (@rangeCheck_append readyForThird 152 24 32
+    (@rangeCheck_append readyForThird 152 8 16
+    secondCoverageChunk19 (@rangeCheck_append readyForThird 160 8 8
+    secondCoverageChunk20 secondCoverageChunk21)) (@rangeCheck_append readyForThird 176 16 16
+    (@rangeCheck_append readyForThird 176 8 8
+    secondCoverageChunk22 secondCoverageChunk23) (@rangeCheck_append readyForThird 192 8 8
+    secondCoverageChunk24 secondCoverageChunk25))))) (@rangeCheck_append readyForThird 208 104 101
+    (@rangeCheck_append readyForThird 208 48 56
+    (@rangeCheck_append readyForThird 208 24 24
+    (@rangeCheck_append readyForThird 208 8 16
+    secondCoverageChunk26 (@rangeCheck_append readyForThird 216 8 8
+    secondCoverageChunk27 secondCoverageChunk28)) (@rangeCheck_append readyForThird 232 8 16
+    secondCoverageChunk29 (@rangeCheck_append readyForThird 240 8 8
+    secondCoverageChunk30 secondCoverageChunk31))) (@rangeCheck_append readyForThird 256 24 32
+    (@rangeCheck_append readyForThird 256 8 16
+    secondCoverageChunk32 (@rangeCheck_append readyForThird 264 8 8
+    secondCoverageChunk33 secondCoverageChunk34)) (@rangeCheck_append readyForThird 280 16 16
+    (@rangeCheck_append readyForThird 280 8 8
+    secondCoverageChunk35 secondCoverageChunk36) (@rangeCheck_append readyForThird 296 8 8
+    secondCoverageChunk37 secondCoverageChunk38)))) (@rangeCheck_append readyForThird 312 48 53
+    (@rangeCheck_append readyForThird 312 24 24
+    (@rangeCheck_append readyForThird 312 8 16
+    secondCoverageChunk39 (@rangeCheck_append readyForThird 320 8 8
+    secondCoverageChunk40 secondCoverageChunk41)) (@rangeCheck_append readyForThird 336 8 16
+    secondCoverageChunk42 (@rangeCheck_append readyForThird 344 8 8
+    secondCoverageChunk43 secondCoverageChunk44))) (@rangeCheck_append readyForThird 360 24 29
+    (@rangeCheck_append readyForThird 360 8 16
+    secondCoverageChunk45 (@rangeCheck_append readyForThird 368 8 8
+    secondCoverageChunk46 secondCoverageChunk47)) (@rangeCheck_append readyForThird 384 16 13
+    (@rangeCheck_append readyForThird 384 8 8
+    secondCoverageChunk48 secondCoverageChunk49) (@rangeCheck_append readyForThird 400 8 5
+    secondCoverageChunk50 secondCoverageChunk51))))))
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk0 : rangeCheck secondMixedTest 0 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk1 : rangeCheck secondMixedTest 8 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk2 : rangeCheck secondMixedTest 16 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk3 : rangeCheck secondMixedTest 24 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk4 : rangeCheck secondMixedTest 32 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk5 : rangeCheck secondMixedTest 40 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk6 : rangeCheck secondMixedTest 48 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk7 : rangeCheck secondMixedTest 56 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk8 : rangeCheck secondMixedTest 64 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk9 : rangeCheck secondMixedTest 72 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk10 : rangeCheck secondMixedTest 80 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk11 : rangeCheck secondMixedTest 88 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk12 : rangeCheck secondMixedTest 96 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk13 : rangeCheck secondMixedTest 104 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk14 : rangeCheck secondMixedTest 112 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk15 : rangeCheck secondMixedTest 120 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk16 : rangeCheck secondMixedTest 128 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk17 : rangeCheck secondMixedTest 136 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk18 : rangeCheck secondMixedTest 144 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk19 : rangeCheck secondMixedTest 152 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk20 : rangeCheck secondMixedTest 160 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk21 : rangeCheck secondMixedTest 168 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk22 : rangeCheck secondMixedTest 176 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk23 : rangeCheck secondMixedTest 184 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk24 : rangeCheck secondMixedTest 192 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk25 : rangeCheck secondMixedTest 200 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk26 : rangeCheck secondMixedTest 208 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk27 : rangeCheck secondMixedTest 216 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk28 : rangeCheck secondMixedTest 224 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk29 : rangeCheck secondMixedTest 232 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk30 : rangeCheck secondMixedTest 240 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk31 : rangeCheck secondMixedTest 248 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk32 : rangeCheck secondMixedTest 256 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk33 : rangeCheck secondMixedTest 264 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk34 : rangeCheck secondMixedTest 272 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk35 : rangeCheck secondMixedTest 280 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk36 : rangeCheck secondMixedTest 288 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk37 : rangeCheck secondMixedTest 296 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk38 : rangeCheck secondMixedTest 304 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk39 : rangeCheck secondMixedTest 312 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk40 : rangeCheck secondMixedTest 320 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk41 : rangeCheck secondMixedTest 328 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk42 : rangeCheck secondMixedTest 336 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk43 : rangeCheck secondMixedTest 344 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk44 : rangeCheck secondMixedTest 352 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk45 : rangeCheck secondMixedTest 360 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk46 : rangeCheck secondMixedTest 368 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk47 : rangeCheck secondMixedTest 376 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk48 : rangeCheck secondMixedTest 384 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk49 : rangeCheck secondMixedTest 392 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk50 : rangeCheck secondMixedTest 400 8 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixedChunk51 : rangeCheck secondMixedTest 408 5 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma secondMixed_all : rangeCheck secondMixedTest 0 secondCount = true := by
+  exact (@rangeCheck_append secondMixedTest 0 208 205
+    (@rangeCheck_append secondMixedTest 0 104 104
+    (@rangeCheck_append secondMixedTest 0 48 56
+    (@rangeCheck_append secondMixedTest 0 24 24
+    (@rangeCheck_append secondMixedTest 0 8 16
+    secondMixedChunk0 (@rangeCheck_append secondMixedTest 8 8 8
+    secondMixedChunk1 secondMixedChunk2)) (@rangeCheck_append secondMixedTest 24 8 16
+    secondMixedChunk3 (@rangeCheck_append secondMixedTest 32 8 8
+    secondMixedChunk4 secondMixedChunk5))) (@rangeCheck_append secondMixedTest 48 24 32
+    (@rangeCheck_append secondMixedTest 48 8 16
+    secondMixedChunk6 (@rangeCheck_append secondMixedTest 56 8 8
+    secondMixedChunk7 secondMixedChunk8)) (@rangeCheck_append secondMixedTest 72 16 16
+    (@rangeCheck_append secondMixedTest 72 8 8
+    secondMixedChunk9 secondMixedChunk10) (@rangeCheck_append secondMixedTest 88 8 8
+    secondMixedChunk11 secondMixedChunk12)))) (@rangeCheck_append secondMixedTest 104 48 56
+    (@rangeCheck_append secondMixedTest 104 24 24
+    (@rangeCheck_append secondMixedTest 104 8 16
+    secondMixedChunk13 (@rangeCheck_append secondMixedTest 112 8 8
+    secondMixedChunk14 secondMixedChunk15)) (@rangeCheck_append secondMixedTest 128 8 16
+    secondMixedChunk16 (@rangeCheck_append secondMixedTest 136 8 8
+    secondMixedChunk17 secondMixedChunk18))) (@rangeCheck_append secondMixedTest 152 24 32
+    (@rangeCheck_append secondMixedTest 152 8 16
+    secondMixedChunk19 (@rangeCheck_append secondMixedTest 160 8 8
+    secondMixedChunk20 secondMixedChunk21)) (@rangeCheck_append secondMixedTest 176 16 16
+    (@rangeCheck_append secondMixedTest 176 8 8
+    secondMixedChunk22 secondMixedChunk23) (@rangeCheck_append secondMixedTest 192 8 8
+    secondMixedChunk24 secondMixedChunk25))))) (@rangeCheck_append secondMixedTest 208 104 101
+    (@rangeCheck_append secondMixedTest 208 48 56
+    (@rangeCheck_append secondMixedTest 208 24 24
+    (@rangeCheck_append secondMixedTest 208 8 16
+    secondMixedChunk26 (@rangeCheck_append secondMixedTest 216 8 8
+    secondMixedChunk27 secondMixedChunk28)) (@rangeCheck_append secondMixedTest 232 8 16
+    secondMixedChunk29 (@rangeCheck_append secondMixedTest 240 8 8
+    secondMixedChunk30 secondMixedChunk31))) (@rangeCheck_append secondMixedTest 256 24 32
+    (@rangeCheck_append secondMixedTest 256 8 16
+    secondMixedChunk32 (@rangeCheck_append secondMixedTest 264 8 8
+    secondMixedChunk33 secondMixedChunk34)) (@rangeCheck_append secondMixedTest 280 16 16
+    (@rangeCheck_append secondMixedTest 280 8 8
+    secondMixedChunk35 secondMixedChunk36) (@rangeCheck_append secondMixedTest 296 8 8
+    secondMixedChunk37 secondMixedChunk38)))) (@rangeCheck_append secondMixedTest 312 48 53
+    (@rangeCheck_append secondMixedTest 312 24 24
+    (@rangeCheck_append secondMixedTest 312 8 16
+    secondMixedChunk39 (@rangeCheck_append secondMixedTest 320 8 8
+    secondMixedChunk40 secondMixedChunk41)) (@rangeCheck_append secondMixedTest 336 8 16
+    secondMixedChunk42 (@rangeCheck_append secondMixedTest 344 8 8
+    secondMixedChunk43 secondMixedChunk44))) (@rangeCheck_append secondMixedTest 360 24 29
+    (@rangeCheck_append secondMixedTest 360 8 16
+    secondMixedChunk45 (@rangeCheck_append secondMixedTest 368 8 8
+    secondMixedChunk46 secondMixedChunk47)) (@rangeCheck_append secondMixedTest 384 16 13
+    (@rangeCheck_append secondMixedTest 384 8 8
+    secondMixedChunk48 secondMixedChunk49) (@rangeCheck_append secondMixedTest 400 8 5
+    secondMixedChunk50 secondMixedChunk51))))))
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk0 : rangeCheck thirdTest 0 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk1 : rangeCheck thirdTest 30 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk2 : rangeCheck thirdTest 60 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk3 : rangeCheck thirdTest 90 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk4 : rangeCheck thirdTest 120 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk5 : rangeCheck thirdTest 150 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk6 : rangeCheck thirdTest 180 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk7 : rangeCheck thirdTest 210 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk8 : rangeCheck thirdTest 240 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk9 : rangeCheck thirdTest 270 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk10 : rangeCheck thirdTest 300 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk11 : rangeCheck thirdTest 330 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk12 : rangeCheck thirdTest 360 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk13 : rangeCheck thirdTest 390 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk14 : rangeCheck thirdTest 420 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk15 : rangeCheck thirdTest 450 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk16 : rangeCheck thirdTest 480 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk17 : rangeCheck thirdTest 510 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk18 : rangeCheck thirdTest 540 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk19 : rangeCheck thirdTest 570 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk20 : rangeCheck thirdTest 600 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk21 : rangeCheck thirdTest 630 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk22 : rangeCheck thirdTest 660 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk23 : rangeCheck thirdTest 690 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk24 : rangeCheck thirdTest 720 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk25 : rangeCheck thirdTest 750 20 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk26 : rangeCheck thirdTest 770 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk27 : rangeCheck thirdTest 800 25 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk28 : rangeCheck thirdTest 825 19 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk29 : rangeCheck thirdTest 844 26 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk30 : rangeCheck thirdTest 870 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk31 : rangeCheck thirdTest 900 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk32 : rangeCheck thirdTest 930 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk33 : rangeCheck thirdTest 960 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk34 : rangeCheck thirdTest 990 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk35 : rangeCheck thirdTest 1020 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk36 : rangeCheck thirdTest 1050 14 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk37 : rangeCheck thirdTest 1064 13 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk38 : rangeCheck thirdTest 1077 22 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk39 : rangeCheck thirdTest 1099 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk40 : rangeCheck thirdTest 1129 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk41 : rangeCheck thirdTest 1159 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk42 : rangeCheck thirdTest 1189 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk43 : rangeCheck thirdTest 1219 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk44 : rangeCheck thirdTest 1249 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk45 : rangeCheck thirdTest 1279 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk46 : rangeCheck thirdTest 1309 21 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk47 : rangeCheck thirdTest 1330 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk48 : rangeCheck thirdTest 1360 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk49 : rangeCheck thirdTest 1390 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk50 : rangeCheck thirdTest 1420 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk51 : rangeCheck thirdTest 1450 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk52 : rangeCheck thirdTest 1480 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk53 : rangeCheck thirdTest 1510 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk54 : rangeCheck thirdTest 1540 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk55 : rangeCheck thirdTest 1570 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk56 : rangeCheck thirdTest 1600 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk57 : rangeCheck thirdTest 1630 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk58 : rangeCheck thirdTest 1660 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk59 : rangeCheck thirdTest 1690 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk60 : rangeCheck thirdTest 1720 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk61 : rangeCheck thirdTest 1750 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk62 : rangeCheck thirdTest 1780 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk63 : rangeCheck thirdTest 1810 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk64 : rangeCheck thirdTest 1840 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk65 : rangeCheck thirdTest 1870 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk66 : rangeCheck thirdTest 1900 30 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTailChunk67 : rangeCheck thirdTest 1930 13 = true := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma thirdTail_all : rangeCheck thirdTest 0 thirdCount = true := by
+  exact (@rangeCheck_append thirdTest 0 990 953
+    (@rangeCheck_append thirdTest 0 510 480
+    (@rangeCheck_append thirdTest 0 240 270
+    (@rangeCheck_append thirdTest 0 120 120
+    (@rangeCheck_append thirdTest 0 60 60
+    (@rangeCheck_append thirdTest 0 30 30
+    thirdTailChunk0 thirdTailChunk1) (@rangeCheck_append thirdTest 60 30 30
+    thirdTailChunk2 thirdTailChunk3)) (@rangeCheck_append thirdTest 120 60 60
+    (@rangeCheck_append thirdTest 120 30 30
+    thirdTailChunk4 thirdTailChunk5) (@rangeCheck_append thirdTest 180 30 30
+    thirdTailChunk6 thirdTailChunk7))) (@rangeCheck_append thirdTest 240 120 150
+    (@rangeCheck_append thirdTest 240 60 60
+    (@rangeCheck_append thirdTest 240 30 30
+    thirdTailChunk8 thirdTailChunk9) (@rangeCheck_append thirdTest 300 30 30
+    thirdTailChunk10 thirdTailChunk11)) (@rangeCheck_append thirdTest 360 60 90
+    (@rangeCheck_append thirdTest 360 30 30
+    thirdTailChunk12 thirdTailChunk13) (@rangeCheck_append thirdTest 420 30 60
+    thirdTailChunk14 (@rangeCheck_append thirdTest 450 30 30
+    thirdTailChunk15 thirdTailChunk16))))) (@rangeCheck_append thirdTest 510 240 240
+    (@rangeCheck_append thirdTest 510 120 120
+    (@rangeCheck_append thirdTest 510 60 60
+    (@rangeCheck_append thirdTest 510 30 30
+    thirdTailChunk17 thirdTailChunk18) (@rangeCheck_append thirdTest 570 30 30
+    thirdTailChunk19 thirdTailChunk20)) (@rangeCheck_append thirdTest 630 60 60
+    (@rangeCheck_append thirdTest 630 30 30
+    thirdTailChunk21 thirdTailChunk22) (@rangeCheck_append thirdTest 690 30 30
+    thirdTailChunk23 thirdTailChunk24))) (@rangeCheck_append thirdTest 750 94 146
+    (@rangeCheck_append thirdTest 750 50 44
+    (@rangeCheck_append thirdTest 750 20 30
+    thirdTailChunk25 thirdTailChunk26) (@rangeCheck_append thirdTest 800 25 19
+    thirdTailChunk27 thirdTailChunk28)) (@rangeCheck_append thirdTest 844 56 90
+    (@rangeCheck_append thirdTest 844 26 30
+    thirdTailChunk29 thirdTailChunk30) (@rangeCheck_append thirdTest 900 30 60
+    thirdTailChunk31 (@rangeCheck_append thirdTest 930 30 30
+    thirdTailChunk32 thirdTailChunk33)))))) (@rangeCheck_append thirdTest 990 460 493
+    (@rangeCheck_append thirdTest 990 199 261
+    (@rangeCheck_append thirdTest 990 87 112
+    (@rangeCheck_append thirdTest 990 60 27
+    (@rangeCheck_append thirdTest 990 30 30
+    thirdTailChunk34 thirdTailChunk35) (@rangeCheck_append thirdTest 1050 14 13
+    thirdTailChunk36 thirdTailChunk37)) (@rangeCheck_append thirdTest 1077 52 60
+    (@rangeCheck_append thirdTest 1077 22 30
+    thirdTailChunk38 thirdTailChunk39) (@rangeCheck_append thirdTest 1129 30 30
+    thirdTailChunk40 thirdTailChunk41))) (@rangeCheck_append thirdTest 1189 120 141
+    (@rangeCheck_append thirdTest 1189 60 60
+    (@rangeCheck_append thirdTest 1189 30 30
+    thirdTailChunk42 thirdTailChunk43) (@rangeCheck_append thirdTest 1249 30 30
+    thirdTailChunk44 thirdTailChunk45)) (@rangeCheck_append thirdTest 1309 51 90
+    (@rangeCheck_append thirdTest 1309 21 30
+    thirdTailChunk46 thirdTailChunk47) (@rangeCheck_append thirdTest 1360 30 60
+    thirdTailChunk48 (@rangeCheck_append thirdTest 1390 30 30
+    thirdTailChunk49 thirdTailChunk50))))) (@rangeCheck_append thirdTest 1450 240 253
+    (@rangeCheck_append thirdTest 1450 120 120
+    (@rangeCheck_append thirdTest 1450 60 60
+    (@rangeCheck_append thirdTest 1450 30 30
+    thirdTailChunk51 thirdTailChunk52) (@rangeCheck_append thirdTest 1510 30 30
+    thirdTailChunk53 thirdTailChunk54)) (@rangeCheck_append thirdTest 1570 60 60
+    (@rangeCheck_append thirdTest 1570 30 30
+    thirdTailChunk55 thirdTailChunk56) (@rangeCheck_append thirdTest 1630 30 30
+    thirdTailChunk57 thirdTailChunk58))) (@rangeCheck_append thirdTest 1690 120 133
+    (@rangeCheck_append thirdTest 1690 60 60
+    (@rangeCheck_append thirdTest 1690 30 30
+    thirdTailChunk59 thirdTailChunk60) (@rangeCheck_append thirdTest 1750 30 30
+    thirdTailChunk61 thirdTailChunk62)) (@rangeCheck_append thirdTest 1810 60 73
+    (@rangeCheck_append thirdTest 1810 30 30
+    thirdTailChunk63 thirdTailChunk64) (@rangeCheck_append thirdTest 1870 30 43
+    thirdTailChunk65 (@rangeCheck_append thirdTest 1900 30 13
+    thirdTailChunk66 thirdTailChunk67)))))))
+
+def initialIndices (kind : Bool) : List ℕ := if kind then [1, 2, 4, 6, 7, 8, 9, 10, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34] else [0, 3, 5, 11, 13, 23]
+
+noncomputable def initialStates (kind : Bool) : List SearchState := (initialIndices kind).map firstAt
+
+lemma allInitialIndices (kind : Bool) : (initialIndices kind).all (fun i => decide (i < firstCount)) = true := by
+  cases kind <;> decide +kernel
+
+lemma initialCoverage (kind : Bool) : initialBinary FF kind (frontierMissing (initialStates kind)) = false := by
+  cases kind <;> decide +kernel
+
+lemma binaryCertificate (kind : Bool) : chkPairPicked [] rootBounds 0 14 1 FF 0 kind = false := by
+  apply initialBinary_from_frontier FF kind (initialStates kind) (initialCoverage kind)
+  intro state membership
+  obtain ⟨i, hi, rfl⟩ := List.mem_map.mp membership
+  have hi' : i < firstCount := of_decide_eq_true (List.all_eq_true.mp (allInitialIndices kind) i hi)
+  exact checkedAfterFirst i hi' firstCoverage_all firstMixed_all
+    (fun j hj => checkedAfterSecond j hj secondCoverage_all secondMixed_all thirdTail_all)
+
+lemma binaryChecked : chk [] rootBounds 0 14 1 FF 0 = false :=
+  chkPair_picked [] rootBounds 0 14 1 FF 0 binaryCertificate
+
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma unaryChecked0 : chkPicked [] rootBounds 0 14 1 0 1 0 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma unaryChecked1 : chkPicked [] rootBounds 0 14 1 0 1 1 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma unaryChecked2 : chkPicked [] rootBounds 0 14 1 0 1 2 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma unaryChecked3 : chkPicked [] rootBounds 0 14 1 0 1 3 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma unaryChecked4 : chkPicked [] rootBounds 0 14 1 0 1 4 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma unaryChecked5 : chkPicked [] rootBounds 0 14 1 0 1 5 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma unaryChecked6 : chkPicked [] rootBounds 0 14 1 0 1 6 = false := by decide +kernel
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+lemma unaryChecked7 : chkPicked [] rootBounds 0 14 1 0 1 7 = false := by decide +kernel
+
+lemma unaryChecked : chk [] rootBounds 0 14 1 0 1 = false := by
   apply chk_picked
   intro b
   fin_cases b
-  · exact rt1_27_0
-  · exact rt1_27_1
-  · exact rt1_27_2
-  · exact rt1_27_3
-  · exact rt1_27_4
-  · exact rt1_27_5
-  · exact rt1_27_6
-  · exact rt1_27_7
+  · exact unaryChecked0
+  · exact unaryChecked1
+  · exact unaryChecked2
+  · exact unaryChecked3
+  · exact unaryChecked4
+  · exact unaryChecked5
+  · exact unaryChecked6
+  · exact unaryChecked7
+
+
+def rootCases : List (ℕ × ℕ) := [(FF, 0), (0, 1)]
+
+lemma rootCases_full : mFull rootCases = true := by decide +kernel
+
 lemma certify_1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rootBounds 0 14 1 p.1 p.2 = false := by
   refine ⟨rootCases, rootCases_full, ?_⟩
   intro p hp
   simp only [rootCases, List.mem_cons, List.not_mem_nil, or_false] at hp
-  rcases hp with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact rt1_0
-  · exact rt1_1
-  · exact rt1_2
-  · exact rt1_3
-  · exact rt1_4
-  · exact rt1_5
-  · exact rt1_6
-  · exact rt1_7
-  · exact rt1_8
-  · exact rt1_9
-  · exact rt1_10
-  · exact rt1_11
-  · exact rt1_12
-  · exact rt1_13
-  · exact rt1_14
-  · exact rt1_15
-  · exact rt1_16
-  · exact rt1_17
-  · exact rt1_18
-  · exact rt1_19
-  · exact rt1_20
-  · exact rt1_21
-  · exact rt1_22
-  · exact rt1_23
-  · exact rt1_24
-  · exact rt1_25
-  · exact rt1_26
-  · exact rt1_27
+  rcases hp with rfl | rfl
+  · exact binaryChecked
+  · exact unaryChecked
+
+
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 lemma small_0 : chk [] rootBounds 0 13 0 FF 1 = false := by decide +kernel
