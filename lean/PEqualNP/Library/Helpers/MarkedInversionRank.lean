@@ -75,6 +75,7 @@ private theorem input_order {n : Nat} {x y : Fin n → Bool} (xy : ∀ i, x i=tr
     simpa [List.getD_eq_getElem?_getD,List.getElem?_eq_getElem,h] using xy ⟨i,h⟩
   · rw [List.getD_append_right _ _ _ _ (by simpa using Nat.le_of_not_gt h),
         List.getD_append_right _ _ _ _ (by simpa using Nat.le_of_not_gt h)]
+    simp
 private def driverNumber : List Bool → Nat
   | [] => 0
   | b :: bs => (if b then 0 else 2^bs.length) + driverNumber bs
