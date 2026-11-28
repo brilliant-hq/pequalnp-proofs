@@ -1,4 +1,2726 @@
 import PEqualNP.Defs
+-- The five-input lower bound is from V_meta_9980__k13, PR #20915 by alexandersato0830.
+-- Its lower-bound method and data derive from #16362 by tungsten-wolf, Apache-2.0.
+namespace RescueK5
+open PEqualNP.CircuitLowerBounds
+abbrev Sig := BitVec 128
+def zero : Sig := 0
+def one : Sig := BitVec.allOnes 128
+def neg (a : Sig) : Sig := ~~~a
+def bin (d : Nat) (a b : Sig) : Sig :=
+  if d=0 then a &&& b else if d=1 then a ||| b else if d=2 then a &&& ~~~b else ~~~a &&& b
+def proper (a : Sig) : Prop := a ≠ zero ∧ a ≠ one
+def allowed (u : Bool) (d : Nat) : Prop := d<2 ∨ (u=true ∧ d<4)
+def flipOp (d : Nat) := if d=2 then 3 else if d=3 then 2 else d
+theorem allowed_four {u d} (h : allowed u d) : d=0 ∨ d=1 ∨ (u=true ∧ d=2) ∨ (u=true ∧ d=3) := by
+  rcases h with h | ⟨h,j⟩
+  · omega
+  · have : d=0 ∨ d=1 ∨ d=2 ∨ d=3 := by omega
+    rcases this with h1 | h1 | h1 | h1
+    · exact Or.inl h1
+    · exact Or.inr (Or.inl h1)
+    · exact Or.inr (Or.inr (Or.inl ⟨h,h1⟩))
+    · exact Or.inr (Or.inr (Or.inr ⟨h,h1⟩))
+theorem bin_flip {u d} (h : allowed u d) (a b : Sig) : bin d a b = bin (flipOp d) b a := by
+  rcases allowed_four h with rfl | rfl | ⟨_,rfl⟩ | ⟨_,rfl⟩ <;> simp [bin,flipOp,BitVec.and_comm,BitVec.or_comm]
+theorem flip_flip {u d} (h : allowed u d) : allowed u (flipOp d) ∧ flipOp (flipOp d)=d := by
+  rcases allowed_four h with rfl | rfl | ⟨hu,rfl⟩ | ⟨hu,rfl⟩
+  all_goals simp_all [flipOp,allowed]
+
+def Live (u : Bool) (target : Sig) : Nat → Finset Sig → Prop
+  | 0,S => S={target} ∧ proper target
+  | k+1,S => ∃ (U : Finset Sig) (a b : Sig) (d : Nat), allowed u d ∧ S=insert a (insert b U) ∧
+      proper a ∧ proper b ∧ a ≠ b ∧
+      bin d a b ∉ insert a (insert b U) ∧ Live u target k (insert (bin d a b) U)
+theorem Live.stop {u} {target : Sig} (hp : proper target) : Live u target 0 {target} := ⟨rfl,hp⟩
+theorem Live.binary {u} {target : Sig} {k : Nat} {U : Finset Sig} {a b : Sig} {d : Nat} (hd : allowed u d)
+    (ha : proper a) (hb : proper b) (hab : a ≠ b)
+    (hfresh : bin d a b ∉ insert a (insert b U)) (tail : Live u target k (insert (bin d a b) U)) :
+    Live u target (k+1) (insert a (insert b U)) :=
+  ⟨U,a,b,d,hd,rfl,ha,hb,hab,hfresh,tail⟩
+theorem Live.ind {u} {target : Sig} {motive : ∀ (k : Nat) (S : Finset Sig), Live u target k S → Prop}
+    (stop : ∀ (hp : proper target), motive 0 {target} (Live.stop hp))
+    (binary : ∀ {k : Nat} {U : Finset Sig} {a b : Sig} {d : Nat} (hd : allowed u d)
+      (ha : proper a) (hb : proper b) (hab : a ≠ b)
+      (hfresh : bin d a b ∉ insert a (insert b U)) (tail : Live u target k (insert (bin d a b) U)),
+      motive k (insert (bin d a b) U) tail →
+      motive (k+1) (insert a (insert b U)) (Live.binary hd ha hb hab hfresh tail))
+    {k : Nat} {S : Finset Sig} (h : Live u target k S) : motive k S h := by
+  induction k generalizing S with
+  | zero =>
+    obtain ⟨rfl,hp⟩ := h
+    exact stop hp
+  | succ k ih =>
+    obtain ⟨U,a,b,d,hd,rfl,ha,hb,hab,hf,tail⟩ := h
+    exact binary hd ha hb hab hf tail (ih tail)
+
+private lemma live_proper {u target k S} (h : Live u target k S) : ∀ a ∈ S, proper a := by
+  induction h using Live.ind with
+  | stop hp => simpa using hp
+  | binary hd ha hb hab hf _ ih =>
+    simp only [Finset.forall_mem_insert]
+    exact ⟨ha,hb,fun a h => ih a (Finset.mem_insert_of_mem h)⟩
+
+private lemma live_size {u target k S} (h : Live u target k S) : S.card ≤ k+1 := by
+  induction h using Live.ind with
+  | stop hp => simp
+  | @binary k U a b d hd ha hb hab hf _ ih =>
+    have hu : bin d a b ∉ U := fun hm => hf (Finset.mem_insert_of_mem (Finset.mem_insert_of_mem hm))
+    rw [Finset.card_insert_of_notMem hu] at ih
+    have h1 := Finset.card_insert_le (a := a) (s := insert b U)
+    have h2 := Finset.card_insert_le (a := b) (s := U)
+    omega
+
+def bit (i : Fin 128) (a : Sig) : Bool := a.getLsbD i.val
+private lemma bit_zero (i) : bit i zero = false := by simp [bit,zero]
+private lemma bit_one (i) : bit i one = true := by unfold bit one; rw [BitVec.getLsbD_allOnes]; simp
+private lemma bit_neg (i) (a : Sig) : bit i (neg a) = !(bit i a) := by simp [bit,neg,i.isLt]
+private lemma bit_bin (i d) (a b : Sig) : bit i (bin d a b) =
+    (if d=0 then bit i a && bit i b else if d=1 then bit i a || bit i b else
+      if d=2 then bit i a && !(bit i b) else !(bit i a) && bit i b) := by
+  unfold bin
+  split_ifs <;> simp [bit]
+theorem bit_ext {a b : Sig} (h : ∀ i, bit i a = bit i b) : a=b :=
+  BitVec.eq_of_getLsbD_eq fun j hj => h ⟨j,hj⟩
+
+def nrm (u : Bool) (a : Sig) : Sig := if u && bit 0 a then neg a else a
+theorem nrm_false (a : Sig) : nrm false a = a := rfl
+theorem nrm_bit (a : Sig) : bit 0 (nrm true a) = false := by
+  cases h : bit 0 a <;> simp [nrm,h,bit_neg]
+theorem nrm_id {u} {a : Sig} (h : bit 0 a = false) : nrm u a = a := by simp [nrm,h]
+theorem neg_neg' (a : Sig) : neg (neg a) = a := by simp [neg]
+theorem nrm_neg (a : Sig) : nrm true (neg a) = nrm true a := by
+  cases h : bit 0 a <;> simp [nrm,h,bit_neg,neg_neg']
+theorem proper_neg {a : Sig} (h : proper (neg a)) : proper a := by
+  refine ⟨?_,?_⟩
+  · rintro rfl
+    exact h.2 (by simp [neg,zero,one])
+  · rintro rfl
+    exact h.1 (by simp [neg,zero,one])
+theorem proper_nrm {u} {a : Sig} (h : proper (nrm u a)) : proper a := by
+  unfold nrm at h
+  split at h
+  · exact proper_neg h
+  · exact h
+def prime (d : Bool) (a b : Sig) := if d then a ||| b else a &&& b
+theorem bit_prime (i) (d : Bool) (a b : Sig) : bit i (prime d a b) =
+    (if d then bit i a || bit i b else bit i a && bit i b) := by cases d <;> simp [prime,bit]
+theorem nrm_prime (d : Bool) (a b : Sig) :
+    ∃ e, e<4 ∧ nrm true (prime d a b) = bin e (nrm true a) (nrm true b) := by
+  refine ⟨if d then (if bit 0 a then (if bit 0 b then 0 else 2) else (if bit 0 b then 3 else 1))
+    else (if bit 0 a then (if bit 0 b then 1 else 3) else (if bit 0 b then 2 else 0)),?_,?_⟩
+  · split_ifs <;> omega
+  · apply bit_ext
+    intro i
+    cases d <;> cases ha : bit 0 a <;> cases hb : bit 0 b <;>
+      simp only [nrm,bit_prime,ha,hb,bit_bin,bit_neg,Bool.true_and,Bool.false_and,Bool.and_true,Bool.and_false,Bool.false_or,
+        Bool.or_false,Bool.true_or,Bool.or_true,Bool.false_eq_true,ite_true,ite_false] <;>
+      cases hx : bit i a <;> cases hy : bit i b <;> simp [hx,hy,bit_neg,bit_prime]
+
+def gv (w : List Sig) (g : Gate) : Sig :=
+  let xs := g.inputs.map (fun i => w.getD i zero)
+  match g.op with
+  | .and => xs.foldr (prime false) one
+  | .or => xs.foldr (prime true) zero
+  | .not => neg (xs.headD zero)
+  | _ => zero
+
+def execute (gs : List Gate) (w : List Sig) : List Sig :=
+  gs.foldl (fun l g => l ++ [gv l g]) w
+
+def represented (w : List Sig) (v : Sig) : Prop := v ∈ w ∨ ¬proper v
+def Repr (u : Bool) (w : List Sig) (v : Sig) : Prop := represented w (nrm u v)
+
+private lemma bin_laws (a : Sig) :
+    bin 0 a one = a ∧ bin 1 a zero = a ∧
+    bin 0 a zero = zero ∧ bin 1 a one = one ∧
+    bin 0 a a = a ∧ bin 1 a a = a ∧ bin 2 a a = zero ∧ bin 3 a a = zero ∧ bin 2 a zero = a ∧
+    bin 3 zero a = a ∧ bin 2 zero a = zero ∧ bin 3 a zero = zero ∧ bin 0 zero a = zero ∧ bin 1 zero a = a ∧
+    bin 0 one a = a ∧ bin 1 one a = one := by
+  refine ⟨?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,?_⟩ <;> apply bit_ext <;> intro i <;>
+    simp [bit_bin,bit_zero,bit_one]
+
+private lemma neg_laws : neg zero = one ∧ neg one = zero := by simp [neg,zero,one]
+
+private lemma operand_cases {w : List Sig} {a : Sig} (h : represented w a) :
+    a = zero ∨ a = one ∨ a ∈ w ∧ proper a := by
+  by_cases hz : a = zero
+  · exact Or.inl hz
+  by_cases ho : a = one
+  · exact Or.inr (Or.inl ho)
+  exact Or.inr (Or.inr ⟨h.resolve_right (fun x => x ⟨hz,ho⟩),hz,ho⟩)
+
+def witness (u : Bool) (w : List Sig) (z : Sig) : Prop :=
+  ∃ d a b, allowed u d ∧ a ∈ w ∧ b ∈ w ∧ proper a ∧ proper b ∧ a ≠ b ∧ z = bin d a b
+
+private lemma bin_rep {u w a b} (d : Nat) (hd : allowed u d) (ha : represented w a) (hb : represented w b)
+    (no : u=true → a ≠ one ∧ b ≠ one) :
+    represented w (bin d a b) ∨ witness u w (bin d a b) := by
+  have rz : represented w zero := Or.inr (fun h => h.1 rfl)
+  have ro : represented w one := Or.inr (fun h => h.2 rfl)
+  obtain ⟨a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16⟩ := bin_laws a
+  obtain ⟨b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12,b13,b14,b15,b16⟩ := bin_laws b
+  by_cases he : a=b
+  · subst b
+    left
+    rcases allowed_four hd with rfl | rfl | ⟨_,rfl⟩ | ⟨_,rfl⟩
+    · exact a5.symm ▸ ha
+    · exact a6.symm ▸ ha
+    · exact a7.symm ▸ rz
+    · exact a8.symm ▸ rz
+  rcases operand_cases ha with rfl | rfl | ⟨ham,hap⟩
+  · left
+    rcases allowed_four hd with rfl | rfl | ⟨_,rfl⟩ | ⟨_,rfl⟩
+    · exact b13.symm ▸ rz
+    · exact b14.symm ▸ hb
+    · exact b11.symm ▸ rz
+    · exact b10.symm ▸ hb
+  · left
+    rcases allowed_four hd with rfl | rfl | ⟨hu,rfl⟩ | ⟨hu,rfl⟩
+    · exact b15.symm ▸ hb
+    · exact b16.symm ▸ ro
+    · exact absurd rfl (no hu).1
+    · exact absurd rfl (no hu).1
+  rcases operand_cases hb with rfl | rfl | ⟨hbm,hbp⟩
+  · left
+    rcases allowed_four hd with rfl | rfl | ⟨_,rfl⟩ | ⟨_,rfl⟩
+    · exact a3.symm ▸ rz
+    · exact a2.symm ▸ ha
+    · exact a9.symm ▸ ha
+    · exact a12.symm ▸ rz
+  · left
+    rcases allowed_four hd with rfl | rfl | ⟨hu,rfl⟩ | ⟨hu,rfl⟩
+    · exact a1.symm ▸ ha
+    · exact a4.symm ▸ ro
+    · exact absurd rfl (no hu).2
+    · exact absurd rfl (no hu).2
+  exact Or.inr ⟨d,a,b,hd,ham,hbm,hap,hbp,he,rfl⟩
+
+theorem norm_ne_one (a : Sig) : nrm true a ≠ one := by
+  intro h
+  have := nrm_bit a
+  rw [h,bit_one] at this
+  exact Bool.noConfusion this
+theorem prime_rep {u w a b} (d : Bool) (ha : Repr u w a) (hb : Repr u w b) :
+    Repr u w (prime d a b) ∨ witness u w (nrm u (prime d a b)) := by
+  cases u
+  · have e : prime d a b = bin (if d then 1 else 0) a b := by cases d <;> rfl
+    have h := bin_rep (u:=false) (if d then 1 else 0) (Or.inl (by split <;> omega)) ha hb (by simp)
+    unfold Repr
+    simp only [nrm_false] at h ⊢
+    rwa [e]
+  · obtain ⟨e,he,eq⟩ := nrm_prime d a b
+    unfold Repr
+    rw [eq]
+    exact bin_rep e (Or.inr ⟨rfl,he⟩) ha hb (fun _ => ⟨norm_ne_one a,norm_ne_one b⟩)
+theorem repr_const {u w} {v : Sig} (h : v=zero ∨ v=one) : Repr u w v := by
+  refine Or.inr fun hp => ?_
+  have := proper_nrm hp
+  rcases h with rfl | rfl
+  · exact this.1 rfl
+  · exact this.2 rfl
+private lemma get_rep {u} (w : List Sig) (i : Nat) : Repr u (w.map (nrm u)) (w.getD i zero) := by
+  simp only [List.getD_eq_getElem?_getD]
+  cases h : w[i]? with
+  | none => exact repr_const (Or.inl rfl)
+  | some a => exact Or.inl (List.mem_map_of_mem (List.mem_of_getElem? h))
+theorem repr_neg {w a} (h : Repr true w a) : Repr true w (neg a) := by
+  unfold Repr
+  rwa [nrm_neg]
+
+def isNot (g : Gate) : Bool := match g.op with
+  | .not => true
+  | _ => false
+private lemma gate_rep (u : Bool) (w : List Sig) (g : Gate)
+    (h : g.op ∈ ({GateOp.and,GateOp.or,GateOp.not} : Set GateOp) ∧ g.inputs.length≤2)
+    (mono : u=false → isNot g=false) :
+    Repr u (w.map (nrm u)) (gv w g) ∨ (isNot g=false ∧ witness u (w.map (nrm u)) (nrm u (gv w g))) := by
+  obtain ⟨o,l⟩ := g
+  simp only [Set.mem_insert_iff,Set.mem_singleton_iff] at h
+  obtain ⟨ho,hl⟩ := h
+  have prim (d : Bool) : Repr u (w.map (nrm u)) ((l.map (fun i => w.getD i zero)).foldr (prime d) (if d then zero else one)) ∨
+      witness u (w.map (nrm u)) (nrm u ((l.map (fun i => w.getD i zero)).foldr (prime d) (if d then zero else one))) := by
+    have unit (v : Sig) : prime d v (if d then zero else one) = v := by
+      apply bit_ext
+      intro i
+      cases d <;> simp [bit_prime,bit_zero,bit_one]
+    cases l with
+    | nil => exact Or.inl (repr_const (by cases d <;> simp))
+    | cons i l =>
+      cases l with
+      | nil =>
+        simp only [List.map_cons,List.map_nil,List.foldr_cons,List.foldr_nil,unit]
+        exact Or.inl (get_rep w i)
+      | cons j l =>
+        cases l with
+        | cons a l => simp at hl
+        | nil =>
+          simp only [List.map_cons,List.map_nil,List.foldr_cons,List.foldr_nil,unit]
+          exact prime_rep d (get_rep w i) (get_rep w j)
+  rcases ho with rfl | rfl | rfl
+  · exact (prim false).imp id (fun h => ⟨rfl,h⟩)
+  · exact (prim true).imp id (fun h => ⟨rfl,h⟩)
+  · cases u
+    · exact absurd (mono rfl) (by simp [isNot])
+    left
+    cases l with
+    | nil => exact repr_const (Or.inr (by simp [gv,neg_laws]))
+    | cons i l => exact repr_neg (get_rep w i)
+
+private lemma pull_gate {u target} {w : List Sig} {z : Sig} {k S c} (h : Live u target k S)
+    (hz : represented w z ∨ (c=1 ∧ witness u w z)) (sub : ∀ a ∈ S, a ∈ w++[z]) :
+    ∃ k' S', k' ≤ k+c ∧ Live u target k' S' ∧ ∀ a ∈ S', a ∈ w := by
+  by_cases hm : z ∈ S
+  · by_cases hw : z ∈ w
+    · refine ⟨k,S,by omega,h,?_⟩
+      intro a ha
+      have hu : a ∈ w ∨ a = z := by simpa using sub a ha
+      rcases hu with hu | rfl
+      · exact hu
+      · exact hw
+    · have hp := live_proper h z hm
+      rcases hz with hr | ⟨rfl,d,a,b,hd,ha,hb,pa,pb,hab,eq⟩
+      · exact False.elim ((hr.resolve_left hw) hp)
+      · subst z
+        let U := S.erase (bin d a b)
+        have ht : Live u target k (insert (bin d a b) U) := by simpa [U,Finset.insert_erase hm] using h
+        have hu : ∀ v ∈ U, v ∈ w := by
+          intro v hv
+          obtain ⟨hne,hm⟩ := Finset.mem_erase.mp hv
+          simpa [hne] using sub v hm
+        have hf : bin d a b ∉ insert a (insert b U) := by
+          intro hh
+          rcases Finset.mem_insert.mp hh with eq | u
+          · exact hw (eq.symm ▸ ha)
+          rcases Finset.mem_insert.mp u with eq | u
+          · exact hw (eq.symm ▸ hb)
+          · exact hw (hu _ u)
+        exact ⟨_,_,Nat.le_refl _,Live.binary hd pa pb hab hf ht,by simpa using And.intro ha (And.intro hb hu)⟩
+  · refine ⟨k,S,by omega,h,?_⟩
+    intro a ha
+    have hn : a ≠ z := fun hh => hm (hh ▸ ha)
+    simpa [hn] using sub a ha
+
+private lemma extract {u target} (gs : List Gate) (w : List Sig)
+    (legal : ∀ g ∈ gs, g.op ∈ ({GateOp.and,GateOp.or,GateOp.not} : Set GateOp) ∧ g.inputs.length≤2)
+    (mono : u=false → ∀ g ∈ gs, isNot g=false)
+    (hp : proper target) (hout : target ∈ (execute gs w).map (nrm u)) :
+    ∃ k S, k ≤ gs.countP (fun g => !isNot g) ∧ Live u target k S ∧ ∀ a ∈ S, a ∈ w.map (nrm u) := by
+  induction gs generalizing w with
+  | nil => exact ⟨0,{target},by simp,Live.stop hp,by simpa [execute] using hout⟩
+  | cons g gs ih =>
+    obtain ⟨k,S,hk,ht,hs⟩ := ih (w++[gv w g]) (fun a ha => legal a (by simp [ha]))
+      (fun hu a ha => mono hu a (by simp [ha])) hout
+    have rep := gate_rep u w g (legal g (by simp)) (fun hu => mono hu g (by simp))
+    rw [List.map_append] at hs
+    have rep' : represented (w.map (nrm u)) (nrm u (gv w g)) ∨
+        ((if isNot g then 0 else 1)=1 ∧ witness u (w.map (nrm u)) (nrm u (gv w g))) :=
+      rep.imp id (fun h => ⟨by simp [h.1],h.2⟩)
+    obtain ⟨l,T,hl,hu,hT⟩ := pull_gate ht rep' hs
+    refine ⟨l,T,?_,hu,hT⟩
+    rw [List.countP_cons]
+    cases hn : isNot g <;> simp [hn] at hl ⊢ <;> omega
+
+private lemma b_read (i) (w : List Sig) (j : Nat) :
+    (w.map (bit i)).getD j false = bit i (w.getD j zero) := by
+  simp only [List.getD_eq_getElem?_getD,List.getElem?_map]
+  cases w[j]? with
+  | none => exact (bit_zero _).symm
+  | some a => rfl
+
+private lemma run_bit (i) (g : Gate) (w : List Sig)
+    (hg : g.op ∈ ({GateOp.and,GateOp.or,GateOp.not} : Set GateOp)) :
+    bit i (gv w g) = g.op.eval (g.inputs.map fun j => (w.map (bit i)).getD j false) := by
+  obtain ⟨o,l⟩ := g
+  simp only [Set.mem_insert_iff,Set.mem_singleton_iff] at hg
+  simp only [b_read]
+  rcases hg with rfl | rfl | rfl
+  · induction l with
+    | nil => exact bit_one _
+    | cons a l ih =>
+      change bit i (prime false _ _) = (_ && _)
+      rw [bit_prime]; exact congrArg (fun x => bit i (w.getD a zero) && x) ih
+  · induction l with
+    | nil => exact bit_zero _
+    | cons a l ih =>
+      change bit i (prime true _ _) = (_ || _)
+      rw [bit_prime]; exact congrArg (fun x => bit i (w.getD a zero) || x) ih
+  · cases l with
+    | nil =>
+      change bit i (neg zero) = !false
+      rw [bit_neg,bit_zero]
+    | cons a l => exact bit_neg _ _
+
+private lemma execute_bits (gs : List Gate) (i) (w : List Sig)
+    (hg : ∀ g ∈ gs, g.op ∈ ({GateOp.and,GateOp.or,GateOp.not} : Set GateOp)) :
+    (execute gs w).map (bit i) =
+    gs.foldl (fun (l : List Bool) g => l++[g.op.eval (g.inputs.map fun j => l.getD j false)]) (w.map (bit i)) := by
+  induction gs generalizing w with
+  | nil => rfl
+  | cons g gs ih =>
+    change (execute gs (w++[gv w g])).map _ = _
+    rw [ih _ (fun a ha => hg a (by simp [ha]))]
+    simp only [List.foldl_cons,List.map_append,List.map_singleton,run_bit i g w (hg g (by simp))]
+
+abbrev Wire (R : Type) := R → Bool
+
+def inv {R} (a : Wire R) : Wire R := fun r => !(a r)
+
+def combine {R} (isOr : Bool) (a b : Wire R) : Wire R :=
+  if isOr then fun r => a r || b r else fun r => a r && b r
+def comb {R} (d : Nat) (a b : Wire R) : Wire R :=
+  if d=0 then combine false a b else if d=1 then combine true a b else
+    if d=2 then combine false a (inv b) else combine false (inv a) b
+
+def Constant {R} (a : Wire R) : Prop := ∃ b : Bool, a = fun _ => b
+
+noncomputable def cost {R} (a : Wire R) : Nat := by
+  classical exact if Constant a then 1 else 0
+
+noncomputable def mass {R} (xs : List (Wire R)) : Nat := (xs.map cost).sum
+
+def Available {R} (u : Bool) (pool : List (Wire R)) (v : Wire R) : Prop :=
+  v ∈ pool ∨ Constant v ∨ (u=true ∧ inv v ∈ pool)
+
+def supply {R} (u : Bool) (pool xs : List (Wire R)) := ∀ a ∈ xs, Available u pool a
+
+def Reach {R} (u : Bool) (roots : List (Wire R)) : Nat → List (Wire R) → Prop
+  | 0,b => b=roots
+  | p+1,c => ∃ (op : Bool) (bank : List (Wire R)) (a b : Wire R), Reach u roots p bank ∧ Available u bank a ∧
+      Available u bank b ∧ c=combine op a b :: bank
+theorem Reach.start {R u} {roots : List (Wire R)} : Reach u roots 0 roots := rfl
+theorem Reach.two {R u} {roots : List (Wire R)} {p bank a b} (op : Bool) (h : Reach u roots p bank)
+    (ha : Available u bank a) (hb : Available u bank b) : Reach u roots (p+1) (combine op a b :: bank) :=
+  ⟨op,bank,a,b,h,ha,hb,rfl⟩
+theorem Reach.ind {R u} {roots : List (Wire R)} {motive : ∀ p bank, Reach u roots p bank → Prop}
+    (start : motive 0 roots Reach.start)
+    (two : ∀ {p bank a b} (op : Bool) (h : Reach u roots p bank) (ha : Available u bank a)
+      (hb : Available u bank b), motive p bank h →
+      motive (p+1) (combine op a b :: bank) (Reach.two op h ha hb))
+    {p bank} (h : Reach u roots p bank) : motive p bank h := by
+  induction p generalizing bank with
+  | zero =>
+    obtain rfl := h
+    exact start
+  | succ p ih =>
+    obtain ⟨op,bank,a,b,h,ha,hb,rfl⟩ := h
+    exact two op h ha hb (ih h)
+
+def kept {α : Type} (save : Bool) (x : α) (xs : List α) := if save then x::xs else xs
+
+def Run {R} (u : Bool) (goal : Wire R) : Nat → List (Wire R) → Prop
+  | 0,zs => List.Perm [goal] zs
+  | s+1,zs => ∃ (op : Nat) (ka kb : Bool) (a b : Wire R) (rest : List (Wire R)), allowed u op ∧ (a::b::rest).Perm zs ∧
+      Run u goal s (comb op a b :: kept ka a (kept kb b rest))
+theorem Run.stop {R u} {goal : Wire R} : Run u goal 0 [goal] := List.Perm.refl _
+theorem Run.perm {R u} {goal : Wire R} {s : Nat} {xs zs : List (Wire R)} (p : xs.Perm zs)
+    (h : Run u goal s xs) : Run u goal s zs := by
+  cases s with
+  | zero => exact List.Perm.trans h p
+  | succ s =>
+    obtain ⟨op,ka,kb,a,b,rest,hd,q,h⟩ := h
+    exact ⟨op,ka,kb,a,b,rest,hd,q.trans p,h⟩
+theorem Run.two {R u} {goal : Wire R} {s : Nat} {a b : Wire R} {rest : List (Wire R)} (op : Nat) (hd : allowed u op) (ka kb : Bool)
+    (h : Run u goal s (comb op a b :: kept ka a (kept kb b rest))) : Run u goal (s+1) (a::b::rest) :=
+  ⟨op,ka,kb,a,b,rest,hd,List.Perm.refl _,h⟩
+theorem Run.ind {R u} {goal : Wire R} {motive : ∀ s ws, Run u goal s ws → Prop}
+    (stop : motive 0 [goal] Run.stop)
+    (perm : ∀ {s xs zs} (p : List.Perm xs zs) (h : Run u goal s xs), motive s xs h → motive s zs (Run.perm p h))
+    (two : ∀ {s a b rest} (op : Nat) (hd : allowed u op) (ka kb : Bool) (h : Run u goal s (comb op a b :: kept ka a (kept kb b rest))),
+      motive s _ h → motive (s+1) (a::b::rest) (Run.two op hd ka kb h))
+    {s ws} (h : Run u goal s ws) : motive s ws h := by
+  induction s generalizing ws with
+  | zero => exact perm h Run.stop stop
+  | succ s ih =>
+    obtain ⟨op,ka,kb,a,b,rest,hd,p,h⟩ := h
+    exact perm p (Run.two op hd ka kb h) (two op hd ka kb h (ih h))
+
+theorem mass_cons {R} (a : Wire R) (xs) : mass (a::xs)=cost a + mass xs := by
+  simp [mass]
+
+theorem mass_kept {R} (a : Wire R) (xs) (k : Bool) : mass xs ≤ mass (kept k a xs) := by
+  cases k <;> simp [kept,mass_cons]
+
+theorem inv_constant {R} {a : Wire R} (h : Constant a) : Constant (inv a) := by
+  obtain ⟨v,rfl⟩ := h
+  exact ⟨!v,rfl⟩
+
+theorem inv_inv' {R} (a : Wire R) : inv (inv a)=a := by
+  funext r
+  simp [inv]
+theorem cost_inv {R} (a : Wire R) : cost (inv a)=cost a := by
+  have : Constant (inv a) ↔ Constant a := ⟨fun h => inv_inv' a ▸ inv_constant h,inv_constant⟩
+  by_cases h : Constant a
+  · simp only [cost,if_pos h,if_pos (this.mpr h)]
+  · simp only [cost,if_neg h,if_neg (fun x => h (this.mp x))]
+theorem avail_inv {R u} {bank : List (Wire R)} {a} (hu : u=true) (h : Available u bank a) : Available u bank (inv a) := by
+  rcases h with h | h | ⟨_,h⟩
+  · exact Or.inr (Or.inr ⟨hu,(inv_inv' a).symm ▸ h⟩)
+  · exact Or.inr (Or.inl (inv_constant h))
+  · exact Or.inl h
+theorem both_constant {R} {a b : Wire R} (op) (h : Constant a) (g : Constant b) :
+    Constant (combine op a b) := by
+  obtain ⟨v,rfl⟩ := h
+  obtain ⟨w,rfl⟩ := g
+  cases op <;> exact ⟨_,rfl⟩
+
+theorem from_constant {R u} (op) {a b : Wire R} {bank}
+    (h : Constant a ∨ Constant b) (ha : Available u bank a) (hb : Available u bank b) :
+    Available u bank (combine op a b) := by
+  rcases h with ⟨v,rfl⟩ | ⟨v,rfl⟩
+  · cases op <;> cases v
+    · exact Or.inr (Or.inl ⟨false, by funext x; simp [combine]⟩)
+    · simpa [combine] using hb
+    · simpa [combine] using hb
+    · exact Or.inr (Or.inl ⟨true, by funext x; simp [combine]⟩)
+  · cases op <;> cases v
+    · exact Or.inr (Or.inl ⟨false, by funext x; simp [combine]⟩)
+    · simpa [combine] using ha
+    · simpa [combine] using ha
+    · exact Or.inr (Or.inl ⟨true, by funext x; simp [combine]⟩)
+
+theorem available_cons {R u} {bank v} (w : Wire R) (h : Available u bank v) :
+    Available u (w::bank) v :=
+  h.imp (List.mem_cons_of_mem _) (Or.imp id (And.imp id (List.mem_cons_of_mem _)))
+
+theorem extend_two {R u} (roots : List (Wire R)) {p bank a b} (op) (hp : Reach u roots p bank)
+    (ha : Available u bank a) (hb : Available u bank b) :
+    ∃ q next, Reach u roots q next ∧ Available u next (combine op a b) ∧
+        (∀ v, Available u bank v → Available u next v) ∧
+        q+cost a+cost b ≤ p+1+cost (combine op a b) := by
+  classical
+  by_cases c : Constant a ∨ Constant b
+  · refine ⟨p,bank,hp,from_constant op c ha hb,fun _ h => h,?_⟩
+    by_cases ca : Constant a <;> by_cases cb : Constant b
+    · simp [cost,ca,cb,both_constant op ca cb]
+    · simp [cost,ca,cb]
+    · simp [cost,ca,cb]
+    · exact False.elim (c.elim ca cb)
+  · have ca : ¬Constant a := fun h => c (Or.inl h)
+    have cb : ¬Constant b := fun h => c (Or.inr h)
+    exact ⟨p+1,_,Reach.two op hp ha hb,Or.inl (by simp),fun _ h => available_cons _ h,
+      by simp [cost,ca,cb]⟩
+theorem comb_prime {R u} {bank : List (Wire R)} {d a b} (hd : allowed u d) (ha : Available u bank a) (hb : Available u bank b) :
+    ∃ op x y, comb d a b=combine op x y ∧ Available u bank x ∧ Available u bank y ∧ cost x=cost a ∧ cost y=cost b := by
+  rcases allowed_four hd with rfl | rfl | ⟨hu,rfl⟩ | ⟨hu,rfl⟩
+  · exact ⟨false,a,b,rfl,ha,hb,rfl,rfl⟩
+  · exact ⟨true,a,b,rfl,ha,hb,rfl,rfl⟩
+  · exact ⟨false,a,inv b,rfl,ha,avail_inv hu hb,rfl,cost_inv b⟩
+  · exact ⟨false,inv a,b,rfl,avail_inv hu ha,hb,cost_inv a,rfl⟩
+theorem extend_comb {R u} (roots : List (Wire R)) {p bank a b} (d) (hd : allowed u d) (hp : Reach u roots p bank)
+    (ha : Available u bank a) (hb : Available u bank b) :
+    ∃ q next, Reach u roots q next ∧ Available u next (comb d a b) ∧
+        (∀ v, Available u bank v → Available u next v) ∧
+        q+cost a+cost b ≤ p+1+cost (comb d a b) := by
+  obtain ⟨op,x,y,e,hx,hy,cx,cy⟩ := comb_prime hd ha hb
+  rw [e,←cx,←cy]
+  exact extend_two roots op hp hx hy
+
+theorem mem_kept {α : Type} {k : Bool} {x a : α} {xs} (h : x ∈ kept k a xs) :
+    x=a ∨ x∈xs := by cases k <;> simp_all [kept]
+
+theorem contraction {R u} {goal : Wire R} (nc : ¬Constant goal) {s ws}
+    (h : Run u goal s ws) (roots : List (Wire R)) {p bank}
+    (hp : Reach u roots p bank) (hs : supply u bank ws) :
+    ∃ q next, Reach u roots q next ∧ Available u next goal ∧ q+mass ws ≤ p+s := by
+  classical
+  induction h using Run.ind generalizing p bank with
+  | stop =>
+    exact ⟨p,bank,hp,hs _ (by simp),by simp [mass,cost,nc]⟩
+  | perm eq _ ih =>
+    have hsub : supply u bank _ := fun v hv => hs v (eq.mem_iff.mp hv)
+    obtain ⟨q,W,hW,hv,hl⟩ := ih hp hsub
+    exact ⟨q,W,hW,hv,by simpa only [mass,←(eq.map cost).sum_eq] using hl⟩
+  | @two s a b rest op hd ka kb _ ih =>
+    obtain ⟨r,T,hT,hz,inc,le⟩ := extend_comb roots op hd hp (hs a (by simp)) (hs b (by simp))
+    have ht : supply u T (comb op a b :: kept ka a (kept kb b rest)) := by
+      intro v h
+      rcases List.mem_cons.mp h with rfl | hh
+      · exact hz
+      · apply inc v
+        apply hs
+        rcases mem_kept hh with rfl | hh
+        · simp
+        · exact List.mem_cons_of_mem _ (List.mem_cons.mpr (mem_kept hh))
+    obtain ⟨q,W,hW,hv,hl⟩ := ih hT ht
+    have hlen := mass_kept a (kept kb b rest) ka
+    have hlen' := mass_kept b rest kb
+    rw [mass_cons] at hl
+    refine ⟨q,W,hW,hv,?_⟩
+    rw [mass_cons,mass_cons]
+    omega
+
+def restrictRows {R S : Type} (rows : S → R) (a : Wire R) : Wire S :=
+  fun r => a (rows r)
+
+theorem restrict_kept {R S : Type} (rows : S → R) (k : Bool) (a : Wire R) (ws) :
+    (kept k a ws).map (restrictRows rows) =
+    kept k (restrictRows rows a) (ws.map (restrictRows rows)) := by
+  cases k <;> simp [kept]
+
+theorem restrict_comb {R S : Type} (rows : S → R) (d) (a b : Wire R) :
+    restrictRows rows (comb d a b) = comb d (restrictRows rows a) (restrictRows rows b) := by
+  unfold comb
+  split_ifs <;> rfl
+theorem restrict_run {R S : Type} {u} (rows : S → R) {goal s ws} (h : Run u goal s ws) :
+    Run u (restrictRows rows goal) s (ws.map (restrictRows rows)) := by
+  induction h using Run.ind with
+  | stop => exact Run.stop
+  | perm p _ ih => exact Run.perm (p.map _) ih
+  | two op hd ka kb _ ih =>
+    simp only [List.map_cons,restrict_kept,restrict_comb] at ih ⊢
+    exact Run.two op hd ka kb ih
+
+theorem projected_bound {R S : Type} {u} (rows : S → R) {goal s ws} (h : Run u goal s ws)
+    (nc : ¬Constant (restrictRows rows goal)) {roots : List (Wire S)} {p bank L}
+    (hp : Reach u roots p bank) (hs : supply u bank (ws.map (restrictRows rows)))
+    (hl : ∀ q bs, Reach u roots q bs → Available u bs (restrictRows rows goal) → L ≤ q) :
+    L + mass (ws.map (restrictRows rows)) ≤ p+s := by
+  obtain ⟨q,bs,hq,ht,hle⟩ := contraction nc (restrict_run rows h) roots hp hs
+  have hqle := hl q bs hq ht
+  omega
+
+abbrev Row := Fin 128
+def observe (a : Sig) : Wire Row := fun r => bit r a
+def table (f : Wire Row) : Sig :=
+  (BitVec.ofBoolListLE (List.ofFn f)).cast (List.length_ofFn)
+
+theorem bit_table (f : Wire Row) (r : Row) : bit r (table f) = f r := by
+  simp only [bit,table,BitVec.getLsbD_cast,BitVec.getLsbD_ofBoolListLE,List.getD_eq_getElem?_getD,List.getElem?_ofFn]; simp [r.isLt]
+
+theorem table_observe (v : Sig) : table (observe v) = v := by
+  apply BitVec.eq_of_getLsbD_eq
+  intro j hj
+  exact bit_table (observe v) ⟨j,hj⟩
+
+theorem observe_table (f : Wire Row) : observe (table f) = f := by
+  funext r
+  exact bit_table f r
+
+theorem obs_neg (a : Sig) : observe (neg a) = inv (observe a) := by
+  funext r
+  exact bit_neg _ _
+
+theorem obs_bin (d : Nat) (a b : Sig) :
+    observe (bin d a b) = comb d (observe a) (observe b) := by
+  funext r
+  simp only [observe,bit_bin,comb]
+  split_ifs <;> rfl
+
+theorem map_kept {α β : Type} (f : α → β) (d : Bool) (a : α) (l : List α) :
+    (kept d a l).map f = kept d (f a) (l.map f) := by cases d <;> rfl
+
+theorem kept_nd {α : Type} (k : Bool) (a : α) (l : List α)
+    (hn : l.Nodup) (ha : a ∉ l) : (kept k a l).Nodup := by cases k <;> simp [kept,hn,ha]
+
+theorem kept_fin (k : Bool) (a : Sig) (l : List Sig) :
+    (kept k a l).toFinset = if k then insert a l.toFinset else l.toFinset := by
+  cases k <;> simp [kept]
+
+theorem list_run {u} {T : Sig} {k S} (h : Live u T k S) (v : List Sig)
+    (hv : v.Nodup) (eqv : v.toFinset = S) : Run u (observe T) k (v.map observe) := by
+  classical
+  induction h using Live.ind generalizing v with
+  | stop hp =>
+    have eq : [T].Perm v := by
+      apply List.perm_of_nodup_nodup_toFinset_eq (by simp) hv
+      simpa [eqv]
+    exact Run.perm (eq.map _) Run.stop
+  | @binary k U a b d hd ha hb hab fresh _ ih =>
+    let rest := ((U.erase a).erase b).toList
+    let ka := decide (a ∈ U)
+    let kb := decide (b ∈ U)
+    let mid := kept kb b rest
+    let tail := kept ka a mid
+    have er : rest.toFinset = (U.erase a).erase b := by simp [rest]
+    have ar : a ∉ rest := by simp [rest]
+    have br : b ∉ rest := by simp [rest]
+    have hr : rest.Nodup := Finset.nodup_toList _
+    have bm := kept_nd kb b rest hr br
+    have am : a ∉ mid := by cases h : kb <;> simp [mid,kept,h,hab,ar]
+    have nd := kept_nd ka a mid bm am
+    have ht : tail.toFinset = U := by
+      change (kept ka a (kept kb b rest)).toFinset = U
+      rw [kept_fin,kept_fin,er]
+      ext j
+      by_cases aa : a ∈ U <;> by_cases bb : b ∈ U <;> by_cases aj : j=a <;>
+        by_cases bj : j=b <;> simp_all [ka,kb]
+    have hf : bin d a b ∉ tail := by
+      intro hz
+      exact fresh (Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (ht ▸ List.mem_toFinset.mpr hz)))
+    have progress := ih (bin d a b::tail) (List.nodup_cons.mpr ⟨hf,nd⟩) (by simp [ht])
+    change Run _ _ _ ((bin d a b::kept ka a (kept kb b rest)).map observe) at progress
+    rw [List.map_cons,map_kept,map_kept,obs_bin] at progress
+    have perm : (a::b::rest).Perm v := by
+      apply List.perm_of_nodup_nodup_toFinset_eq (by simp [hab,ar,br,hr]) hv
+      ext j
+      by_cases ja : j=a <;> by_cases jb : j=b <;> simp_all [er]
+    exact Run.perm (perm.map _) (Run.two d hd ka kb progress)
+
+theorem table_inv (f : Wire Row) : table (inv f) = neg (table f) := by
+  rw [←table_observe (neg (table f)),obs_neg,observe_table]
+
+theorem table_prime (d : Bool) (f g : Wire Row) :
+    table (combine d f g) = prime d (table f) (table g) := by
+  apply bit_ext
+  intro r
+  rw [bit_table,bit_prime,bit_table,bit_table]
+  cases d <;> rfl
+
+theorem available_rep {u} {bank : List (Wire Row)} {a} (h : Available u bank a) :
+    Repr u ((bank.map table).map (nrm u)) (table a) := by
+  rcases h with hm | ⟨b,rfl⟩ | ⟨rfl,hm⟩
+  · exact Or.inl (List.mem_map_of_mem (List.mem_map_of_mem hm))
+  · apply repr_const
+    cases b
+    · exact Or.inl (bit_ext fun i => (bit_table _ i).trans (bit_zero i).symm)
+    · exact Or.inr (bit_ext fun i => (bit_table _ i).trans (bit_one i).symm)
+  · have := table_inv a
+    refine Or.inl ?_
+    rw [←nrm_neg,←this]
+    exact List.mem_map_of_mem (List.mem_map_of_mem hm)
+
+theorem reach_live_sub {u} {roots : List (Wire Row)} {p bank}
+    (h : Reach u roots p bank) {T k S} (run : Live u T k S)
+    (sub : ∀ a ∈ S, a ∈ (bank.map table).map (nrm u)) :
+    ∃ l V, l ≤ p+k ∧ Live u T l V ∧ ∀ a ∈ V, a ∈ (roots.map table).map (nrm u) := by
+  induction h using Reach.ind generalizing k S with
+  | start => exact ⟨k,S,by omega,run,sub⟩
+  | @two p bank a b d h ha hb ih =>
+    rw [List.map_cons,List.map_cons,table_prime] at sub
+    have rep := prime_rep d (available_rep ha) (available_rep hb)
+    obtain ⟨k',S',hk,run',sub'⟩ := pull_gate (c:=1) run (rep.imp id (fun h => ⟨rfl,h⟩))
+      (fun a hm => by simpa [or_comm] using sub a hm)
+    obtain ⟨l,V,hl,hr,hs⟩ := ih run' sub'
+    exact ⟨l,V,by omega,hr,hs⟩
+
+def plainWord (a : Sig) : Bool := !(bit 0 a)
+theorem nrm_map {u} {w : List Sig} (h : w.all plainWord=true) : w.map (nrm u)=w := by
+  have e : w.map (nrm u) = w.map id := by
+    apply List.map_congr_left
+    intro a ha
+    exact nrm_id (by simpa [plainWord] using List.all_eq_true.mp h a ha)
+  rw [e,List.map_id]
+theorem reach_live {u} {roots : List Sig} {p bank T} (hp : proper T) (nT : plainWord T=true) (nR : roots.all plainWord=true)
+    (h : Reach u (roots.map observe) p bank) (hit : Available u bank (observe T)) :
+    ∃ k S, k ≤ p ∧ Live u T k S ∧ ∀ a ∈ S, a ∈ roots := by
+  have hm := available_rep hit
+  rw [table_observe] at hm
+  unfold Repr at hm
+  rw [nrm_id (by simpa [plainWord] using nT)] at hm
+  have mem := hm.resolve_right (fun hn => hn hp)
+  obtain ⟨l,V,hl,hr,hs⟩ := reach_live_sub h (Live.stop hp) (by simpa using mem)
+  refine ⟨l,V,by omega,hr,?_⟩
+  have e : (roots.map observe).map table = roots := by simp [List.map_map,Function.comp_def,table_observe]
+  rw [e,nrm_map nR] at hs
+  exact hs
+
+theorem live_row_difference {u T k S} (h : Live u T k S) {r s : Row}
+    (diff : bit r T ≠ bit s T) : ∃ a ∈ S, bit r a ≠ bit s a := by
+  induction h using Live.ind with
+  | stop hp => exact ⟨_,by simp,diff⟩
+  | @binary k U a b d hd ha hb hab hf _ ih =>
+    obtain ⟨v,hv,hd⟩ := ih
+    rcases Finset.mem_insert.mp hv with rfl | hu
+    · by_cases aeq : bit r a = bit s a
+      · refine ⟨b,by simp,?_⟩
+        intro beq
+        exact hd (by rw [bit_bin,bit_bin,aeq,beq])
+      · exact ⟨a,by simp,aeq⟩
+    · exact ⟨v,Finset.mem_insert_of_mem (Finset.mem_insert_of_mem hu),hd⟩
+
+theorem raw_required {u T k S} (h : Live u T k S) (roots : List Sig) (a : Sig)
+    (sub : ∀ v ∈ S, v ∈ roots) (r s : Row) (diff : bit r T ≠ bit s T)
+    (isolated : ∀ v ∈ roots, v ≠ a → bit r v = bit s v) : a ∈ S := by
+  obtain ⟨v,hv,hd⟩ := live_row_difference h diff
+  by_cases veq : v=a
+  · simpa [veq] using hv
+  · exact False.elim (hd (isolated v (sub v hv) veq))
+
+def rename (f : Row → Row) (a : Sig) := table fun r => bit (f r) a
+theorem bit_rename (f : Row → Row) (a : Sig) (r : Row) :
+    bit r (rename f a) = bit (f r) a := bit_table _ _
+theorem observe_rename (f : Row → Row) (a : Sig) :
+    observe (rename f a) = restrictRows f (observe a) := by funext r; exact bit_rename f a r
+theorem rename_bin (f : Row → Row) (d : Nat) (a b : Sig) :
+    rename f (bin d a b) = bin d (rename f a) (rename f b) := by
+  apply bit_ext
+  intro r
+  simp only [bit_rename,bit_bin]
+
+theorem rename_inj (f : Row → Row) (onto : Function.Surjective f) :
+    Function.Injective (rename f) := by
+  intro a b h
+  apply BitVec.eq_of_getLsbD_eq
+  intro j hj
+  obtain ⟨r,hr⟩ := onto ⟨j,hj⟩
+  have he := congrArg (bit r) h
+  change bit ⟨j,hj⟩ a = bit ⟨j,hj⟩ b
+  rw [bit_rename,bit_rename,hr] at he
+  exact he
+theorem rename_constants (f : Row → Row) : rename f zero = zero ∧ rename f one = one := by
+  constructor <;> apply BitVec.eq_of_getLsbD_eq <;> intro j hj
+  · exact (bit_rename f zero ⟨j,hj⟩).trans ((bit_zero _).trans (bit_zero ⟨j,hj⟩).symm)
+  · exact (bit_rename f one ⟨j,hj⟩).trans ((bit_one _).trans (bit_one ⟨j,hj⟩).symm)
+theorem live_rename {u T k S} (h : Live u T k S) (f : Row → Row) (onto : Function.Surjective f) :
+    Live u (rename f T) k (S.image (rename f)) := by
+  have inj := rename_inj f onto
+  obtain ⟨fz,fo⟩ := rename_constants f
+  have pp (v) (p : proper v) : proper (rename f v) :=
+    ⟨fun e => p.1 (inj (e.trans fz.symm)),fun e => p.2 (inj (e.trans fo.symm))⟩
+  induction h using Live.ind with
+  | stop hp => simpa using Live.stop (pp _ hp)
+  | @binary k U a b d hd ha hb hab hf _ ih =>
+    have fresh : rename f (bin d a b) ∉ (insert a (insert b U)).image (rename f) := by
+      intro hm
+      obtain ⟨v,hv,eq⟩ := Finset.mem_image.mp hm
+      exact hf (inj eq ▸ hv)
+    simp only [Finset.image_insert,rename_bin] at fresh ih ⊢
+    exact Live.binary hd (pp _ ha) (pp _ hb) (fun hh => hab (inj hh)) fresh ih
+
+theorem mono_row_difference {u T k S} (h : Live u T k S) (none : u=false) {r s : Row}
+    (pos : bit r T = true) (negRow : bit s T = false) :
+    ∃ a ∈ S, bit r a = true ∧ bit s a = false := by
+  induction h using Live.ind with
+  | stop hp => exact ⟨_,by simp,pos,negRow⟩
+  | @binary k U a b d hd ha hb hab hf _ ih =>
+    obtain ⟨v,hv,hp,hn⟩ := ih
+    rcases Finset.mem_insert.mp hv with rfl | hu
+    · rw [bit_bin] at hp hn
+      subst none
+      rcases allowed_four hd with rfl | rfl | ⟨h,_⟩ | ⟨h,_⟩
+      · cases p : bit r a <;> cases q : bit s a <;> cases u : bit r b <;> cases z : bit s b <;> simp_all
+      · cases p : bit r a <;> cases q : bit s a <;> cases u : bit r b <;> cases z : bit s b <;> simp_all
+      · exact Bool.noConfusion h
+      · exact Bool.noConfusion h
+    · exact ⟨v,Finset.mem_insert_of_mem (Finset.mem_insert_of_mem hu),hp,hn⟩
+
+def Lower (u : Bool) (roots : List Sig) (T : Sig) (L : Nat) : Prop :=
+  ∀ p bank, Reach u (roots.map observe) p bank → Available u bank (observe T) → L ≤ p
+theorem reach_up {R u} {roots : List (Wire R)} {p bank} (h : Reach false roots p bank) : Reach u roots p bank := by
+  have up {bank : List (Wire R)} {a} (h : Available false bank a) : Available u bank a :=
+    h.imp id (Or.imp id (fun h => Bool.noConfusion h.1))
+  induction h using Reach.ind with
+  | start => exact Reach.start
+  | two op h ha hb ih => exact Reach.two op ih (up ha) (up hb)
+theorem lower_down {u roots T L} (h : Lower true roots T L) : Lower u roots T L := by
+  cases u
+  · exact fun p bank hr ha => h p bank (reach_up hr) (ha.imp id (Or.imp id (fun h => Bool.noConfusion h.1)))
+  · exact h
+
+def Impossible (u : Bool) (T : Sig) (cap : Nat) (S : Finset Sig) : Prop :=
+  ∀ k, k ≤ cap → ¬Live u T k S
+
+def Essential (T : Sig) (roots : List Sig) (a : Sig) : Prop :=
+  ∃ r s : Row, bit r T ≠ bit s T ∧ ∀ v ∈ roots, v ≠ a → bit r v = bit s v
+
+theorem lower_impossible {u roots T L} (hp : proper T) (nT : plainWord T=true) (nR : roots.all plainWord=true)
+    (essential : ∀ a ∈ roots, Essential T roots a)
+    (noRun : Impossible u T L roots.toFinset) : Lower u roots T (L+1) := by
+  intro p bank h ha
+  obtain ⟨k,S,hk,run,hs⟩ := reach_live hp nT nR h ha
+  have he : roots.toFinset = S := by
+    ext a
+    rw [List.mem_toFinset]
+    refine ⟨fun hm => ?_,hs a⟩
+    obtain ⟨r,s,hd,iso⟩ := essential _ hm
+    exact raw_required run roots a hs r s hd iso
+  by_contra! small
+  exact noRun k (by omega) (he.symm ▸ run)
+
+theorem observe_proper {v : Sig} (hv : proper v) : ¬Constant (observe v) := by
+  rintro ⟨b,h⟩
+  have hr : Repr false [] v := by
+    apply repr_const
+    cases b
+    · exact Or.inl (bit_ext fun i => (congrFun h i).trans (bit_zero i).symm)
+    · exact Or.inr (bit_ext fun i => (congrFun h i).trans (bit_one i).symm)
+  have hr' : represented [] v := hr
+  exact (hr'.resolve_left (by simp)) hv
+
+theorem mass_append {R} (a b : List (Wire R)) : mass (a++b) = mass a + mass b := by
+  simp [mass]
+theorem mass_constants {R} (xs : List (Wire R)) (hc : ∀ x ∈ xs, Constant x) :
+    mass xs = xs.length := by
+  induction xs with
+  | nil => simp [mass]
+  | cons a xs ih =>
+    have ha := hc a (by simp)
+    simp only [mass_cons,List.length_cons,cost,if_pos ha,ih (fun x hx => hc x (by simp [hx]))]
+    omega
+
+theorem lower_slice {u} {roots other : List Sig} {T G : Sig} (pT : proper T) (nT : plainWord T=true) (nR : roots.all plainWord=true) (pG : proper G)
+    (r : Row → Row) (eq : rename r T = G)
+    (covered : ∀ a ∈ roots, Available u (other.map observe) (observe (rename r a)))
+    (singles : Finset Sig) (necessary : ∀ a ∈ singles, Essential T roots a)
+    (constant : ∀ a ∈ singles, Constant (observe (rename r a)))
+    (L : Nat) (prior : Lower u other G L) : Lower u roots T (L + singles.card) := by
+  classical
+  intro p bank hh ha
+  obtain ⟨k,S,hk,run,sub⟩ := reach_live pT nT nR hh ha
+  have subS : singles ⊆ S := by
+    intro a hs
+    obtain ⟨i,j,hd,hiso⟩ := necessary a hs
+    exact raw_required run roots a sub i j hd hiso
+  let front := singles.toList ++ (S \ singles).toList
+  have nd : front.Nodup := by
+    simp only [front,List.nodup_append]
+    refine ⟨Finset.nodup_toList _,Finset.nodup_toList _,?_⟩
+    intro a ha b hb he
+    subst b
+    exact (Finset.mem_sdiff.mp (Finset.mem_toList.mp hb)).2 (Finset.mem_toList.mp ha)
+  have fe : front.toFinset=S := by ext a; simp [front,Finset.union_sdiff_of_subset subS]
+  have run' := list_run run front nd fe
+  have gc : restrictRows r (observe T) = observe G := (observe_rename _ _).symm.trans (congrArg observe eq)
+  have supp : supply u (other.map observe) ((front.map observe).map (restrictRows r)) := by
+    intro v hv
+    obtain ⟨_,hm,rfl⟩ := List.mem_map.mp hv
+    obtain ⟨a,hmem,rfl⟩ := List.mem_map.mp hm
+    rw [←observe_rename]
+    exact covered a (sub _ (fe ▸ List.mem_toFinset.mpr hmem))
+  have bound := projected_bound r run' (gc ▸ observe_proper pG) Reach.start supp
+    (L:=L) (gc ▸ prior)
+  have massLo : singles.card ≤ mass ((front.map observe).map (restrictRows r)) := by
+    simp only [front,List.map_append,mass_append]
+    let xs := (singles.toList.map observe).map (restrictRows r)
+    have only : ∀ v ∈ xs, Constant v := by
+      intro v hv
+      obtain ⟨_,hm,rfl⟩ := List.mem_map.mp hv
+      obtain ⟨a,hmem,rfl⟩ := List.mem_map.mp hm
+      rw [←observe_rename]
+      exact constant _ (Finset.mem_toList.mp hmem)
+    have sz := mass_constants xs only
+    simp only [xs,List.length_map,Finset.length_toList] at sz
+    change singles.card ≤ mass xs + _
+    rw [sz]
+    omega
+  omega
+
+def childTwo (ws : List Sig) (a b : Sig) (d : Nat) (ka kb : Bool) : List Sig :=
+  bin d a b :: kept ka a (kept kb b ((ws.erase a).erase b))
+
+theorem erase_fin {l : List Sig} (h : l.Nodup) (a : Sig) : (l.erase a).toFinset = l.toFinset.erase a := by
+  ext x
+  simp [h.mem_erase_iff]
+
+theorem enum_step {u} {T : Sig} {cap : Nat} {ws : List Sig} (hn : ws.Nodup) (out : T ∉ ws)
+    (twoStep : ∀ a ∈ ws, ∀ b ∈ ws, ∀ d, allowed u d → ∀ ka kb, a ≠ b → bin d a b ∉ ws →
+      proper (bin d a b) → (childTwo ws a b d ka kb).length ≤ cap →
+      Impossible u T (cap-1) (childTwo ws a b d ka kb).toFinset) :
+    Impossible u T cap ws.toFinset := by
+  classical
+  intro k hk h
+  generalize he : ws.toFinset = S at h
+  induction h using Live.ind with
+  | stop hp =>
+    have mem : T ∈ ws.toFinset := he.symm ▸ Finset.mem_singleton_self _
+    exact out (List.mem_toFinset.mp mem)
+  | @binary k U a b d hd ha hb hab hf tail _ =>
+    have am : a ∈ ws := List.mem_toFinset.mp (he.symm ▸ Finset.mem_insert_self _ _)
+    have bm : b ∈ ws := List.mem_toFinset.mp (he.symm ▸ Finset.mem_insert_of_mem (Finset.mem_insert_self _ _))
+    have fresh : bin d a b ∉ ws := fun h => hf (he ▸ List.mem_toFinset.mpr h)
+    have hz := live_proper tail _ (Finset.mem_insert_self _ _)
+    let ka := decide (a ∈ U)
+    let kb := decide (b ∈ U)
+    let rest := (ws.erase a).erase b
+    have er : rest.toFinset = (ws.toFinset.erase a).erase b := by
+      rw [show rest=(ws.erase a).erase b by rfl,erase_fin (hn.erase _) b,
+        erase_fin hn a]
+    have ke : (kept ka a (kept kb b rest)).toFinset = U := by
+      rw [kept_fin,kept_fin,er,he]
+      ext j
+      by_cases aa : a ∈ U <;> by_cases bb : b ∈ U <;> by_cases ja : j=a <;>
+        by_cases jb : j=b <;> simp_all [ka,kb]
+    have rn : rest.Nodup := (hn.erase _).erase _
+    have ar : a ∉ rest := fun h => (hn.not_mem_erase) (List.mem_of_mem_erase h)
+    have br : b ∉ rest := (hn.erase a).not_mem_erase
+    have nk := kept_nd kb b rest rn br
+    have ax : a ∉ kept kb b rest := by cases kb <;> simp [kept,ar,hab]
+    have nd : (childTwo ws a b d ka kb).Nodup := by
+      refine List.nodup_cons.mpr ⟨?_,kept_nd ka a _ nk ax⟩
+      intro h
+      exact hf (Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (ke ▸ List.mem_toFinset.mpr h)))
+    have eq : (childTwo ws a b d ka kb).toFinset = insert (bin d a b) U := by
+      change (bin d a b::kept ka a (kept kb b rest)).toFinset = _
+      simp [ke]
+    have sc := live_size tail
+    have len : (childTwo ws a b d ka kb).length ≤ cap := by
+      rw [←List.toFinset_card_of_nodup nd,eq]
+      omega
+    exact twoStep a am b bm d hd ka kb hab fresh hz len k (by omega) (eq.symm ▸ tail)
+
+def Sep (T : Sig) (width : Nat) (pos negRow : Fin width → Row)
+    (asig : Sig → BitVec width × BitVec width) : Prop :=
+  (∀ i, bit (pos i) T = true ∧ bit (negRow i) T = false) ∧
+  ∀ w i, (asig w).1.getLsbD i.val = bit (pos i) w ∧
+    (asig w).2.getLsbD i.val = bit (negRow i) w
+
+def column {n} (oriented : Bool) (s : BitVec n × BitVec n) : BitVec n :=
+  if oriented then s.1 &&& ~~~s.2 else s.1 ^^^ s.2
+
+def covered {n} (oriented : Bool) (sig : Sig → BitVec n × BitVec n) : List Sig → BitVec n
+  | [] => 0
+  | a::ws => column oriented (sig a) ||| covered oriented sig ws
+
+theorem covered_bit {n : Nat} {oriented : Bool} {sig : Sig → BitVec n × BitVec n} {ws : List Sig} {i : Fin n} :
+    (covered oriented sig ws).getLsbD i.val = true ↔
+    ∃ a ∈ ws, (column oriented (sig a)).getLsbD i.val = true := by
+  induction ws with
+  | nil => simp [covered]
+  | cons a ws ih =>
+    simp only [covered,BitVec.getLsbD_or,Bool.or_eq_true,ih,List.mem_cons,exists_eq_or_imp]
+
+theorem cover_sound {u T k S} (h : Live u T k S) {ws : List Sig} (he : ws.toFinset=S)
+    {width : Nat} {r s : Fin width → Row} {sig} (correct : Sep T width r s sig)
+    (oriented : Bool) (zeroNot : oriented=true → u=false) :
+    covered oriented sig ws = BitVec.allOnes width := by
+  apply BitVec.eq_of_getLsbD_eq
+  intro j hj
+  let i : Fin width := ⟨j,hj⟩
+  have yes := (correct.1 i).1
+  have no := (correct.1 i).2
+  rw [BitVec.getLsbD_allOnes]; simp only [hj,decide_true]
+  apply (covered_bit (i:=i)).mpr
+  cases oriented with
+  | false =>
+    obtain ⟨a,ha,hd⟩ := live_row_difference h (show bit (r i) T ≠ bit (s i) T by simp [yes,no])
+    refine ⟨a,List.mem_toFinset.mp (he.symm ▸ ha),?_⟩
+    simp only [column,Bool.false_eq_true,ite_false,BitVec.getLsbD_xor,(correct.2 a i).1,(correct.2 a i).2]
+    cases hx : bit (r i) a <;> cases hy : bit (s i) a <;> simp_all
+  | true =>
+    obtain ⟨a,ha,hp,hn⟩ := mono_row_difference h (zeroNot rfl) yes no
+    refine ⟨a,List.mem_toFinset.mp (he.symm ▸ ha),?_⟩
+    simp only [column,ite_true,BitVec.getLsbD_and,BitVec.getLsbD_not,i.isLt,decide_true,
+      Bool.true_and,(correct.2 a i).1,(correct.2 a i).2,hp,hn,Bool.not_false,Bool.and_self]
+
+theorem cover_required {u T ws k} (h : Live u T k (List.toFinset ws)) {n : Nat} {r s : Fin n → Row} {sig}
+    (correct : Sep T n r s sig) :
+    covered (!u) sig ws = BitVec.allOnes n := by
+  apply cover_sound h rfl correct
+  simp
+
+def Slice (u : Bool) (raw : List Sig) (T d : Sig) (L : Nat) : Prop :=
+  ∃ (f : Row → Row) (roots : List Sig), (∀ r, bit (f r) d = true) ∧
+    (∀ a ∈ raw, Available u (roots.map observe) (restrictRows f (observe a))) ∧
+    ¬Constant (restrictRows f (observe T)) ∧
+    ∀ p bank, Reach u (roots.map observe) p bank → Available u bank (restrictRows f (observe T)) → L ≤ p
+
+def masked (d a : Sig) := a &&& d
+def availableB (u : Bool) (d : Sig) (pool : List Sig) (a : Sig) :=
+  let m := masked d a
+  m == zero || m == d || (pool.map (masked d)).any (fun v => v==m) ||
+    (u && (let c := masked d (neg a); (pool.map (masked d)).any (fun v => v==c)))
+
+theorem masked_eq {f : Row → Row} {d a b : Sig} (dom : ∀ r, bit (f r) d = true)
+    (eq : masked d a = masked d b) :
+    restrictRows f (observe a) = restrictRows f (observe b) := by
+  funext r
+  have h := congrArg (bit (f r)) eq
+  change bit (f r) a = bit (f r) b
+  simpa only [bit,masked,BitVec.getLsbD_and,show d.getLsbD (f r).val = true from dom r,
+    Bool.and_true] using h
+
+theorem masked_zero {f : Row → Row} {d a : Sig} (dom : ∀ r, bit (f r) d = true)
+    (eq : masked d a = zero) : restrictRows f (observe a) = fun _ => false := by
+  funext r
+  have he := congrArg (bit (f r)) eq
+  change bit (f r) a = false
+  rw [bit_zero] at he
+  simpa only [bit,masked,BitVec.getLsbD_and,show d.getLsbD (f r).val = true from dom r,
+    Bool.and_true] using he
+
+theorem masked_one {f : Row → Row} {d a : Sig} (dom : ∀ r, bit (f r) d = true)
+    (eq : masked d a = d) : restrictRows f (observe a) = fun _ => true := by
+  funext r
+  have he := congrArg (bit (f r)) eq
+  change bit (f r) a = true
+  rw [dom r] at he
+  simpa only [bit,masked,BitVec.getLsbD_and,show d.getLsbD (f r).val = true from dom r,
+    Bool.and_true] using he
+
+def poolSupply (u : Bool) (f : Row → Row) (bank : List (Wire Row)) (pool : List Sig) :=
+  ∀ a ∈ pool, Available u bank (restrictRows f (observe a))
+
+theorem availableB_sound {u} {f : Row → Row} {d a : Sig} {bank pool}
+    (dom : ∀ r, bit (f r) d = true) (supplyB : poolSupply u f bank pool)
+    (check : availableB u d pool a = true) : Available u bank (restrictRows f (observe a)) := by
+  simp only [availableB,List.any_map,Function.comp_def,Bool.or_eq_true,Bool.and_eq_true,beq_iff_eq,List.any_eq_true] at check
+  rcases check with ((hz | ho) | ⟨v,hv,he⟩) | ⟨hu,v,hv,he⟩
+  · exact Or.inr (Or.inl ⟨false,masked_zero dom hz⟩)
+  · exact Or.inr (Or.inl ⟨true,masked_one dom ho⟩)
+  · exact masked_eq dom he ▸ supplyB v hv
+  · have h := avail_inv hu (masked_eq dom he ▸ supplyB v hv)
+    rw [obs_neg] at h
+    have e : inv (restrictRows f (inv (observe a))) = restrictRows f (observe a) := by
+      funext r
+      simp [inv,restrictRows]
+    rwa [e] at h
+
+def W (a : Nat) : Sig := BitVec.ofNat 128 a
+def full : Nat := 0xffffffffffffffffffffffffffffffff
+def xN : Nat → Nat
+  | 0 => 0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  | 1 => 0xcccccccccccccccccccccccccccccccc
+  | 2 => 0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0
+  | 3 => 0xff00ff00ff00ff00ff00ff00ff00ff00
+  | 4 => 0xffff0000ffff0000ffff0000ffff0000
+  | 5 => 0xffffffff00000000ffffffff00000000
+  | _ => 0xffffffffffffffff0000000000000000
+def nb (o a b : Nat) : Nat :=
+  bif Nat.beq o 0 then Nat.land a b else bif Nat.beq o 1 then Nat.lor a b else
+    bif Nat.beq o 2 then Nat.xor a (Nat.land a b) else Nat.xor b (Nat.land a b)
+theorem bit_W (r : Row) (a : Nat) : bit r (W a) = a.testBit r.val := by
+  unfold bit W
+  rw [BitVec.getLsbD_ofNat]
+  simp [r.isLt]
+theorem tb_land (a b i : Nat) : (Nat.land a b).testBit i = (a.testBit i && b.testBit i) := Nat.testBit_and ..
+theorem tb_lor (a b i : Nat) : (Nat.lor a b).testBit i = (a.testBit i || b.testBit i) := Nat.testBit_or ..
+theorem tb_xor (a b i : Nat) : (Nat.xor a b).testBit i = (a.testBit i ^^ b.testBit i) := Nat.testBit_xor ..
+theorem nbeq {a b : Nat} (h : a ≠ b) : Nat.beq a b = false := by
+  cases e : Nat.beq a b
+  · rfl
+  · exact absurd (Nat.eq_of_beq_eq_true e) h
+theorem W_nb (o a b : Nat) : W (nb o a b) = bin o (W a) (W b) := by
+  apply bit_ext
+  intro r
+  rw [bit_bin,bit_W,bit_W,bit_W]
+  by_cases h0 : o = 0
+  · subst h0
+    exact tb_land a b _
+  by_cases h1 : o = 1
+  · subst h1
+    exact tb_lor a b _
+  by_cases h2 : o = 2
+  · subst h2
+    change (Nat.xor a (Nat.land a b)).testBit r.val = _
+    rw [tb_xor,tb_land]
+    cases a.testBit r.val <;> cases b.testBit r.val <;> rfl
+  · unfold nb
+    rw [nbeq h0,nbeq h1,nbeq h2,if_neg h0,if_neg h1,if_neg h2]
+    change (Nat.xor b (Nat.land a b)).testBit r.val = _
+    rw [tb_xor,tb_land]
+    cases a.testBit r.val <;> cases b.testBit r.val <;> rfl
+theorem bin_four (u : Bool) (o : Nat) (h : (u || Nat.blt o 2) = true) : ∃ e, allowed u e ∧ ∀ a b, bin o a b = bin e a b := by
+  cases u
+  · refine ⟨o,Or.inl ?_,fun _ _ => rfl⟩
+    simpa only [Bool.false_or,Nat.blt_eq] using h
+  · by_cases h : o < 4
+    · exact ⟨o,Or.inr ⟨rfl,h⟩,fun _ _ => rfl⟩
+    · refine ⟨3,Or.inr ⟨rfl,by omega⟩,fun a b => ?_⟩
+      have h0 : o ≠ 0 := by omega
+      have h1 : o ≠ 1 := by omega
+      have h2 : o ≠ 2 := by omega
+      simp [bin,h0,h1,h2]
+theorem W_zero : W 0 = zero := rfl
+theorem W_full : W full = one := by
+  apply bit_ext
+  intro r
+  rw [bit_W,bit_one]
+  revert r
+  decide +kernel
+theorem W_inj {a b : Nat} (ha : a < 2^128) (hb : b < 2^128) (h : W a = W b) : a = b := by
+  have := congrArg BitVec.toNat h
+  simpa only [W,BitVec.toNat_ofNat,Nat.mod_eq_of_lt ha,Nat.mod_eq_of_lt hb] using this
+
+def rootsW (R : List Nat) : List Sig := R.map fun i => W (xN i)
+def LowN (u : Bool) (R : List Nat) (T L : Nat) : Prop := Lower u (rootsW R) (W T) L
+abbrev SliceD := Nat × Nat × List Nat
+def SliceN (u : Bool) (R : List Nat) (T : Nat) (s : SliceD) : Prop :=
+  Slice u (rootsW R) (W T) (W s.1) s.2.1 ∧ ∀ v ∈ s.2.2, v ∈ R
+
+def baseOK (T : Nat) (R : List Nat) (E : List (Nat × Nat × Nat)) : Bool :=
+  decide (T < 2^128) && !(T.testBit 0) && (E.map Prod.fst == R) && !R.isEmpty && decide (rootsW R).Nodup &&
+  R.all (fun i => !((xN i).testBit 0)) &&
+  E.all (fun e => decide (e.2.1 < 128) && decide (e.2.2 < 128) && (T.testBit e.2.1 != T.testBit e.2.2) &&
+    R.all (fun i => i == e.1 || (xN i).testBit e.2.1 == (xN i).testBit e.2.2))
+
+abbrev BaseP (T : Nat) (R : List Nat) : Prop :=
+  T < 2^128 ∧ plainWord (W T) = true ∧ (rootsW R).Nodup ∧ (rootsW R).all plainWord = true ∧
+  (∀ a ∈ rootsW R, Essential (W T) (rootsW R) a) ∧ proper (W T)
+theorem BaseP.lt {T R} (h : BaseP T R) : T < 2^128 := h.1
+theorem BaseP.plain {T R} (h : BaseP T R) : plainWord (W T) = true := h.2.1
+theorem BaseP.nodup {T R} (h : BaseP T R) : (rootsW R).Nodup := h.2.2.1
+theorem BaseP.plainR {T R} (h : BaseP T R) : (rootsW R).all plainWord = true := h.2.2.2.1
+theorem BaseP.ess {T R} (h : BaseP T R) : ∀ a ∈ rootsW R, Essential (W T) (rootsW R) a := h.2.2.2.2.1
+theorem BaseP.prop {T R} (h : BaseP T R) : proper (W T) := h.2.2.2.2.2
+
+theorem baseOK_ok {T R E} (h : baseOK T R E = true) : BaseP T R := by
+  simp only [baseOK,Bool.and_eq_true,decide_eq_true_eq,beq_iff_eq,Bool.not_eq_true',List.all_eq_true] at h
+  obtain ⟨⟨⟨⟨⟨⟨hT,h0⟩,hE⟩,hne⟩,nd⟩,pr⟩,he⟩ := h
+  have ess : ∀ a ∈ rootsW R, Essential (W T) (rootsW R) a := by
+    intro a ha
+    obtain ⟨i,hi,rfl⟩ := List.mem_map.mp ha
+    rw [←hE] at hi
+    obtain ⟨e,hem,rfl⟩ := List.mem_map.mp hi
+    obtain ⟨⟨⟨h1,h2⟩,h3⟩,h4⟩ := he e hem
+    refine ⟨⟨e.2.1,h1⟩,⟨e.2.2,h2⟩,?_,?_⟩
+    · rw [bit_W,bit_W]
+      simpa using h3
+    · intro v hv hne
+      obtain ⟨j,hj,rfl⟩ := List.mem_map.mp hv
+      rw [bit_W,bit_W]
+      have := h4 j hj
+      simp only [Bool.or_eq_true,beq_iff_eq] at this
+      rcases this with rfl | this
+      · exact absurd rfl hne
+      · exact this
+  refine ⟨hT,?_,nd,?_,ess,?_⟩
+  · have : bit 0 (W T) = false := (bit_W 0 T).trans h0
+    simp [plainWord,this]
+  · rw [List.all_eq_true]
+    intro a ha
+    obtain ⟨i,hi,rfl⟩ := List.mem_map.mp ha
+    have : bit 0 (W (xN i)) = false := (bit_W 0 _).trans (by simpa using pr i hi)
+    simp [plainWord,this]
+  · cases R with
+    | nil => simp at hne
+    | cons i R =>
+      obtain ⟨r,s,hd,_⟩ := ess (W (xN i)) (by simp [rootsW])
+      constructor
+      · intro hh
+        rw [hh,bit_zero,bit_zero] at hd
+        exact hd rfl
+      · intro hh
+        rw [hh,bit_one,bit_one] at hd
+        exact hd rfl
+
+theorem lowOf {u T R E K} (hB : baseOK T R E = true) (h : Impossible u (W T) K (rootsW R).toFinset) :
+    LowN u R T (K+1) := by
+  have b := baseOK_ok hB
+  exact lower_impossible b.prop b.plain b.plainR b.ess h
+theorem lowCount {u T R E K} (hB : baseOK T R E = true) (h : K + 2 ≤ R.length) : LowN u R T (K+1) := by
+  apply lowOf hB
+  intro k hk run
+  have b := baseOK_ok hB
+  have := live_size run
+  rw [List.toFinset_card_of_nodup b.nodup,rootsW,List.length_map] at this
+  omega
+
+def rowOf : List Nat → Nat → Nat → Nat
+  | [],w,_ => w
+  | v::vs,w,r => rowOf vs (w + ((r % 2) <<< v)) (r / 2)
+def sliceChk (R : List Nat) (T : Nat) (R' : List Nat) (G d : Nat) (vs : List Nat) (w : Nat) : Bool :=
+  vs.all (fun v => R.contains v) &&
+  (List.range 128).all (fun r => let q := rowOf vs w r
+    Nat.blt q 128 && d.testBit q && (T.testBit q == G.testBit r)) &&
+  R.all (fun i => (List.range 128).all (fun r => !((xN i).testBit (rowOf vs w r))) ||
+    (List.range 128).all (fun r => (xN i).testBit (rowOf vs w r)) ||
+    R'.any (fun j => (List.range 128).all (fun r => (xN i).testBit (rowOf vs w r) == (xN j).testBit r)))
+
+theorem mkSlice {u R T E R' G E' d L vs w} (_hB : baseOK T R E = true) (hB' : baseOK G R' E' = true)
+    (hL : LowN u R' G L) (h : sliceChk R T R' G d vs w = true) : SliceN u R T (d,L,vs) := by
+  have b' := baseOK_ok hB'
+  simp only [sliceChk,Bool.and_eq_true,List.all_eq_true,List.mem_range,Bool.or_eq_true,beq_iff_eq,
+    Bool.not_eq_true',List.any_eq_true,Nat.blt_eq,List.contains_eq_mem,decide_eq_true_eq] at h
+  obtain ⟨⟨hv,hr⟩,hR⟩ := h
+  let f : Row → Row := fun r => ⟨rowOf vs w r.val,(hr r.val r.isLt).1.1⟩
+  have fe (r : Row) (a : Nat) : bit (f r) (W a) = a.testBit (rowOf vs w r.val) := bit_W _ _
+  have obs : restrictRows f (observe (W T)) = observe (W G) := by
+    funext r
+    change bit (f r) (W T) = bit r (W G)
+    rw [fe,bit_W]
+    exact (hr r.val r.isLt).2
+  refine ⟨⟨f,rootsW R',?_,?_,?_,?_⟩,hv⟩
+  · intro r
+    rw [fe]
+    exact (hr r.val r.isLt).1.2
+  · intro a ha
+    obtain ⟨i,hi,rfl⟩ := List.mem_map.mp ha
+    rcases hR i hi with (h | h) | ⟨j,hj,h⟩
+    · refine Or.inr (Or.inl ⟨false,funext fun r => ?_⟩)
+      exact (fe r _).trans (h r.val r.isLt)
+    · refine Or.inr (Or.inl ⟨true,funext fun r => ?_⟩)
+      exact (fe r _).trans (h r.val r.isLt)
+    · have e : restrictRows f (observe (W (xN i))) = observe (W (xN j)) := by
+        funext r
+        exact (fe r _).trans ((h r.val r.isLt).trans (bit_W r _).symm)
+      rw [e]
+      exact Or.inl (List.mem_map_of_mem (List.mem_map_of_mem hj))
+  · rw [obs]
+    exact observe_proper b'.prop
+  · rw [obs]
+    exact hL
+
+def opOK (u : Bool) (o : Nat) : Bool := u || Nat.blt o 2
+def av (u : Bool) (d : Nat) (P : List Nat) (v : Nat) : Bool :=
+  let m := Nat.land v d
+  Nat.beq m 0 || Nat.beq m d || P.any (fun x => Nat.beq x m || (u && Nat.beq x (Nat.xor d m)))
+def cn (d v : Nat) : Nat :=
+  let m := Nat.land v d
+  bif Nat.beq m 0 || Nat.beq m d then 1 else 0
+def sumc (d : Nat) : List Nat → Nat
+  | [] => 0
+  | v::l => Nat.add (cn d v) (sumc d l)
+def mkPool (u : Bool) (P : List Nat) : List (Nat × Nat × Nat) → List Nat
+  | [] => P
+  | c::cs => mkPool u (bif opOK u c.1 then P ++ [nb c.1 (P.getD c.2.1 0) (P.getD c.2.2 0)] else P) cs
+def initPool (d : Nat) (vs : List Nat) : List Nat := vs.map fun v => Nat.land (xN v) d
+
+abbrev RF (f : Row → Row) (v : Nat) : Wire Row := restrictRows f (observe (W v))
+def PS (u : Bool) (f : Row → Row) (bank : List (Wire Row)) (P : List Nat) : Prop :=
+  ∀ v ∈ P, Available u bank (RF f v)
+theorem rf_apply (f : Row → Row) (v : Nat) (r : Row) : RF f v r = v.testBit (f r).val := bit_W _ _
+theorem rf_land {f : Row → Row} {d : Nat} (dom : ∀ r, bit (f r) (W d) = true) (v : Nat) :
+    RF f (Nat.land v d) = RF f v := by
+  funext r
+  have h := dom r
+  rw [bit_W] at h
+  rw [rf_apply,rf_apply]
+  have : (Nat.land v d).testBit (f r).val = (v.testBit (f r).val && d.testBit (f r).val) := Nat.testBit_and ..
+  rw [this,h,Bool.and_true]
+theorem rf_zero {f : Row → Row} : RF f 0 = fun _ => false := by
+  funext r
+  rw [rf_apply]
+  exact Nat.zero_testBit _
+theorem rf_dom {f : Row → Row} {d : Nat} (dom : ∀ r, bit (f r) (W d) = true) : RF f d = fun _ => true := by
+  funext r
+  exact dom r
+theorem rf_xor {f : Row → Row} {d : Nat} (dom : ∀ r, bit (f r) (W d) = true) (m : Nat) :
+    RF f (Nat.xor d m) = inv (RF f m) := by
+  funext r
+  have h := dom r
+  rw [bit_W] at h
+  change RF f (Nat.xor d m) r = !(RF f m r)
+  rw [rf_apply,rf_apply]
+  have : (Nat.xor d m).testBit (f r).val = ((d.testBit (f r).val) ^^ (m.testBit (f r).val)) := Nat.testBit_xor ..
+  rw [this,h,Bool.true_xor]
+theorem cn_ok {f : Row → Row} {d : Nat} (dom : ∀ r, bit (f r) (W d) = true) (v : Nat) : cn d v ≤ cost (RF f v) := by
+  change (bif (Nat.beq (Nat.land v d) 0 || Nat.beq (Nat.land v d) d) then 1 else 0) ≤ _
+  cases h : (Nat.beq (Nat.land v d) 0 || Nat.beq (Nat.land v d) d)
+  · exact Nat.zero_le _
+  · have c : Constant (RF f v) := by
+      rw [←rf_land dom v]
+      rw [Bool.or_eq_true] at h
+      rcases h with h | h
+      · rw [Nat.eq_of_beq_eq_true h,rf_zero]
+        exact ⟨false,rfl⟩
+      · rw [Nat.eq_of_beq_eq_true h,rf_dom dom]
+        exact ⟨true,rfl⟩
+    rw [cost,if_pos c]
+    exact Nat.le_refl 1
+theorem av_ok {u} {f : Row → Row} {d : Nat} (dom : ∀ r, bit (f r) (W d) = true) {bank P v} (hP : PS u f bank P)
+    (h : av u d P v = true) : Available u bank (RF f v) := by
+  simp only [av,Bool.or_eq_true,List.any_eq_true,Bool.and_eq_true] at h
+  rw [←rf_land dom v]
+  rcases h with (h | h) | ⟨x,hx,h | ⟨hu,h⟩⟩
+  · rw [Nat.eq_of_beq_eq_true h,rf_zero]
+    exact Or.inr (Or.inl ⟨false,rfl⟩)
+  · rw [Nat.eq_of_beq_eq_true h,rf_dom dom]
+    exact Or.inr (Or.inl ⟨true,rfl⟩)
+  · rw [←Nat.eq_of_beq_eq_true h]
+    exact hP x hx
+  · have e := hP x hx
+    rw [Nat.eq_of_beq_eq_true h,rf_xor dom] at e
+    have e' := avail_inv hu e
+    rwa [inv_inv'] at e'
+theorem rf_nb (f : Row → Row) (o a b : Nat) : RF f (nb o a b) = comb o (RF f a) (RF f b) := by
+  unfold RF
+  rw [W_nb,obs_bin,restrict_comb]
+theorem pay_nb {u} {f : Row → Row} {roots bank p P} (o a b : Nat) (ho : opOK u o = true) (hr : Reach u roots p bank) (hP : PS u f bank P)
+    (ha : Available u bank (RF f a)) (hb : Available u bank (RF f b)) :
+    ∃ next, Reach u roots (p+1) next ∧ PS u f next P ∧ Available u next (RF f (nb o a b)) ∧
+      ∀ v, Available u bank v → Available u next v := by
+  obtain ⟨e,he,heq⟩ := bin_four u o ho
+  have hn : RF f (nb o a b) = comb e (RF f a) (RF f b) := by
+    unfold RF
+    rw [W_nb,heq,obs_bin,restrict_comb]
+  obtain ⟨op,x,y,e1,hx,hy,_,_⟩ := comb_prime (d:=e) he ha hb
+  refine ⟨_,Reach.two op hr hx hy,fun v hv => available_cons _ (hP v hv),?_,fun v hv => available_cons _ hv⟩
+  rw [hn,e1]
+  exact Or.inl (by simp)
+theorem getD_ps {u} {f : Row → Row} {bank P} (hP : PS u f bank P) (i : Nat) : Available u bank (RF f (P.getD i 0)) := by
+  rw [List.getD_eq_getElem?_getD]
+  cases h : P[i]? with
+  | none => exact Or.inr (Or.inl ⟨false,rf_zero⟩)
+  | some a => exact hP a (List.mem_of_getElem? h)
+theorem mkPool_ok {u} {f : Row → Row} {roots} (cs : List (Nat × Nat × Nat)) {bank p P} (hr : Reach u roots p bank)
+    (hP : PS u f bank P) : ∃ next, Reach u roots (p+cs.length) next ∧ PS u f next (mkPool u P cs) := by
+  induction cs generalizing bank p P with
+  | nil => exact ⟨bank,hr,hP⟩
+  | cons c cs ih =>
+    have big : ∃ next, Reach u roots (p+1) next ∧ PS u f next (bif opOK u c.1 then P ++ [nb c.1 (P.getD c.2.1 0) (P.getD c.2.2 0)] else P) := by
+      cases ho : opOK u c.1
+      · refine ⟨_,Reach.two false hr (Or.inr (Or.inl ⟨false,rfl⟩)) (Or.inr (Or.inl ⟨false,rfl⟩)),fun v hv => available_cons _ (hP v hv)⟩
+      · obtain ⟨next,h1,h2,h3,_⟩ := pay_nb c.1 _ _ ho hr hP (getD_ps hP c.2.1) (getD_ps hP c.2.2)
+        refine ⟨next,h1,?_⟩
+        intro v hv
+        rw [cond_true] at hv
+        rcases List.mem_append.mp hv with hv | hv
+        · exact h2 v hv
+        · rw [List.mem_singleton.mp hv]
+          exact h3
+    obtain ⟨next,h1,this⟩ := big
+    obtain ⟨out,o1,o2⟩ := ih h1 this
+    exact ⟨out,by rw [List.length_cons,show p+(cs.length+1) = p+1+cs.length by omega]; exact o1,o2⟩
+
+abbrev CutV := Nat × Nat × Nat × List Nat
+def keepB (u : Bool) (d : Nat) (P : List Nat) (ka : Bool) (a : Nat) : Bool := bif ka then av u d P a else true
+def keepC (d : Nat) (ka : Bool) (a : Nat) : Nat := bif ka then cn d a else 0
+def cutEval (u : Bool) (k : Nat) (rest : List Nat) (a b z : Nat) (ka kb : Bool) (c : CutV) : Bool :=
+  rest.all (av u c.1 c.2.2.2) && keepB u c.1 c.2.2.2 ka a && keepB u c.1 c.2.2.2 kb b &&
+  (bif av u c.1 c.2.2.2 z then
+    Nat.blt (Nat.add k c.2.2.1) (Nat.add c.2.1 (Nat.add (Nat.add (sumc c.1 rest) (cn c.1 z)) (Nat.add (keepC c.1 ka a) (keepC c.1 kb b))))
+  else av u c.1 c.2.2.2 a && av u c.1 c.2.2.2 b &&
+    Nat.blt (Nat.add (Nat.add k c.2.2.1) 1) (Nat.add c.2.1 (Nat.add (Nat.add (sumc c.1 rest) (cn c.1 z)) (Nat.add (keepC c.1 ka a) (keepC c.1 kb b)))))
+def same (u : Bool) (p : Nat × Nat) (v : Nat) : Bool :=
+  bif u then Nat.testBit v p.1 == Nat.testBit v p.2 else !(Nat.testBit v p.1) || Nat.testBit v p.2
+def sepEval (u : Bool) (rest : List Nat) (a b z : Nat) (ka kb : Bool) (p : Nat × Nat) : Bool :=
+  same u p z && (!ka || same u p a) && (!kb || same u p b) && rest.all (same u p)
+def sepOK (T : Nat) (p : Nat × Nat) : Bool := Nat.blt p.1 128 && Nat.blt p.2 128 && T.testBit p.1 && !(T.testBit p.2)
+
+def kidW (rest : List Nat) (a b z : Nat) (ka kb : Bool) : List Sig :=
+  W z :: kept ka (W a) (kept kb (W b) (rest.map W))
+theorem sumc_ok {f : Row → Row} {d : Nat} (dom : ∀ r, bit (f r) (W d) = true) (l : List Nat) :
+    sumc d l ≤ mass (l.map (RF f)) := by
+  induction l with
+  | nil => simp [sumc]
+  | cons v l ih =>
+    rw [List.map_cons,mass_cons]
+    exact Nat.add_le_add (cn_ok dom v) ih
+theorem mass_keep {f : Row → Row} {d : Nat} (dom : ∀ r, bit (f r) (W d) = true) (ka : Bool) (a : Nat) (l : List (Wire Row)) :
+    keepC d ka a + mass l ≤ mass (kept ka (RF f a) l) := by
+  cases ka
+  · simp [keepC,kept]
+  · rw [kept,if_pos rfl,mass_cons]
+    exact Nat.add_le_add_right (cn_ok dom a) _
+theorem kid_map (f : Row → Row) (rest : List Nat) (a b z : Nat) (ka kb : Bool) :
+    ((kidW rest a b z ka kb).map observe).map (restrictRows f) =
+      RF f z :: kept ka (RF f a) (kept kb (RF f b) (rest.map (RF f))) := by
+  cases ka <;> cases kb <;> simp [kidW,kept,List.map_map,Function.comp_def,RF]
+
+def CutP (u : Bool) (_R : List Nat) (T : Nat) (c : CutV) : Prop :=
+  ∃ (f : Row → Row) (roots : List Sig) (bank : List (Wire Row)), (∀ r, bit (f r) (W c.1) = true) ∧
+    ¬Constant (restrictRows f (observe (W T))) ∧ Reach u (roots.map observe) c.2.2.1 bank ∧ PS u f bank c.2.2.2 ∧
+    ∀ p bank, Reach u (roots.map observe) p bank → Available u bank (restrictRows f (observe (W T))) → c.2.1 ≤ p
+
+theorem cut_sound {u R T c k rest a b o ka kb} (hc : CutP u R T c) (ho : opOK u o = true)
+    (nd : (kidW rest a b (nb o a b) ka kb).Nodup)
+    (h : cutEval u k rest a b (nb o a b) ka kb c = true) :
+    Impossible u (W T) k (kidW rest a b (nb o a b) ka kb).toFinset := by
+  obtain ⟨f,roots,bank,dom,nc,hr,hP,lo⟩ := hc
+  simp only [cutEval,Bool.and_eq_true,List.all_eq_true] at h
+  obtain ⟨⟨⟨h1,h2⟩,h3⟩,h4⟩ := h
+  have key : ∃ q bank', Reach u (roots.map observe) q bank' ∧ PS u f bank' c.2.2.2 ∧ Available u bank' (RF f (nb o a b)) ∧
+      k + q < c.2.1 + ((sumc c.1 rest + cn c.1 (nb o a b)) + (keepC c.1 ka a + keepC c.1 kb b)) := by
+    cases hz : av u c.1 c.2.2.2 (nb o a b)
+    · rw [hz,cond_false,Bool.and_eq_true,Bool.and_eq_true,Nat.blt_eq] at h4
+      obtain ⟨next,n1,n2,n3,_⟩ := pay_nb o a b ho hr hP (av_ok dom hP h4.1.1) (av_ok dom hP h4.1.2)
+      refine ⟨_,next,n1,n2,n3,?_⟩
+      have := h4.2
+      exact this
+    · rw [hz,cond_true,Nat.blt_eq] at h4
+      exact ⟨_,bank,hr,hP,av_ok dom hP hz,h4⟩
+  obtain ⟨q,bank',r1,r2,r3,r4⟩ := key
+  intro k' hk run
+  have supp : supply u bank' (((kidW rest a b (nb o a b) ka kb).map observe).map (restrictRows f)) := by
+    rw [kid_map]
+    intro v hv
+    rcases List.mem_cons.mp hv with rfl | hv
+    · exact r3
+    have kb' : ∀ v ∈ kept kb (RF f b) (rest.map (RF f)), Available u bank' v := by
+      intro v hv
+      cases kb
+      · obtain ⟨x,hx,rfl⟩ := List.mem_map.mp hv
+        exact av_ok dom r2 (h1 x hx)
+      · rcases List.mem_cons.mp hv with rfl | hv
+        · exact av_ok dom r2 h3
+        · obtain ⟨x,hx,rfl⟩ := List.mem_map.mp hv
+          exact av_ok dom r2 (h1 x hx)
+    cases ka
+    · exact kb' v hv
+    · rcases List.mem_cons.mp hv with rfl | hv
+      · exact av_ok dom r2 h2
+      · exact kb' v hv
+  have bound := projected_bound f (list_run run _ nd rfl) nc r1 supp lo
+  rw [kid_map,mass_cons] at bound
+  have m1 := mass_keep dom ka a (kept kb (RF f b) (rest.map (RF f)))
+  have m2 := mass_keep dom kb b (rest.map (RF f))
+  have m3 := sumc_ok dom rest
+  have m4 := cn_ok dom (nb o a b)
+  omega
+
+theorem kid_mem {rest : List Nat} {a b z : Nat} {ka kb : Bool} {v : Sig} (hv : v ∈ kidW rest a b z ka kb) :
+    ∃ x, v = W x ∧ (x = z ∨ (ka = true ∧ x = a) ∨ (kb = true ∧ x = b) ∨ x ∈ rest) := by
+  rcases List.mem_cons.mp hv with rfl | hv
+  · exact ⟨z,rfl,Or.inl rfl⟩
+  have low : ∀ v ∈ kept kb (W b) (rest.map W), ∃ x, v = W x ∧ ((kb = true ∧ x = b) ∨ x ∈ rest) := by
+    intro v hv
+    cases kb
+    · obtain ⟨x,hx,e⟩ := List.mem_map.mp hv
+      exact ⟨x,e.symm,Or.inr hx⟩
+    · rcases List.mem_cons.mp hv with e | hv
+      · exact ⟨b,e,Or.inl ⟨rfl,rfl⟩⟩
+      · obtain ⟨x,hx,e⟩ := List.mem_map.mp hv
+        exact ⟨x,e.symm,Or.inr hx⟩
+  cases ka
+  · obtain ⟨x,h1,h2⟩ := low v hv
+    exact ⟨x,h1,Or.inr (Or.inr h2)⟩
+  · rcases List.mem_cons.mp hv with e | hv
+    · exact ⟨a,e,Or.inr (Or.inl ⟨rfl,rfl⟩)⟩
+    · obtain ⟨x,h1,h2⟩ := low v hv
+      exact ⟨x,h1,Or.inr (Or.inr h2)⟩
+theorem sep_sound {u T k rest a b o ka kb p} (hT : sepOK T p = true)
+    (h : sepEval u rest a b (nb o a b) ka kb p = true) :
+    Impossible u (W T) k (kidW rest a b (nb o a b) ka kb).toFinset := by
+  simp only [sepOK,Bool.and_eq_true,Nat.blt_eq,Bool.not_eq_true'] at hT
+  obtain ⟨⟨⟨p1,p2⟩,t1⟩,t2⟩ := hT
+  simp only [sepEval,Bool.and_eq_true,Bool.or_eq_true,Bool.not_eq_true',List.all_eq_true] at h
+  obtain ⟨⟨⟨h1,h2⟩,h3⟩,h4⟩ := h
+  have all : ∀ v ∈ kidW rest a b (nb o a b) ka kb, ∃ x, v = W x ∧ same u p x = true := by
+    intro v hv
+    obtain ⟨x,rfl,hx⟩ := kid_mem hv
+    refine ⟨x,rfl,?_⟩
+    rcases hx with rfl | ⟨q,rfl⟩ | ⟨q,rfl⟩ | hx
+    · exact h1
+    · subst q; exact h2.resolve_left (by simp)
+    · subst q; exact h3.resolve_left (by simp)
+    · exact h4 x hx
+  intro k' _ run
+  cases u
+  · obtain ⟨v,hv,hp,hn⟩ := mono_row_difference run rfl (r:=⟨p.1,p1⟩) (s:=⟨p.2,p2⟩) (by rw [bit_W]; exact t1) (by rw [bit_W]; exact t2)
+    obtain ⟨x,rfl,hx⟩ := all v (List.mem_toFinset.mp hv)
+    rw [bit_W] at hp hn
+    simp only [same,cond_false,Bool.or_eq_true,Bool.not_eq_true'] at hx
+    rcases hx with hx | hx
+    · rw [hx] at hp; exact Bool.noConfusion hp
+    · rw [hx] at hn; exact Bool.noConfusion hn
+  · obtain ⟨v,hv,hne⟩ := live_row_difference run (r:=⟨p.1,p1⟩) (s:=⟨p.2,p2⟩) (by rw [bit_W,bit_W,t1,t2]; simp)
+    obtain ⟨x,rfl,hx⟩ := all v (List.mem_toFinset.mp hv)
+    apply hne
+    rw [bit_W,bit_W]
+    simpa only [same,cond_true,beq_iff_eq] using hx
+
+def KWOwn (S : Finset Sig) (T : Sig) (owns : Sig → Row → Row → Prop) : Prop :=
+  (∀ p n, bit p T = true → bit n T = false → ∃ v, owns v p n) ∧
+  (∀ v p n, owns v p n → v ∈ S ∧ bit p v = true ∧ bit n v = false) ∧
+  (∀ v w p n, owns v p n → owns w p n → v = w) ∧
+  (∀ v p n p' n', owns v p n → owns v p' n' → owns v p n')
+abbrev KWRooms (S : Finset Sig) (T : Sig) := {o : Sig → Row → Row → Prop // KWOwn S T o}
+def KWRooms.owns {S T} (H : KWRooms S T) : Sig → Row → Row → Prop := H.1
+theorem KWRooms.total {S T} (H : KWRooms S T) : ∀ p n, bit p T = true → bit n T = false → ∃ v, H.owns v p n := H.2.1
+theorem KWRooms.valid {S T} (H : KWRooms S T) {v p n} : H.owns v p n → v ∈ S ∧ bit p v = true ∧ bit n v = false := H.2.2.1 v p n
+theorem KWRooms.unique {S T} (H : KWRooms S T) {v w p n} : H.owns v p n → H.owns w p n → v = w := H.2.2.2.1 v w p n
+theorem KWRooms.rect {S T} (H : KWRooms S T) {v p n p' n'} : H.owns v p n → H.owns v p' n' → H.owns v p n' := H.2.2.2.2 v p n p' n'
+theorem kwLeaf (T : Sig) : Nonempty (KWRooms {T} T) := by
+  refine ⟨⟨fun v p n => v = T ∧ bit p T = true ∧ bit n T = false,?_,?_,?_,?_⟩⟩
+  · intro p n hp hn
+    exact ⟨T,rfl,hp,hn⟩
+  · rintro v p n ⟨rfl,hp,hn⟩
+    exact ⟨by simp,hp,hn⟩
+  · rintro v w p n ⟨rfl,_⟩ ⟨rfl,_⟩
+    rfl
+  · rintro v p n p' n' ⟨rfl,hp,_⟩ ⟨_,_,hn⟩
+    exact ⟨rfl,hp,hn⟩
+theorem kwFork {T : Sig} {U : Finset Sig} {a b : Sig} {d : Nat} (d01 : d=0 ∨ d=1) (hab : a ≠ b) (ha : a ∉ U) (hb : b ∉ U)
+    (hz : bin d a b ∉ U) (H : KWRooms (insert (bin d a b) U) T) : Nonempty (KWRooms (insert a (insert b U)) T) := by
+  classical
+  let z := bin d a b
+  let own : Sig → Row → Row → Prop := fun v p n => (v ∈ U ∧ H.owns v p n) ∨
+    (H.owns z p n ∧ v = (if d=0 then (if bit n a = false then a else b) else (if bit p a = true then a else b)))
+  have pickU : ∀ (p n : Row), (if d=0 then (if bit n a = false then a else b) else (if bit p a = true then a else b)) ∉ U := by
+    intro p n
+    split <;> split <;> assumption
+  refine ⟨⟨own,?_,?_,?_,?_⟩⟩
+  · intro p n hp hn
+    obtain ⟨v,hv⟩ := H.total p n hp hn
+    rcases Finset.mem_insert.mp (H.valid hv).1 with e | hm
+    · refine ⟨_,Or.inr ⟨?_,rfl⟩⟩
+      rw [show v = z from e] at hv
+      exact hv
+    · exact ⟨v,Or.inl ⟨hm,hv⟩⟩
+  · intro v p n h
+    rcases h with ⟨hm,hv⟩ | ⟨hv,rfl⟩
+    · exact ⟨Finset.mem_insert_of_mem (Finset.mem_insert_of_mem hm),(H.valid hv).2⟩
+    · obtain ⟨_,hp,hn⟩ := H.valid hv
+      change bit p (bin d a b) = true at hp
+      change bit n (bin d a b) = false at hn
+      rw [bit_bin] at hp hn
+      rcases d01 with rfl | rfl
+      · cases pa : bit p a <;> cases na : bit n a <;> cases pb : bit p b <;> cases nb' : bit n b <;> simp_all
+      · cases pa : bit p a <;> cases na : bit n a <;> cases pb : bit p b <;> cases nb' : bit n b <;> simp_all
+  · intro v w p n h1 h2
+    rcases h1 with ⟨vU,hv⟩ | ⟨hv,rfl⟩ <;> rcases h2 with ⟨wU,hw⟩ | ⟨hw,rfl⟩
+    · exact H.unique hv hw
+    · exact absurd (show z ∈ U by rw [←H.unique hv hw]; exact vU) hz
+    · exact absurd (show z ∈ U by rw [←H.unique hw hv]; exact wU) hz
+    · rfl
+  · intro v p n p' n' h1 h2
+    rcases h1 with ⟨vU,hv⟩ | ⟨hv,e1⟩ <;> rcases h2 with ⟨wU,hw⟩ | ⟨hw,e2⟩
+    · exact Or.inl ⟨vU,H.rect hv hw⟩
+    · exact absurd (e2 ▸ vU) (pickU p' n')
+    · exact absurd (e1 ▸ wU) (pickU p n)
+    · refine Or.inr ⟨H.rect hv hw,?_⟩
+      by_cases h : d=0
+      · rw [if_pos h] at e2 ⊢
+        exact e2
+      · rw [if_neg h] at e1 ⊢
+        exact e1
+theorem kwTight {T : Sig} {k : Nat} {S : Finset Sig} (run : Live false T k S) (tight : S.card=k+1) :
+    Nonempty (KWRooms S T) := by
+  induction k generalizing S with
+  | zero =>
+    obtain ⟨rfl,_⟩ := run
+    exact kwLeaf T
+  | succ k ih =>
+    obtain ⟨U,a,b,d,hd,rfl,_,_,hab,hfresh,tail⟩ := run
+    have fresh : bin d a b ∉ U := fun h => hfresh (Finset.mem_insert_of_mem (Finset.mem_insert_of_mem h))
+    have li := live_size tail
+    rw [Finset.card_insert_of_notMem fresh] at li
+    have le1 := Finset.card_insert_le a (insert b U)
+    have le2 := Finset.card_insert_le b U
+    have ha : a ∉ U := by
+      intro h
+      rw [Finset.insert_eq_of_mem (Finset.mem_insert_of_mem h : a ∈ insert b U)] at tight
+      omega
+    have hb : b ∉ U := by
+      intro h
+      rw [Finset.insert_eq_of_mem h] at tight le1
+      omega
+    have eq : (insert (bin d a b) U).card=k+1 := by
+      rw [Finset.card_insert_of_notMem fresh]
+      omega
+    obtain ⟨H⟩ := ih tail eq
+    have d01 : d=0 ∨ d=1 := by
+      rcases hd with h | ⟨h,_⟩
+      · omega
+      · exact Bool.noConfusion h
+    exact kwFork d01 hab ha hb fresh H
+def only (l : List Nat) (p n a : Nat) : Bool :=
+  Nat.blt p 128 && Nat.blt n 128 && l.all (fun x => !(Nat.testBit x p) || Nat.testBit x n || Nat.beq x a)
+abbrev KwD := Nat × Nat × Nat × Nat × Nat × Nat
+def findW (l : List Nat) (p n : Nat) : Nat := (l.find? (fun x => Nat.testBit x p && !(Nat.testBit x n))).getD 0
+def kwOK (T : Nat) (q : KwD) : Bool :=
+  T.testBit q.1 && T.testBit q.2.2.2.1 && T.testBit q.2.2.2.2.2 && !(T.testBit q.2.1) && !(T.testBit q.2.2.1) && !(T.testBit q.2.2.2.2.1)
+def kwList (l : List Nat) (q : KwD) : Bool :=
+  let a := findW l q.1 q.2.2.1
+  let b := findW l q.1 q.2.2.2.2.1
+  only l q.1 q.2.2.1 a && only l q.2.2.2.1 q.2.1 a &&
+  (bif Nat.beq q.1 q.2.2.2.2.2 && Nat.beq q.2.1 q.2.2.2.2.1 then !(Nat.testBit a q.1 && !(Nat.testBit a q.2.1))
+   else only l q.1 q.2.2.2.2.1 b && only l q.2.2.2.2.2 q.2.1 b && !(Nat.beq a b))
+theorem only_own {l : List Nat} {T p n a : Nat} (H : KWRooms ((l.map W).toFinset) (W T))
+    (h : only l p n a = true) (tp : T.testBit p = true) (tn : T.testBit n = false) :
+    ∃ (hp : p < 128) (hn : n < 128), H.owns (W a) ⟨p,hp⟩ ⟨n,hn⟩ := by
+  simp only [only,Bool.and_eq_true,Nat.blt_eq,List.all_eq_true,Bool.or_eq_true,Bool.not_eq_true'] at h
+  obtain ⟨⟨hp,hn⟩,hl⟩ := h
+  refine ⟨hp,hn,?_⟩
+  obtain ⟨v,hv⟩ := H.total ⟨p,hp⟩ ⟨n,hn⟩ (by rw [bit_W]; exact tp) (by rw [bit_W]; exact tn)
+  obtain ⟨hm,h1,h2⟩ := H.valid hv
+  obtain ⟨x,hx,rfl⟩ := List.mem_map.mp (List.mem_toFinset.mp hm)
+  rw [bit_W] at h1 h2
+  rcases hl x hx with (h | h) | h
+  · rw [h] at h1; exact Bool.noConfusion h1
+  · rw [h] at h2; exact Bool.noConfusion h2
+  · rw [Nat.eq_of_beq_eq_true h] at hv
+    exact hv
+theorem kw_sound {T k : Nat} {l : List Nat} (nd : (l.map W).Nodup) (size : l.length = k+1) (lt : ∀ x ∈ l, x < 2^128) (q : KwD)
+    (hT : kwOK T q = true) (h : kwList l q = true) : Impossible false (W T) k (l.map W).toFinset := by
+  intro k' hk run
+  have lb := live_size run
+  rw [List.toFinset_card_of_nodup nd,List.length_map] at lb
+  obtain ⟨H⟩ := kwTight run (by rw [List.toFinset_card_of_nodup nd,List.length_map]; omega)
+  simp only [kwOK,Bool.and_eq_true,Bool.not_eq_true'] at hT
+  obtain ⟨⟨⟨⟨⟨t1,t2⟩,t3⟩,t4⟩,t5⟩,t6⟩ := hT
+  simp only [kwList,Bool.and_eq_true] at h
+  obtain ⟨⟨h1,h2⟩,h3⟩ := h
+  obtain ⟨hp,hna,o1⟩ := only_own H h1 t1 t5
+  obtain ⟨hpa,hn,o2⟩ := only_own H h2 t2 t4
+  have own := H.rect o1 o2
+  cases hc : (Nat.beq q.1 q.2.2.2.2.2 && Nat.beq q.2.1 q.2.2.2.2.1)
+  · rw [hc,cond_false] at h3
+    simp only [Bool.and_eq_true,Bool.not_eq_true'] at h3
+    obtain ⟨⟨h4,h5⟩,h6⟩ := h3
+    obtain ⟨_,hnb,o3⟩ := only_own H h4 t1 t6
+    obtain ⟨hpb,_,o4⟩ := only_own H h5 t3 t4
+    have own' := H.rect o3 o4
+    have ee := H.unique own own'
+    have mem : ∀ {a : Nat}, W a ∈ (l.map W).toFinset → ∃ x ∈ l, W x = W a := by
+      intro a ha
+      obtain ⟨x,hx,e⟩ := List.mem_map.mp (List.mem_toFinset.mp ha)
+      exact ⟨x,hx,e⟩
+    have fw : ∀ p n, findW l p n < 2^128 := by
+      intro p n
+      unfold findW
+      cases hf : l.find? (fun x => Nat.testBit x p && !(Nat.testBit x n)) with
+      | none => exact Nat.two_pow_pos 128
+      | some x => exact lt x (List.mem_of_find?_eq_some hf)
+    have := W_inj (fw _ _) (fw _ _) ee
+    rw [this,Nat.beq_refl] at h6
+    exact Bool.noConfusion h6
+  · rw [hc,cond_true] at h3
+    have v := (H.valid own).2
+    rw [bit_W,bit_W] at v
+    rw [v.1,v.2] at h3
+    exact Bool.noConfusion h3
+
+def hiM : Nat → Nat
+  | 0 => 0x22222222222222222222222222222222
+  | 1 => 0x0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c
+  | 2 => 0x00f000f000f000f000f000f000f000f0
+  | 3 => 0x0000ff000000ff000000ff000000ff00
+  | _ => 0x00000000ffff000000000000ffff0000
+def loM : Nat → Nat
+  | 0 => 0x44444444444444444444444444444444
+  | 1 => 0x30303030303030303030303030303030
+  | 2 => 0x0f000f000f000f000f000f000f000f00
+  | 3 => 0x00ff000000ff000000ff000000ff0000
+  | _ => 0x0000ffff000000000000ffff00000000
+def keM : Nat → Nat
+  | 0 => 0x99999999999999999999999999999999
+  | 1 => 0xc3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3
+  | 2 => 0xf00ff00ff00ff00ff00ff00ff00ff00f
+  | 3 => 0xff0000ffff0000ffff0000ffff0000ff
+  | _ => 0xffff00000000ffffffff00000000ffff
+def shM : Nat → Nat
+  | 0 => 1
+  | 1 => 2
+  | 2 => 4
+  | 3 => 8
+  | _ => 16
+def swapN (i v : Nat) : Nat :=
+  Nat.lor (Nat.lor (Nat.land v (keM i)) (Nat.shiftLeft (Nat.land v (hiM i)) (shM i))) (Nat.shiftRight (Nat.land v (loM i)) (shM i))
+def sig (i : Nat) (r : Row) : Row :=
+  if (hiM i).testBit r.val then Fin.ofNat 128 (r.val + shM i) else
+    if (loM i).testBit r.val then Fin.ofNat 128 (r.val - shM i) else r
+def swapFacts (i : Nat) (r : Row) : Prop :=
+  ((keM i).testBit r.val = true ∧ (sig i r).val = r.val ∧ (decide (shM i ≤ r.val) && (hiM i).testBit (r.val - shM i)) = false ∧ (loM i).testBit (shM i + r.val) = false) ∨
+  ((keM i).testBit r.val = false ∧ shM i ≤ r.val ∧ (sig i r).val = r.val - shM i ∧ (hiM i).testBit (r.val - shM i) = true ∧ (loM i).testBit (shM i + r.val) = false) ∨
+  ((keM i).testBit r.val = false ∧ (sig i r).val = shM i + r.val ∧ (decide (shM i ≤ r.val) && (hiM i).testBit (r.val - shM i)) = false ∧ (loM i).testBit (shM i + r.val) = true)
+theorem swap_facts : ∀ (i : Fin 5) (r : Row), swapFacts i.val r ∧ sig i.val (sig i.val r) = r := by
+  unfold swapFacts
+  decide +kernel
+theorem swap_ok (i : Nat) (hi : i < 5) (v : Nat) : W (swapN i v) = rename (sig i) (W v) := by
+  apply bit_ext
+  intro r
+  rw [bit_W,bit_rename,bit_W]
+  have e : (swapN i v).testBit r.val = (((v.testBit r.val && (keM i).testBit r.val) ||
+      (decide (shM i ≤ r.val) && (v.testBit (r.val - shM i) && (hiM i).testBit (r.val - shM i)))) ||
+      (v.testBit (shM i + r.val) && (loM i).testBit (shM i + r.val))) := by
+    have s1 : (Nat.shiftLeft (Nat.land v (hiM i)) (shM i)).testBit r.val = (decide (shM i ≤ r.val) && (Nat.land v (hiM i)).testBit (r.val - shM i)) := by
+      exact Nat.testBit_shiftLeft ..
+    have s2 : (Nat.shiftRight (Nat.land v (loM i)) (shM i)).testBit r.val = (Nat.land v (loM i)).testBit (shM i + r.val) := by
+      exact Nat.testBit_shiftRight ..
+    unfold swapN
+    rw [tb_lor,tb_lor,s1,s2,tb_land,tb_land,tb_land]
+  rw [e]
+  rcases (swap_facts ⟨i,hi⟩ r).1 with ⟨h1,h2,h3,h4⟩ | ⟨h1,h2,h3,h4,h5⟩ | ⟨h1,h2,h3,h4⟩
+  · change (sig i r).val = r.val at h2
+    rw [h2]
+    simp only [] at h1 h3 h4
+    rw [h1,h4]
+    cases hd : decide (shM i ≤ r.val)
+    · simp
+    · rw [hd,Bool.true_and] at h3
+      rw [h3]; simp
+  · change (sig i r).val = r.val - shM i at h3
+    rw [h3]
+    simp only [] at h1 h2 h4 h5
+    rw [h1,h4,h5,decide_eq_true h2]
+    simp
+  · change (sig i r).val = shM i + r.val at h2
+    rw [h2]
+    simp only [] at h1 h3 h4
+    rw [h1,h4]
+    cases hd : decide (shM i ≤ r.val)
+    · simp
+    · rw [hd,Bool.true_and] at h3
+      rw [h3]; simp
+def permN (l : List Nat) (v : Nat) : Nat := l.foldl (fun v i => swapN i v) v
+def symOK (T : Nat) (l : List Nat) : Bool := l.all fun i => Nat.blt i 5 && Nat.beq (swapN i T) T
+theorem perm_sound {u T k} (l : List Nat) (hT : symOK T l = true) (s : List Nat)
+    (h : Impossible u (W T) k ((s.map (permN l)).map W).toFinset) : Impossible u (W T) k (s.map W).toFinset := by
+  induction l generalizing s with
+  | nil =>
+    simpa [show (permN [] : Nat → Nat) = id from rfl] using h
+  | cons i l ih =>
+    simp only [symOK,List.all_cons,Bool.and_eq_true,Nat.blt_eq] at hT
+    obtain ⟨⟨hi,hs⟩,hl⟩ := hT
+    have h' : Impossible u (W T) k ((s.map (swapN i)).map W).toFinset := by
+      apply ih hl
+      have : (s.map (swapN i)).map (permN l) = s.map (permN (i::l)) := by
+        rw [List.map_map]
+        rfl
+      rw [this]
+      exact h
+    intro k' hk run
+    have onto : Function.Surjective (sig i) := fun r => ⟨sig i r,(swap_facts ⟨i,hi⟩ r).2⟩
+    have r2 := live_rename run (sig i) onto
+    rw [←swap_ok i hi T,Nat.eq_of_beq_eq_true hs] at r2
+    apply h' k' hk
+    have : ((s.map (swapN i)).map W).toFinset = (s.map W).toFinset.image (rename (sig i)) := by
+      ext v
+      simp only [List.mem_toFinset,List.mem_map,Finset.mem_image,exists_exists_and_eq_and,swap_ok i hi]
+    rw [this]
+    exact r2
+
+abbrev StD := List Nat × List (List Nat)
+def picks : List Nat → List (Nat × List Nat)
+  | [] => []
+  | x::xs => (x,xs) :: (picks xs).map fun p => (p.1,x::p.2)
+def pairs : List Nat → List (Nat × Nat × List Nat)
+  | [] => []
+  | x::xs => ((picks xs).map fun p => (x,p.1,p.2)) ++ (pairs xs).map fun p => (p.1,p.2.1,x::p.2.2)
+theorem picks_ok {l : List Nat} {a : Nat} (h : a ∈ l) : ∃ p ∈ picks l, p.1 = a ∧ (a::p.2).Perm l := by
+  induction l with
+  | nil => cases h
+  | cons x xs ih =>
+    rcases List.mem_cons.mp h with rfl | h
+    · exact ⟨(a,xs),by simp [picks],rfl,List.Perm.refl _⟩
+    · obtain ⟨p,hp,rfl,q⟩ := ih h
+      refine ⟨(p.1,x::p.2),?_,rfl,?_⟩
+      · simp only [picks,List.mem_cons,List.mem_map]
+        exact Or.inr ⟨p,hp,rfl⟩
+      · exact (List.Perm.swap x p.1 p.2).trans (q.cons x)
+theorem pairs_ok {l : List Nat} {a b : Nat} (ha : a ∈ l) (hb : b ∈ l) (hab : a ≠ b) :
+    ∃ p ∈ pairs l, (p.1::p.2.1::p.2.2).Perm l ∧ ((p.1 = a ∧ p.2.1 = b) ∨ (p.1 = b ∧ p.2.1 = a)) := by
+  induction l with
+  | nil => cases ha
+  | cons x xs ih =>
+    have first (c : Nat) (hc : c ∈ xs) : ∃ p ∈ pairs (x::xs), (p.1::p.2.1::p.2.2).Perm (x::xs) ∧ p.1 = x ∧ p.2.1 = c := by
+      obtain ⟨p,hp,rfl,q⟩ := picks_ok hc
+      refine ⟨(x,p.1,p.2),?_,q.cons x,rfl,rfl⟩
+      simp only [pairs,List.mem_append,List.mem_map]
+      exact Or.inl ⟨p,hp,rfl⟩
+    rcases List.mem_cons.mp ha with rfl | ha2
+    · rcases List.mem_cons.mp hb with rfl | hb
+      · exact absurd rfl hab
+      · obtain ⟨p,h1,h2,h3,h4⟩ := first b hb
+        exact ⟨p,h1,h2,Or.inl ⟨h3,h4⟩⟩
+    · rcases List.mem_cons.mp hb with e | hb
+      · subst e
+        obtain ⟨p,h1,h2,h3,h4⟩ := first a ha2
+        exact ⟨p,h1,h2,Or.inr ⟨h3,h4⟩⟩
+      · obtain ⟨p,hp,q,e⟩ := ih ha2 hb
+        refine ⟨(p.1,p.2.1,x::p.2.2),?_,?_,e⟩
+        · simp only [pairs,List.mem_append,List.mem_map]
+          exact Or.inr ⟨p,hp,rfl⟩
+        · exact ((List.Perm.swap x p.2.1 p.2.2).cons p.1).trans ((List.Perm.swap x p.1 _).trans (q.cons x))
+
+def mem1 (z : Nat) (l : List Nat) : Bool := l.any fun x => Nat.beq x z
+def beqL : List Nat → List Nat → Bool
+  | [],[] => true
+  | x::xs,y::ys => Nat.beq x y && beqL xs ys
+  | _,_ => false
+theorem beqL_ok {a b : List Nat} (h : beqL a b = true) : a = b := by
+  induction a generalizing b with
+  | nil => cases b with
+    | nil => rfl
+    | cons => simp [beqL] at h
+  | cons x xs ih => cases b with
+    | nil => simp [beqL] at h
+    | cons y ys =>
+      simp only [beqL,Bool.and_eq_true] at h
+      rw [Nat.eq_of_beq_eq_true h.1,ih h.2]
+def ins (z : Nat) : List Nat → List Nat
+  | [] => [z]
+  | x::xs => bif Nat.ble z x then z::x::xs else x :: ins z xs
+theorem mem_ins {z v : Nat} {l : List Nat} : v ∈ ins z l ↔ v = z ∨ v ∈ l := by
+  induction l with
+  | nil => simp [ins]
+  | cons x xs ih =>
+    unfold ins
+    cases Nat.ble z x
+    · simp only [cond_false,List.mem_cons,ih]
+      tauto
+    · simp
+def kidN (rest : List Nat) (a b z : Nat) (ka kb : Bool) : List Nat :=
+  ins z (bif ka then ins a (bif kb then ins b rest else rest) else bif kb then ins b rest else rest)
+theorem kid_fin (rest : List Nat) (a b z : Nat) (ka kb : Bool) :
+    ((kidN rest a b z ka kb).map W).toFinset = (kidW rest a b z ka kb).toFinset := by
+  ext v
+  cases ka <;> cases kb <;> simp [kidN,kidW,kept,mem_ins] <;> aesop
+
+def keeps : List (Bool × Bool) := [(true,true),(true,false),(false,true),(false,false)]
+def bl (b : Bool) : Nat := bif b then 1 else 0
+def mkCut (u : Bool) (Z : List SliceD) (c : Nat × List (Nat × Nat × Nat)) : CutV :=
+  let s := Z.getD c.1 (0,0,[])
+  (s.1,s.2.1,c.2.length,mkPool u (initPool s.1 s.2.2) c.2)
+abbrev Tabs := List CutV × List (Nat × Nat) × List KwD × List (List Nat)
+def Tabs.cuts (t : Tabs) : List CutV := t.1
+def Tabs.seps (t : Tabs) : List (Nat × Nat) := t.2.1
+def Tabs.kws (t : Tabs) : List KwD := t.2.2.1
+def Tabs.perms (t : Tabs) : List (List Nat) := t.2.2.2
+def sortN (l : List Nat) : List Nat := l.foldr ins []
+theorem mem_sortN {v : Nat} {l : List Nat} : v ∈ sortN l ↔ v ∈ l := by
+  induction l with
+  | nil => simp [sortN]
+  | cons x xs ih =>
+    change v ∈ ins x (sortN xs) ↔ _
+    rw [mem_ins,ih]
+    simp
+def hintOK (u : Bool) (k : Nat) (next : List (List Nat)) (t : Tabs) (rest : List Nat) (a b z : Nat) (ka kb : Bool) (i : Nat) : Bool :=
+  bif Nat.blt i 10000 then (match t.cuts[i]? with
+    | some c => cutEval u k rest a b z ka kb c
+    | none => false)
+  else bif Nat.blt i 20000 then (match t.seps[i-10000]? with
+    | some q => sepEval u rest a b z ka kb q
+    | none => false)
+  else bif Nat.blt i 30000 then (match t.kws[i-20000]? with
+    | some q => !u && Nat.beq (kidN rest a b z ka kb).length (k+1) && kwList (kidN rest a b z ka kb) q
+    | none => false)
+  else (match t.perms[i-30000]? with
+    | some l => next.any (beqL (sortN ((kidN rest a b z ka kb).map (permN l))))
+    | none => false)
+def kidOK (u : Bool) (k : Nat) (next : List (List Nat)) (t : Tabs) (rest : List Nat) (hints : List Nat)
+    (a b z : Nat) (kk : Bool × Bool) : Bool :=
+  Nat.blt k (Nat.add (Nat.add rest.length (Nat.add (bl kk.1) (bl kk.2))) 0) ||
+  hints.any (hintOK u k next t rest a b z kk.1 kk.2)
+def opsOf (u : Bool) : List Nat := bif u then [0,1,2,3] else [0,1]
+def pairOK (u : Bool) (k : Nat) (next : List (List Nat)) (t : Tabs) (s : List Nat)
+    (p : Nat × Nat × List Nat) (hints : List Nat) : Bool :=
+  (opsOf u).all fun o =>
+    let z := nb o p.1 p.2.1
+    mem1 z s || Nat.beq z 0 || Nat.beq z full ||
+      keeps.all (kidOK u k next t p.2.2 hints p.1 p.2.1 z)
+def allZip (f : Nat × Nat × List Nat → List Nat → Bool) : List (Nat × Nat × List Nat) → List (List Nat) → Bool
+  | [],_ => true
+  | p::ps,[] => f p [] && allZip f ps []
+  | p::ps,h::hs => f p h && allZip f ps hs
+theorem allZip_ok {f ps hs} (h : allZip f ps hs = true) : ∀ p ∈ ps, ∃ x, f p x = true := by
+  induction ps generalizing hs with
+  | nil => intro p hp; cases hp
+  | cons q ps ih =>
+    intro p hp
+    cases hs with
+    | nil =>
+      simp only [allZip,Bool.and_eq_true] at h
+      rcases List.mem_cons.mp hp with rfl | hp
+      · exact ⟨_,h.1⟩
+      · exact ih h.2 p hp
+    | cons x hs =>
+      simp only [allZip,Bool.and_eq_true] at h
+      rcases List.mem_cons.mp hp with rfl | hp
+      · exact ⟨_,h.1⟩
+      · exact ih h.2 p hp
+def asc : List Nat → Bool
+  | [] => true
+  | [x] => Nat.blt x (2^128)
+  | x::y::l => Nat.blt x y && asc (y::l)
+theorem asc_ok {l : List Nat} (h : asc l = true) : l.Pairwise (· < ·) ∧ ∀ x ∈ l, x < 2^128 := by
+  induction l with
+  | nil => simp
+  | cons x l ih =>
+    cases l with
+    | nil =>
+      simp only [asc,Nat.blt_eq] at h
+      simpa using h
+    | cons y l =>
+      simp only [asc,Bool.and_eq_true,Nat.blt_eq] at h
+      obtain ⟨i1,i2⟩ := ih h.2
+      have hy := List.pairwise_cons.mp i1
+      refine ⟨List.pairwise_cons.mpr ⟨?_,i1⟩,?_⟩
+      · intro v hv
+        rcases List.mem_cons.mp hv with rfl | hv
+        · exact h.1
+        · exact h.1.trans (hy.1 v hv)
+      · intro v hv
+        rcases List.mem_cons.mp hv with rfl | hv
+        · exact h.1.trans (i2 y (by simp))
+        · exact i2 v hv
+theorem asc_nodup {l : List Nat} (h : asc l = true) : l.Nodup ∧ (l.map W).Nodup := by
+  obtain ⟨h1,h2⟩ := asc_ok h
+  have nd : l.Nodup := h1.imp (fun h => Nat.ne_of_lt h)
+  refine ⟨nd,?_⟩
+  refine nd.map_on ?_
+  intro x hx y hy e
+  exact W_inj (h2 x hx) (h2 y hy) e
+def stOK (u : Bool) (T : Nat) (t : Tabs) (k : Nat) (next : List (List Nat)) (st : StD) : Bool :=
+  asc st.1 && !(mem1 T st.1) &&
+  allZip (pairOK u k next t st.1) (pairs st.1) st.2
+def levelOK (u : Bool) (T : Nat) (t : Tabs) (k : Nat) (next : List (List Nat)) (D : List StD) : Bool :=
+  D.all (stOK u T t k next)
+abbrev TabsP (u : Bool) (R : List Nat) (T : Nat) (t : Tabs) : Prop :=
+  (∀ c ∈ t.cuts, CutP u R T c) ∧ t.seps.all (sepOK T) = true ∧ t.kws.all (kwOK T) = true ∧ t.perms.all (symOK T) = true
+theorem TabsP.c {u R T t} (h : TabsP u R T t) : ∀ c ∈ t.cuts, CutP u R T c := h.1
+theorem TabsP.s {u R T t} (h : TabsP u R T t) : t.seps.all (sepOK T) = true := h.2.1
+theorem TabsP.k {u R T t} (h : TabsP u R T t) : t.kws.all (kwOK T) = true := h.2.2.1
+theorem TabsP.p {u R T t} (h : TabsP u R T t) : t.perms.all (symOK T) = true := h.2.2.2
+def LevelN (u : Bool) (T k : Nat) (D : List StD) : Prop :=
+  ∀ st ∈ D, Impossible u (W T) k (st.1.map W).toFinset
+theorem cutsGood {u R T} {Z : List SliceD} {C : List (Nat × List (Nat × Nat × Nat))} (hZ : ∀ s ∈ Z, SliceN u R T s)
+    (hC : C.all (fun c => Nat.blt c.1 Z.length) = true) : ∀ c ∈ C.map (mkCut u Z), CutP u R T c := by
+  intro c hc
+  obtain ⟨q,hq,rfl⟩ := List.mem_map.mp hc
+  have hi : q.1 < Z.length := by simpa only [Nat.blt_eq] using List.all_eq_true.mp hC q hq
+  have hm : Z.getD q.1 (0,0,[]) ∈ Z := by
+    rw [List.getD_eq_getElem?_getD,List.getElem?_eq_getElem hi]
+    exact List.getElem_mem hi
+  obtain ⟨⟨f,roots,dom,base,nc,lo⟩,hv⟩ := hZ _ hm
+  have ps : PS u f (roots.map observe) (initPool (Z.getD q.1 (0,0,[])).1 (Z.getD q.1 (0,0,[])).2.2) := by
+    intro v hv'
+    obtain ⟨j,hj,rfl⟩ := List.mem_map.mp hv'
+    rw [rf_land dom]
+    exact base _ (List.mem_map_of_mem (hv j hj))
+  obtain ⟨bank,b1,b2⟩ := mkPool_ok q.2 (Reach.start (u:=u) (roots:=roots.map observe)) ps
+  refine ⟨f,roots,bank,dom,nc,?_,b2,lo⟩
+  simpa [mkCut] using b1
+
+theorem stStep {u R T E t k next st} (hB : baseOK T R E = true) (ht : TabsP u R T t)
+    (hn : ∀ s ∈ next, Impossible u (W T) k (s.map W).toFinset)
+    (h : stOK u T t k next st = true) : Impossible u (W T) (k+1) (st.1.map W).toFinset := by
+  have b := baseOK_ok hB
+  simp only [stOK,Bool.and_eq_true,Bool.not_eq_true'] at h
+  obtain ⟨⟨ha,hT⟩,hz⟩ := h
+  obtain ⟨nd,ndW⟩ := asc_nodup ha
+  have lt := (asc_ok ha).2
+  have hTm : W T ∉ st.1.map W := by
+    intro hm
+    obtain ⟨x,hx,e⟩ := List.mem_map.mp hm
+    have := W_inj (lt x hx) b.lt e
+    subst this
+    have : mem1 x st.1 = true := List.any_eq_true.mpr ⟨x,hx,Nat.beq_refl x⟩
+    rw [hT] at this
+    exact Bool.noConfusion this
+  apply enum_step ndW hTm
+  intro a' ha' b' hb' d hd ka kb hab fresh hprop hlen
+  obtain ⟨a,ham,rfl⟩ := List.mem_map.mp ha'
+  obtain ⟨c,hcm,rfl⟩ := List.mem_map.mp hb'
+  have hac : a ≠ c := fun h => hab (by rw [h])
+  have inOps : ∀ {o : Nat}, allowed u o → o ∈ opsOf u := by
+    intro o h
+    cases u
+    · rcases h with h | ⟨h,_⟩
+      · have : o = 0 ∨ o = 1 := by omega
+        simpa [opsOf] using this
+      · exact Bool.noConfusion h
+    · have : o = 0 ∨ o = 1 ∨ o = 2 ∨ o = 3 := by rcases h with h | ⟨_,h⟩ <;> omega
+      simpa [opsOf] using this
+  have opk : ∀ {o : Nat}, allowed u o → opOK u o = true := by
+    intro o h
+    cases u
+    · rcases h with h | ⟨h,_⟩
+      · simpa only [opOK,Bool.false_or,Nat.blt_eq] using h
+      · exact Bool.noConfusion h
+    · rfl
+  obtain ⟨p,hp,perm,ho⟩ := pairs_ok ham hcm hac
+  obtain ⟨x,hx⟩ := allZip_ok hz p hp
+
+  have core : ∀ (o : Nat) (ja jb : Bool), allowed u o → W (nb o p.1 p.2.1) = bin d (W a) (W c) →
+      (p.2.2.length + (bl ja + bl jb) ≤ k) →
+      Impossible u (W T) k (kidW p.2.2 p.1 p.2.1 (nb o p.1 p.2.1) ja jb).toFinset := by
+    intro o ja jb ho4 hW hl
+    have hf := List.all_eq_true.mp hx o (inOps ho4)
+    simp only [Bool.or_eq_true] at hf
+    have pm (v : Nat) : v ∈ st.1 ↔ v = p.1 ∨ v = p.2.1 ∨ v ∈ p.2.2 := by
+      rw [←perm.mem_iff]
+      simp
+    rcases hf with ((hf | hf) | hf) | hf
+    · exfalso
+      obtain ⟨y,hy,e⟩ := List.any_eq_true.mp hf
+      apply fresh
+      rw [←hW,←Nat.eq_of_beq_eq_true e]
+      exact List.mem_map_of_mem hy
+    · exfalso
+      apply hprop.1
+      rw [←hW,Nat.eq_of_beq_eq_true hf]
+      rfl
+    · exfalso
+      apply hprop.2
+      rw [←hW,Nat.eq_of_beq_eq_true hf]
+      exact W_full
+    have hk := List.all_eq_true.mp hf (ja,jb) (by cases ja <;> cases jb <;> simp [keeps])
+    simp only [kidOK,Bool.or_eq_true] at hk
+    have ndp : ((p.1::p.2.1::p.2.2).map W).Nodup := (perm.map W).nodup_iff.mpr ndW
+    simp only [List.map_cons,List.nodup_cons,List.mem_cons,not_or] at ndp
+    have nk : (kidW p.2.2 p.1 p.2.1 (nb o p.1 p.2.1) ja jb).Nodup := by
+      have n1 := kept_nd jb (W p.2.1) _ ndp.2.2 ndp.2.1
+      have n2 : W p.1 ∉ kept jb (W p.2.1) (p.2.2.map W) := by
+        cases jb
+        · exact ndp.1.2
+        · simp only [kept,if_true,List.mem_cons,not_or]
+          exact ndp.1
+      refine List.nodup_cons.mpr ⟨?_,kept_nd ja _ _ n1 n2⟩
+      intro hm
+      apply fresh
+      rw [←hW]
+      have sub : W (nb o p.1 p.2.1) ∈ (p.1::p.2.1::p.2.2).map W := by
+        rcases mem_kept hm with h | h
+        · rw [h]; simp
+        · rcases mem_kept h with h | h
+          · rw [h]; simp
+          · simp [h]
+      exact (perm.map W).mem_iff.mp sub
+    rcases hk with hk | hk
+    · exfalso
+      rw [Nat.blt_eq] at hk
+      have : k < p.2.2.length + (bl ja + bl jb) + 0 := hk
+      omega
+    · obtain ⟨i,_,hi⟩ := List.any_eq_true.mp hk
+      unfold hintOK at hi
+      have sub : ∀ x ∈ kidN p.2.2 p.1 p.2.1 (nb o p.1 p.2.1) ja jb, x < 2^128 := by
+        intro x hx
+        have hx' : x = nb o p.1 p.2.1 ∨ x ∈ st.1 := by
+          unfold kidN at hx
+          rw [mem_ins] at hx
+          rcases hx with hx | hx
+          · exact Or.inl hx
+          · right
+            rw [pm]
+            cases ja <;> cases jb <;> simp only [cond_true,cond_false,mem_ins] at hx <;> tauto
+        rcases hx' with rfl | hx'
+        · have l1 : p.1 < 2^128 := lt _ ((pm _).mpr (Or.inl rfl))
+          have l2 : p.2.1 < 2^128 := lt _ ((pm _).mpr (Or.inr (Or.inl rfl)))
+          have la : Nat.land p.1 p.2.1 < 2^128 := Nat.lt_of_le_of_lt (Nat.and_le_left) l1
+          unfold nb
+          cases Nat.beq o 0 <;> cases Nat.beq o 1 <;> cases Nat.beq o 2 <;>
+            first | exact la | exact Nat.or_lt_two_pow l1 l2 | exact Nat.xor_lt_two_pow l1 la | exact Nat.xor_lt_two_pow l2 la
+        · exact lt x hx'
+      cases h1 : Nat.blt i 10000
+      · rw [h1,cond_false] at hi
+        cases h2 : Nat.blt i 20000
+        · rw [h2,cond_false] at hi
+          cases h3 : Nat.blt i 30000
+          · rw [h3,cond_false] at hi
+            cases hg : t.perms[i-30000]? with
+            | none => rw [hg] at hi; exact Bool.noConfusion hi
+            | some l =>
+              rw [hg] at hi
+              obtain ⟨s,hs',e⟩ := List.any_eq_true.mp hi
+              rw [←kid_fin]
+              apply perm_sound l (List.all_eq_true.mp ht.p l (List.mem_of_getElem? hg))
+              have : (((kidN p.2.2 p.1 p.2.1 (nb o p.1 p.2.1) ja jb).map (permN l)).map W).toFinset = (s.map W).toFinset := by
+                rw [←beqL_ok e]
+                ext v
+                simp only [List.mem_toFinset,List.mem_map,mem_sortN]
+              rw [this]
+              exact hn s hs'
+          · rw [h3,cond_true] at hi
+            cases hg : t.kws[i-20000]? with
+            | none => rw [hg] at hi; exact Bool.noConfusion hi
+            | some q =>
+              rw [hg] at hi
+              simp only [Bool.and_eq_true,Bool.not_eq_true'] at hi
+              obtain ⟨⟨hu,hlen⟩,hkw⟩ := hi
+              rw [←kid_fin]
+              have sz := Nat.eq_of_beq_eq_true hlen
+              have nd' : ((kidN p.2.2 p.1 p.2.1 (nb o p.1 p.2.1) ja jb).map W).Nodup := by
+                apply List.dedup_eq_self.mp
+                apply (List.dedup_sublist _).eq_of_length
+                have c1 : ((kidN p.2.2 p.1 p.2.1 (nb o p.1 p.2.1) ja jb).map W).toFinset.card = (kidW p.2.2 p.1 p.2.1 (nb o p.1 p.2.1) ja jb).length := by
+                  rw [kid_fin,List.toFinset_card_of_nodup nk]
+                rw [List.card_toFinset] at c1
+                rw [c1,List.length_map]
+                have il : ∀ (z : Nat) (l : List Nat), (ins z l).length = l.length + 1 := by
+                  intro z l
+                  induction l with
+                  | nil => rfl
+                  | cons x xs ih =>
+                    unfold ins
+                    cases Nat.ble z x
+                    · rw [cond_false,List.length_cons,ih,List.length_cons]
+                    · rfl
+                unfold kidN kidW
+                cases ja <;> cases jb <;> simp [kept,il]
+              subst hu
+              exact kw_sound nd' sz sub q (List.all_eq_true.mp ht.k q (List.mem_of_getElem? hg)) hkw
+        · rw [h2,cond_true] at hi
+          cases hg : t.seps[i-10000]? with
+          | none => rw [hg] at hi; exact Bool.noConfusion hi
+          | some q =>
+            rw [hg] at hi
+            exact sep_sound (List.all_eq_true.mp ht.s q (List.mem_of_getElem? hg)) hi
+      · rw [h1,cond_true] at hi
+        cases hg : t.cuts[i]? with
+        | none => rw [hg] at hi; exact Bool.noConfusion hi
+        | some q =>
+          rw [hg] at hi
+          exact cut_sound (ht.c q (List.mem_of_getElem? hg)) (opk ho4) nk hi
+  have rp : (((st.1.map W).erase (W a)).erase (W c)).Perm (p.2.2.map W) := by
+    have e : (W a :: W c :: p.2.2.map W).Perm (st.1.map W) := by
+      rcases ho with ⟨rfl,rfl⟩ | ⟨rfl,rfl⟩
+      · exact perm.map W
+      · exact (List.Perm.swap _ _ _).trans (perm.map W)
+    have e1 := e.erase (W a)
+    rw [List.erase_cons_head] at e1
+    have e2 := e1.erase (W c)
+    rw [List.erase_cons_head] at e2
+    exact e2.symm
+  have lenr : (((st.1.map W).erase (W a)).erase (W c)).length = p.2.2.length := by
+    rw [rp.length_eq,List.length_map]
+  have fits : p.2.2.length + (bl ka + bl kb) ≤ k := by
+    have h := hlen
+    unfold childTwo at h
+    cases ka <;> cases kb <;> simp [kept,lenr] at h <;> simp [bl] <;> omega
+  rw [Nat.add_sub_cancel]
+  rcases ho with ⟨rfl,rfl⟩ | ⟨rfl,rfl⟩
+  · have r := core d ka kb hd (W_nb _ _ _) fits
+    have e : (childTwo (st.1.map W) (W p.1) (W p.2.1) d ka kb).toFinset = (kidW p.2.2 p.1 p.2.1 (nb d p.1 p.2.1) ka kb).toFinset := by
+      unfold childTwo kidW
+      rw [W_nb]
+      ext v
+      cases ka <;> cases kb <;> simp [kept,rp.mem_iff]
+    rw [e]
+    exact r
+  · have hfl := flip_flip hd
+    have r := core (flipOp d) kb ka hfl.1 (by rw [W_nb]; exact (bin_flip hd _ _).symm) (by omega)
+    have e : (childTwo (st.1.map W) (W p.2.1) (W p.1) d ka kb).toFinset = (kidW p.2.2 p.1 p.2.1 (nb (flipOp d) p.1 p.2.1) kb ka).toFinset := by
+      unfold childTwo kidW
+      rw [W_nb,bin_flip hd]
+      ext v
+      cases ka <;> cases kb <;> simp [kept,rp.mem_iff] <;> tauto
+    rw [e]
+    exact r
+
+theorem levelStep {u R T E t k D' D} (hB : baseOK T R E = true) (ht : TabsP u R T t)
+    (hI : LevelN u T k D') (h : levelOK u T t k (D'.map Prod.fst) D = true) : LevelN u T (k+1) D := by
+  intro st hst
+  refine stStep hB ht ?_ (List.all_eq_true.mp h st hst)
+  intro s hs
+  obtain ⟨q,hq,rfl⟩ := List.mem_map.mp hs
+  exact hI q hq
+theorem chunks {u : Bool} {T : Nat} {t : Tabs} {k : Nat} {next : List (List Nat)} (c : Nat) (D : List StD) (n : Nat) (hc : 0 < c)
+    (hl : Nat.ble D.length (n*c) = true)
+    (h : ∀ i, i < n → levelOK u T t k next ((D.drop (i*c)).take c) = true) : levelOK u T t k next D = true := by
+  rw [levelOK,List.all_eq_true]
+  intro x hx
+  obtain ⟨j,hj,rfl⟩ := List.getElem_of_mem hx
+  have hl' := Nat.le_of_ble_eq_true hl
+  have hi : j / c < n := by
+    rw [Nat.div_lt_iff_lt_mul hc]
+    omega
+  refine List.all_eq_true.mp (h _ hi) _ ?_
+  have hm : j / c * c + j % c = j := by rw [Nat.mul_comm]; exact Nat.div_add_mod j c
+  have hmod := Nat.mod_lt j hc
+  refine List.mem_of_getElem? (i := j % c) ?_
+  rw [List.getElem?_take_of_lt hmod,List.getElem?_drop,hm]
+  exact List.getElem?_eq_getElem hj
+theorem lowSearch {u R T E K D} (hB : baseOK T R E = true) (hI : LevelN u T K D)
+    (h : (D.map Prod.fst).contains (R.map xN) = true) : LowN u R T (K+1) := by
+  apply lowOf hB
+  simp only [List.contains_eq_mem,decide_eq_true_eq] at h
+  obtain ⟨q,hq,e⟩ := List.mem_map.mp h
+  have := hI q hq
+  rw [e] at this
+  simpa only [rootsW,List.map_map,Function.comp_def] using this
+
+def sw0 : Nat := 0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+def sw1 : Nat := 0xcccccccccccccccccccccccccccccccc
+def sw2 : Nat := 0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0
+def sw3 : Nat := 0xff00ff00ff00ff00ff00ff00ff00ff00
+def sw4 : Nat := 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+def sw5 : Nat := 0xffaaffaaffaaffaaffaaffaaffaaffaa
+def sw6 : Nat := 0xffccffccffccffccffccffccffccffcc
+def sw7 : Nat := 0xfefefefefefefefefefefefefefefefe
+def sw8 : Nat := 0xee00ee00ee00ee00ee00ee00ee00ee
+def sw9 : Nat := 0xfcfcfcfcfcfcfcfcfcfcfcfcfcfcfcfc
+def sw10 : Nat := 0xfff0fff0fff0fff0fff0fff0fff0fff0
+def sw11 : Nat := 0xfe00fe00fe00fe00fe00fe00fe00fe
+def sw12 : Nat := 0xffff0000ffff0000ffff0000ffff0000
+def sw13 : Nat := 0xffffaaaaffffaaaaffffaaaaffffaaaa
+def sw14 : Nat := 0xffffccccffffccccffffccccffffcccc
+def sw15 : Nat := 0xeeee0000eeee0000eeee0000eeee
+def sw16 : Nat := 0xfffff0f0fffff0f0fffff0f0fffff0f0
+def sw17 : Nat := 0xffffff00ffffff00ffffff00ffffff00
+def sw18 : Nat := 0xfffffafafffffafafffffafafffffafa
+def sw19 : Nat := 0xfffffcfcfffffcfcfffffcfcfffffcfc
+def sw20 : Nat := 0xffeeffeeffeeffeeffeeffeeffeeffee
+def sw21 : Nat := 0xffffeeeeffffeeeeffffeeeeffffeeee
+def sw22 : Nat := 0xfffefffefffefffefffefffefffefffe
+def sw23 : Nat := 0xfefe0000fefe0000fefe0000fefe
+def sw24 : Nat := 0xaaa8aaa8aaa8aaa8aaa8aaa8aaa8aaa8
+def sw25 : Nat := 0xfffcfffcfffcfffcfffcfffcfffcfffc
+def sw26 : Nat := 0xa0000000a0000000a0000000a
+def sw27 : Nat := 0xfffffff0fffffff0fffffff0fffffff0
+def sw28 : Nat := 0x88888888888888888888888888888888
+def sw29 : Nat := 0xaaaa0000aaaa0000aaaa0000aaaa
+def sw30 : Nat := 0xaaaafefeaaaafefeaaaafefeaaaafefe
+def sw31 : Nat := 0xf000f000f000f000f000f000f000f000
+def sw32 : Nat := 0xfc00fc00fc00fc00fc00fc00fc00fc
+def sw33 : Nat := 0xee000000ee000000ee000000ee
+def sw34 : Nat := 0xfffafffafffafffafffafffafffafffa
+def sw35 : Nat := 0xffffffaaffffffaaffffffaaffffffaa
+def sw36 : Nat := 0xfafafafafafafafafafafafafafafafa
+def sw37 : Nat := 0xfffffffcfffffffcfffffffcfffffffc
+def sw38 : Nat := 0xffffffccffffffccffffffccffffffcc
+def sw39 : Nat := 0xfa00fa00fa00fa00fa00fa00fa00fa
+def sw40 : Nat := 0xfffe0000fffe0000fffe0000fffe
+def sw41 : Nat := 0xfffffe00fffffe00fffffe00fffffe00
+def sw42 : Nat := 0x2aaaa0002aaaa0002aaaa0002aaaa
+def sw43 : Nat := 0xfffffefefffffefefffffefefffffefe
+def sw44 : Nat := 0xaaaaaaa8aaaaaaa8aaaaaaa8aaaaaaa8
+def sw45 : Nat := 0xfffffffefffffffefffffffefffffffe
+def sw46 : Nat := 0xaaaafffeaaaafffeaaaafffeaaaafffe
+def sw47 : Nat := 0xfe000000fe000000fe000000fe
+def sw48 : Nat := 0xfffc0000fffc0000fffc0000fffc
+def sw49 : Nat := 0xffff000affff000affff000affff000a
+def sw50 : Nat := 0x55555550555555505555555055555550
+def sw51 : Nat := 0xffff8888ffff8888ffff8888ffff8888
+def sw52 : Nat := 0xfffefefefffefefefffefefefffefefe
+def sw53 : Nat := 0xfefefe00fefefe00fefefe00fefefe
+def sw54 : Nat := 0xff000000ff000000ff000000ff000000
+def sw55 : Nat := 0xffff00aaffff00aaffff00aaffff00aa
+def sw56 : Nat := 0xfefefffefefefffefefefffefefefffe
+def sw57 : Nat := 0xaaa8fffcaaa8fffcaaa8fffcaaa8fffc
+def sw58 : Nat := 0xffff00eeffff00eeffff00eeffff00ee
+def sw59 : Nat := 0xaafeaafeaafeaafeaafeaafeaafeaafe
+def sw60 : Nat := 0xeeeefffeeeeefffeeeeefffeeeeefffe
+def sw61 : Nat := 0xaafe0000aafe0000aafe0000aafe
+def sw62 : Nat := 0x8888fff88888fff88888fff88888fff8
+def sw63 : Nat := 0xfcccfcccfcccfcccfcccfcccfcccfccc
+def sw64 : Nat := 0xfffff000fffff000fffff000fffff000
+def sw65 : Nat := 0xfff00000fff00000fff00000fff0
+def sw66 : Nat := 0xaafcfe00aafcfe00aafcfe00aafcfe
+def sw67 : Nat := 0xccfcccfcccfcccfcccfcccfcccfcccfc
+def sw68 : Nat := 0xffffffeeffffffeeffffffeeffffffee
+def sw69 : Nat := 0xf3f2f3f2f3f2f3f2f3f2f3f2f3f2f3f2
+def sw70 : Nat := 0xf3f0f3f0f3f0f3f0f3f0f3f0f3f0f3f0
+def sw71 : Nat := 0xaafaaafaaafaaafaaafaaafaaafaaafa
+def sw72 : Nat := 0xfff0f0f0fff0f0f0fff0f0f0fff0f0f0
+def sw73 : Nat := 0xfffffffafffffffafffffffafffffffa
+def sw74 : Nat := 0xffffee00ffffee00ffffee00ffffee
+def sw75 : Nat := 0xffa00000ffa00000ffa00000ffa
+def sw76 : Nat := 0xeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaea
+def sw77 : Nat := 0xffc0ffc0ffc0ffc0ffc0ffc0ffc0ffc0
+def sw78 : Nat := 0xffffc0c0ffffc0c0ffffc0c0ffffc0c0
+def sw79 : Nat := 0x3fffc0003fffc0003fffc0003fffc
+def sw80 : Nat := 0xfffeff00fffeff00fffeff00fffeff00
+def sw81 : Nat := 0xff00fe00ff00fe00ff00fe00ff00fe00
+def sw82 : Nat := 0xaaaafffcaaaafffcaaaafffcaaaafffc
+def sw83 : Nat := 0x99989998999899989998999899989998
+def sw84 : Nat := 0xffccccccffccccccffccccccffcccccc
+def sw85 : Nat := 0xffe00000ffe00000ffe00000ffe
+def sw86 : Nat := 0xffffffff00000000ffffffff00000000
+def s1_T : Nat := 0x88888888888888888888888888888888
+def s1_R : List Nat := [0, 1]
+def s1_E : List (Nat × Nat × Nat) := [(0,2,3),(1,1,3)]
+theorem s1_B : baseOK s1_T s1_R s1_E = true := by decide +kernel
+theorem s1_L : LowN true s1_R s1_T 1 := lowCount s1_B (by decide +kernel)
+def s2_T : Nat := 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+def s2_R : List Nat := [0, 1]
+def s2_E : List (Nat × Nat × Nat) := [(0,0,1),(1,0,2)]
+theorem s2_B : baseOK s2_T s2_R s2_E = true := by decide +kernel
+theorem s2_L : LowN true s2_R s2_T 1 := lowCount s2_B (by decide +kernel)
+def s3_T : Nat := 0xe8e8e8e8e8e8e8e8e8e8e8e8e8e8e8e8
+def s3_R : List Nat := [0, 1, 2]
+def s3_E : List (Nat × Nat × Nat) := [(0,2,3),(1,1,3),(2,1,5)]
+theorem s3_B : baseOK s3_T s3_R s3_E = true := by decide +kernel
+theorem s3_S0 : SliceN true s3_R s3_T (0x33333333333333333333333333333333,1,[0, 2]) := mkSlice (w:=0) s3_B s1_B s1_L (by decide +kernel)
+theorem s3_S1 : SliceN true s3_R s3_T (0x55555555555555555555555555555555,1,[1, 2]) := mkSlice (w:=0) s3_B s1_B s1_L (by decide +kernel)
+theorem s3_S2 : SliceN true s3_R s3_T (0xcccccccccccccccccccccccccccccccc,1,[0, 2]) := mkSlice (w:=2) s3_B s2_B s2_L (by decide +kernel)
+theorem s3_S3 : SliceN true s3_R s3_T (0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,1,[1, 2]) := mkSlice (w:=1) s3_B s2_B s2_L (by decide +kernel)
+theorem s3_S4 : SliceN true s3_R s3_T (0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f,1,[0, 1]) := mkSlice (w:=0) s3_B s1_B s1_L (by decide +kernel)
+theorem s3_S5 : SliceN true s3_R s3_T (0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,1,[0, 1]) := mkSlice (w:=4) s3_B s2_B s2_L (by decide +kernel)
+def s3_Z : List SliceD := [(0x33333333333333333333333333333333,1,[0, 2]),(0x55555555555555555555555555555555,1,[1, 2]),(0xcccccccccccccccccccccccccccccccc,1,[0, 2]),(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,1,[1, 2]),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f,1,[0, 1]),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,1,[0, 1])]
+theorem s3_Y : ∀ s ∈ s3_Z, SliceN true s3_R s3_T s := by
+  unfold s3_Z
+  simp only [List.forall_mem_cons]
+  exact ⟨s3_S0,s3_S1,s3_S2,s3_S3,s3_S4,s3_S5,by simp⟩
+def s3_C : List (Nat × List (Nat × Nat × Nat)) := [(0,[]),(1,[]),(2,[]),(3,[]),(4,[]),(5,[])]
+def s3_t : Tabs := (s3_C.map (mkCut true s3_Z),[(5,4),(3,1),(3,0),(3,2),(6,2),(5,1)],[],[])
+theorem s3_W : TabsP true s3_R s3_T s3_t := ⟨cutsGood s3_Y (by decide +kernel),by decide +kernel,by decide +kernel,by decide +kernel⟩
+noncomputable def s3_D3 : List StD := [
+([sw0,sw1,sw2],[[0,1,10000,2,3,10001,10002],[4,1,10003,10000,3],[10001,0,5,2,10004,10005]])]
+def s3_D2 : List StD := []
+theorem s3_I2 : LevelN true s3_T 2 s3_D2 := by intro s h; cases h
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s3_C3x0 : levelOK true s3_T s3_t 2 (s3_D2.map Prod.fst) ((s3_D3.drop (0*16)).take 16) = true := by decide +kernel
+theorem s3_I3 : LevelN true s3_T 3 s3_D3 := levelStep s3_B s3_W s3_I2 (chunks 16 s3_D3 1 (by omega) (by decide +kernel) (by
+  intro i hi
+  interval_cases i
+  · exact s3_C3x0
+  ))
+theorem s3_L : LowN true s3_R s3_T 4 := lowSearch s3_B s3_I3 (by decide +kernel)
+def s4_T : Nat := 0xfefefefefefefefefefefefefefefefe
+def s4_R : List Nat := [0, 1, 2]
+def s4_E : List (Nat × Nat × Nat) := [(0,0,1),(1,0,2),(2,0,4)]
+theorem s4_B : baseOK s4_T s4_R s4_E = true := by decide +kernel
+theorem s4_L : LowN true s4_R s4_T 2 := lowCount s4_B (by decide +kernel)
+def s5_T : Nat := 0xfee8fee8fee8fee8fee8fee8fee8fee8
+def s5_R : List Nat := [0, 1, 2, 3]
+def s5_E : List (Nat × Nat × Nat) := [(0,2,3),(1,1,3),(2,1,5),(3,1,9)]
+theorem s5_B : baseOK s5_T s5_R s5_E = true := by decide +kernel
+theorem s5_S0 : SliceN true s5_R s5_T (0x55555555555555555555555555555555,4,[1, 2, 3]) := mkSlice (w:=0) s5_B s3_B s3_L (by decide +kernel)
+theorem s5_S1 : SliceN true s5_R s5_T (0x33333333333333333333333333333333,4,[0, 2, 3]) := mkSlice (w:=0) s5_B s3_B s3_L (by decide +kernel)
+theorem s5_S2 : SliceN true s5_R s5_T (0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f,4,[0, 1, 3]) := mkSlice (w:=0) s5_B s3_B s3_L (by decide +kernel)
+theorem s5_S3 : SliceN true s5_R s5_T (0xff00ff00ff00ff00ff00ff00ff00ff,4,[0, 1, 2]) := mkSlice (w:=0) s5_B s3_B s3_L (by decide +kernel)
+theorem s5_S4 : SliceN true s5_R s5_T (0x11111111111111111111111111111111,1,[2, 3]) := mkSlice (w:=0) s5_B s1_B s1_L (by decide +kernel)
+theorem s5_S5 : SliceN true s5_R s5_T (0x22222222222222222222222222222222,1,[2, 3]) := mkSlice (w:=1) s5_B s2_B s2_L (by decide +kernel)
+theorem s5_S6 : SliceN true s5_R s5_T (0x44444444444444444444444444444444,1,[2, 3]) := mkSlice (w:=2) s5_B s2_B s2_L (by decide +kernel)
+theorem s5_S7 : SliceN true s5_R s5_T (0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,2,[1, 2, 3]) := mkSlice (w:=1) s5_B s4_B s4_L (by decide +kernel)
+theorem s5_S8 : SliceN true s5_R s5_T (0xcccccccccccccccccccccccccccccccc,2,[0, 2, 3]) := mkSlice (w:=2) s5_B s4_B s4_L (by decide +kernel)
+theorem s5_S9 : SliceN true s5_R s5_T (0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,2,[0, 1, 3]) := mkSlice (w:=4) s5_B s4_B s4_L (by decide +kernel)
+theorem s5_S10 : SliceN true s5_R s5_T (0xaa00aa00aa00aa00aa00aa00aa00aa,1,[1, 2]) := mkSlice (w:=1) s5_B s2_B s2_L (by decide +kernel)
+theorem s5_S11 : SliceN true s5_R s5_T (0xff00ff00ff00ff00ff00ff00ff00ff00,2,[0, 1, 2]) := mkSlice (w:=8) s5_B s4_B s4_L (by decide +kernel)
+theorem s5_S12 : SliceN true s5_R s5_T (0xcc00cc00cc00cc00cc00cc00cc00cc,1,[0, 2]) := mkSlice (w:=2) s5_B s2_B s2_L (by decide +kernel)
+theorem s5_S13 : SliceN true s5_R s5_T (0x50505050505050505050505050505050,1,[1, 3]) := mkSlice (w:=4) s5_B s2_B s2_L (by decide +kernel)
+def s5_Z : List SliceD := [(0x55555555555555555555555555555555,4,[1, 2, 3]),(0x33333333333333333333333333333333,4,[0, 2, 3]),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f,4,[0, 1, 3]),(0xff00ff00ff00ff00ff00ff00ff00ff,4,[0, 1, 2]),(0x11111111111111111111111111111111,1,[2, 3]),(0x22222222222222222222222222222222,1,[2, 3]),(0x44444444444444444444444444444444,1,[2, 3]),(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,2,[1, 2, 3]),(0xcccccccccccccccccccccccccccccccc,2,[0, 2, 3]),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,2,[0, 1, 3]),(0xaa00aa00aa00aa00aa00aa00aa00aa,1,[1, 2]),(0xff00ff00ff00ff00ff00ff00ff00ff00,2,[0, 1, 2]),(0xcc00cc00cc00cc00cc00cc00cc00cc,1,[0, 2]),(0x50505050505050505050505050505050,1,[1, 3])]
+theorem s5_Y : ∀ s ∈ s5_Z, SliceN true s5_R s5_T s := by
+  unfold s5_Z
+  simp only [List.forall_mem_cons]
+  exact ⟨s5_S0,s5_S1,s5_S2,s5_S3,s5_S4,s5_S5,s5_S6,s5_S7,s5_S8,s5_S9,s5_S10,s5_S11,s5_S12,s5_S13,by simp⟩
+def s5_C : List (Nat × List (Nat × Nat × Nat)) := [(0,[]),(1,[]),(2,[]),(3,[]),(2,[(1,0,1)]),(3,[(1,0,1)]),(4,[]),(0,[(1,0,2)]),(1,[(1,0,2)]),(5,[]),(1,[(3,0,2)]),(6,[]),(0,[(3,0,2)]),(2,[(1,1,2)]),(2,[(1,0,2)]),(0,[(1,0,1)]),(1,[(1,0,1)]),(1,[(3,0,1)]),(7,[]),(0,[(3,0,1)]),(8,[]),(0,[(2,0,1)]),(9,[]),(10,[]),(0,[(2,0,2)]),(11,[]),(12,[]),(0,[(1,0,2),(1,1,2)]),(8,[(1,1,2)]),(0,[(1,0,1),(1,1,2)]),(0,[(1,0,1),(1,0,2)]),(0,[(1,1,2),(1,0,3)]),(3,[(3,1,2)]),(0,[(0,0,2)]),(0,[(2,1,2)]),(0,[(0,1,2)]),(13,[])]
+def s5_t : Tabs := (s5_C.map (mkCut true s5_Z),[(5,4),(3,2),(3,1),(5,1),(9,8),(9,1),(6,4),(6,2),(10,8),(10,2),(12,8),(12,4),(7,8)],[],[[],[1],[2,1],[0,1],[0,2,1],[1,0,2,1],[0,1,2],[0,1,2,1],[1,2],[1,2,1],[2],[1,0]])
+theorem s5_W : TabsP true s5_R s5_T s5_t := ⟨cutsGood s5_Y (by decide +kernel),by decide +kernel,by decide +kernel,by decide +kernel⟩
+noncomputable def s5_D6 : List StD := [
+([sw0,sw1,sw2,sw3],[[0,1,10000,30000,10001,10002],[0,10001,30001,10000,10003,2],[0,10000,30002,10004,10005,3],[1,10002,30003,10006,10007,2],[1,10002,30004,10008,10009,3],[2,10003,30005,10010,10011,3]])]
+noncomputable def s5_D5 : List StD := [
+([sw0,sw1,sw4,sw2,sw3],[[0,1],[1],[0,30006,10003,4],[0,30007,10005,5],[0],[1,30008,10007,4],[1,30009,10009,5],[4,6,2,30000,10003,30010,10010],[5,6,3,30010,10005,30000,10011],[10003,4,10010,10011]])]
+noncomputable def s5_D4 : List StD := [
+([sw0,sw1,sw2,sw5,sw6],[[7,30011,8],[7,9],[10],[7,8,9],[8,11],[8,7,11],[12],[13,9,10007],[14,11,10003],[7,8]]),
+([sw0,sw1,sw2,sw7,sw3],[[15,4,16],[15,16,4],[17],[15,18],[4,15,16],[19],[16,20],[21],[4,22],[3,18,30000]]),
+([sw8,sw0,sw1,sw2,sw3],[[0,1],[1,0],[2,23,6],[7],[24,23],[6,23],[6,25,5],[6,26],[23,25],[23,25]])]
+noncomputable def s5_D3 : List StD := [
+([sw0,sw9,sw6,sw10],[[27,28,10012],[29,28,10000],[30,10000,10001],[3,31,32],[3,28,1],[1,28]]),
+([sw11,sw0,sw1,sw2],[[0,18],[24,20,33],[34,6,35],[36,18],[11,18],[9,20]])]
+def s5_D2 : List StD := []
+theorem s5_I2 : LevelN true s5_T 2 s5_D2 := by intro s h; cases h
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s5_C3x0 : levelOK true s5_T s5_t 2 (s5_D2.map Prod.fst) ((s5_D3.drop (0*16)).take 16) = true := by decide +kernel
+theorem s5_I3 : LevelN true s5_T 3 s5_D3 := levelStep s5_B s5_W s5_I2 (chunks 16 s5_D3 1 (by omega) (by decide +kernel) (by
+  intro i hi
+  interval_cases i
+  · exact s5_C3x0
+  ))
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s5_C4x0 : levelOK true s5_T s5_t 3 (s5_D3.map Prod.fst) ((s5_D4.drop (0*16)).take 16) = true := by decide +kernel
+theorem s5_I4 : LevelN true s5_T 4 s5_D4 := levelStep s5_B s5_W s5_I3 (chunks 16 s5_D4 1 (by omega) (by decide +kernel) (by
+  intro i hi
+  interval_cases i
+  · exact s5_C4x0
+  ))
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s5_C5x0 : levelOK true s5_T s5_t 4 (s5_D4.map Prod.fst) ((s5_D5.drop (0*16)).take 16) = true := by decide +kernel
+theorem s5_I5 : LevelN true s5_T 5 s5_D5 := levelStep s5_B s5_W s5_I4 (chunks 16 s5_D5 1 (by omega) (by decide +kernel) (by
+  intro i hi
+  interval_cases i
+  · exact s5_C5x0
+  ))
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s5_C6x0 : levelOK true s5_T s5_t 5 (s5_D5.map Prod.fst) ((s5_D6.drop (0*16)).take 16) = true := by decide +kernel
+theorem s5_I6 : LevelN true s5_T 6 s5_D6 := levelStep s5_B s5_W s5_I5 (chunks 16 s5_D6 1 (by omega) (by decide +kernel) (by
+  intro i hi
+  interval_cases i
+  · exact s5_C6x0
+  ))
+theorem s5_L : LowN true s5_R s5_T 7 := lowSearch s5_B s5_I6 (by decide +kernel)
+def s6_T : Nat := 0xfffefffefffefffefffefffefffefffe
+def s6_R : List Nat := [0, 1, 2, 3]
+def s6_E : List (Nat × Nat × Nat) := [(0,0,1),(1,0,2),(2,0,4),(3,0,8)]
+theorem s6_B : baseOK s6_T s6_R s6_E = true := by decide +kernel
+theorem s6_L : LowN true s6_R s6_T 3 := lowCount s6_B (by decide +kernel)
+def s7_T : Nat := 0xfffefee8fffefee8fffefee8fffefee8
+def s7_R : List Nat := [0, 1, 2, 3, 4]
+def s7_E : List (Nat × Nat × Nat) := [(0,2,3),(1,1,3),(2,1,5),(3,1,9),(4,1,17)]
+theorem s7_B : baseOK s7_T s7_R s7_E = true := by decide +kernel
+theorem s7_S0 : SliceN true s7_R s7_T (0x55555555555555555555555555555555,7,[1, 2, 3, 4]) := mkSlice (w:=0) s7_B s5_B s5_L (by decide +kernel)
+theorem s7_S1 : SliceN true s7_R s7_T (0x33333333333333333333333333333333,7,[0, 2, 3, 4]) := mkSlice (w:=0) s7_B s5_B s5_L (by decide +kernel)
+theorem s7_S2 : SliceN true s7_R s7_T (0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f,7,[0, 1, 3, 4]) := mkSlice (w:=0) s7_B s5_B s5_L (by decide +kernel)
+theorem s7_S3 : SliceN true s7_R s7_T (0xff00ff00ff00ff00ff00ff00ff00ff,7,[0, 1, 2, 4]) := mkSlice (w:=0) s7_B s5_B s5_L (by decide +kernel)
+theorem s7_S4 : SliceN true s7_R s7_T (0xffff0000ffff0000ffff0000ffff,7,[0, 1, 2, 3]) := mkSlice (w:=0) s7_B s5_B s5_L (by decide +kernel)
+theorem s7_S5 : SliceN true s7_R s7_T (0x11111111111111111111111111111111,4,[2, 3, 4]) := mkSlice (w:=0) s7_B s3_B s3_L (by decide +kernel)
+theorem s7_S6 : SliceN true s7_R s7_T (0x3333000033330000333300003333,4,[0, 2, 3]) := mkSlice (w:=0) s7_B s3_B s3_L (by decide +kernel)
+theorem s7_S7 : SliceN true s7_R s7_T (0x5555000055550000555500005555,4,[1, 2, 3]) := mkSlice (w:=0) s7_B s3_B s3_L (by decide +kernel)
+theorem s7_S8 : SliceN true s7_R s7_T (0x3030303030303030303030303030303,4,[0, 3, 4]) := mkSlice (w:=0) s7_B s3_B s3_L (by decide +kernel)
+theorem s7_S9 : SliceN true s7_R s7_T (0x5050505050505050505050505050505,4,[1, 3, 4]) := mkSlice (w:=0) s7_B s3_B s3_L (by decide +kernel)
+theorem s7_S10 : SliceN true s7_R s7_T (0x1010101010101010101010101010101,1,[3, 4]) := mkSlice (w:=0) s7_B s1_B s1_L (by decide +kernel)
+theorem s7_S11 : SliceN true s7_R s7_T (0xf000f000f000f000f000f000f000f,4,[0, 1, 4]) := mkSlice (w:=0) s7_B s3_B s3_L (by decide +kernel)
+theorem s7_S12 : SliceN true s7_R s7_T (0xf0f00000f0f00000f0f00000f0f,4,[0, 1, 3]) := mkSlice (w:=0) s7_B s3_B s3_L (by decide +kernel)
+theorem s7_S13 : SliceN true s7_R s7_T (0xff000000ff000000ff000000ff,4,[0, 1, 2]) := mkSlice (w:=0) s7_B s3_B s3_L (by decide +kernel)
+theorem s7_S14 : SliceN true s7_R s7_T (0x550055005500550055005500550055,4,[1, 2, 4]) := mkSlice (w:=0) s7_B s3_B s3_L (by decide +kernel)
+theorem s7_S15 : SliceN true s7_R s7_T (0x33003300330033003300330033003300,2,[0, 2, 4]) := mkSlice (w:=8) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S16 : SliceN true s7_R s7_T (0xffff0000ffff0000ffff0000ffff0000,3,[0, 1, 2, 3]) := mkSlice (w:=16) s7_B s6_B s6_L (by decide +kernel)
+theorem s7_S17 : SliceN true s7_R s7_T (0x11110000111100001111000011110000,1,[2, 3]) := mkSlice (w:=16) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S18 : SliceN true s7_R s7_T (0x10101010101010101010101010101010,1,[3, 4]) := mkSlice (w:=4) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S19 : SliceN true s7_R s7_T (0x11001100110011001100110011001100,1,[2, 4]) := mkSlice (w:=8) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S20 : SliceN true s7_R s7_T (0x22222222222222222222222222222222,2,[2, 3, 4]) := mkSlice (w:=1) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S21 : SliceN true s7_R s7_T (0x2222000022220000222200002222,1,[2, 3]) := mkSlice (w:=1) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S22 : SliceN true s7_R s7_T (0xff000000ff000000ff000000ff0000,2,[0, 1, 2]) := mkSlice (w:=16) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S23 : SliceN true s7_R s7_T (0x2020202020202020202020202020202,1,[3, 4]) := mkSlice (w:=1) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S24 : SliceN true s7_R s7_T (0xcc000000cc000000cc000000cc,1,[0, 2]) := mkSlice (w:=2) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S25 : SliceN true s7_R s7_T (0xcccccccccccccccccccccccccccccccc,3,[0, 2, 3, 4]) := mkSlice (w:=2) s7_B s6_B s6_L (by decide +kernel)
+theorem s7_S26 : SliceN true s7_R s7_T (0xa0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a,2,[1, 3, 4]) := mkSlice (w:=1) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S27 : SliceN true s7_R s7_T (0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c,2,[0, 3, 4]) := mkSlice (w:=2) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S28 : SliceN true s7_R s7_T (0xa0a00000a0a00000a0a00000a0a,1,[1, 3]) := mkSlice (w:=1) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S29 : SliceN true s7_R s7_T (0xcccc0000cccc0000cccc0000cccc,2,[0, 2, 3]) := mkSlice (w:=2) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S30 : SliceN true s7_R s7_T (0x330033003300330033003300330033,4,[0, 2, 4]) := mkSlice (w:=0) s7_B s3_B s3_L (by decide +kernel)
+theorem s7_S31 : SliceN true s7_R s7_T (0x30003000300030003000300030003,1,[0, 4]) := mkSlice (w:=0) s7_B s1_B s1_L (by decide +kernel)
+theorem s7_S32 : SliceN true s7_R s7_T (0x44444444444444444444444444444444,2,[2, 3, 4]) := mkSlice (w:=2) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S33 : SliceN true s7_R s7_T (0xaa00aa00aa00aa00aa00aa00aa00aa,2,[1, 2, 4]) := mkSlice (w:=1) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S34 : SliceN true s7_R s7_T (0xf0f00000f0f00000f0f00000f0f0,2,[0, 1, 3]) := mkSlice (w:=4) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S35 : SliceN true s7_R s7_T (0xff00ff00ff00ff00ff00ff00ff00ff00,3,[0, 1, 2, 4]) := mkSlice (w:=8) s7_B s6_B s6_L (by decide +kernel)
+theorem s7_S36 : SliceN true s7_R s7_T (0x30303030303030303030303030303030,2,[0, 3, 4]) := mkSlice (w:=4) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S37 : SliceN true s7_R s7_T (0x33330000333300003333000033330000,2,[0, 2, 3]) := mkSlice (w:=16) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S38 : SliceN true s7_R s7_T (0x50505050505050505050505050505050,2,[1, 3, 4]) := mkSlice (w:=4) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S39 : SliceN true s7_R s7_T (0x55005500550055005500550055005500,2,[1, 2, 4]) := mkSlice (w:=8) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S40 : SliceN true s7_R s7_T (0x55550000555500005555000055550000,2,[1, 2, 3]) := mkSlice (w:=16) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S41 : SliceN true s7_R s7_T (0xaa000000aa000000aa000000aa,1,[1, 2]) := mkSlice (w:=1) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S42 : SliceN true s7_R s7_T (0xc0c00000c0c00000c0c00000c0c,1,[0, 3]) := mkSlice (w:=2) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S43 : SliceN true s7_R s7_T (0xf0f00000f0f00000f0f00000f0f0000,2,[0, 1, 3]) := mkSlice (w:=16) s7_B s4_B s4_L (by decide +kernel)
+theorem s7_S44 : SliceN true s7_R s7_T (0xf0000000f0000000f0000000f0000,1,[0, 1]) := mkSlice (w:=16) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S45 : SliceN true s7_R s7_T (0x440044004400440044004400440044,1,[2, 4]) := mkSlice (w:=2) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S46 : SliceN true s7_R s7_T (0x3030000030300000303000003030000,1,[0, 3]) := mkSlice (w:=16) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S47 : SliceN true s7_R s7_T (0x500050005000500050005000500050,1,[1, 4]) := mkSlice (w:=4) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S48 : SliceN true s7_R s7_T (0xf0000000f0000000f0000000f00,1,[0, 1]) := mkSlice (w:=8) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S49 : SliceN true s7_R s7_T (0xf0000000f0000000f0000000f0,1,[0, 1]) := mkSlice (w:=4) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S50 : SliceN true s7_R s7_T (0x300030003000300030003000300030,1,[0, 4]) := mkSlice (w:=4) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S51 : SliceN true s7_R s7_T (0x220022002200220022002200220022,1,[2, 4]) := mkSlice (w:=1) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S52 : SliceN true s7_R s7_T (0x5000500050005000500050005000500,1,[1, 4]) := mkSlice (w:=8) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S53 : SliceN true s7_R s7_T (0x4040404040404040404040404040404,1,[3, 4]) := mkSlice (w:=2) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S54 : SliceN true s7_R s7_T (0xa000a000a000a000a000a000a000a,1,[1, 4]) := mkSlice (w:=1) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S55 : SliceN true s7_R s7_T (0x3300000033000000330000003300,1,[0, 2]) := mkSlice (w:=8) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S56 : SliceN true s7_R s7_T (0x550000005500000055000000550000,1,[1, 2]) := mkSlice (w:=16) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S57 : SliceN true s7_R s7_T (0x5050000050500000505000005050,1,[1, 3]) := mkSlice (w:=4) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S58 : SliceN true s7_R s7_T (0x3030000030300000303000003030,1,[0, 3]) := mkSlice (w:=4) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S59 : SliceN true s7_R s7_T (0x5050000050500000505000005050000,1,[1, 3]) := mkSlice (w:=16) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S60 : SliceN true s7_R s7_T (0x50005000500050005000500050005,1,[1, 4]) := mkSlice (w:=0) s7_B s1_B s1_L (by decide +kernel)
+theorem s7_S61 : SliceN true s7_R s7_T (0x110011001100110011001100110011,1,[2, 4]) := mkSlice (w:=0) s7_B s1_B s1_L (by decide +kernel)
+theorem s7_S62 : SliceN true s7_R s7_T (0x3000300030003000300030003000300,1,[0, 4]) := mkSlice (w:=8) s7_B s2_B s2_L (by decide +kernel)
+theorem s7_S63 : SliceN true s7_R s7_T (0xc000c000c000c000c000c000c000c,1,[0, 4]) := mkSlice (w:=2) s7_B s2_B s2_L (by decide +kernel)
+def s7_Z : List SliceD := [(0x55555555555555555555555555555555,7,[1, 2, 3, 4]),(0x33333333333333333333333333333333,7,[0, 2, 3, 4]),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f,7,[0, 1, 3, 4]),(0xff00ff00ff00ff00ff00ff00ff00ff,7,[0, 1, 2, 4]),(0xffff0000ffff0000ffff0000ffff,7,[0, 1, 2, 3]),(0x11111111111111111111111111111111,4,[2, 3, 4]),(0x3333000033330000333300003333,4,[0, 2, 3]),(0x5555000055550000555500005555,4,[1, 2, 3]),(0x3030303030303030303030303030303,4,[0, 3, 4]),(0x5050505050505050505050505050505,4,[1, 3, 4]),(0x1010101010101010101010101010101,1,[3, 4]),(0xf000f000f000f000f000f000f000f,4,[0, 1, 4]),(0xf0f00000f0f00000f0f00000f0f,4,[0, 1, 3]),(0xff000000ff000000ff000000ff,4,[0, 1, 2]),(0x550055005500550055005500550055,4,[1, 2, 4]),(0x33003300330033003300330033003300,2,[0, 2, 4]),(0xffff0000ffff0000ffff0000ffff0000,3,[0, 1, 2, 3]),(0x11110000111100001111000011110000,1,[2, 3]),(0x10101010101010101010101010101010,1,[3, 4]),(0x11001100110011001100110011001100,1,[2, 4]),(0x22222222222222222222222222222222,2,[2, 3, 4]),(0x2222000022220000222200002222,1,[2, 3]),(0xff000000ff000000ff000000ff0000,2,[0, 1, 2]),(0x2020202020202020202020202020202,1,[3, 4]),(0xcc000000cc000000cc000000cc,1,[0, 2]),(0xcccccccccccccccccccccccccccccccc,3,[0, 2, 3, 4]),(0xa0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a,2,[1, 3, 4]),(0xc0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c,2,[0, 3, 4]),(0xa0a00000a0a00000a0a00000a0a,1,[1, 3]),(0xcccc0000cccc0000cccc0000cccc,2,[0, 2, 3]),(0x330033003300330033003300330033,4,[0, 2, 4]),(0x30003000300030003000300030003,1,[0, 4]),(0x44444444444444444444444444444444,2,[2, 3, 4]),(0xaa00aa00aa00aa00aa00aa00aa00aa,2,[1, 2, 4]),(0xf0f00000f0f00000f0f00000f0f0,2,[0, 1, 3]),(0xff00ff00ff00ff00ff00ff00ff00ff00,3,[0, 1, 2, 4]),(0x30303030303030303030303030303030,2,[0, 3, 4]),(0x33330000333300003333000033330000,2,[0, 2, 3]),(0x50505050505050505050505050505050,2,[1, 3, 4]),(0x55005500550055005500550055005500,2,[1, 2, 4]),(0x55550000555500005555000055550000,2,[1, 2, 3]),(0xaa000000aa000000aa000000aa,1,[1, 2]),(0xc0c00000c0c00000c0c00000c0c,1,[0, 3]),(0xf0f00000f0f00000f0f00000f0f0000,2,[0, 1, 3]),(0xf0000000f0000000f0000000f0000,1,[0, 1]),(0x440044004400440044004400440044,1,[2, 4]),(0x3030000030300000303000003030000,1,[0, 3]),(0x500050005000500050005000500050,1,[1, 4]),(0xf0000000f0000000f0000000f00,1,[0, 1]),(0xf0000000f0000000f0000000f0,1,[0, 1]),(0x300030003000300030003000300030,1,[0, 4]),(0x220022002200220022002200220022,1,[2, 4]),(0x5000500050005000500050005000500,1,[1, 4]),(0x4040404040404040404040404040404,1,[3, 4]),(0xa000a000a000a000a000a000a000a,1,[1, 4]),(0x3300000033000000330000003300,1,[0, 2]),(0x550000005500000055000000550000,1,[1, 2]),(0x5050000050500000505000005050,1,[1, 3]),(0x3030000030300000303000003030,1,[0, 3]),(0x5050000050500000505000005050000,1,[1, 3]),(0x50005000500050005000500050005,1,[1, 4]),(0x110011001100110011001100110011,1,[2, 4]),(0x3000300030003000300030003000300,1,[0, 4]),(0xc000c000c000c000c000c000c000c,1,[0, 4])]
+theorem s7_Y : ∀ s ∈ s7_Z, SliceN true s7_R s7_T s := by
+  unfold s7_Z
+  simp only [List.forall_mem_cons]
+  exact ⟨s7_S0,s7_S1,s7_S2,s7_S3,s7_S4,s7_S5,s7_S6,s7_S7,s7_S8,s7_S9,s7_S10,s7_S11,s7_S12,s7_S13,s7_S14,s7_S15,s7_S16,s7_S17,s7_S18,s7_S19,s7_S20,s7_S21,s7_S22,s7_S23,s7_S24,s7_S25,s7_S26,s7_S27,s7_S28,s7_S29,s7_S30,s7_S31,s7_S32,s7_S33,s7_S34,s7_S35,s7_S36,s7_S37,s7_S38,s7_S39,s7_S40,s7_S41,s7_S42,s7_S43,s7_S44,s7_S45,s7_S46,s7_S47,s7_S48,s7_S49,s7_S50,s7_S51,s7_S52,s7_S53,s7_S54,s7_S55,s7_S56,s7_S57,s7_S58,s7_S59,s7_S60,s7_S61,s7_S62,s7_S63,by simp⟩
+def s7_C : List (Nat × List (Nat × Nat × Nat)) := [(0,[]),(1,[]),(2,[]),(3,[]),(4,[]),(2,[(1,0,1)]),(3,[(1,0,1)]),(4,[(1,0,1)]),(5,[]),(0,[(1,0,3)]),(1,[(1,0,3)]),(2,[(1,0,3),(1,1,3)]),(3,[(1,0,3),(1,1,3)]),(6,[]),(7,[]),(0,[(1,0,1)]),(1,[(1,0,1)]),(8,[]),(3,[(1,0,1),(1,2,4)]),(4,[(1,0,1),(1,2,4)]),(9,[]),(10,[]),(0,[(2,0,3)]),(4,[(3,0,1)]),(1,[(2,0,3)]),(0,[(1,1,2)]),(1,[(1,1,2)]),(11,[(1,0,1)]),(5,[(1,0,1)]),(11,[]),(4,[(1,2,3)]),(0,[(1,1,2),(1,1,3),(1,2,3)]),(1,[(1,1,2),(1,1,3),(1,2,3)]),(12,[]),(13,[]),(0,[(1,0,3),(1,2,3)]),(1,[(1,0,2),(1,2,3)]),(2,[(1,0,2),(1,1,3),(1,2,3)]),(3,[(1,1,3)]),(6,[(1,0,2)]),(14,[(1,0,2)]),(15,[]),(14,[]),(1,[(1,2,3),(1,0,4)]),(16,[]),(0,[(1,1,3),(1,2,3)]),(1,[(1,1,3),(1,2,3)]),(2,[(1,0,1),(1,2,3)]),(3,[(1,0,1),(1,2,3)]),(17,[]),(5,[(1,1,2)]),(5,[(1,0,2)]),(0,[(1,2,3),(3,1,3)]),(18,[]),(19,[]),(0,[(1,1,3),(3,2,3)]),(0,[(1,0,3),(1,1,3)]),(1,[(1,0,3),(1,1,4)]),(4,[(1,0,2)]),(20,[]),(4,[(3,0,2)]),(0,[(1,0,3),(1,1,4)]),(0,[(1,1,3),(1,0,4)]),(21,[]),(1,[(1,0,3),(1,1,3)]),(9,[(1,0,2)]),(22,[]),(23,[]),(4,[(1,1,2)]),(11,[(1,1,2)]),(0,[(1,0,1),(2,0,3)]),(4,[(1,1,2),(1,0,4)]),(2,[(0,1,3)]),(0,[(1,0,1),(1,0,3)]),(12,[(1,0,1)]),(8,[(2,0,2)]),(4,[(1,0,1),(1,1,2)]),(24,[]),(0,[(1,0,1),(1,0,2)]),(2,[(1,0,1),(1,2,4)]),(1,[(1,0,1),(1,0,2)]),(1,[(1,0,2),(3,0,1)]),(1,[(1,0,1),(3,0,2)]),(0,[(1,0,2),(3,0,1)]),(0,[(1,0,1),(3,0,2)]),(25,[]),(0,[(1,0,2),(2,0,1)]),(0,[(1,0,1),(2,0,2)]),(2,[(1,0,1),(1,3,4)]),(26,[]),(1,[(1,1,3),(3,0,3)]),(27,[]),(0,[(1,1,3),(3,0,3)]),(0,[(1,0,3),(3,1,3)]),(3,[(1,0,1),(1,3,4)]),(28,[]),(8,[(1,0,1)]),(1,[(1,0,1),(1,2,4)]),(9,[(1,0,1)]),(3,[(1,0,1),(3,2,4)]),(5,[(2,0,1)]),(5,[(2,0,2)]),(1,[(1,0,1),(3,3,4)]),(2,[(1,0,1),(3,3,4)]),(9,[(2,0,2)]),(29,[]),(2,[(1,1,2),(2,0,4)]),(2,[(1,1,2),(0,0,1)]),(2,[(1,1,2),(3,0,1)]),(30,[]),(1,[(1,1,2),(0,0,4)]),(2,[(1,1,2),(0,0,4)]),(3,[(1,1,2),(0,0,4)]),(31,[]),(9,[(3,0,1)]),(32,[]),(5,[(3,0,1)]),(9,[(2,0,1)]),(0,[(1,0,1),(1,2,4)]),(0,[(1,0,1),(3,2,4)]),(33,[]),(3,[(1,0,2),(1,1,4)]),(2,[(1,0,2),(1,1,4)]),(0,[(1,0,2),(1,1,4)]),(0,[(1,1,2),(1,0,4)]),(0,[(1,0,1),(1,3,4)]),(0,[(1,0,1),(3,3,4)]),(4,[(1,0,2),(1,1,4)]),(34,[]),(4,[(1,2,3),(0,0,4)]),(9,[(1,1,2)]),(2,[(1,2,3),(2,0,4)]),(3,[(1,2,3),(2,0,4)]),(35,[]),(4,[(1,2,3),(2,0,4)]),(13,[(2,0,2)]),(9,[(3,1,2)]),(9,[(2,1,2)]),(4,[(1,2,3),(2,0,1)]),(4,[(1,2,3),(3,0,1)]),(2,[(1,2,3)]),(3,[(1,2,3)]),(2,[(0,0,1),(1,2,3)]),(36,[]),(3,[(0,0,1),(1,2,3)]),(37,[]),(4,[(0,0,1),(1,2,3)]),(38,[]),(39,[]),(40,[]),(3,[(0,0,1),(3,2,3)]),(4,[(0,0,1),(2,2,3)]),(3,[(0,0,1),(2,2,3)]),(3,[(1,0,1),(3,2,3)]),(2,[(1,0,1),(3,2,3)]),(3,[(1,0,1),(2,2,3)]),(3,[(1,1,2),(0,0,3)]),(3,[(1,1,2),(1,0,3)]),(1,[(2,0,3),(1,1,2)]),(2,[(2,0,3),(1,1,2)]),(3,[(2,0,3),(1,1,2)]),(3,[(2,0,3),(3,1,2)]),(3,[(2,0,3),(2,1,2)]),(2,[(2,0,3),(2,1,2)]),(0,[(0,1,2)]),(4,[(0,2,3),(1,0,1)]),(4,[(0,2,3),(3,0,1)]),(5,[(0,0,1)]),(0,[(0,1,2),(1,0,3)]),(0,[(2,0,3),(0,1,2)]),(41,[]),(42,[]),(0,[(2,0,3),(2,1,2)]),(0,[(2,0,3),(3,1,2)]),(43,[]),(4,[(1,2,3),(1,0,1)]),(0,[(1,1,2),(1,0,3)]),(0,[(2,0,3),(1,1,2)]),(44,[]),(45,[]),(46,[]),(47,[]),(0,[(1,2,3)]),(1,[(1,2,3)]),(0,[(1,2,3),(2,0,4)]),(1,[(1,2,3),(2,0,4)]),(5,[(3,1,2)]),(5,[(2,1,2)]),(5,[(1,0,2),(1,1,2)]),(5,[(1,0,1),(1,1,2)]),(5,[(1,0,1),(1,0,2)]),(0,[(1,2,3),(1,1,4)]),(0,[(1,1,3),(1,2,4)]),(0,[(1,1,2),(1,3,4)]),(3,[(1,0,2),(1,3,4)]),(48,[]),(49,[]),(0,[(1,1,2),(1,2,3),(1,1,5)]),(0,[(1,1,2),(1,2,3),(2,3,4)]),(0,[(1,1,2),(1,1,3),(1,2,5)]),(0,[(1,1,2),(1,1,3),(2,3,4)]),(15,[(1,1,2)]),(4,[(1,0,3),(1,2,4)]),(11,[(1,0,2)]),(16,[(1,2,3)]),(3,[(1,0,3),(1,2,4)]),(12,[(1,0,2)]),(39,[(1,1,2)]),(0,[(1,1,3),(1,1,2),(1,2,4)]),(0,[(1,1,3),(1,1,2),(2,3,5)]),(0,[(1,1,2),(1,1,3),(2,2,5)]),(4,[(1,1,3),(1,0,3),(1,0,4)]),(3,[(0,0,3)]),(3,[(0,1,3)]),(0,[(1,0,2),(1,0,3)]),(14,[(2,0,2)]),(4,[(1,0,1),(1,0,3),(1,1,3)]),(8,[(1,1,2)]),(0,[(1,0,2),(1,1,3),(1,2,3)]),(30,[(1,1,2)]),(0,[(1,0,1),(1,1,3),(1,2,3)]),(0,[(1,0,1),(1,0,2),(1,2,3)]),(0,[(1,0,1),(1,0,2),(1,1,3)]),(4,[(1,1,3),(1,2,4)]),(4,[(1,1,2),(1,3,4)]),(4,[(1,1,3),(2,2,4)]),(4,[(1,1,2),(2,3,4)]),(4,[(1,1,3),(1,1,2)]),(1,[(1,1,3),(1,2,4)]),(16,[(1,1,2)]),(3,[(1,1,2),(1,2,3)]),(1,[(1,0,1),(1,1,3),(1,2,3)]),(3,[(1,2,3),(3,0,2)]),(50,[]),(51,[]),(52,[]),(0,[(1,1,3),(1,2,3),(3,0,2)]),(53,[]),(2,[(1,0,3),(1,2,4)]),(1,[(1,0,1),(1,3,4),(1,2,3)]),(54,[]),(1,[(1,0,1),(1,1,2),(1,2,3)]),(3,[(1,0,2)]),(1,[(1,0,2),(1,1,3),(1,2,3)]),(1,[(1,1,3),(1,2,3),(3,0,2)]),(0,[(1,2,3),(1,0,1),(1,3,5)]),(2,[(1,0,2),(1,2,3),(3,1,3)]),(1,[(1,0,2),(1,2,3),(3,1,3)]),(0,[(1,0,2),(1,1,2)]),(0,[(1,0,2),(1,1,2),(1,0,3)]),(0,[(2,0,3),(1,0,2),(3,1,2)]),(4,[(1,0,1),(1,1,3),(1,2,3)]),(2,[(1,1,3),(1,2,3),(3,0,2)]),(55,[]),(56,[]),(4,[(1,0,3),(3,2,3)]),(14,[(1,1,2)]),(2,[(1,1,2)]),(4,[(1,0,2),(1,1,3),(1,1,4)]),(2,[(1,1,2),(0,0,3)]),(4,[(1,0,2),(1,1,3),(1,0,5)]),(3,[(1,0,2),(0,1,3)]),(30,[(2,0,2)]),(3,[(1,0,3),(1,1,2),(1,3,5)]),(0,[(1,1,3)]),(3,[(1,0,2),(1,2,3)]),(1,[(1,0,2),(1,0,3),(1,2,3)]),(20,[(1,1,2)]),(4,[(1,1,3),(3,0,3)]),(4,[(1,0,3),(1,1,3)]),(4,[(1,0,3),(3,1,3)]),(7,[(1,0,2)]),(3,[(1,1,2),(3,0,1)]),(3,[(1,1,2),(2,0,4)]),(0,[(1,0,1),(1,1,3)]),(4,[(1,0,1),(1,2,3)]),(4,[(1,0,1),(3,2,3)]),(4,[(1,0,1),(2,2,3)]),(3,[(1,1,2),(2,0,3)]),(3,[(2,2,3)]),(3,[(0,2,3)]),(4,[(1,2,3),(1,0,1),(1,2,5)]),(57,[]),(58,[]),(4,[(1,0,2),(1,1,2),(1,0,5)]),(8,[(0,0,2)]),(0,[(2,0,3),(1,0,1)]),(0,[(2,0,3),(2,0,1)]),(8,[(1,0,2)]),(0,[(2,1,2),(0,0,3)]),(0,[(2,1,2),(1,0,3)]),(59,[]),(0,[(1,0,2),(1,0,3),(1,2,3)]),(30,[(1,0,2)]),(0,[(1,0,3),(1,2,3),(3,0,2)]),(0,[(1,0,2),(1,2,3),(3,0,3)]),(0,[(1,0,2),(1,0,3),(1,2,5)]),(0,[(1,0,3),(2,1,4)]),(4,[(1,0,1),(3,2,4)]),(0,[(1,0,3),(1,0,1),(3,3,5)]),(8,[(3,0,1)]),(3,[(0,0,1),(1,0,1),(3,2,5)]),(8,[(2,0,1)]),(3,[(0,0,1),(1,0,1),(1,2,5)]),(4,[(0,0,1),(1,0,1)]),(3,[(1,0,3)]),(0,[(0,0,3)]),(0,[(2,2,3)]),(30,[(1,0,1)]),(30,[(2,0,1)]),(14,[(2,0,1)]),(0,[(1,0,1),(0,0,3)]),(0,[(1,0,1),(2,1,3)]),(9,[(0,0,2)]),(0,[(1,0,1),(2,2,3)]),(14,[(1,0,1)]),(0,[(2,1,3)]),(60,[]),(61,[]),(14,[(0,0,2)]),(14,[(3,0,1)]),(14,[(3,1,2)]),(14,[(2,1,2)]),(0,[(0,2,3)]),(0,[(0,2,3),(2,0,3)]),(9,[(0,1,2)]),(0,[(0,2,3),(0,0,3)]),(7,[(1,0,1)]),(9,[(3,0,2)]),(0,[(1,1,3),(0,2,3)]),(0,[(0,1,3)]),(0,[(0,1,2),(1,1,2)]),(0,[(0,1,2),(1,1,2),(2,0,3)]),(0,[(0,1,2),(1,1,2),(0,0,3)]),(0,[(0,1,2),(1,1,2),(1,0,3)]),(7,[(1,1,2)]),(0,[(2,0,3),(0,1,3)]),(0,[(2,0,3),(1,1,2),(3,3,5)]),(62,[]),(0,[(1,2,3),(0,2,3)]),(0,[(0,2,3),(1,2,3)]),(0,[(0,2,3),(1,2,3),(2,0,5)]),(0,[(0,2,3),(1,2,3),(0,0,5)]),(5,[(0,1,2),(1,1,2)]),(63,[]),(0,[(1,1,2),(1,1,3)]),(5,[(1,1,2),(1,0,3)]),(40,[(1,1,2)]),(32,[(1,0,1)]),(40,[(1,0,2)]),(0,[(2,1,2),(2,0,3)]),(0,[(2,1,2),(1,0,1)]),(0,[(2,1,2),(1,0,1),(1,0,3)]),(0,[(2,0,3),(1,0,1),(1,1,2)]),(0,[(1,1,2),(1,0,2)]),(0,[(1,0,2),(1,1,3),(1,2,5)]),(0,[(1,1,3),(1,2,3),(0,0,1)]),(0,[(1,1,3),(1,2,3),(2,0,1)]),(9,[(2,1,2),(1,0,1)]),(9,[(2,1,2),(2,0,2)]),(5,[(0,1,2)]),(0,[(1,0,1),(1,0,2),(1,0,3)]),(9,[(1,0,1),(1,1,2)]),(30,[(2,1,2)]),(0,[(2,0,3),(1,0,1),(2,1,2)]),(11,[(3,0,2)]),(30,[(3,0,2)]),(14,[(3,0,2)]),(11,[(0,0,1),(1,0,1)]),(11,[(2,0,2)]),(11,[(2,1,2)]),(0,[(0,0,1),(1,0,1)]),(11,[(0,1,2)]),(0,[(0,0,1),(1,0,1),(1,3,5)]),(14,[(0,0,1)]),(11,[(3,1,2)]),(30,[(3,1,2)]),(12,[(3,0,1)]),(12,[(2,0,1)]),(7,[(2,0,1)]),(11,[(2,0,1)]),(11,[(3,0,1)]),(11,[(0,0,1)]),(7,[(3,1,2)]),(7,[(2,1,2)]),(0,[(1,1,2),(2,0,3)]),(11,[(0,0,2)]),(7,[(2,0,2)]),(11,[(1,0,2),(1,1,2)]),(9,[(1,0,1),(3,2,3)]),(0,[(2,0,3),(1,0,2),(2,1,3)]),(30,[(2,0,2),(1,0,1)]),(0,[(2,0,3),(1,0,2),(0,1,3)])]
+def s7_t : Tabs := (s7_C.map (mkCut true s7_Z),[(5,4),(3,2),(3,1),(5,1),(9,8),(9,1),(17,16),(17,1),(6,4),(6,2),(10,8),(10,2),(18,16),(18,2),(12,8),(12,4),(20,16),(20,4),(24,16),(24,8),(10,16),(18,4),(24,0),(17,0),(19,2),(5,8),(19,8),(22,8),(17,4),(9,2),(20,8),(20,0),(7,4),(18,0),(19,1),(21,1),(25,1),(3,0),(12,0),(21,4),(22,4),(14,16),(7,1),(14,8)],[],[[],[1],[2,1],[3,2,1],[0,1],[0,2,1],[0,3,2,1],[1,0,2,1],[1,0,3,2,1],[2,1,0,3,2,1],[0,1,2,3],[0,1,2,1,3],[0,1,2,3,2,1],[1,2,3],[1,2,1,3],[1,2,3,2,1],[2,3],[2],[3],[3,2],[0,1,0,2],[0,1,2,1,0],[1,0,2],[1,2,1,0],[0],[2,3,2,1],[0,2,3,2,1],[0,2],[2,3,2],[0,1,2,1,0,3],[0,1,2,3,2,1,0],[1,2,1,0,3],[1,2,3,2,1,0],[2,1,0,3],[2,3,2,1,0],[2,1,0],[3,2,1,0],[2,1,0,3,2,1,0],[1,0],[1,0,3],[0,2,1,3,2],[0,1,3,2],[0,1,0,2,1,3],[2,1,3,2],[1,3,2],[1,0,2,1,3],[1,0,2,1,3,2],[0,1,0,2,3,2,1],[0,1,2,1,0,3,2,1],[0,3,2],[0,3],[1,0,2,3,2,1],[0,2,3],[1,2,1,0,3,2,1],[0,1,0,3],[0,1,2,3,2],[0,1,2],[2,1,3],[0,2,1,3],[0,1,3],[0,1,2,1],[1,3],[1,2,1],[1,2],[1,2,3,2],[0,1,0,2,1,3,2],[1,2,1,3,2],[1,3,2,1],[0,1,0,3,2,1],[0,1,3,2,1],[1,0,2,1,0,3,2,1],[1,0,2,1,3,2,1],[1,0,2,1,0]])
+theorem s7_W : TabsP true s7_R s7_T s7_t := ⟨cutsGood s7_Y (by decide +kernel),by decide +kernel,by decide +kernel,by decide +kernel⟩
+noncomputable def s7_D9 : List StD := [
+([sw0,sw1,sw2,sw3,sw12],[[0,1,10000,30000,10001,10002],[0,10001,30001,10000,10003,2],[0,10000,30002,10004,10005,3],[0,10000,30003,10006,10007,4],[1,10002,30004,10008,10009,2],[1,10002,30005,10010,10011,3],[1,10002,30006,10012,10013,4],[2,10003,30007,10014,10015,3],[2,10003,30008,10016,10017,4],[3,10005,30009,10018,10019,4]])]
+noncomputable def s7_D8 : List StD := [
+([sw0,sw1,sw4,sw2,sw3,sw12],[[0,1],[0,1],[0,30010,10003,5],[0,30011,10005,6],[0,30012,10007,7],[0],[1,30013,10009,5],[1,30014,10011,6],[1,30015,10013,7],[5,8,2,30000,10003,30016,10014],[6,8,3,30017,10005,30018,10015],[7,8,4,30019,10007,30000,10017],[5,10003,30000,10014,10015,6],[5,10003,30018,10016,10017,7],[6,10005,30016,10018,10019,7]])]
+noncomputable def s7_D7 : List StD := [
+([sw0,sw1,sw2,sw3,sw13,sw14],[[9,10,30007],[9,30020,10003,11],[9,30021,10005,12],[9,4],[9,10,13,10007],[10,30022,10009,11],[10,30023,10011,12],[10,9,14,10013],[10,4],[11,10003,30007,10014,10015,12],[11,10009,30000,10003,30024,14,30025],[11,10003,30024,10009,30000,13,30026],[12,10011,30017,10005,30027,14,30003],[12,10005,30027,10011,30017,13,30006],[9,10]]),
+([sw0,sw1,sw4,sw2,sw7,sw3,sw12],[[15,16],[16],[15,16,5],[17],[15,30011,10005,18],[15,30012,10007,19],[15],[16,15,5],[20],[16,30014,10011,18],[16,30015,10013,19],[5,8],[5],[18,8,30000,10005],[19,8,30018,10007],[8],[5,30016,10015,18],[5,30028,10017,19],[18,21,6,30000,10005,30018,10018],[19,21,7,30018,10007,30000,10019],[10005,18,10018,10019]]),
+([sw0,sw1,sw2,sw7,sw3,sw12],[[15,5,16],[15,5,16],[15,17],[15,30029,10005,10001],[15,30030,10007,10001],[5,15,16],[16,20],[16,30031,10011,10002],[16,30032,10013,10002],[5,8],[5,30033,10015,10003],[5,30034,10017,10003],[30035,3,10018,30000,10005,30018,30009],[30036,4,10019,30018,10007,30000,30037],[30009,10005,10007,10018,10019,30035,30036]]),
+([sw15,sw0,sw1,sw2,sw3,sw12],[[22,7,8,23],[22,7],[8,30038,10003,2],[8,30035,10005,3],[7,8,9],[22,7,8,24],[22,30024,10003,10001],[22,30027,10005,10001],[22,7,10006],[8,30000,10009,10002],[8,30017,10011,10002],[7,8,10012],[30000,10003,10005,10014,10015,30039,30033],[7,10017,10019],[7,10019,10017]]),
+([sw0,sw1,sw4,sw2,sw3,sw10,sw12],[[25,26],[26],[25,5,30040],[25,6,30041],[25,30042,30010,27,10001],[25,30042,10007,10001],[25],[26,5,30043],[26,6,30044],[26,30045,30013,27,10002],[26,30045,10013,10002],[5,30016,30033,28,10014],[6,30018,30039,28,10015],[27,28,8,30007,30000,30019,30046,29],[30,28,30007,10007,30000,10017],[5,6],[6],[5,30016,10017,10014],[5],[6,30018,10019,10015],[7,27,30000,10017,30007,10007]])]
+noncomputable def s7_D6 : List StD := [
+([sw0,sw1,sw10,sw16,sw17],[[31,32,10000,30000,10001,10002],[31,10001,30000,10000,30019,29,30042],[31,10001,30018,10000,30017,33,30047],[31,10000,30016,10004,30000,34,30048],[32,10002,30024,10008,30049,29,30045],[32,10002,30050,10008,30027,33,30051],[32,10002,30052,10010,30024,34,30053],[29,33,4,30,34],[29,34,4,30,33],[33,34,3,30,29]]),
+([sw0,sw1,sw2,sw5,sw14,sw17],[[35,36,30038],[35,30054,10003,37],[38],[35,30055,30056,39,10004],[35,10004,34,10005],[36,30038,10009,37],[36,30013,30044,40,10020],[34],[36,38,34,10013],[10009,37,10003,30050,30057],[10003,37,10009,30000,30026],[10003,37,41,30000,10014,30009],[39,40,42,43,41,44,13],[35,39],[36,38]]),
+([sw0,sw1,sw4,sw2,sw3,sw16,sw17],[[45,46],[46],[45,30058,47],[45,30059,48],[45,30060,10001],[45,30056,10001],[45],[46,30057,47],[46,30061,48],[46,30062,10002],[46,30063,10002],[47,30033,49],[48,30039,49],[50,30035,33],[51,30038,34],[47,30000,48],[52],[47,48,53],[48,47,54],[55],[47,48]]),
+([sw0,sw1,sw2,sw3,sw13,sw14,sw18],[[56,30045,57],[56,58,11],[56,59],[58],[56,57,59],[60],[57,30043,11],[57,10011],[57,56,14],[58],[57,61,30064],[11,10015],[11,14],[11,62,63],[14],[10011,59],[10015,10011],[10011,59],[56,57],[11],[57,20]]),
+([sw0,sw1,sw2,sw3,sw13,sw19],[[64,30063,30007,65,10008],[11,30017,30005,51,10009],[66,65,10011,30021,67,10005,30018],[68],[30018,65,0,66,67,57,30055,10007],[64,10008,65,11],[64,30023,10011,10008],[64,66,61,10008],[33],[11,30035,10015,10009],[11,66,62,10009],[13],[10011,69,67,30004,10005,30003],[10005,10007,10011,30000,30041],[61,17,67]]),
+([sw15,sw0,sw2,sw9,sw3,sw12],[[15,70,24],[2,8,71],[70,72,8],[8,30035,10005,29],[73,8],[70,30000,30017,74,10001],[70,10001,75,10002],[70,30024,10005,10001],[70,76,10006],[24],[77,10005,30017,53,10015,30039],[76,53,10021,75,10019],[10002,10005,30000,53,10015,30024],[74,75,10002,76,53,10012],[10005,76,10019,10017]]),
+([sw0,sw1,sw2,sw7,sw3,sw20,sw12],[[78,79,80],[78,80,79],[81],[78,80,18],[82],[78,59],[79,78,80],[83],[80,78,18],[84],[80,85],[86],[79,30019,18],[79,18,30016],[79,10017],[18,79,30018],[79,18],[10019,59],[87],[18,10019],[10017,59]]),
+([sw0,sw1,sw4,sw2,sw3,sw21,sw16],[[56,64],[64],[56,30005,88],[56,89],[90],[56,89],[56],[64,30002,88],[64,91],[92],[64,91],[88,30017,51],[51,89],[90],[51,88,89],[88,53],[88,51,53],[93],[48,89,10015],[94,53,95],[88,51]]),
+([sw0,sw1,sw4,sw2,sw3,sw22,sw12],[[30000,85,89],[96],[79,97,28],[28,89],[30010],[28,89],[98],[89,85,97],[97,85],[30013],[97,85],[79,85,28],[28,85],[29],[28,85],[89,28,18],[99],[89,53],[100],[18,54],[7,85,30000]]),
+([sw23,sw0,sw1,sw4,sw2,sw3,sw12],[[0,19,17],[19,20],[19,17],[19,8],[6,95,21],[51],[30000,77,95],[75],[101,102,103],[21,95],[19,30004,21],[104],[95,77,101],[21,105],[19,30001,21],[101,19,77],[21,95],[19,30000,21],[95,10015],[19,49],[19,49]]),
+([sw24,sw0,sw1,sw2,sw3,sw25,sw12],[[106],[107,29,108],[106,109],[29,17],[30010],[28,30056,30030],[98,30063,110],[28,30017,111],[28,30000,112],[30000,28,113],[28,10007],[28,112,98],[28,98,112],[114],[28,115],[98,28,112],[116],[98,53],[117],[112,54],[113,115]]),
+([sw0,sw1,sw2,sw7,sw3,sw22,sw12],[[118,79,97],[118,97,79],[96],[118,89],[30010],[118,89],[79,118,97],[98],[97,85],[30013],[97,85],[28],[79,53],[30016],[79,53],[30035,30018,89],[3],[10019,89],[119],[95,10019,120],[30036,89,30000]]),
+([sw0,sw1,sw2,sw3,sw22,sw12],[[96,98,10000,18,85,10001,89],[96,28,10001,10000,121,59],[10000,98,18,89,122,10004],[30010,10006],[10000,98,30030,89,10007,30000,10013],[98,28,122,85,118,10003],[18,85,123,96,10005],[30013,10012],[95,96,10007,30032,85,10013,30024],[18,122,124],[30016,122,10016],[122,30034,10017,10003],[30018,18,10018],[18,30036,10019,10005],[4,30036,30000,85,10007]]),
+([sw23,sw0,sw1,sw2,sw7,sw3,sw12],[[15,17],[17,95,20],[17,8],[4],[21,95],[125],[126,95],[126,127,103],[75],[21,95],[21,30004,127],[95,126,102],[104],[21,105],[95,30001,21],[101],[95,128],[21,30000,127],[21,95],[21,30000,127],[95,10019,10022]]),
+([sw23,sw0,sw1,sw2,sw3,sw12],[[0,44,17,105],[17,44,20,95],[17,44,8,105],[3,44,30035,105,10005,30000,10018],[30018,30000,10007],[75,104,10000,105,95,19,10001],[75,101,10001,10000,127,63],[10000,10018,30004,95,10005,30018],[105,104,10000,44,30000,10006,19],[95,101,10002,126,128,10003,105],[10002,10005,30001,105,10011,30050],[95,75,19,30024,10012],[10003,95,30000,128,10015,30039,10005],[105,75,19,30038,10016],[105,19,10019,30035,10018]]),
+([sw26,sw0,sw1,sw2,sw3,sw12,sw27],[[129],[130,10002],[30016],[30018],[30000],[30013],[130,10002],[131,128],[130,41,132],[130,44,128],[130,128,30000],[130,128],[10002,133],[10002,44],[10002,128],[130,128],[130,132,134],[135],[128,130,132],[136],[137]]),
+([sw28,sw0,sw1,sw2,sw3,sw12,sw27],[[138],[139],[140,30016,41],[130,30018,141],[138,30000,41],[130,30046],[30000,130,41],[142,143],[130,41,144],[130,145,146],[130,41,30065],[41,147,130],[143,148,144],[41,149,146],[8,147,30046],[130,41,143],[130,143],[150],[144,41],[151],[152]]),
+([sw0,sw1,sw4,sw2,sw3,sw12,sw27],[[30000,10001,10002],[139],[10001,30040,54],[10001,30041,53],[10001,30056,54],[10001,30010,0],[138],[10002,30043,54],[10002,30044,53],[10002,30063,54],[10002,30013,8],[54,30016,140],[53,30018,141],[139,30000,54],[8,30000,30046],[48,54],[47,53],[153],[48,54],[154],[155]]),
+([sw29,sw0,sw1,sw2,sw3,sw25,sw12],[[156],[98,30013,17],[17,30016,28],[156,30018,98],[98,30056,30030],[157],[98,30063,158],[28,30017,159],[98,30000,160],[98,30000,10006],[98,10006,10023],[98,160,28],[28,98,160],[161],[28,115],[98,28,160],[162],[98,53],[163],[160,54],[4,115,30000]]),
+([sw0,sw30,sw1,sw2,sw3,sw12],[[17],[17,19,104,10001],[17,127,101,10000],[10001,104,30010,95,10005,30018,10011],[19,89,10007,104,10024],[17,19,104],[17,19,101],[3,21,30002,95,10005,30018,10018],[19,89,10007,21,10019],[17,10002,126,10003],[17,30001,10011,10002],[17,19,10012],[17,30000,10015,10003],[17,19,10016],[19,10019,10007]]),
+([sw15,sw0,sw1,sw31,sw2,sw3,sw12],[[164,165,166],[165,164],[3,30007,8],[167,77],[3,95,167],[168],[169,165,95],[8,30024,77],[167,170],[167,95],[165,66],[8,30000,95],[167,77],[167,171],[165,66],[172],[173],[165,30000,104],[30000,95,77],[165,66],[165,174]]),
+([sw15,sw0,sw1,sw2,sw3,sw10,sw12],[[25,175,139],[175,25],[28,30016,20],[28,30018,3],[28,30007,29],[176],[177,175,158],[28,30027,178],[28,30024,178],[28,30024,178],[175,178],[28,30017,178],[28,30000,178],[28,30000,178],[175,178],[30000,54,53],[173],[175,53,10019],[172],[175,54,10017],[175,54,30000]]),
+([sw29,sw32,sw0,sw1,sw2,sw3,sw12],[[0,30018,17],[156],[17,30054,117],[17,30059,100],[156,10005,117],[157],[0,30000,75],[117,100],[117,100],[28],[75,179],[117,30001,75],[100,30000,75],[117,10005],[117,180,10023],[117,179,100],[100,148,160],[100,179],[117,148,179],[117,181],[10005,180]]),
+([sw33,sw0,sw1,sw2,sw3,sw12,sw17],[[182,183],[183,182],[50,77],[30018],[30000],[30016],[184,77,185],[50,170],[50,41,77],[50,44,77],[50,41,77],[50,77],[50,148,170],[50,44,170],[50,44,170],[77,41],[77,44],[77,41],[30000,44,41],[186],[187]])]
+noncomputable def s7_D5 : List StD := [
+([sw0,sw1,sw4,sw10,sw16,sw17],[[31,32],[32],[31,30049,10001],[31,30027,10001],[31,30024,10001],[31],[32,30019,10002],[32,30017,10002],[32,30000,10002],[188,30019,29],[189,30017,33],[190,30000,34],[6,191,153],[17,192,7],[6,193,17]]),
+([sw0,sw1,sw10,sw34,sw16,sw17],[[31,10002],[31,29],[29],[31,194,195],[31,195,196],[10002,195],[32,10002,10012],[10002,196],[10002,195],[31],[29,197,198],[29,199,200],[30,194,42],[30,199,20],[29]]),
+([sw0,sw1,sw10,sw16,sw35],[[31,30024,10002,201],[31,201,202,203,10005],[31,204,205,206,10025],[34],[10002,10005,207,30050,10008,30045],[10002,201,204,30024,10008,30051],[10008,17,10002,30000,30066],[202,203,204,201,191,205],[14,203,202,208,10005,209],[42,206,201,208,203,210]]),
+([sw15,sw2,sw5,sw6,sw12],[[96,8,30038,10003],[8,211,212],[8,211,213],[214,8],[215,75,171,10003,30024,30017,10009],[10003,104,10009,30000,30027],[10003,216,10017,10026],[8],[171,215,216,10026,10017],[216,10026,10017]]),
+([sw0,sw9,sw6,sw16,sw17],[[217,218,77,30043,10001,30010,10004],[219,220,77,30044,10001,30011,10000],[10001,221,10000,30017,30047],[77,222,10004,30000,30048,10001],[219,217,141,223,224,225,226],[223,217,227,219],[34,217,223,228,207,17,53],[33,219,224,77,229,109],[224,219,227,217],[77,17,230,217]]),
+([sw0,sw1,sw36,sw6,sw16,sw17],[[218,30000,231],[232],[218,30041,233],[218,233,234],[218,30060,10000],[231,30043,235],[236],[231,30063,10010],[231,235,237],[130,30019,219],[218,234],[237,233],[234,235],[231,237],[234,233,235]]),
+([sw0,sw1,sw36,sw10,sw18,sw17],[[31,170],[33],[31,170],[33],[31,238,89],[130,170],[239,128,240],[241,170,10010],[170,10010],[31,170],[33],[130,238,89],[242,170,148],[170,130],[130,89]]),
+([sw0,sw1,sw2,sw5,sw19,sw17],[[243,30022,149],[149,30027,37],[244],[182,30056,10004],[65,10004,67],[243,245,37],[243,30013,181],[246],[243,149,115],[37,30016,179],[247],[37,149,181],[42,149,148],[65,149,67],[67,181]]),
+([sw15,sw0,sw2,sw6,sw10,sw12],[[248,26],[98,30067,28],[28,248,213],[28,148,29],[249],[28,30000,171],[28,171,95],[28,30024,178],[28,178,171],[95,28,53],[250],[251,53,10027],[28,171],[95,178],[171,53,30000]]),
+([sw0,sw1,sw2,sw5,sw14,sw27],[[149,30038,41],[149,30006,37],[252],[130,30004,253],[9,41,67],[41,30002,37],[217,30061,254],[246],[67,149,115],[37,41,254],[37,149,253],[255],[256,149,41],[9,149,67],[67,41,115]]),
+([sw15,sw2,sw36,sw3,sw6,sw12],[[257,258,8],[8,258,259],[8,260,242],[8,260,261],[214],[8],[171,30000,170],[104,30017,10003],[170,10028,10019],[262,30024,10029],[104,171,170],[171,178],[8],[171,10019,10017],[170,10019,178]]),
+([sw0,sw1,sw2,sw3,sw13,sw37],[[148,30007,145],[148,30005,178],[178,30004,53],[171],[0,145,67],[145,263,178],[145,148,178],[53,178,115],[10002],[263,148],[217,145,53],[10003],[263,148],[10005],[0,148,67]]),
+([sw23,sw0,sw1,sw36,sw3,sw16],[[264,17],[17,20],[20,17],[265,95,149],[17,65,104],[149,95],[75],[149,95],[104,127,170],[104,95],[170,10011,53],[95,149],[104,95],[104,149,127],[95,149]]),
+([sw0,sw1,sw2,sw5,sw13,sw38],[[148,30038,266],[148,267],[268],[269],[0,267],[266,115],[266,148,115],[266,115],[270],[40,148],[271,267],[20,148,10003],[268,148],[0,267],[0,148,267]]),
+([sw29,sw1,sw2,sw5,sw25,sw12],[[98,30068,96],[96,30069,148],[156],[98,95],[157],[98,118],[118],[118],[118],[98,148,118],[118],[98,118],[98,95],[118],[95,148,118]]),
+([sw24,sw1,sw2,sw5,sw25,sw12],[[98,29,272],[29,109],[273],[95],[98,30056,253],[98,118],[118],[118],[118],[98,253,118],[118],[98,118],[98,118],[118],[118]]),
+([sw23,sw0,sw1,sw7,sw3,sw16],[[274,17],[17,20],[4],[181,95,21],[17,181],[181,95],[75],[21,95],[21,127,171],[104],[181,171,21],[95,181],[21,95],[21,127],[95,53]]),
+([sw0,sw1,sw2,sw3,sw21,sw27],[[149,275,145],[149,30005,178],[149,30004,178],[139],[9,145,67],[145,30002,178],[145,30001,178],[138],[67,149,115],[66,275,54],[130,149,53],[276],[141,149,54],[277],[29,67,54]]),
+([sw15,sw0,sw2,sw3,sw25,sw12],[[278,17,156],[17,181],[278,171,53],[22,181,95],[115],[171,30017,54],[53,30000,178],[22,171,95],[171,178],[171,53],[262],[77,53,10019],[75],[171,54,10017],[95,53,178]]),
+([sw23,sw0,sw1,sw3,sw10,sw12],[[25,17],[17,20],[3,54],[279,54,280],[53],[254,281,170],[178,30024,282],[254,170],[281,178],[254,30000,283],[178,282],[281,254],[75],[281,10030,30035],[281,254]]),
+([sw0,sw30,sw1,sw3,sw10,sw12],[[17],[17,281,77],[77,30006,282],[149,170],[281,234,10024],[17,281,20],[3,282,54],[149,77],[281,234,10019],[17,30000,170],[17,77],[17,254,281],[17],[281,10019,234],[281,149]]),
+([sw15,sw2,sw36,sw9,sw3,sw12],[[17,284,181],[75,285],[17,284,181],[181,95,53],[73],[286],[287],[75,53],[75,53],[75,95,286],[104,95],[104,53],[75,53],[75,53],[95,174]]),
+([sw29,sw32,sw1,sw36,sw3,sw12],[[0,170],[17,30059,117],[285],[117,10005],[288],[170,117],[117,170],[98],[170,181,75],[117,181],[10005,148,181],[75,179],[117,10005],[117,181],[10005,148,181]]),
+([sw15,sw39,sw1,sw2,sw3,sw12],[[20,77,178],[178,20,289],[20,170,54],[242,253],[290],[75,77],[77,170,54],[177],[77,178],[178,30000,54],[178,10029,21],[170,178],[170,54],[170,10028,21],[10011,54,291]]),
+([sw0,sw1,sw2,sw20,sw21,sw17],[[292,170],[292,170],[293],[253],[292,95],[95,77,54],[294],[295],[170,296,67],[174,170,10016],[235,170,10014],[170,54],[7,54,293],[7,95,174],[6,95,54]]),
+([sw23,sw0,sw1,sw2,sw3,sw21],[[9,19,288],[19,297],[19,298],[174,95],[19,288],[149,19,95],[174,170,149],[149,95],[283],[174,299,234],[170,115,67],[282],[174,10015],[75,19,10031],[10015,174]]),
+([sw28,sw4,sw2,sw3,sw22,sw12],[[10032],[95,30070,54],[96,30071,170],[30046],[95,30046,54],[54,170],[53,95],[300],[54,67],[95,54,170],[301],[96,53],[302],[95,54,303],[304,54,30000]]),
+([sw23,sw0,sw1,sw2,sw3,sw13],[[0,288],[288,170,20],[288,170,54],[305,95,174],[0,288],[104,170],[174,170,149],[104,95],[77],[95,126],[170,126],[126],[170,126],[104,170,126],[126]]),
+([sw40,sw0,sw1,sw4,sw2,sw3],[[0,77,67],[67,170,115],[22,67,306],[67,77,53],[307,95,54],[30000,77,170],[253],[115,170],[77,67,115],[149],[95,77,54],[67,115],[54,77],[53,67],[77,53,67]]),
+([sw23,sw28,sw4,sw2,sw3,sw12],[[0,170,30007],[22,20,306],[20,170,149],[149,95],[65],[10032],[149,30038,95],[170,30038,149],[170,30038,104],[104,170,282],[254,95,21],[282,149],[170,282,95],[170,149],[95,149]]),
+([sw23,sw0,sw1,sw2,sw3,sw12],[[0,77,17],[17,20],[17,77,149],[149,95],[65],[149,77,95],[149,170],[77,95,149],[77,174],[95,77,282],[170,171,75],[95,149],[77,282,95],[77,149],[95,149]]),
+([sw0,sw1,sw2,sw7,sw3,sw41],[[181,18],[18],[18],[18],[181,18],[18],[18],[181,18],[18],[18],[18],[18],[18],[18],[181,18]]),
+([sw42,sw1,sw2,sw3,sw25,sw12],[[98,77,17],[17,308,309],[98,96,77],[98,77,113],[98,157,77],[98,77,282],[181,98,53],[114],[113,115],[98,282],[310],[98,181],[117],[113,54],[113,181]]),
+([sw24,sw1,sw2,sw3,sw22,sw12],[[98,77,96],[96,308],[98,96,77],[30030],[98,30010,77],[98,77,282],[181,98,53],[114],[282,115,53],[98,282],[310],[98,181],[117],[282,54,181],[14,181,10023]]),
+([sw23,sw0,sw1,sw2,sw3,sw43],[[65,288],[288,65],[65,181],[181,282,149],[65],[181,77,170],[149,170],[282,95],[10023],[95,181],[181,115,53],[10033],[77,282,95],[10031],[30000,282,10022]]),
+([sw44,sw1,sw2,sw3,sw25,sw12],[[98,77,17],[17,283],[98,253,77],[98,77,300],[98,113,77],[98,77,253],[283,98,181],[114],[282,115,53],[98,283],[310],[98,181],[117],[283,54,181],[14,181,30056]]),
+([sw40,sw0,sw1,sw2,sw7,sw3],[[15,77,113],[70,115,311],[312,77,53],[104,115,313],[314,282,21],[282,77,170],[115,170],[180],[77,95,115],[95,77,282],[235],[53,115],[54],[77,53,95],[10022,115]]),
+([sw29,sw1,sw2,sw3,sw22,sw12],[[282,77,170],[115,170],[282,95],[30030],[67],[95,282],[170,115,53],[114],[282,115,53],[77,282,95],[310],[77,53,98],[117],[282,54,315],[14,115,174]]),
+([sw44,sw1,sw2,sw3,sw12,sw37],[[282,77,217],[217,283],[282,253,77],[77,174],[30010],[253,282,77],[283,115],[282,174],[30046],[77,282,253],[77,53,235],[30040],[282,174],[30041],[30056]]),
+([sw0,sw1,sw2,sw3,sw12,sw45],[[282,77,253],[115,283,174],[282,253,77],[77,174],[30010],[253,282,77],[283,115],[282,115,174],[30013],[77,282,253],[77,53,235],[30016],[282,174],[30018],[30000]]),
+([sw40,sw0,sw1,sw2,sw3,sw12],[[0,77,174],[174,282],[316,77,149],[174,282],[53],[282,77,283],[174,283],[77,253],[77,174],[174,77,282],[283,171],[282,174],[77,282,174],[77,149],[282,174]]),
+([sw40,sw0,sw1,sw2,sw3,sw22],[[53,77,113],[53,282,115],[235,53],[315,282,235],[14],[282,77,253],[115,283,171],[53,253,77],[10023],[235,77,282],[53,115],[10033],[77,53,253],[10031],[10022]]),
+([sw40,sw0,sw1,sw2,sw3],[[0,174,67,77,10001,113],[67,174,22,115,282,10002,317],[67,149,316,53,77,10003,318],[113,174,307,235,282,10005,21],[253,282,10000,77,10002,10001],[174,115,10001,10000,10003],[77,115,10001,253,67,10005,10004],[174,10003,282,77,10009],[10002,67,235,115,10011,10005],[77,174,10003,253,282,10015,10005]]),
+([sw0,sw46,sw1,sw2,sw3,sw12],[[174],[282,77,253],[149,283,171],[282,253,77],[77,67,10024],[149,282],[149,77],[149,282],[0,67,30000],[253,282,77],[283,171],[282,149],[77,282,253],[77,149],[282,149]]),
+([sw47,sw0,sw1,sw2,sw3,sw12],[[0,77,253],[149,20,319],[253,77],[282],[181],[253,77],[149,170],[77,253],[77,174],[253,77],[170,235],[170,149],[77,253],[77,149],[30000,149,235]]),
+([sw0,sw1,sw2,sw3,sw22,sw12],[[253,77],[315,283,171],[77,253],[113],[253,67,315],[253,77],[315,171,283],[320],[67,115],[77,253],[310],[253,181,67],[117],[315,235],[14,67,30000]]),
+([sw29,sw11,sw1,sw2,sw3,sw12],[[0,77,253],[253,77],[315,170],[77,253],[234],[315,320],[253,77],[283],[235,181],[253,77],[315,235],[170,179,21],[77,253],[77,181,235],[315,235]]),
+([sw29,sw48,sw0,sw1,sw2,sw3],[[0,30000,67],[283],[235,10034,113],[113,10035,115],[113,10036,115],[0,10024,174],[174,115,306],[235,181],[174,235,181],[235,30063,180],[115,30017,174],[115,30000,178],[235,115,181],[181,235],[174,282]]),
+([sw0,sw1,sw2,sw3,sw49,sw27],[[235,240],[256,283,174],[282,253,178],[235,174,283],[256,240],[235,282],[240,235],[282,240],[8,235,10002],[256,283,174],[235,256,253],[321],[256,235],[136],[256,240]]),
+([sw26,sw50,sw1,sw2,sw3,sw12],[[30010],[235,10002],[170],[95],[240],[10002,235],[0,256,321],[0,282,253],[0,235,322],[235,282],[10002,235],[10002,178],[256,282,253],[235,256,253],[256,235]]),
+([sw0,sw1,sw2,sw3,sw51,sw27],[[235,30046,253],[256,283,178],[178,253],[235,178,253],[256,253,30065],[235,282],[256,235],[282,178],[8,235,30046],[256,253],[235,256,253],[321],[256,235],[136],[256,322]]),
+([sw0,sw1,sw2,sw3,sw52,sw12],[[315,170],[315,170],[282,67],[113],[315,67],[240,315,282],[315,115,67],[320],[170,115,67],[315,282,67],[310],[170,181,67],[315,282,117],[315,30000,282],[14,67,104]]),
+([sw53,sw0,sw1,sw2,sw3,sw12],[[0,283,113],[42,315,320],[42,315,310],[42,283,117],[14,65,104],[283,170,315],[315,283,170],[282,95],[283,240,315],[95,315,282],[283,171],[170,179,21],[315,283,95],[170,181,240],[283,10019,315]]),
+([sw28,sw4,sw2,sw3,sw12,sw27],[[10037],[256,30070,27],[27,30071,130],[256,30046,275],[256,30046,10002],[130,282],[256,253],[282,180],[8,282,30046],[256,282,130],[130,256,253],[321],[256,130,282],[136],[137]]),
+([sw23,sw0,sw1,sw2,sw54,sw3],[[323,240],[324,325,326],[240,170,181],[30035],[240,282,30000],[181,240],[178,170,327],[178,30004,104],[282,95],[240,181],[240,30001,101],[240,171,283],[170,30000,104],[170,282,95],[180]]),
+([sw0,sw1,sw2,sw3,sw55,sw19],[[65,30046,180],[180,30040,327],[65,10004,178],[65,180,10004],[65,180,10004],[65,327,282],[180,115],[327,65,178],[328],[65,282],[65,62],[62],[327,180],[62],[65,62]]),
+([sw0,sw1,sw2,sw56,sw3,sw12],[[282,170],[115,170],[180],[282,95],[115,240],[95,282],[320],[170,115,283],[282,115,67],[310],[170,282,95],[170,181,240],[320,282,117],[313,115,30000],[282,10018]]),
+([sw57,sw0,sw1,sw2,sw3,sw12],[[0,283,180],[22,282,178],[316,253,234],[307,283,180],[0,181,113],[283,171],[113,283],[282,253,113],[283,10007,10023],[253,282,77],[283,171],[282,149],[171,283],[253,149],[283,149]]),
+([sw0,sw1,sw2,sw3,sw58,sw16],[[180,240,149],[180,30040,149],[149,195,178],[195,180],[195,180],[240,30043,51],[180,195,240],[195,240],[195,149],[180,53],[20,149,53],[170],[329,180,10015],[240,180,10036],[51,240]]),
+([sw29,sw59,sw1,sw2,sw3,sw12],[[253],[117,170],[100,170],[117,95],[240],[117,170],[117,170,100],[117,95],[14,180],[117,119],[170,119],[170,119],[117,119],[117,119],[95,180]]),
+([sw0,sw1,sw60,sw2,sw3,sw12],[[282,170],[180],[171,170,283],[282,95],[171,240,115],[149],[95,282],[170,171,283],[282,115,67],[20,170,310],[310,282,117],[306,240,30000],[170,282,171],[170,49],[282,49]]),
+([sw61,sw0,sw1,sw2,sw3,sw12],[[0,77,180],[149,170],[149,77],[0,282,180],[240],[180,77],[180,170,149],[77,95,149],[77,180],[95,77,49],[180,235,170],[170,149],[77,54],[77,149],[95,180]]),
+([sw62,sw0,sw1,sw2,sw3,sw12],[[0,283,180],[149,282],[149,42,330],[180,283],[0,256,322],[283,30000,149],[180,283],[149,253,113],[283,180],[253,282,137],[283,195,322],[282,149],[180,283],[253,149],[283,180]]),
+([sw15,sw0,sw2,sw63,sw3,sw12],[[180,77],[20,77,167],[167,20,313],[180,95],[65],[180,170,167],[180,77],[77,95,167],[77,180],[167,77],[180,30000,77],[77,254],[180,167,170],[95,254],[95,180]]),
+([sw15,sw0,sw1,sw2,sw3,sw64],[[180,77],[104,313],[104,77,149],[180,95],[104,65],[180,77],[180,170,149],[77,95,104],[77,180],[104,77,49],[180,171],[95,149],[180,30000,77],[77,149],[95,180]]),
+([sw15,sw0,sw1,sw31,sw10,sw12],[[331,77,180],[332,333],[20,30007,28],[180,77],[334],[180,77],[77,30024,332],[332,170],[77,180],[28,30000,170],[180,77],[170,178],[10038],[104,30000,335],[77,180]]),
+([sw15,sw65,sw0,sw1,sw2,sw3],[[8,30000,240],[137,240],[178,137,282],[240,10035,149],[240,10036,149],[8,10039,178],[8,10040,240],[149,215,336],[149,104,215],[149,240],[178,30027,149],[178,30024,149],[240,30017,49],[240,30000,49],[180,337,254]]),
+([sw66,sw0,sw1,sw2,sw3,sw12],[[0,77,180],[22,20,306],[20,77,8],[180,282,49],[0,51,101],[282,77,170],[49,170],[77,338],[77,240,101],[49,77],[49,171],[282,149],[77,282,171],[77,49],[282,49]]),
+([sw15,sw0,sw67,sw2,sw3,sw12],[[180,171],[22,20,313],[20,77,100],[180,171],[65],[180,171],[180,30024,100],[77,95,100],[171,180],[100,77],[180,171],[95,149],[180,54,77],[77,10021,104],[171,180]]),
+([sw0,sw1,sw2,sw3,sw58,sw17],[[180,77],[180,170,50],[77,253],[50,180,253],[77,180],[50,77],[180,195,170],[50,170,195],[170,195],[180,253,77],[253,77],[77,253],[339,180,54],[186],[50,307]]),
+([sw33,sw0,sw1,sw2,sw54,sw17],[[340,77,180],[341,342],[343,77],[30009],[171],[180,77],[180,170,341],[77,30024,341],[77,180],[343,77],[180,30000,170],[343,149,170],[77,30000,180],[77,149],[10022]])]
+noncomputable def s7_D4 : List StD := [
+([sw0,sw4,sw10,sw16,sw38],[[180],[188,30018,344],[189,30000,171],[345,344,95],[188,171],[189,344],[345,95],[344,346,171],[95,171,282],[95,344,282]]),
+([sw0,sw1,sw10,sw16,sw68],[[180,171],[188,95],[171,180],[10000],[180,171],[95,347],[10008],[171,180],[20,180,282],[20,282]]),
+([sw0,sw1,sw10,sw18,sw38],[[347,30000,180],[347,283,178],[171],[345,180,240],[180,235,178],[189,347,348],[170],[40,347,235],[240,347,283],[20,283]]),
+([sw15,sw2,sw5,sw25,sw12],[[28,282,98],[28,171],[28,282,170],[240],[171,28,282],[116],[77,53,10026],[28,170],[282,10026,180],[170,53,149]]),
+([sw23,sw0,sw6,sw10,sw12],[[248,171,178],[178,170],[349,171],[240],[347,171,170],[178,170,349],[171,178],[178,171,101],[170,178],[171,349]]),
+([sw0,sw30,sw6,sw10,sw12],[[178],[347,170],[349,170],[171,240,10024],[347,170],[349,170],[248,240,10027],[240,171,101],[170,347],[170,349]]),
+([sw15,sw39,sw9,sw3,sw12],[[8,171],[350,351,170],[100,253,315],[352],[350,8,170],[353],[171,178],[170,253],[170,178],[10011,54,291]]),
+([sw0,sw9,sw6,sw16,sw35],[[218,30011,180],[220,95],[221,180,195],[77],[180,195,178],[195,349],[17,195,171],[95,180],[17,180,171],[17,54,315]]),
+([sw15,sw36,sw6,sw10,sw12],[[178,171],[178,354,170],[8,171],[249],[104,171,170],[178,170,8],[171,178],[178,171,8],[170,178],[171,54,30000]]),
+([sw4,sw36,sw6,sw16,sw17],[[195,171,180],[45,195,236],[195,170,50],[51,195,171],[130,171,170],[171,170,50],[98,355,77],[95,54,149],[170,171,51],[171,355,170]]),
+([sw0,sw1,sw69,sw16,sw17],[[256,171,253],[256,253,171],[256,283,171],[256,253,67],[356,95,357,10041],[253,282,10042],[283,171],[256,253],[171,256,283],[256,171]]),
+([sw15,sw65,sw0,sw2,sw6],[[8,171],[358,171,253],[358,10035,54],[359,358,95],[8,10026,178],[171,215],[359,171,360],[171,30000,54],[359,171,95],[359,54,282]]),
+([sw0,sw9,sw6,sw14,sw27],[[54,171,180],[282,171,219],[54,171,253],[361,180,10001],[180,54,282],[253,219,362],[219,171],[282,54,180],[219,171],[219,171]]),
+([sw0,sw1,sw70,sw18,sw17],[[282,170],[45,170],[171],[282,180,67],[180,282,178],[54,282,10043],[170,178],[42,170,54],[170,282,180],[42,282,54]]),
+([sw0,sw1,sw7,sw10,sw41],[[282,170],[180],[315,170],[282,67],[320],[308,282,77],[170,65,67],[315,310],[54,282],[170,282,67]]),
+([sw29,sw48,sw1,sw2,sw5],[[0,67],[282,10034,363],[54,10035,195],[77],[67,282,178],[67,262],[178,67,282],[54,282,195],[180,195,171],[178,282]]),
+([sw15,sw71,sw9,sw3,sw12],[[262,308,171],[350,351,313],[308,171,180],[352],[262,171],[262,353,364],[171,180],[180,171],[170,178],[171,180]]),
+([sw0,sw1,sw72,sw17,sw73],[[180,170,282],[191,170],[282,180,95],[365],[180,282,95],[170,178],[109,170,30013],[170,180],[321],[322]]),
+([sw74,sw0,sw1,sw2,sw17],[[182,293,366],[293,40,367],[180,170,30016],[293,180],[293,170,40],[40,170],[40,293,95],[293,77],[293,40,170],[170,54]]),
+([sw0,sw1,sw72,sw17,sw68],[[40,170],[40,170],[40,180,95],[366],[180,77],[170,40,293],[367],[170,180],[29,170,30016],[215]]),
+([sw40,sw28,sw4,sw2,sw3],[[0,95,30007],[22,368,306],[368,77,149],[368,95,149],[10032],[95,30072,149],[77,30007,149],[180,77,54],[53,95],[95,54,77]]),
+([sw75,sw0,sw1,sw10,sw12],[[25,29],[54,95,347],[29,25],[203],[347,95],[347,95],[322,180,195],[180,195,369],[95,347],[95,347]]),
+([sw23,sw76,sw9,sw3,sw12],[[369,77,180],[370,371,372],[369,95,180],[373],[180,77],[77,95,104],[77,180],[180,282],[95,178],[95,180]]),
+([sw23,sw0,sw9,sw77,sw12],[[369,77,180],[370,95,374],[369,77,180],[65],[180,77],[126,95],[77,180],[180,77],[95,178],[77,180]]),
+([sw23,sw0,sw9,sw3,sw78],[[369,77,178],[178,95],[369,95,180],[369,77,104],[180,77],[77,95,104],[104,178,171],[178,171,180],[95,77,178],[77,180,95]]),
+([sw79,sw0,sw1,sw2,sw3],[[0,77,67],[67,69,375],[67,77,376],[69,180,54],[282,77,253],[54,283,171],[77,253],[54,77],[283,171],[77,54]]),
+([sw0,sw1,sw2,sw80,sw43],[[282,95],[171,283],[282,95],[377],[95,282],[283,171],[378],[95,282],[379],[34,282,54]]),
+([sw23,sw0,sw1,sw2,sw81],[[180,171],[370,95,178],[370,77,149],[180,171],[180,171],[180,283],[178,95,149],[95,77,282],[180,171],[180,283]]),
+([sw0,sw82,sw1,sw2,sw3],[[0,171,180],[282,171,283],[171,283],[282,253,77],[22,282,149],[149,253],[149,171],[253,282,77],[283,171],[171,282]]),
+([sw40,sw0,sw1,sw2,sw3],[[0,171,180],[22,95,149],[149,77],[180,171],[180,171],[171,283],[149,95],[95,77,282],[180,171],[171,283]]),
+([sw47,sw0,sw1,sw2,sw54],[[323,95],[283,171],[95,283],[10036],[283,95,171],[171,283],[283,30004,149],[95,282],[95,30001,180],[180,30000,77]]),
+([sw0,sw1,sw7,sw72,sw17],[[282,171,283],[180],[171,283],[282,95],[380],[95,282],[283,171],[380,77,54],[34,282,30000],[171,282]]),
+([sw23,sw0,sw1,sw3,sw72],[[369,171,178],[178,95],[369,171,30000],[369,77,54],[283,171],[178,95,282],[171,283],[178,171,283],[178,77,282],[171,283]]),
+([sw0,sw1,sw2,sw52,sw17],[[282,171,283],[171,283],[381],[282,95],[95,282],[380],[283,171],[379],[171,282],[34,282,54]]),
+([sw62,sw4,sw2,sw3,sw12],[[382,171,283],[171,335,383],[171,283,384],[171,54,137],[382,283],[382,253],[283,180],[137,283],[335,149],[283,180]]),
+([sw15,sw0,sw63,sw10,sw12],[[369,171,283],[385,20,372],[369,171,180],[65],[385,171,180],[104,95],[171,180],[180,171],[95,347],[171,180]]),
+([sw15,sw0,sw1,sw10,sw64],[[20,171,283],[104,313],[29,171,149],[20,65,104],[104,171,180],[104,95],[171,180],[180,171],[95,347],[171,149]]),
+([sw83,sw4,sw2,sw3,sw12],[[0,98,114],[98,54,109],[114,109],[95,54,67],[114,77,54],[382,95,53],[54,67],[114,54,77],[114,53],[95,54,368]]),
+([sw33,sw0,sw2,sw84,sw17],[[369,77,180],[369,77,349],[180,14,372],[271],[180,170,349],[349,77,170],[77,180],[180,77,262],[77,349],[170,180]]),
+([sw33,sw0,sw1,sw72,sw17],[[369,109,386],[109,14],[369,77,149],[271],[387,77,262],[149,170],[77,180],[262,77],[262,347,170],[77,149]])]
+noncomputable def s7_D3 : List StD := [
+([sw4,sw10,sw18,sw38],[[388,170,283],[109,283,77],[345,170],[109,170,271],[20,283],[109,170,77]]),
+([sw15,sw65,sw36,sw6],[[29,389,283],[358,283],[359,358,372],[390,391,392],[359,283],[359,283]]),
+([sw40,sw0,sw63,sw10],[[20,283,180],[104,283,347],[180,77],[180,77],[178,283],[180,283,77]]),
+([sw85,sw0,sw1,sw10],[[25,77,180],[104,170,347],[180,77],[180,77],[347,170],[180,77]]),
+([sw47,sw0,sw1,sw72],[[325,77,180],[347,325,372],[325,77,180],[180,77],[347,170],[180,77]])]
+def s7_D2 : List StD := []
+theorem s7_I2 : LevelN true s7_T 2 s7_D2 := by intro s h; cases h
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C3x0 : levelOK true s7_T s7_t 2 (s7_D2.map Prod.fst) ((s7_D3.drop (0*16)).take 16) = true := by decide +kernel
+theorem s7_I3 : LevelN true s7_T 3 s7_D3 := levelStep s7_B s7_W s7_I2 (chunks 16 s7_D3 1 (by omega) (by decide +kernel) (by
+  intro i hi
+  interval_cases i
+  · exact s7_C3x0
+  ))
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C4x0 : levelOK true s7_T s7_t 3 (s7_D3.map Prod.fst) ((s7_D4.drop (0*16)).take 16) = true := by decide +kernel
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C4x1 : levelOK true s7_T s7_t 3 (s7_D3.map Prod.fst) ((s7_D4.drop (1*16)).take 16) = true := by decide +kernel
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C4x2 : levelOK true s7_T s7_t 3 (s7_D3.map Prod.fst) ((s7_D4.drop (2*16)).take 16) = true := by decide +kernel
+theorem s7_I4 : LevelN true s7_T 4 s7_D4 := levelStep s7_B s7_W s7_I3 (chunks 16 s7_D4 3 (by omega) (by decide +kernel) (by
+  intro i hi
+  interval_cases i
+  · exact s7_C4x0
+  · exact s7_C4x1
+  · exact s7_C4x2
+  ))
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C5x0 : levelOK true s7_T s7_t 4 (s7_D4.map Prod.fst) ((s7_D5.drop (0*16)).take 16) = true := by decide +kernel
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C5x1 : levelOK true s7_T s7_t 4 (s7_D4.map Prod.fst) ((s7_D5.drop (1*16)).take 16) = true := by decide +kernel
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C5x2 : levelOK true s7_T s7_t 4 (s7_D4.map Prod.fst) ((s7_D5.drop (2*16)).take 16) = true := by decide +kernel
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C5x3 : levelOK true s7_T s7_t 4 (s7_D4.map Prod.fst) ((s7_D5.drop (3*16)).take 16) = true := by decide +kernel
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C5x4 : levelOK true s7_T s7_t 4 (s7_D4.map Prod.fst) ((s7_D5.drop (4*16)).take 16) = true := by decide +kernel
+theorem s7_I5 : LevelN true s7_T 5 s7_D5 := levelStep s7_B s7_W s7_I4 (chunks 16 s7_D5 5 (by omega) (by decide +kernel) (by
+  intro i hi
+  interval_cases i
+  · exact s7_C5x0
+  · exact s7_C5x1
+  · exact s7_C5x2
+  · exact s7_C5x3
+  · exact s7_C5x4
+  ))
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C6x0 : levelOK true s7_T s7_t 5 (s7_D5.map Prod.fst) ((s7_D6.drop (0*16)).take 16) = true := by decide +kernel
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C6x1 : levelOK true s7_T s7_t 5 (s7_D5.map Prod.fst) ((s7_D6.drop (1*16)).take 16) = true := by decide +kernel
+theorem s7_I6 : LevelN true s7_T 6 s7_D6 := levelStep s7_B s7_W s7_I5 (chunks 16 s7_D6 2 (by omega) (by decide +kernel) (by
+  intro i hi
+  interval_cases i
+  · exact s7_C6x0
+  · exact s7_C6x1
+  ))
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C7x0 : levelOK true s7_T s7_t 6 (s7_D6.map Prod.fst) ((s7_D7.drop (0*16)).take 16) = true := by decide +kernel
+theorem s7_I7 : LevelN true s7_T 7 s7_D7 := levelStep s7_B s7_W s7_I6 (chunks 16 s7_D7 1 (by omega) (by decide +kernel) (by
+  intro i hi
+  interval_cases i
+  · exact s7_C7x0
+  ))
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C8x0 : levelOK true s7_T s7_t 7 (s7_D7.map Prod.fst) ((s7_D8.drop (0*16)).take 16) = true := by decide +kernel
+theorem s7_I8 : LevelN true s7_T 8 s7_D8 := levelStep s7_B s7_W s7_I7 (chunks 16 s7_D8 1 (by omega) (by decide +kernel) (by
+  intro i hi
+  interval_cases i
+  · exact s7_C8x0
+  ))
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 0 in
+theorem s7_C9x0 : levelOK true s7_T s7_t 8 (s7_D8.map Prod.fst) ((s7_D9.drop (0*16)).take 16) = true := by decide +kernel
+theorem s7_I9 : LevelN true s7_T 9 s7_D9 := levelStep s7_B s7_W s7_I8 (chunks 16 s7_D9 1 (by omega) (by decide +kernel) (by
+  intro i hi
+  interval_cases i
+  · exact s7_C9x0
+  ))
+theorem s7_L : LowN true s7_R s7_T 10 := lowSearch s7_B s7_I9 (by decide +kernel)
+end RescueK5
+
 namespace PEqualNP.Outside.L_meta_48478
 open PEqualNP.CircuitLowerBounds
 abbrev Row := Fin 128
@@ -3456,14 +6178,14 @@ set_option maxHeartbeats 0 in
 lemma h6Bound : Lower h6R h6G 8 := carry_of (swaps := [(2,3),(3,4),(1,2),(2,3),(0,1),(1,2)]) (roots2 := Cofactor12168.R_32) (T2 := Cofactor12168.G_32) (by decide +kernel) Cofactor12168.low_32
 def h8R : List Nat := varsOf 15
 def h8G : Nat := 0xeaa8eaa8eaa8eaa8eaa8eaa8eaa8eaa8
-def h8Pos : List Nat := [5,14,5,9,3,5,14,9,14,3,3,3,5,3,9,7,7,11,11,13,13]
-def h8Neg : List Nat := [4,12,6,8,2,1,10,1,6,1,0,6,0,10,0,6,1,10,1,12,1]
-def h8Mask : Nat := fullMask 21
-def h8Base : List Decor := [(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,0x1ffebd,0x1502a0),(0xcccccccccccccccccccccccccccccccc,0x7af52,0x2a954),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,0x199167,0x88907),(0xff00ff00ff00ff00ff00ff00ff00ff00,0x1e41ca,0xa204a)]
-def h8Steps : List (Nat × Nat × Nat) := [(0,0,1),(1,0,1),(2,0,1),(3,0,1),(0,0,2),(1,0,2),(2,0,2),(3,0,2),(0,0,3),(1,0,3),(2,0,3),(3,0,3),(0,1,2),(1,1,2),(2,1,2),(3,1,2),(0,1,3),(1,1,3),(2,1,3),(3,1,3),(0,2,3),(1,2,3),(2,2,3),(3,2,3),(1,2,4),(0,1,28),(2,2,4),(1,3,4),(0,1,31),(2,3,4),(0,2,5),(1,1,34),(3,2,5),(0,3,5),(1,1,37),(3,3,5),(2,1,8),(1,3,8),(0,2,41),(2,3,8),(3,1,9),(0,3,9),(1,2,45),(3,3,9),(2,1,12),(2,2,12),(3,1,13),(3,2,13),(1,3,18),(0,1,52),(2,3,18),(1,2,54),(1,3,19),(0,2,56),(2,3,19),(1,1,58),(1,2,22),(0,1,60),(2,2,23),(1,1,62)]
-def h8W : BT Decor := buildWiresBT 6 h8Base h8Steps
-def h8AutoList : List (List (Nat × Nat)) := [[]]
-def h8Autos : BT (List (Nat × Nat)) := btOfList 1 h8AutoList
+def h8Pos : List Nat := [5,14,5,9,3,5,14,9,14,3,3,7,7]
+def h8Neg : List Nat := [4,12,6,8,2,1,10,1,6,1,0,6,1]
+def h8Mask : Nat := fullMask 13
+def h8Base : List Decor := [(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,7869,4768),(0xcccccccccccccccccccccccccccccccc,8018,2388),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,6503,2311),(0xff00ff00ff00ff00ff00ff00ff00ff00,458,74)]
+def h8Steps : List (Nat × Nat × Nat) := [(0,0,1),(1,0,1),(2,0,1),(3,0,1),(0,1,2),(1,1,2),(2,1,2),(1,2,4),(2,2,4),(0,2,5),(3,2,5),(1,3,10),(2,3,10)]
+def h8W : BT Decor := buildWiresBT 5 h8Base h8Steps
+def h8AutoList : List (List (Nat × Nat)) := [[],[(2,3)],[(1,2)],[(1,3)],[(2,3),(1,2)],[(2,3),(1,3)]]
+def h8Autos : BT (List (Nat × Nat)) := btOfList 3 h8AutoList
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h8Pairs : goodPairs h8G h8Pos h8Neg := goodPairs_of (by decide +kernel)
@@ -3490,7 +6212,7 @@ def h8Empty : BT (List (List Nat)) := BT.empty
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h8EmptyOk : btAll (fun bk => ∀ xs ∈ bk, Impossible h8G (3 - 1) xs.toFinset) h8Empty := trivial
-def h8Block3_0 : List NodeSpec := nodesWithIdentity [([0,1,3,28],[]),([0,1,3,30],[]),([0,1,2,31],[]),([0,1,2,33],[]),([0,1,3,34],[]),([0,1,3,36],[]),([0,1,2,37],[]),([0,1,2,39],[]),([0,2,3,35],[]),([0,2,3,40],[]),([0,1,2,41],[]),([0,1,2,43],[]),([0,2,3,29],[]),([0,2,3,44],[]),([0,1,2,45],[]),([0,1,2,47],[]),([0,2,3,38],[]),([0,2,3,48],[]),([0,1,3,46],[]),([0,1,3,49],[]),([0,2,3,32],[]),([0,2,3,50],[]),([0,1,3,42],[]),([0,1,3,51],[]),([0,3,16,17],[]),([0,1,2,52],[]),([0,1,2,54],[]),([0,1,2,56],[]),([0,1,2,58],[]),([0,2,20,21],[]),([0,1,3,60],[]),([0,1,3,57],[]),([0,1,3,55],[]),([0,1,3,62],[]),([0,1,24,25],[]),([0,2,3,63],[]),([0,2,3,53],[]),([0,2,3,59],[]),([0,2,3,61],[])]
+def h8Block3_0 : List NodeSpec := nodesWithIdentity [([0,1,3,11],[]),([0,1,3,12],[]),([0,1,3,13],[]),([0,1,3,14],[]),([0,3,8,9],[]),([0,1,2,15],[]),([0,1,2,16],[])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h8Test3_0 : checkNodesBT h8W h8G h8Mask h8Pools h8Autos h8Empty 3 h8Block3_0 = true := by decide +kernel
@@ -3502,7 +6224,7 @@ def h8Bucket3 : BT (List (List Nat)) := buildBucketsBT h8W h8Nodes3
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h8Bucket3Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h8G 3 xs.toFinset) h8Bucket3 := buildBucketsBT_sound (by decide) h8Pairs h8WOk h8PoolsOk h8AutosOk h8EmptyOk h8Check3
-def h8Block4_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4],[]),([0,1,2,3,5],[]),([0,1,2,3,6],[]),([0,1,2,3,7],[]),([0,1,2,3,8],[]),([0,1,2,3,9],[]),([0,1,2,3,10],[]),([0,1,2,3,11],[]),([0,1,2,3,12],[]),([0,1,2,3,13],[]),([0,1,2,3,14],[]),([0,1,2,3,15],[]),([0,1,2,3,16],[]),([0,1,2,3,17],[]),([0,1,2,3,18],[]),([0,1,2,3,19],[]),([0,1,2,3,20],[]),([0,1,2,3,21],[]),([0,1,2,3,22],[]),([0,1,2,3,23],[]),([0,1,2,3,24],[]),([0,1,2,3,25],[]),([0,1,2,3,26],[]),([0,1,2,3,27],[])]
+def h8Block4_0 : List NodeSpec := [([0,1,2,3,4],[],[0,1]),([0,1,2,3,5],[],[0,1]),([0,1,2,3,6],[],[0]),([0,1,2,3,7],[],[0]),([0,1,2,3,8],[],[0]),([0,1,2,3,9],[],[0]),([0,1,2,3,10],[],[0])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h8Test4_0 : checkNodesBT h8W h8G h8Mask h8Pools h8Autos h8Bucket3 4 h8Block4_0 = true := by decide +kernel
@@ -3514,7 +6236,7 @@ def h8Bucket4 : BT (List (List Nat)) := buildBucketsBT h8W h8Nodes4
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h8Bucket4Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h8G 4 xs.toFinset) h8Bucket4 := buildBucketsBT_sound (by decide) h8Pairs h8WOk h8PoolsOk h8AutosOk h8Bucket3Ok h8Check4
-def h8Block5_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3],[])]
+def h8Block5_0 : List NodeSpec := [([0,1,2,3],[],[0,1,2,3,4,5])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h8Test5_0 : checkNodesBT h8W h8G h8Mask h8Pools h8Autos h8Bucket4 5 h8Block5_0 = true := by decide +kernel
@@ -3547,8 +6269,8 @@ def h11Mask : Nat := fullMask 6
 def h11Base : List Decor := [(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,45,36),(0xff00ff00ff00ff00ff00ff00ff00ff00,30,24),(0xffff0000ffff0000ffff0000ffff0000,51,3)]
 def h11Steps : List (Nat × Nat × Nat) := []
 def h11W : BT Decor := buildWiresBT 2 h11Base h11Steps
-def h11AutoList : List (List (Nat × Nat)) := [[]]
-def h11Autos : BT (List (Nat × Nat)) := btOfList 1 h11AutoList
+def h11AutoList : List (List (Nat × Nat)) := [[],[(3,4)],[(2,3)],[(2,4)],[(3,4),(2,3)],[(3,4),(2,4)]]
+def h11Autos : BT (List (Nat × Nat)) := btOfList 3 h11AutoList
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h11Pairs : goodPairs h11G h11Pos h11Neg := goodPairs_of (by decide +kernel)
@@ -3602,14 +6324,14 @@ set_option maxHeartbeats 0 in
 lemma h13Bound : Lower h13R h13G 5 := lift_of (z := 1) (o := 0) (essPairs := [(VAR 0,0,1)]) (by decide +kernel) h11Bound
 def h7R : List Nat := varsOf 31
 def h7G : Nat := 0xeeeaeaa8eeeaeaa8eeeaeaa8eeeaeaa8
-def h7Pos : List Nat := [5,14,5,9,14,5,14,9,22,17,17,3,26,22,3,26,22,26,7,9,13,21,11,25,19,26,22,14,3,7,11,19,22,14,26,14,26,22,7,11,19,3,13,9,5,17,14,21,17,5,9,22,17,13,25,17,9,5,26,3,13,3,21,14,22,26,30,30,30,30]
-def h7Neg : List Nat := [4,12,6,8,10,1,6,1,6,1,16,2,24,20,1,10,18,18,6,10,1,1,10,1,18,28,28,28,0,1,1,1,16,8,16,4,8,4,2,2,2,6,12,12,12,28,2,20,20,20,28,2,18,8,24,24,24,28,2,10,4,18,4,0,0,0,18,10,6,28]
-def h7Mask : Nat := fullMask 70
-def h7Base : List Decor := [(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,0x7bf7bfc0f1fc4ead,0xe0b042a0),(0xcccccccccccccccccccccccccccccccc,0x3fac0843ffff47f952,0x1c2c1843c0014f8954),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,0x3dd22ad46b2c352177,0x305207be280e042147),(0xff00ff00ff00ff00ff00ff00ff00ff00,0x3e95644c9e4ada90da,0x280be43c120e48901a),(0xffff0000ffff0000ffff0000ffff0000,0x3f44d9a13587a3b700,0x2423d7a0050f033400)]
-def h7Steps : List (Nat × Nat × Nat) := [(0,0,1),(1,0,1),(2,0,1),(3,0,1),(1,0,2),(2,0,2),(1,0,3),(2,0,3),(1,0,4),(2,0,4),(0,1,2),(1,1,2),(2,1,2),(0,1,3),(1,1,3),(2,1,3),(0,1,4),(1,1,4),(2,1,4),(0,2,3),(1,2,3),(0,0,25),(1,0,25),(2,0,25),(3,0,25),(0,1,25),(1,0,30),(3,0,30),(2,2,3),(3,2,3),(0,2,4),(1,2,4),(2,2,4),(3,2,4),(1,2,5),(0,3,4),(1,3,4),(2,3,4),(3,3,4),(1,3,39),(3,3,39),(1,4,30),(3,4,30),(1,4,39),(3,4,39),(1,30,39),(1,3,5),(3,2,51),(1,4,51),(3,4,51),(1,30,51),(1,4,5),(3,2,56),(3,3,56),(1,5,30),(3,2,59),(3,3,59),(1,1,25),(2,1,25),(3,1,25),(0,1,39),(2,1,39),(1,4,25),(3,4,25),(0,1,51),(2,1,51),(0,1,56),(2,1,56),(2,1,44),(3,5,25),(2,1,74),(0,0,36),(1,0,36),(2,0,36),(3,0,36),(0,1,36),(1,0,80),(3,0,80),(1,3,80),(3,3,80),(1,39,80),(1,56,80),(1,5,80),(3,2,87),(3,4,87),(1,1,36),(2,1,36),(3,1,36),(3,3,36),(2,1,48),(3,5,36),(2,1,95),(0,0,41),(1,0,41),(2,0,41),(3,0,41),(0,1,41),(1,0,101),(3,0,101),(1,1,41),(2,1,41),(3,1,41),(2,1,45),(2,1,49),(1,2,101),(3,2,101),(1,51,101),(1,56,101),(1,5,101),(3,3,113),(3,4,113),(3,2,41),(2,1,53),(3,5,41),(2,1,118),(2,1,52),(2,1,54),(2,1,57),(2,1,58),(1,0,17),(3,3,6),(1,3,17),(3,4,6),(1,4,17),(2,6,17),(0,6,25),(1,17,130),(2,6,25),(0,6,36),(1,17,133),(2,6,36),(3,2,6),(1,0,126),(3,0,126),(3,2,126),(1,4,126),(3,4,126),(1,0,63),(1,2,63),(1,4,63),(1,2,144),(3,2,144),(3,3,144),(2,4,63),(3,4,63),(2,6,63),(1,0,128),(3,0,128),(3,2,128),(1,0,91),(1,2,91),(1,3,91),(1,2,156),(3,2,156),(2,3,91),(2,6,91),(1,2,129),(1,0,20),(1,4,20),(2,6,20),(1,0,143),(3,0,143),(3,3,143),(3,4,143),(0,6,41),(1,20,169),(2,6,41),(1,0,163),(3,0,163),(3,3,163),(1,0,105),(1,2,105),(3,3,176),(2,2,105),(1,3,105),(2,6,105),(1,3,164),(1,0,23),(2,6,23),(1,0,155),(3,0,155),(3,4,155),(1,0,179),(3,0,179),(3,4,179),(1,4,183),(1,3,136),(1,4,136),(1,2,125),(1,4,125),(1,2,127),(1,3,127),(1,3,161),(3,3,161),(1,4,161),(3,4,161),(3,2,181),(1,4,181),(3,4,181),(3,1,197),(3,4,197),(1,0,205),(3,0,205),(2,1,205),(3,7,25),(3,2,190),(3,3,190),(3,1,199),(3,3,199),(1,0,213),(3,0,213),(2,1,213),(3,7,36),(3,1,202),(3,2,202),(1,0,219),(3,0,219),(2,1,219),(3,7,41),(3,3,124),(3,4,124),(1,8,63),(1,8,91),(3,2,162),(3,4,162),(1,8,105),(3,2,182),(3,3,182),(1,3,66),(1,4,66),(1,2,70),(1,4,70),(1,4,73),(1,2,72),(1,3,72),(1,3,94),(1,2,117),(0,4,9),(3,4,9),(0,4,11),(3,4,11),(0,9,11),(0,2,11),(3,2,11),(0,3,9),(3,3,9),(1,3,248),(1,4,248),(3,4,248),(1,2,250),(1,4,250),(3,4,250),(0,4,27),(1,4,27),(3,4,27),(1,2,259),(1,3,259),(0,3,13),(3,3,13),(0,9,13),(0,2,13),(3,2,13),(1,3,266),(3,3,266),(1,4,266),(1,2,243),(0,3,77),(3,3,77),(1,2,272),(2,9,20),(2,9,23),(1,4,26),(1,4,29),(0,25,41),(0,25,77),(0,41,77),(0,9,41),(1,25,243),(3,0,67),(0,1,67),(0,9,67),(1,3,76),(1,3,79),(0,36,41),(0,27,36),(0,27,41),(1,36,250),(0,1,258),(3,2,258),(1,2,221),(3,2,255),(3,2,261),(1,4,251),(3,4,251),(3,3,269),(0,1,297),(3,10,41),(0,11,13),(1,4,263),(1,3,245),(0,2,98),(2,11,17),(2,11,23),(0,25,36),(0,25,98),(0,36,98),(0,11,36),(3,3,260),(3,4,254),(0,1,291),(3,12,36),(2,13,17),(2,13,20),(0,13,25),(0,1,282),(3,14,25),(1,4,167),(3,4,167),(1,3,186),(0,16,41),(1,4,64),(3,17,41),(3,25,128),(3,17,67),(1,3,92),(3,36,126),(1,2,141),(1,2,147),(1,4,139),(0,19,36),(3,20,36),(1,3,146),(0,22,25),(3,23,25),(3,26,27),(1,4,75),(3,4,31),(3,30,62),(3,76,77),(1,3,96),(3,3,81),(3,80,90),(3,97,98),(1,40,285),(3,40,293),(1,2,119),(3,2,102),(3,101,104),(1,40,328)]
-def h7W : BT Decor := buildWiresBT 9 h7Base h7Steps
-def h7AutoList : List (List (Nat × Nat)) := [[]]
-def h7Autos : BT (List (Nat × Nat)) := btOfList 1 h7AutoList
+def h7Pos : List Nat := [5,14,5,9,14,5,14,9,22,17,17,3,26,22,3,26,22,7,26,13,11,19,26,3,7,22,9,7,3,13,9,5,17,14,21,11,22,9,25,13,21,14,14,14,25,21,14]
+def h7Neg : List Nat := [4,12,6,8,10,1,6,1,6,1,16,2,24,20,1,10,18,6,18,1,10,18,28,0,1,16,10,2,6,12,12,12,28,2,20,1,28,0,1,8,1,8,4,0,24,4,28]
+def h7Mask : Nat := fullMask 47
+def h7Base : List Decor := [(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,0x31edfdba4ead,0x148010842a0),(0xcccccccccccccccccccccccccccccccc,0x4e1a1bf7f952,0x21c378954),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,0x6f96ab0b2177,0x6415f0422147),(0xff00ff00ff00ff00ff00ff00ff00ff00,0x5eea645c90da,0x5291e450901a),(0xffff0000ffff0000ffff0000ffff0000,0x31550265b700,0x501502653400)]
+def h7Steps : List (Nat × Nat × Nat) := [(0,0,1),(1,0,1),(2,0,1),(3,0,1),(1,0,2),(2,0,2),(1,0,3),(1,1,2),(2,1,2),(0,1,3),(2,1,3),(0,2,3),(1,2,3),(0,0,17),(1,0,17),(2,0,17),(3,0,17),(0,1,17),(1,0,22),(3,0,22),(2,2,3),(1,2,4),(2,2,4),(1,2,5),(1,3,4),(2,3,4),(1,3,28),(3,3,28),(1,4,22),(1,4,5),(1,5,22),(1,3,35),(3,3,35),(1,1,17),(2,1,17),(3,1,17),(0,1,28),(2,1,28),(1,4,17),(3,4,17),(2,1,31),(3,5,17),(2,1,46),(2,1,32),(1,0,13),(1,3,13),(3,4,6),(1,4,13),(3,4,13),(2,6,13),(0,6,17),(1,13,55),(2,6,17),(3,2,6),(3,0,50),(3,2,50),(1,4,50),(3,4,50),(1,0,39),(1,2,39),(1,4,39),(2,4,39),(3,4,39),(2,6,39),(1,2,54),(1,3,58),(1,3,69),(3,3,69),(3,1,71),(3,4,71),(1,0,74),(2,1,74),(3,7,17),(3,3,49),(1,8,39),(1,3,42),(1,4,45),(1,4,9),(3,4,9),(0,9,11),(3,2,11),(0,3,9),(3,3,9),(1,3,85),(0,4,19),(1,4,19),(3,4,19),(3,3,91),(1,9,15),(2,9,15),(3,3,64),(1,2,87),(1,4,87),(1,4,18),(1,4,21),(0,1,29),(0,1,82),(0,29,82),(0,9,29),(3,9,29),(3,0,43),(0,1,43),(3,3,43),(3,2,29),(0,1,90),(0,1,108),(1,4,88),(3,4,88),(0,1,111),(3,10,29),(2,12,108),(1,4,95),(3,4,95),(0,12,29),(1,4,40),(3,13,29),(3,18,19),(1,4,16),(1,4,47),(3,4,23),(3,22,38)]
+def h7W : BT Decor := buildWiresBT 7 h7Base h7Steps
+def h7AutoList : List (List (Nat × Nat)) := [[],[(3,4)],[(2,3)],[(2,4)],[(3,4),(2,3)],[(3,4),(2,4)]]
+def h7Autos : BT (List (Nat × Nat)) := btOfList 3 h7AutoList
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Pairs : goodPairs h7G h7Pos h7Neg := goodPairs_of (by decide +kernel)
@@ -3624,8 +6346,8 @@ set_option maxHeartbeats 0 in
 lemma h7AutosOk : btAll (fun sw => swapsValid sw = true ∧ permWord sw h7G = h7G) h7Autos := btAll_ofList (autos_of (by decide +kernel))
 def h7SliceList : List (Option (Nat × Nat)) := [some (subcubeFast 0 2,5),some (subcubeFast 1 0,5),some (subcubeFast 1 2,4),some (subcubeFast 4 0,6),some (subcubeFast 8 0,6),some (subcubeFast 16 0,6)]
 def h7Slices : BT (Option (Nat × Nat)) := btOfList 3 h7SliceList
-def h7Specs : List PoolSpec := [(1,[]),(0,[]),(3,[(0,0,1)]),(4,[(0,0,1)]),(5,[(0,0,1)]),(2,[]),(0,[(1,2,5)]),(4,[]),(3,[]),(0,[(1,3,5)]),(0,[(1,4,5)]),(3,[(0,0,1),(1,4,5)]),(5,[(1,2,3)]),(3,[(0,0,1),(1,3,39)]),(3,[(0,0,1),(3,5,25)]),(5,[]),(3,[(0,0,1),(1,3,5)]),(4,[(1,2,4)]),(3,[(0,0,1),(1,4,39)]),(3,[(0,0,1),(3,5,36)]),(4,[(0,0,1),(1,2,5)]),(5,[(0,0,1),(1,2,5)]),(3,[(1,3,4)]),(4,[(0,0,1),(1,4,51)]),(4,[(0,0,1),(3,5,41)]),(5,[(0,0,1),(1,3,5)]),(4,[(0,0,1),(1,4,5)]),(3,[(1,0,1)]),(4,[(1,0,1)]),(5,[(1,0,1)]),(1,[(2,1,2)]),(1,[(2,1,3)]),(1,[(2,1,4)]),(3,[(1,0,1),(3,4,6)]),(3,[(1,0,1),(0,6,25)]),(3,[(1,0,1),(2,6,25)]),(3,[(1,0,1),(3,3,6)]),(3,[(1,0,1),(0,6,36)]),(3,[(1,0,1),(2,6,36)]),(1,[(3,2,6)]),(4,[(1,0,1),(3,2,6)]),(5,[(1,0,1),(3,2,6)]),(4,[(1,0,1),(2,6,25)]),(5,[(1,0,1),(2,6,36)]),(4,[(1,0,1),(0,6,41)]),(4,[(1,0,1),(2,6,41)]),(1,[(3,3,6)]),(5,[(1,0,1),(3,3,6)]),(5,[(1,0,1),(2,6,41)]),(1,[(3,4,6)]),(4,[(1,0,1),(3,4,6)]),(3,[(2,0,1)]),(4,[(2,0,1)]),(5,[(2,0,1)]),(3,[(3,0,1)]),(4,[(3,0,1)]),(5,[(3,0,1)]),(0,[(1,0,17)]),(0,[(1,0,20)]),(0,[(1,0,23)]),(1,[(2,1,39)]),(1,[(2,1,51)]),(1,[(2,1,56)]),(4,[(1,0,2)]),(5,[(1,0,2)]),(1,[(0,1,39)]),(0,[(1,0,2)]),(4,[(1,0,2),(3,4,9)]),(5,[(1,0,2),(3,3,9)]),(4,[(1,0,2),(0,9,41)]),(4,[(1,0,2),(3,4,250)]),(3,[(1,0,25)]),(5,[(1,0,3),(3,2,11)]),(4,[(1,0,25)]),(3,[(3,3,9)]),(3,[(1,0,36)]),(4,[(1,0,4),(3,2,13)]),(5,[(1,0,36)]),(3,[(3,4,9)]),(4,[(2,0,2)]),(5,[(2,0,2)]),(3,[(1,0,3)]),(4,[(3,2,11)]),(3,[(1,0,4)]),(5,[(3,2,13)]),(5,[(1,0,3)]),(1,[(0,1,51)]),(0,[(1,0,3)]),(3,[(1,0,3),(3,4,11)]),(3,[(1,0,3),(0,11,36)]),(3,[(1,0,3),(3,4,248)]),(4,[(1,0,41)]),(5,[(1,0,41)]),(3,[(1,0,4),(3,3,13)]),(4,[(3,4,11)]),(3,[(2,0,3)]),(5,[(2,0,3)]),(4,[(1,0,4)]),(5,[(3,3,13)]),(1,[(0,1,56)]),(3,[(1,0,4),(0,13,25)]),(3,[(1,0,4),(3,3,266)]),(0,[(1,0,4)]),(3,[(2,0,4)]),(4,[(2,0,4)]),(4,[(1,1,2)]),(5,[(1,1,2)]),(3,[(2,1,25)]),(3,[(2,1,36)]),(4,[(2,1,2)]),(5,[(2,1,2)]),(3,[(1,0,17)]),(4,[(2,1,2),(1,4,17)]),(5,[(2,1,2),(1,3,17)]),(4,[(2,1,2),(1,4,126)]),(4,[(2,1,2),(3,17,41)]),(3,[(1,3,17)]),(4,[(2,1,25)]),(3,[(0,1,25)]),(3,[(1,4,17)]),(5,[(2,1,36)]),(3,[(0,1,36)]),(3,[(1,1,3)]),(5,[(1,1,3)]),(4,[(2,1,41)]),(3,[(2,1,3)]),(5,[(2,1,3)]),(4,[(1,0,20)]),(3,[(2,1,3),(1,4,20)]),(3,[(2,1,25),(1,4,63)]),(3,[(2,1,3),(3,20,36)]),(4,[(0,1,25)]),(4,[(1,4,20)]),(5,[(2,1,41)]),(4,[(0,1,41)]),(3,[(1,1,4)]),(4,[(1,1,4)]),(3,[(2,1,4)]),(4,[(2,1,4)]),(5,[(1,0,23)]),(3,[(2,1,36),(1,3,91)]),(3,[(2,1,4),(3,23,25)]),(5,[(0,1,36)]),(5,[(0,1,41)]),(3,[(0,0,25)]),(3,[(0,0,25),(1,4,26)]),(3,[(1,0,25),(3,4,27)]),(3,[(2,0,25)]),(3,[(3,0,25)]),(4,[(3,0,25)]),(3,[(0,1,25),(1,1,25)]),(3,[(1,1,25)]),(3,[(3,1,25)]),(3,[(3,1,25),(1,4,64)]),(3,[(1,4,25)]),(4,[(1,4,25)]),(3,[(3,4,25)]),(4,[(3,4,25)]),(3,[(0,0,36)]),(3,[(0,0,36),(1,3,76)]),(3,[(1,0,36),(3,3,77)]),(3,[(2,0,36)]),(3,[(3,0,36)]),(5,[(3,0,36)]),(3,[(0,1,36),(1,1,36)]),(3,[(1,1,36)]),(3,[(3,1,36)]),(3,[(3,1,36),(1,3,92)]),(3,[(3,3,36)]),(5,[(3,3,36)]),(4,[(0,0,41)]),(4,[(2,0,41)]),(4,[(3,0,41)]),(5,[(3,0,41)]),(4,[(0,1,41),(1,1,41)]),(4,[(1,1,41)]),(4,[(2,1,41),(1,2,105)]),(4,[(3,1,41)]),(4,[(3,2,41)]),(5,[(3,2,41)])]
-def h7Pools : BT (Option BoundPool) := buildPoolsBT 8 h7W h7R h7Slices h7Specs
+def h7Specs : List PoolSpec := [(1,[]),(0,[]),(3,[(0,0,1)]),(4,[(0,0,1)]),(5,[(0,0,1)]),(2,[]),(0,[(1,2,5)]),(4,[]),(3,[]),(0,[(1,4,5)]),(3,[(0,0,1),(1,4,5)]),(5,[(1,2,3)]),(3,[(0,0,1),(1,3,28)]),(3,[(0,0,1),(3,5,17)]),(4,[(0,0,1),(1,2,5)]),(5,[(0,0,1),(1,2,5)]),(5,[]),(3,[(1,0,1)]),(4,[(1,0,1)]),(5,[(1,0,1)]),(1,[(2,1,2)]),(3,[(1,0,1),(3,4,6)]),(3,[(1,0,1),(0,6,17)]),(3,[(1,0,1),(2,6,17)]),(1,[(3,2,6)]),(4,[(1,0,1),(3,2,6)]),(5,[(1,0,1),(3,2,6)]),(4,[(1,0,1),(2,6,17)]),(3,[(2,0,1)]),(4,[(2,0,1)]),(5,[(2,0,1)]),(3,[(3,0,1)]),(4,[(3,0,1)]),(5,[(3,0,1)]),(0,[(1,0,13)]),(1,[(2,1,28)]),(4,[(1,0,2)]),(5,[(1,0,2)]),(1,[(0,1,28)]),(0,[(1,0,2)]),(4,[(1,0,2),(3,4,9)]),(4,[(1,0,2),(0,9,29)]),(4,[(1,0,17),(3,4,19)]),(3,[(1,0,17)]),(5,[(1,0,3),(3,2,11)]),(4,[(1,0,17)]),(3,[(3,3,9)]),(5,[(1,0,2),(3,3,9)]),(4,[(2,0,2)]),(5,[(2,0,2)]),(3,[(1,0,3)]),(4,[(3,2,11)]),(4,[(1,1,2)]),(5,[(1,1,2)]),(3,[(2,1,17)]),(4,[(2,1,2)]),(5,[(2,1,2)]),(3,[(1,0,13)]),(4,[(2,1,2),(1,4,13)]),(4,[(2,1,2),(1,4,50)]),(4,[(2,1,2),(3,13,29)]),(3,[(1,3,13)]),(5,[(2,1,2),(1,3,13)]),(4,[(2,1,17)]),(3,[(0,1,17)]),(3,[(0,0,17)]),(3,[(0,0,17),(1,4,18)]),(3,[(1,0,17),(3,4,19)]),(3,[(2,0,17)]),(3,[(3,0,17)]),(4,[(3,0,17)]),(4,[(0,1,17)]),(3,[(0,1,17),(1,1,17)]),(3,[(1,1,17)]),(3,[(2,1,17),(1,4,39)]),(3,[(3,1,17)]),(3,[(3,1,17),(1,4,40)]),(4,[(1,2,4)]),(3,[(1,3,4)]),(3,[(1,4,17)]),(4,[(1,4,17)]),(3,[(3,4,17)]),(4,[(3,4,17)])]
+def h7Pools : BT (Option BoundPool) := buildPoolsBT 7 h7W h7R h7Slices h7Specs
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Slice5 : Slice h7R h7G (subcubeFast 16 0) 6 := slice_fast_direct (zDead := 0) (by decide +kernel) h8Bound
@@ -3654,7 +6376,7 @@ def h7Empty : BT (List (List Nat)) := BT.empty
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7EmptyOk : btAll (fun bk => ∀ xs ∈ bk, Impossible h7G (3 - 1) xs.toFinset) h7Empty := trivial
-def h7Block3_0 : List NodeSpec := nodesWithIdentity [([0,25,41,87],[]),([0,36,41,59],[]),([0,2,59,280],[]),([0,2,87,290],[]),([0,25,36,113],[]),([0,3,59,310],[]),([0,3,113,289],[]),([0,4,87,309],[]),([0,4,113,279],[]),([4,25,131,246],[]),([0,25,131,288],[]),([0,25,226,288],[]),([0,25,59,288],[]),([0,25,204,288],[]),([3,36,134,264],[]),([0,36,134,278],[]),([0,36,227,278],[]),([0,36,87,278],[]),([0,36,212,278],[]),([2,41,170,302],[]),([0,41,170,308],[]),([0,41,230,308],[]),([0,1,41,348],[]),([0,41,113,308],[]),([0,41,218,308],[]),([0,1,41,349],[]),([0,1,41,353],[])]
+def h7Block3_0 : List NodeSpec := nodesWithIdentity [([0,17,29,101],[]),([0,2,35,102],[]),([4,17,56,84],[]),([0,17,56,122],[]),([0,17,79,122],[]),([0,17,35,122],[]),([0,17,73,122],[])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test3_0 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Empty 3 h7Block3_0 = true := by decide +kernel
@@ -3666,15 +6388,15 @@ def h7Bucket3 : BT (List (List Nat)) := buildBucketsBT h7W h7Nodes3
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Bucket3Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h7G 3 xs.toFinset) h7Bucket3 := buildBucketsBT_sound (by decide) h7Pairs h7WOk h7PoolsOk h7AutosOk h7EmptyOk h7Check3
-def h7Block4_0 : List NodeSpec := nodesWithIdentity [([0,3,4,30,39],[]),([0,2,4,30,51],[]),([0,2,3,30,56],[]),([0,2,3,4,59],[]),([0,3,4,39,80],[]),([0,2,4,51,80],[]),([0,2,3,56,80],[]),([0,2,3,4,87],[]),([0,3,4,39,101],[]),([0,3,4,39,59],[]),([0,3,4,39,87],[]),([0,2,4,51,101],[]),([0,2,3,56,101],[]),([0,2,3,4,113],[]),([0,2,4,51,59],[]),([0,2,4,51,113],[]),([0,2,3,56,87],[]),([0,2,3,56,113],[]),([0,3,4,17,130],[]),([0,3,4,17,133],[]),([0,2,3,6,144],[]),([0,2,3,4,150],[]),([0,2,4,6,156],[]),([0,2,3,4,160],[]),([0,2,4,20,130],[]),([0,2,4,20,169],[]),([0,3,4,6,176],[]),([0,2,3,4,180],[]),([0,2,3,23,133],[]),([0,2,3,23,169],[]),([0,1,2,3,205],[]),([0,1,2,4,213],[]),([0,1,3,4,219],[]),([0,2,3,8,144],[]),([0,2,4,8,156],[]),([0,3,4,8,176],[]),([0,1,2,3,237],[]),([0,1,2,4,240],[]),([0,1,3,4,241],[]),([0,1,2,3,259],[]),([0,1,2,4,272],[]),([0,1,4,25,274],[]),([0,1,3,36,275],[]),([0,4,18,25,65],[]),([0,3,21,36,65],[]),([0,1,25,41,77],[7]),([0,1,4,25,281],[7]),([0,3,4,25,87],[]),([0,1,27,36,41],[15]),([0,1,3,36,281],[15]),([0,3,4,36,59],[]),([0,2,4,41,59],[]),([0,2,3,41,87],[]),([0,2,3,4,292],[]),([0,1,3,4,293],[]),([0,3,4,37,59],[]),([0,2,4,42,59],[]),([0,3,4,59,248],[]),([0,2,4,59,250],[]),([0,2,3,59,257],[]),([0,2,3,59,259],[]),([0,2,3,204,257],[]),([0,2,3,204,259],[]),([0,1,3,248,257],[]),([0,1,2,250,257],[]),([0,2,4,59,249],[]),([0,3,4,33,87],[]),([0,2,3,43,87],[]),([0,3,4,87,266],[]),([0,2,4,87,271],[])]
+def h7Block4_0 : List NodeSpec := nodesWithIdentity [([0,3,4,22,28],[]),([0,2,3,22,34],[]),([0,2,3,4,35],[]),([0,3,4,28,35],[]),([0,3,4,13,55],[]),([0,2,3,6,65],[]),([0,2,3,4,68],[]),([0,1,2,3,74],[]),([0,2,3,8,65],[]),([0,1,2,3,81],[]),([0,1,2,3,91],[]),([0,1,4,17,94],[]),([0,4,14,17,41],[]),([0,1,17,29,82],[7]),([0,1,4,17,103],[7]),([0,3,4,17,101],[])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test4_0 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket3 4 h7Block4_0 = true := by decide +kernel
-def h7Block4_1 : List NodeSpec := nodesWithIdentity [([0,2,4,87,272],[]),([0,2,3,87,243],[]),([0,2,4,212,271],[]),([0,2,4,212,272],[]),([0,1,4,266,271],[]),([0,1,2,243,271],[]),([0,2,3,87,242],[]),([0,2,3,4,300],[]),([0,1,4,25,306],[]),([0,1,2,41,307],[]),([0,4,15,25,69],[]),([0,2,21,41,69],[]),([0,1,25,36,98],[8]),([0,1,4,25,311],[8]),([0,2,4,25,113],[]),([0,1,2,41,311],[15]),([0,2,3,36,113],[]),([0,3,4,59,247],[]),([0,2,4,34,113],[]),([0,2,3,38,113],[]),([0,3,4,113,305],[]),([0,3,4,113,293],[]),([0,2,4,113,263],[]),([0,2,3,113,245],[]),([0,3,4,218,305],[]),([0,3,4,218,293],[]),([0,1,4,263,305],[]),([0,1,3,245,305],[]),([0,2,3,113,244],[]),([0,2,3,4,314],[]),([0,1,3,36,316],[]),([0,1,2,41,317],[]),([0,3,15,36,71],[]),([0,2,18,41,71],[]),([0,1,3,36,318],[8]),([0,1,2,41,318],[7]),([0,3,4,87,265],[]),([0,2,4,113,262],[]),([0,2,3,4,319],[]),([0,1,3,4,176],[]),([0,1,2,3,144],[]),([0,1,2,4,156],[]),([0,4,17,25,101],[]),([0,1,25,41,91],[7]),([0,1,4,25,326],[7]),([0,3,17,36,101],[]),([0,1,36,41,63],[15]),([0,1,3,36,326],[15]),([0,2,4,30,126],[]),([0,3,4,30,143],[]),([0,2,3,30,144],[]),([0,1,3,143,148],[]),([0,1,2,126,148],[]),([0,2,3,80,128],[]),([0,3,4,80,155],[]),([0,2,4,80,156],[]),([0,1,4,155,159],[]),([0,1,2,128,159],[]),([0,4,20,25,80],[]),([0,1,25,36,105],[8]),([0,1,4,25,335],[8]),([0,2,20,41,80],[]),([0,1,2,41,335],[15]),([0,1,38,41,143],[]),([0,2,3,101,163],[]),([0,3,4,101,176],[]),([0,2,4,101,179],[]),([0,1,4,178,179],[]),([0,1,3,163,178],[]),([0,3,23,30,36],[])]
+def h7Block4_1 : List NodeSpec := nodesWithIdentity [([0,2,3,4,109],[]),([0,3,4,27,35],[]),([0,3,4,35,85],[]),([0,2,3,35,89],[]),([0,2,3,35,91],[]),([0,2,3,73,89],[]),([0,2,3,73,91],[]),([0,1,3,85,89],[]),([0,2,4,35,86],[]),([0,2,3,4,113],[]),([0,1,3,4,115],[]),([0,4,13,17,100],[]),([0,1,17,29,53],[7]),([0,1,4,17,120],[7]),([0,2,4,22,50],[]),([0,2,3,22,65],[])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test4_1 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket3 4 h7Block4_1 = true := by decide +kernel
-def h7Block4_2 : List NodeSpec := nodesWithIdentity [([0,2,23,30,41],[]),([0,1,3,36,338],[8]),([0,1,2,41,338],[7]),([0,1,33,36,179],[]),([0,1,34,41,155],[]),([1,2,3,4,339],[]),([0,4,24,25,131],[]),([0,4,24,25,226],[]),([0,4,24,25,59],[]),([0,4,24,25,204],[]),([0,1,2,3,340],[]),([0,1,29,36,41],[]),([0,1,2,3,341],[]),([0,1,30,36,41],[]),([0,2,3,4,342],[]),([0,2,3,64,144],[]),([0,1,25,41,79],[]),([0,1,25,41,80],[]),([0,1,25,36,100],[]),([0,1,25,36,101],[]),([1,2,3,4,343],[]),([0,3,35,36,134],[]),([0,3,35,36,227],[]),([0,3,35,36,87],[]),([0,3,35,36,212],[]),([0,1,2,4,344],[]),([0,1,2,4,345],[]),([0,2,3,4,346],[]),([0,2,4,92,156],[]),([1,2,3,4,347],[]),([0,2,40,41,170],[]),([0,2,40,41,230],[]),([0,1,40,41,285],[]),([0,2,40,41,113],[]),([0,2,40,41,218],[]),([0,1,40,41,293],[]),([0,1,3,4,350],[]),([0,1,3,4,351],[]),([0,2,3,4,352],[]),([0,3,4,106,176],[]),([0,1,40,41,328],[])]
+def h7Block4_2 : List NodeSpec := nodesWithIdentity [([0,1,3,64,66],[]),([1,2,3,4,121],[]),([0,4,16,17,56],[]),([0,4,16,17,79],[]),([0,4,16,17,35],[]),([0,4,16,17,73],[]),([0,1,2,3,123],[]),([0,1,21,26,29],[]),([0,1,2,3,124],[]),([0,1,22,26,29],[]),([0,2,3,4,125],[]),([0,2,3,40,65],[])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test4_2 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket3 4 h7Block4_2 = true := by decide +kernel
@@ -3689,43 +6411,43 @@ def h7Bucket4 : BT (List (List Nat)) := buildBucketsBT h7W h7Nodes4
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Bucket4Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h7G 4 xs.toFinset) h7Bucket4 := buildBucketsBT_sound (by decide) h7Pairs h7WOk h7PoolsOk h7AutosOk h7Bucket3Ok h7Check4
-def h7Block5_0 : List NodeSpec := nodesWithIdentity [([0,2,3,4,5,30],[]),([0,1,3,4,25,39],[6,7]),([0,1,2,4,25,51],[8,9]),([0,1,2,3,25,56],[10,11]),([0,1,2,3,4,44],[13]),([0,1,2,3,4,74],[7,8,14]),([0,2,3,4,5,80],[]),([0,1,3,4,36,39],[6,15]),([0,1,2,4,36,51],[9,16]),([0,1,2,3,36,56],[8,10]),([0,1,2,3,4,48],[18]),([0,1,2,3,4,95],[8,15,19]),([0,1,3,4,39,41],[6,20]),([0,1,3,4,39,44],[6,20]),([0,1,3,4,39,45],[]),([0,1,3,4,39,48],[6,21]),([0,1,3,4,39,49],[]),([0,1,2,3,4,45],[0]),([0,1,2,3,4,49],[0]),([0,2,3,4,5,101],[]),([0,1,2,4,41,51],[9,15]),([0,1,2,3,41,56],[7,10]),([0,1,2,3,4,53],[23]),([0,1,2,3,4,118],[7,15,24]),([0,1,2,4,44,51],[9,13]),([0,1,2,4,51,52],[]),([0,1,2,4,51,53],[9,25]),([0,1,2,4,51,54],[]),([0,1,2,3,4,52],[0]),([0,1,2,3,4,54],[0]),([0,1,2,3,48,56],[10,18]),([0,1,2,3,56,57],[]),([0,1,2,3,53,56],[10,23]),([0,1,2,3,56,58],[]),([0,1,2,3,4,57],[0]),([0,1,2,3,4,58],[0]),([0,3,4,6,17,25],[]),([0,3,4,6,17,36],[]),([0,2,3,4,6,126],[]),([0,2,3,4,6,63],[]),([0,2,3,4,6,128],[]),([0,2,3,4,6,91],[]),([0,2,3,4,17,129],[8]),([0,2,4,6,20,25],[]),([0,2,3,4,6,143],[]),([0,2,4,6,20,41],[]),([0,2,3,4,6,163],[]),([0,2,3,4,6,105],[]),([0,2,3,4,20,164],[7]),([0,2,3,6,23,36],[]),([0,2,3,4,6,155],[]),([0,2,3,6,23,41],[]),([0,2,3,4,6,179],[]),([0,2,3,4,23,183],[15]),([0,1,3,4,25,136],[7]),([0,1,2,4,25,125],[8]),([0,1,2,3,25,127],[33]),([0,1,2,3,4,130],[0,7,8,34]),([0,1,2,3,4,132],[35]),([0,1,3,4,36,136],[15]),([0,1,2,4,36,125],[36]),([0,1,2,3,36,127],[8]),([0,1,2,3,4,133],[0,8,15,37]),([0,1,2,3,4,135],[38]),([0,1,3,4,41,136],[40]),([0,1,3,4,136,191],[]),([0,1,3,4,132,136],[42]),([0,1,3,4,136,192],[]),([0,1,3,4,135,136],[43]),([0,1,2,3,4,191],[1])]
+def h7Block5_0 : List NodeSpec := [([0,2,3,4,5,22],[],[0,2]),([0,1,3,4,17,28],[6,7],[0]),([0,1,2,3,17,34],[9,10],[0]),([0,1,2,3,4,31],[12],[0]),([0,1,2,3,4,46],[7,8,13],[0]),([0,1,3,4,28,31],[6,14],[0]),([0,1,3,4,28,32],[],[0]),([0,1,2,3,4,32],[0],[0]),([0,3,4,6,13,17],[],[0]),([0,2,3,4,6,50],[],[0]),([0,2,3,4,6,39],[],[0]),([0,2,3,4,13,54],[8],[0]),([0,1,3,4,17,58],[7],[0]),([0,1,2,3,17,51],[21],[0]),([0,1,2,3,4,55],[0,7,8,22],[0,2]),([0,1,2,3,4,57],[23],[0])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test5_0 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket4 5 h7Block5_0 = true := by decide +kernel
-def h7Block5_1 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,192],[1]),([0,1,2,4,41,125],[15]),([0,1,2,3,41,127],[7]),([0,1,2,3,4,169],[0,7,15,44]),([0,1,2,3,4,171],[45]),([0,1,2,4,125,193],[]),([0,1,2,4,125,132],[35]),([0,1,2,4,125,194],[]),([0,1,2,4,125,171],[48]),([0,1,2,3,4,193],[1]),([0,1,2,3,4,194],[1]),([0,1,2,3,127,195],[]),([0,1,2,3,127,135],[38]),([0,1,2,3,127,196],[]),([0,1,2,3,127,171],[45]),([0,1,2,3,4,195],[1]),([0,1,2,3,4,196],[1]),([0,2,3,4,7,30],[]),([0,1,3,4,25,161],[7]),([0,1,2,4,25,181],[8]),([0,1,2,3,4,197],[1,15]),([0,1,2,3,4,209],[]),([0,2,3,4,7,80],[]),([0,1,3,4,36,161],[15]),([0,1,2,3,36,190],[8]),([0,1,2,3,4,199],[1,7]),([0,1,2,3,4,217],[]),([0,1,3,4,33,161],[]),([0,1,3,4,37,161],[]),([0,1,2,3,4,198],[]),([0,1,2,3,4,200],[]),([0,2,3,4,7,101],[]),([0,1,2,4,41,181],[15]),([0,1,2,3,41,190],[7]),([0,1,2,3,4,202],[1,8]),([0,1,2,3,4,223],[]),([0,1,2,4,34,181],[]),([0,1,2,3,4,201],[]),([0,1,2,4,42,181],[]),([0,1,2,3,4,203],[]),([0,1,2,3,38,190],[]),([0,1,2,3,4,210],[]),([0,1,2,3,43,190],[]),([0,1,2,3,4,211],[]),([2,3,4,8,17,124],[57]),([0,3,4,8,17,25],[]),([0,3,4,8,17,36],[]),([0,2,3,4,8,126],[]),([0,2,3,4,8,63],[0]),([0,2,3,4,8,128],[]),([0,2,3,4,8,91],[0]),([2,3,4,8,20,162],[58]),([0,2,4,8,20,25],[]),([0,2,3,4,8,143],[]),([0,2,4,8,20,41],[]),([0,2,3,4,8,163],[]),([0,2,3,4,8,105],[0]),([2,3,4,8,23,182],[59]),([0,2,3,8,23,36],[]),([0,2,3,4,8,155],[]),([0,2,3,8,23,41],[]),([0,2,3,4,8,179],[]),([0,1,3,4,25,66],[7]),([0,1,2,4,25,70],[8]),([0,1,2,3,4,32],[]),([0,1,2,3,4,73],[15]),([0,1,3,4,36,66],[15]),([0,1,2,3,36,72],[8]),([0,1,2,3,4,82],[]),([0,1,2,3,4,94],[7])]
+def h7Block5_1 : List NodeSpec := nodesWithIdentity [([0,1,3,4,58,70],[]),([0,1,3,4,57,58],[27]),([0,1,2,3,4,70],[1]),([0,2,3,4,7,22],[]),([0,1,3,4,17,69],[7]),([0,1,2,3,4,71],[1,16]),([0,1,2,3,4,77],[]),([0,1,3,4,25,69],[]),([0,1,2,3,4,72],[]),([2,3,4,8,13,49],[34]),([0,3,4,8,13,17],[]),([0,2,3,4,8,50],[]),([0,2,3,4,8,39],[0]),([0,1,3,4,17,42],[7]),([0,1,2,3,4,24],[]),([0,1,2,3,4,45],[16])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test5_1 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket4 5 h7Block5_1 = true := by decide +kernel
-def h7Block5_2 : List NodeSpec := nodesWithIdentity [([1,2,3,4,66,124],[8]),([0,2,3,4,65,66],[8]),([0,1,3,4,33,66],[]),([0,1,3,4,37,66],[]),([0,1,2,3,4,233],[]),([0,1,2,3,4,234],[]),([0,1,2,4,41,70],[15]),([0,1,2,3,41,72],[7]),([0,1,2,3,4,103],[]),([0,1,2,3,4,117],[8]),([1,2,3,4,70,162],[8]),([0,2,3,4,69,70],[8]),([0,1,2,4,34,70],[]),([0,1,2,3,4,235],[]),([0,1,2,4,42,70],[]),([0,1,2,3,4,236],[]),([1,2,3,4,72,182],[8]),([0,2,3,4,71,72],[8]),([0,1,2,3,38,72],[]),([0,1,2,3,4,238],[]),([0,1,2,3,43,72],[]),([0,1,2,3,4,239],[]),([0,1,4,9,11,25],[7,8]),([0,1,3,4,9,248],[8]),([0,1,2,4,11,250],[8]),([0,1,2,3,4,27],[1,15]),([0,1,3,9,13,36],[8,15]),([0,1,3,4,9,266],[8]),([0,1,2,3,13,243],[8]),([0,1,2,3,4,77],[1,7]),([0,1,4,9,20,25],[7,8]),([0,1,3,4,9,143],[0]),([0,1,2,4,20,250],[1]),([0,1,2,3,4,61],[0]),([0,1,2,3,4,165],[1]),([0,1,2,3,4,274],[]),([0,1,3,9,23,36],[8,15]),([0,1,3,4,9,155],[0]),([0,1,2,3,23,243],[1]),([0,1,2,3,4,89],[0]),([0,1,2,3,4,184],[1]),([0,1,2,3,4,275],[]),([0,2,3,4,18,65],[]),([0,2,3,4,21,65],[]),([0,1,3,4,25,65],[6,7]),([0,1,3,4,36,65],[6,15]),([0,1,2,3,4,55],[]),([0,1,2,3,4,86],[]),([1,2,3,4,9,124],[8]),([1,3,4,9,25,26],[]),([1,3,4,9,25,29],[]),([0,1,4,9,25,41],[]),([0,1,4,9,25,250],[7]),([0,1,3,4,25,77],[7]),([0,1,3,4,25,243],[7,67]),([0,1,3,4,9,67],[0]),([0,1,3,4,9,68],[]),([1,3,4,9,36,76],[]),([1,3,4,9,36,79],[]),([0,1,3,9,36,41],[]),([0,1,3,4,27,36],[15]),([0,1,3,4,36,250],[15,68]),([0,1,3,4,9,93],[]),([0,1,3,9,36,243],[15]),([0,1,2,4,27,41],[15]),([0,1,2,3,41,77],[7]),([0,1,2,3,4,281],[0,7,15,69]),([0,1,2,3,4,258],[1]),([0,1,2,3,4,256],[70]),([0,1,2,3,4,221],[])]
+def h7Block5_2 : List NodeSpec := nodesWithIdentity [([1,2,3,4,42,49],[8]),([0,2,3,4,41,42],[8]),([0,1,3,4,25,42],[]),([0,1,2,3,4,80],[]),([0,1,4,9,11,17],[7,8]),([0,1,3,4,9,85],[8]),([0,1,2,3,4,19],[1,16]),([0,1,4,9,15,17],[7,8]),([0,1,3,4,9,64],[0]),([0,1,2,4,15,87],[1]),([0,1,2,3,4,37],[0]),([0,1,2,3,4,93],[1]),([0,1,2,3,4,94],[]),([0,2,3,4,14,41],[]),([0,1,3,4,17,41],[6,7]),([0,1,2,3,4,36],[])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test5_2 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket4 5 h7Block5_2 = true := by decide +kernel
-def h7Block5_3 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,29],[]),([1,2,3,4,27,29],[8]),([0,2,3,4,59],[]),([0,1,2,3,4,59],[]),([0,2,3,4,27,59],[1]),([0,2,3,4,27,204],[]),([0,1,2,3,4,248],[]),([0,1,3,4,27,248],[8,72]),([0,1,2,3,4,250],[]),([0,1,2,4,27,250],[8,68]),([0,1,2,3,27,257],[]),([0,1,2,3,259],[]),([0,1,2,3,4,259],[]),([0,1,2,3,27,259],[15]),([1,2,3,4,9,29],[8]),([0,2,3,4,9,59],[]),([0,1,2,3,9,259],[]),([0,1,2,3,4,107],[]),([0,1,2,3,4,255],[]),([0,1,2,3,4,79],[]),([1,2,3,4,77,79],[8]),([0,2,3,4,87],[]),([0,1,2,3,4,87],[]),([0,2,3,4,77,87],[1]),([0,2,3,4,77,212],[]),([0,1,2,3,4,266],[]),([0,1,3,4,77,266],[8,76]),([0,1,2,4,77,271],[]),([0,1,2,4,272],[]),([0,1,2,3,4,272],[]),([0,1,2,4,77,272],[7]),([0,1,2,3,4,243],[]),([0,1,2,3,77,243],[8,67]),([1,2,3,4,9,79],[8]),([0,2,3,4,9,87],[]),([0,1,2,4,9,272],[]),([0,1,2,3,4,108],[]),([0,1,2,3,4,261],[]),([0,1,3,4,10,116],[]),([0,1,2,4,41,251],[15]),([0,1,2,3,41,269],[7]),([0,1,2,3,4,297],[1]),([0,1,2,3,4,301],[]),([0,1,2,3,4,298],[]),([0,1,2,3,4,299],[]),([0,1,2,11,13,41],[7,15]),([0,1,2,4,11,263],[8]),([0,1,2,3,13,245],[8]),([0,1,2,3,4,98],[1,8]),([0,1,4,11,17,25],[7,8]),([0,1,3,4,17,248],[1]),([0,1,2,4,11,126],[0]),([0,1,2,3,4,60],[0]),([0,1,2,3,4,137],[1]),([0,1,2,3,4,306],[]),([0,1,2,11,23,41],[7,15]),([0,1,2,4,11,179],[0]),([0,1,2,3,23,245],[1]),([0,1,2,3,4,115],[0]),([0,1,2,3,4,187],[1]),([0,1,2,3,4,307],[]),([0,2,3,4,15,69],[]),([0,2,3,4,21,69],[]),([0,1,2,4,25,69],[8,9]),([0,1,2,3,4,50],[]),([0,1,2,4,41,69],[9,15]),([0,1,2,3,4,112],[]),([1,2,3,4,11,162],[8]),([1,2,4,11,25,26],[]),([1,2,4,11,25,29],[])]
+def h7Block5_3 : List NodeSpec := [([1,2,3,4,9,49],[8],[0]),([1,3,4,9,17,18],[],[0]),([1,3,4,9,17,21],[],[0]),([0,1,4,9,17,29],[],[0]),([0,1,4,9,17,87],[7],[0]),([0,1,3,4,17,82],[7],[0]),([0,1,3,4,17,83],[7,40],[0]),([0,1,3,4,9,43],[0],[0]),([0,1,3,4,9,44],[],[0]),([0,1,2,3,4,103],[0,7,16,41],[0,1]),([0,1,2,3,4,90],[1],[0,1,3]),([0,1,2,3,4,92],[42],[0]),([0,1,2,3,4,104],[],[0]),([0,1,2,3,4,21],[],[0]),([1,2,3,4,19,21],[8],[0]),([0,2,3,4,35],[],[0,1,2,4])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test5_3 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket4 5 h7Block5_3 = true := by decide +kernel
-def h7Block5_4 : List NodeSpec := nodesWithIdentity [([0,1,4,11,25,36],[]),([0,1,4,11,25,248],[8]),([0,1,2,4,25,98],[8]),([0,1,2,4,25,245],[8,88]),([0,1,2,4,11,67],[0]),([0,1,2,4,11,68],[]),([0,1,2,11,36,41],[]),([0,1,2,3,36,98],[8]),([0,1,2,3,4,311],[0,8,15,89]),([0,1,2,3,4,253],[90]),([0,1,2,3,4,215],[]),([1,2,3,4,11,29],[8]),([0,2,3,4,11,59],[]),([0,1,2,3,11,259],[]),([0,1,2,3,4,120],[]),([0,1,2,4,41,248],[15,72]),([0,1,2,3,4,252],[]),([1,2,4,11,41,97],[]),([1,2,4,11,41,100],[]),([0,1,2,4,11,116],[]),([0,1,2,11,41,245],[15]),([0,1,2,3,4,100],[]),([1,2,3,4,98,100],[8]),([0,2,3,4,113],[]),([0,1,2,3,4,113],[]),([0,2,3,4,98,113],[1]),([0,2,3,4,98,218],[]),([0,1,3,4,98,305],[]),([0,1,3,4,293],[]),([0,1,2,3,4,293],[]),([0,1,3,4,98,293],[8]),([0,1,2,3,4,263],[]),([0,1,2,4,98,263],[8,93]),([0,1,2,3,4,245],[]),([0,1,2,3,98,245],[8,88]),([1,2,3,4,11,100],[8]),([0,2,3,4,11,113],[]),([0,1,3,4,11,293],[]),([0,1,2,3,4,121],[]),([0,1,2,3,4,260],[]),([0,1,3,4,36,254],[15]),([0,1,2,4,12,93],[]),([0,1,2,3,36,303],[8]),([0,1,2,3,4,291],[1]),([0,1,2,3,4,315],[]),([0,1,2,3,4,313],[]),([0,1,2,3,4,295],[]),([0,1,3,13,17,36],[8,15]),([0,1,3,4,17,266],[1]),([0,1,2,3,13,128],[0]),([0,1,2,3,4,88],[0]),([0,1,2,3,4,151],[1]),([0,1,2,3,4,316],[]),([0,1,2,13,20,41],[7,15]),([0,1,2,4,20,263],[1]),([0,1,2,3,13,163],[0]),([0,1,2,3,4,114],[0]),([0,1,2,3,4,172],[1]),([0,1,2,3,4,317],[]),([0,2,3,4,15,71],[]),([0,2,3,4,18,71],[]),([0,1,2,3,36,71],[8,10]),([0,1,2,3,4,85],[]),([0,1,2,3,41,71],[7,10]),([0,1,2,3,4,111],[]),([1,2,3,4,13,182],[8]),([0,1,3,13,25,36],[]),([0,1,2,13,25,41],[]),([0,1,2,3,13,67],[0]),([0,1,2,3,4,318],[0,7,8,100])]
+def h7Block5_4 : List NodeSpec := [([0,1,2,3,4,35],[],[0]),([0,2,3,4,19,35],[1],[0,2]),([0,2,3,4,19,73],[],[0]),([0,1,2,3,4,85],[],[0]),([0,1,3,4,19,85],[8,44],[0]),([0,1,2,3,19,89],[],[0,2]),([0,1,2,3,91],[],[0]),([0,1,2,3,4,91],[],[0]),([0,1,2,3,19,91],[16],[0]),([1,2,3,4,9,21],[8],[0]),([0,2,3,4,9,35],[],[0,2]),([0,1,2,3,9,91],[],[0]),([0,1,2,3,4,48],[],[0]),([0,1,2,3,4,97],[],[0,1]),([0,1,3,4,10,108],[],[0,3]),([0,1,2,4,29,88],[16],[0])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test5_4 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket4 5 h7Block5_4 = true := by decide +kernel
-def h7Block5_5 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,268],[101]),([0,1,2,3,4,207],[]),([1,2,3,13,36,76],[]),([1,2,3,13,36,79],[]),([0,1,3,13,36,266],[8]),([0,1,2,3,36,263],[8,93]),([0,1,2,3,13,93],[]),([1,2,3,4,13,79],[8]),([0,2,3,4,13,87],[]),([0,1,2,4,13,272],[]),([0,1,2,3,4,122],[]),([0,1,2,3,41,266],[7,76]),([0,1,2,3,4,267],[]),([1,2,3,13,41,97],[]),([1,2,3,13,41,100],[]),([0,1,2,3,13,116],[]),([0,1,2,13,41,263],[7]),([1,2,3,4,13,100],[8]),([0,2,3,4,13,113],[]),([0,1,3,4,13,293],[]),([0,1,2,3,4,123],[]),([0,1,2,3,4,273],[]),([0,1,3,4,25,270],[7]),([0,1,2,4,25,304],[8]),([0,1,2,3,14,68],[]),([0,1,2,3,4,282],[1]),([0,1,2,3,4,320],[]),([0,1,2,3,4,312],[]),([0,1,2,3,4,296],[]),([0,2,3,4,16,101],[]),([0,1,3,4,16,116],[]),([0,1,2,4,41,167],[15]),([0,1,2,3,41,186],[7]),([0,1,2,3,4,324],[]),([0,1,2,3,4,322],[8]),([0,1,2,3,4,143],[]),([0,1,2,3,4,63],[15]),([0,1,2,4,42,167],[]),([0,1,2,3,4,321],[]),([0,1,2,3,4,155],[]),([0,1,2,3,4,91],[7]),([0,1,2,3,43,186],[]),([0,1,2,3,4,323],[]),([0,1,3,4,25,124],[7]),([0,1,3,4,36,124],[15]),([0,1,2,3,4,224],[]),([0,1,2,3,4,225],[]),([0,2,3,4,17,65],[8]),([0,1,4,17,20,25],[7,8]),([0,1,3,4,17,143],[8]),([0,1,2,4,20,126],[8]),([0,1,3,17,23,36],[8,15]),([0,1,3,4,17,155],[8]),([0,1,2,3,23,128],[8]),([0,3,4,17,25,30],[]),([0,3,4,17,25,64],[]),([0,1,4,17,25,41],[]),([0,1,4,17,25,126],[7]),([0,1,3,4,25,128],[7,112]),([0,1,3,4,25,91],[7]),([0,1,3,4,17,67],[1]),([0,1,3,4,17,68],[]),([0,3,4,17,36,80],[]),([0,3,4,17,36,92],[]),([0,1,3,17,36,41],[]),([0,1,3,4,36,126],[15,113]),([0,1,3,4,36,63],[15]),([0,1,3,4,17,93],[]),([0,1,3,17,36,128],[15]),([0,2,3,4,17,101],[8])]
+def h7Block5_5 : List NodeSpec := [([0,1,2,3,4,111],[1],[0,3]),([0,1,2,3,4,114],[],[0]),([0,1,2,3,4,112],[],[0]),([0,2,3,4,12,100],[],[0]),([0,1,3,4,12,108],[],[0]),([0,1,2,4,29,95],[16],[0]),([0,1,2,3,4,118],[],[0]),([0,1,2,3,4,117],[8],[0]),([0,1,2,3,4,64],[],[0]),([0,1,2,3,4,39],[16],[0,3]),([0,1,2,4,30,95],[],[0]),([0,1,2,3,4,116],[],[0]),([0,1,3,4,17,49],[7],[0]),([0,1,2,3,4,78],[],[0]),([0,2,3,4,13,41],[8],[0]),([0,1,4,13,15,17],[7,8],[0])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test5_5 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket4 5 h7Block5_5 = true := by decide +kernel
-def h7Block5_6 : List NodeSpec := nodesWithIdentity [([0,1,2,4,41,63],[15]),([0,1,2,3,41,91],[7]),([0,1,2,3,4,110],[]),([0,1,2,3,4,140],[8,114]),([0,1,2,3,4,149],[]),([0,1,2,3,4,326],[1,7,15,115]),([0,1,2,3,4,138],[]),([0,1,2,4,63,126],[8,113]),([0,1,2,3,4,141],[]),([0,1,2,3,4,142],[]),([0,1,2,3,4,30],[]),([0,2,3,4,30,63],[8]),([0,1,3,4,63,143],[8]),([0,1,2,3,4,126],[]),([0,1,2,3,144],[]),([0,1,2,3,4,144],[]),([0,1,2,3,63,144],[15]),([0,1,2,3,63,148],[]),([0,2,3,4,17,30],[8,118]),([0,1,2,3,17,144],[]),([0,1,2,3,4,152],[]),([0,1,2,3,4,147],[]),([0,1,2,3,91,128],[8,112]),([0,1,2,3,4,154],[]),([0,1,2,3,4,80],[]),([0,2,3,4,80,91],[8]),([0,1,3,4,91,155],[8]),([0,1,2,4,156],[]),([0,1,2,3,4,156],[]),([0,1,2,4,91,156],[7]),([0,1,2,4,91,159],[]),([0,1,2,3,4,128],[]),([0,2,3,4,17,80],[8,121]),([0,1,2,4,17,156],[]),([0,2,3,4,19,80],[]),([0,1,3,4,36,139],[15]),([0,1,2,4,19,93],[]),([0,1,2,3,36,189],[8]),([0,1,2,3,4,334],[]),([0,1,2,3,4,330],[7]),([0,1,2,3,4,333],[]),([0,1,2,3,38,189],[]),([0,1,2,3,4,331],[]),([0,1,2,3,4,179],[]),([0,1,2,3,4,105],[8]),([0,1,2,4,25,162],[8]),([0,1,2,3,4,228],[]),([0,1,2,4,41,162],[15]),([0,1,2,3,4,229],[]),([0,2,3,4,20,69],[8]),([0,1,2,20,23,41],[7,15]),([0,1,2,4,20,179],[8]),([0,1,2,3,23,163],[8]),([0,2,4,20,25,30],[]),([0,2,4,20,25,64],[]),([0,1,4,20,25,36],[]),([0,1,4,20,25,143],[8]),([0,1,2,4,25,163],[8,128]),([0,1,2,4,25,105],[8]),([0,1,2,4,20,67],[1]),([0,1,2,4,20,68],[]),([0,2,3,4,20,80],[7]),([0,1,2,20,36,41],[]),([0,1,2,3,36,105],[8]),([0,1,2,3,4,84],[]),([0,1,2,3,4,145],[7,129]),([0,1,2,3,4,335],[1,8,15,130]),([0,1,2,3,4,166],[]),([0,1,3,4,25,143],[8]),([0,1,3,4,38,143],[])]
+def h7Block5_6 : List NodeSpec := [([0,1,3,4,13,64],[8],[0]),([0,3,4,13,17,22],[],[0]),([0,3,4,13,17,40],[],[0]),([0,1,4,13,17,29],[],[0]),([0,1,4,13,17,50],[7],[0]),([0,1,3,4,17,52],[7,58],[0]),([0,1,3,4,17,53],[7],[0]),([0,1,3,4,13,43],[1],[0]),([0,1,3,4,13,44],[],[0]),([0,2,3,4,13,100],[8],[0,1]),([0,1,2,3,4,110],[],[0]),([0,1,2,3,4,61],[8,59],[0]),([0,1,2,3,4,67],[],[0,2,3]),([0,1,2,3,4,120],[1,7,16,60],[0,1]),([0,1,2,3,4,59],[],[0]),([0,1,2,4,39,50],[8,62],[0])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test5_6 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket4 5 h7Block5_6 = true := by decide +kernel
-def h7Block5_7 : List NodeSpec := nodesWithIdentity [([0,1,2,4,41,143],[15]),([0,1,2,4,42,143],[]),([0,1,2,3,4,168],[]),([0,2,3,4,20,30],[8,131]),([0,1,2,3,20,144],[]),([0,2,4,20,41,101],[]),([0,2,4,20,41,106],[]),([0,1,2,4,20,116],[]),([0,1,2,20,41,163],[15]),([0,1,2,3,4,173],[]),([0,1,2,3,4,146],[]),([0,1,2,3,105,163],[8,128]),([0,1,2,3,4,175],[]),([0,1,2,3,4,101],[]),([0,2,3,4,101,105],[8]),([0,1,3,4,176],[]),([0,1,2,3,4,176],[]),([0,1,3,4,105,176],[8]),([0,1,3,4,105,178],[]),([0,1,2,4,105,179],[8]),([0,1,2,3,4,163],[]),([0,2,3,4,20,101],[8,134]),([0,1,3,4,20,176],[]),([0,2,3,4,22,30],[]),([0,1,3,4,25,153],[7]),([0,1,2,4,25,174],[8]),([0,1,2,3,22,68],[]),([0,1,2,3,4,337],[]),([0,1,2,3,4,327],[15]),([0,1,2,3,4,336],[]),([0,1,2,3,4,332],[]),([0,1,2,3,36,182],[8]),([0,1,2,3,4,231],[]),([0,1,2,3,41,182],[7]),([0,1,2,3,4,232],[]),([0,2,3,4,23,71],[8]),([0,2,3,4,23,30],[15]),([0,1,3,23,25,36],[]),([0,1,2,23,25,41],[]),([0,1,2,3,23,67],[1]),([0,1,2,3,4,47],[]),([0,1,2,3,4,157],[15,140]),([0,1,2,3,4,338],[1,7,8,141]),([0,2,3,23,36,80],[]),([0,2,3,23,36,92],[]),([0,1,3,23,36,155],[8]),([0,1,2,3,36,179],[8]),([0,1,2,3,23,93],[]),([0,1,2,3,4,185],[]),([0,1,3,4,34,155],[]),([0,1,3,4,36,155],[8]),([0,1,2,3,41,155],[7]),([0,1,2,3,43,155],[]),([0,1,2,3,4,177],[]),([0,2,3,4,23,80],[8,142]),([0,1,2,4,23,156],[]),([0,2,3,23,41,101],[]),([0,2,3,23,41,106],[]),([0,1,2,3,23,116],[]),([0,1,2,23,41,179],[7]),([0,1,2,3,4,188],[]),([0,1,2,4,33,179],[]),([0,1,2,3,38,179],[]),([0,1,2,3,4,158],[]),([0,1,2,4,41,179],[7,8]),([0,2,3,4,23,101],[8,143]),([0,1,3,4,23,176],[]),([1,2,3,4,26,27],[]),([0,2,3,4,25,131],[]),([0,2,3,4,25,226],[])]
+def h7Block5_7 : List NodeSpec := [([0,1,2,3,4,62],[],[0,2]),([0,1,2,3,4,63],[],[0]),([0,1,2,3,4,22],[],[0]),([0,2,3,4,22,39],[8],[0,2]),([0,1,2,3,65],[],[0]),([0,1,2,3,4,65],[],[0]),([0,1,2,3,39,65],[16],[0]),([0,1,2,3,39,66],[],[0,2,3]),([0,2,3,4,13,22],[8,64],[0]),([0,1,2,3,13,65],[],[0]),([1,2,3,4,18,19],[],[0]),([0,2,3,4,17,56],[],[0]),([0,2,3,4,17,79],[],[0]),([0,1,2,3,17,98],[66],[0]),([0,2,3,4,17,35],[],[0]),([0,2,3,4,17,73],[],[0])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test5_7 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket4 5 h7Block5_7 = true := by decide +kernel
-def h7Block5_8 : List NodeSpec := nodesWithIdentity [([0,1,2,3,25,276],[145]),([0,2,3,4,25,59],[]),([0,2,3,4,25,204],[]),([0,1,3,4,25,248],[8]),([0,1,2,4,25,250],[8]),([0,1,2,3,25,259],[146]),([1,2,3,4,28,29],[]),([0,1,3,4,25,254],[8]),([0,1,2,4,25,251],[8]),([0,1,2,3,4,75],[7,8,15]),([0,1,3,4,29,36],[15]),([0,1,2,4,29,41],[15]),([0,1,2,3,4,277],[]),([0,1,2,3,4,31],[7,8,15]),([0,1,3,4,30,36],[15]),([0,1,2,4,30,41],[15]),([0,1,2,3,4,46],[]),([0,2,3,4,30,62],[150]),([0,1,3,4,25,139],[8]),([0,1,2,4,25,167],[8]),([0,2,3,4,63,64],[]),([0,1,2,4,25,126],[8,116]),([0,1,2,3,25,144],[129]),([0,1,2,3,25,325],[153]),([0,1,3,4,25,79],[7]),([0,1,3,4,25,80],[7]),([0,1,25,36,41],[7,8,15,17,22]),([0,1,4,25,36,93],[7,8]),([0,1,3,25,36,68],[8,15]),([0,1,2,4,25,100],[8]),([0,1,2,4,25,101],[8]),([0,1,4,25,41,116],[7,8]),([0,1,2,25,41,68],[7,15]),([0,1,2,3,4,283],[]),([0,1,2,3,4,284],[]),([0,1,2,3,4,116],[]),([0,1,3,4,67,116],[8]),([0,1,2,3,4,93],[]),([0,1,2,4,67,93],[8]),([0,1,2,3,4,68],[]),([0,1,2,3,67,68],[8]),([0,1,3,4,25,116],[8]),([0,1,2,4,25,93],[8]),([0,1,2,3,4,206],[]),([0,1,2,3,4,208],[]),([0,1,2,3,4,67],[]),([1,2,3,4,76,77],[]),([0,2,3,4,36,134],[]),([0,2,3,4,36,227],[]),([0,1,2,4,36,286],[159]),([0,2,3,4,36,87],[]),([0,2,3,4,36,212],[]),([0,1,3,4,36,266],[8]),([0,1,2,4,36,272],[160]),([0,1,2,3,36,243],[8]),([1,2,3,4,78,79],[]),([0,1,3,4,36,270],[8]),([0,1,2,3,36,269],[8]),([0,1,2,3,4,96],[7,8,15]),([0,1,2,3,41,79],[7]),([0,1,2,3,4,287],[]),([0,1,2,3,4,81],[7,8,15]),([0,1,2,3,41,80],[7]),([0,1,2,3,4,83],[]),([0,2,3,4,80,90],[164]),([0,1,3,4,36,153],[8]),([0,1,2,3,36,186],[8]),([0,2,3,4,91,92],[]),([0,1,2,4,36,156],[140]),([0,1,2,3,36,128],[8,119])]
+def h7Block5_8 : List NodeSpec := [([0,1,3,4,17,85],[8],[0]),([0,1,2,3,17,91],[67],[0]),([1,2,3,4,20,21],[],[0]),([0,1,3,4,17,96],[8],[0]),([0,1,2,3,4,47],[7,8,16],[0]),([0,1,3,4,21,26],[16],[0]),([0,1,2,3,4,99],[],[0]),([0,1,2,3,4,23],[7,8,16],[0]),([0,1,3,4,22,26],[16],[0,5]),([0,1,2,3,4,33],[],[0]),([0,2,3,4,22,38],[72],[0]),([0,1,3,4,17,60],[8],[0]),([0,2,3,4,39,40],[],[0]),([0,1,3,4,17,64],[8],[0,2]),([0,1,2,3,17,65],[74],[0]),([0,1,2,3,17,119],[76],[0])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test5_8 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket4 5 h7Block5_8 = true := by decide +kernel
-def h7Block5_9 : List NodeSpec := nodesWithIdentity [([0,1,2,4,36,329],[167]),([0,1,2,3,36,100],[8]),([0,1,2,3,36,101],[8]),([0,1,3,36,41,116],[8,15]),([0,1,2,36,41,93],[7,15]),([0,1,3,4,36,116],[8]),([0,1,2,3,36,68],[8]),([0,1,2,3,4,214],[]),([0,1,2,3,4,216],[]),([1,2,3,4,97,98],[]),([0,2,3,4,41,170],[]),([0,2,3,4,41,230],[]),([0,1,3,4,41,285],[]),([0,2,3,4,41,113],[]),([0,2,3,4,41,218],[]),([0,1,3,4,41,293],[]),([0,1,2,4,41,263],[7,8]),([0,1,2,3,41,245],[7,8]),([1,2,3,4,99,100],[]),([0,1,2,4,41,304],[7,8]),([0,1,2,3,41,303],[7,8]),([0,1,2,3,4,119],[7,8,15]),([0,1,2,3,4,294],[]),([0,1,2,3,4,102],[7,8,15]),([0,1,2,3,4,109],[]),([0,2,3,4,101,104],[174]),([0,1,2,4,41,174],[7,8]),([0,1,2,3,41,189],[7,8]),([0,2,3,4,105,106],[]),([0,1,3,4,41,176],[176]),([0,1,2,3,41,163],[7,8,132]),([0,1,3,4,41,328],[]),([0,1,2,4,41,93],[7,8]),([0,1,2,3,41,68],[7,8]),([0,1,2,3,4,220],[]),([0,1,2,3,4,222],[])]
+def h7Block5_9 : List NodeSpec := [([0,1,17,26,29],[7,8,16,77,78],[0,1,2,3]),([0,1,4,17,26,107],[7,8],[0]),([0,1,2,3,4,105],[],[0]),([0,1,2,3,4,106],[],[0]),([0,1,2,3,4,108],[],[0]),([0,1,3,4,43,108],[8],[0]),([0,1,3,4,17,108],[8],[0]),([0,1,2,3,4,75],[],[0]),([0,1,2,3,4,76],[],[0,3]),([0,1,2,3,4,43],[],[0])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test5_9 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket4 5 h7Block5_9 = true := by decide +kernel
@@ -3740,30 +6462,34 @@ def h7Bucket5 : BT (List (List Nat)) := buildBucketsBT h7W h7Nodes5
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Bucket5Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h7G 5 xs.toFinset) h7Bucket5 := buildBucketsBT_sound (by decide) h7Pairs h7WOk h7PoolsOk h7AutosOk h7Bucket4Ok h7Check5
-def h7Block6_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,5,25],[0,1,2,7,8,12]),([0,1,2,3,4,5,36],[0,1,2,8,15,17]),([0,1,3,4,39],[0,2,5,6,20,21]),([0,1,2,3,4,39],[0,2,5,6,7,8,15,20,21]),([0,1,2,3,4,5,41],[0,1,3,7,15,22]),([0,1,2,4,51],[0,3,5,9,16,25]),([0,1,2,3,4,51],[0,3,5,7,8,9,15,16,25]),([0,1,2,3,56],[0,4,5,10,11,26]),([0,1,2,3,4,56],[0,4,5,7,8,10,11,15,26]),([0,2,3,4,6,17],[0,1,5,8,27,30]),([0,2,3,4,6,20],[0,1,5,7,28,31]),([0,2,3,4,6,23],[0,1,5,15,29,32]),([0,1,2,3,4,6,25],[1,7,8,12,27]),([0,1,2,3,4,6,36],[1,8,15,17,27]),([0,1,3,4,136],[1,5,27,39,40,41]),([0,1,2,3,4,136],[0,1,5,7,8,15,27,39,40,41]),([0,1,2,3,4,6,41],[1,7,15,22,28]),([0,1,2,4,125],[1,5,28,36,46,47]),([0,1,2,3,4,125],[0,1,5,7,8,15,28,36,46,47]),([0,1,2,3,127],[1,5,29,33,49,50]),([0,1,2,3,4,127],[0,1,5,7,8,15,29,33,49,50]),([0,1,2,3,4,7,25],[0,1,7,8,51]),([0,1,2,3,4,7,36],[0,1,8,15,51]),([0,1,2,3,4,161],[0,1,7,8,15]),([0,1,2,3,4,7,41],[0,1,7,15,52]),([0,1,2,3,4,181],[0,1,7,8,15]),([0,1,2,3,4,190],[0,1,7,8,15]),([0,2,3,4,8,17],[0,1,5,8,30,54]),([0,2,3,4,8,20],[0,1,5,7,31,55]),([0,2,3,4,8,23],[0,1,5,15,32,56]),([0,1,2,3,4,8,25],[1,5,7,8,54]),([0,1,2,3,4,8,36],[1,5,8,15,54]),([0,1,2,3,4,66],[5,6,7,15,60]),([0,1,2,3,4,8,41],[1,5,7,15,55]),([0,1,2,3,4,70],[5,8,9,15,61]),([0,1,2,3,4,72],[5,7,8,10,62]),([0,1,2,3,4,9,11],[7,8]),([0,1,2,3,4,9,13],[8,15]),([0,1,2,3,4,9,20],[7,8]),([0,1,2,3,4,9,23],[8,15]),([0,1,2,3,4,65],[0,2,5,6,7,8,15,65]),([0,1,2,3,4,9,65],[0,1,5,8,65]),([0,1,2,3,4,9,66],[1,5,60]),([0,1,3,4,9,25],[0,7,8,63,66]),([0,1,3,4,9,36],[0,8,15,64,66]),([0,1,2,3,4,9,41],[7,8,15,63]),([0,1,2,3,4,27],[1,15,71,73]),([0,1,2,3,4,9,27],[5,7,64,73]),([0,1,2,3,4,250],[0,1,7,8,15,63,68,74]),([0,1,2,3,4,9,250],[0,7,8,63]),([0,1,2,3,4,77],[1,7,75,77]),([0,1,2,3,4,9,77],[5,15,63,77]),([0,1,2,3,4,243],[0,1,7,8,15,64,67,78]),([0,1,2,3,4,9,243],[0,8,15,64]),([0,1,2,3,4,10,41],[0,7,8,15,79]),([0,1,2,3,4,251],[0,1,5,7,8,15,81,82]),([0,1,2,3,4,269],[0,1,5,7,8,15,83,84]),([0,1,2,3,4,11,13],[7,15]),([0,1,2,3,4,11,17],[7,8]),([0,1,2,3,4,11,23],[7,15]),([0,1,2,3,4,69],[0,3,5,7,8,9,15,86]),([0,1,2,3,4,11,69],[0,1,5,7,86]),([0,1,2,3,4,11,70],[1,5,61]),([0,1,2,4,11,25],[0,7,8,81,87]),([0,1,2,3,4,11,36],[7,8,15,81]),([0,1,2,3,4,11,27],[5,8,71,85]),([0,1,2,3,4,248],[0,1,7,8,15,72,81,82]),([0,1,2,3,4,11,248],[0,8,81]),([0,1,2,4,11,41],[0,7,15,85,87]),([0,1,2,3,4,98],[1,8,91,92])]
+def h7Block6_0 : List NodeSpec := [([0,1,2,3,4,5,17],[0,1,2,7,8,11],[0,2]),([0,1,3,4,28],[0,2,5,6,14,15],[0,1,3]),([0,1,2,3,4,28],[0,2,5,6,7,8,14,15,16],[0,1]),([0,2,3,4,6,13],[0,1,5,8,17,20],[0,1]),([0,1,2,3,4,6,17],[1,7,8,11,17],[0,2]),([0,1,3,4,58],[1,5,17,24,25,26],[0,1,3]),([0,1,2,3,4,58],[0,1,5,7,8,16,17,24,25,26],[0,1]),([0,1,2,3,4,7,17],[0,1,7,8,28],[0,2]),([0,1,2,3,4,69],[0,1,7,8,16],[0,1]),([0,2,3,4,8,13],[0,1,5,8,20,31],[0,1]),([0,1,2,3,4,8,17],[1,5,7,8,31],[0,2]),([0,1,2,3,4,42],[5,6,7,16,35],[0,1]),([0,1,2,3,4,9,11],[7,8],[0,2]),([0,1,2,3,4,9,15],[7,8],[0]),([0,1,2,3,4,41],[0,2,5,6,7,8,16,38],[0,1]),([0,1,2,3,4,9,41],[0,1,5,8,38],[0])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test6_0 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket5 6 h7Block6_0 = true := by decide +kernel
-def h7Block6_1 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,11,98],[5,15,81,92]),([0,1,2,3,4,245],[0,1,7,8,15,85,88,94]),([0,1,2,3,4,11,245],[0,7,15,85]),([0,1,2,3,4,12,36],[0,7,8,15,95]),([0,1,2,3,4,254],[0,1,5,7,8,15,63,74]),([0,1,2,3,4,303],[0,1,5,7,8,15,97,98]),([0,1,2,3,4,13,17],[8,15]),([0,1,2,3,4,13,20],[7,15]),([0,1,2,3,4,71],[0,4,5,7,8,10,15,99]),([0,1,2,3,4,13,71],[0,1,5,15,99]),([0,1,2,3,4,13,72],[1,5,62]),([0,1,2,3,4,13,25],[7,8,15,83]),([0,1,2,3,13,36],[0,8,15,83,102]),([0,1,2,3,4,13,77],[5,8,75,97]),([0,1,2,3,4,266],[0,1,7,8,15,76,83,84]),([0,1,2,3,4,13,266],[0,8,83]),([0,1,2,3,13,41],[0,7,15,97,102]),([0,1,2,3,4,13,98],[5,7,83,91]),([0,1,2,3,4,263],[0,1,7,8,15,93,97,98]),([0,1,2,3,4,13,263],[0,7,97]),([0,1,2,3,4,14,25],[0,7,8,15,103]),([0,1,2,3,4,270],[0,1,5,7,8,15,64,78]),([0,1,2,3,4,304],[0,1,5,7,8,15,85,94]),([0,1,2,3,4,16,41],[1,7,8,15,105]),([0,1,2,3,4,167],[0,1,5,7,8,15,107]),([0,1,2,3,4,186],[0,1,5,7,8,15,108]),([0,1,2,3,4,124],[0,1,5,7,8,15,30,57,111]),([0,1,2,3,4,17,124],[0,1,5,8,57]),([0,1,2,3,4,17,66],[0,5,6]),([0,1,2,3,4,17,20],[7,8]),([0,1,2,3,4,17,23],[8,15]),([0,1,3,4,17,25],[1,7,8,30,109]),([0,1,3,4,17,36],[1,8,15,30,110]),([0,1,2,3,4,17,41],[1,7,8,15,109]),([0,1,2,3,4,126],[0,1,7,8,15,109,113,116]),([0,1,2,3,4,17,126],[1,7,8,109]),([0,1,2,3,4,63],[0,15,107,117]),([0,1,2,3,4,17,63],[7,110,117]),([0,1,2,3,4,128],[0,1,7,8,15,110,112,119]),([0,1,2,3,4,17,128],[1,8,15,110]),([0,1,2,3,4,91],[0,7,108,120]),([0,1,2,3,4,17,91],[15,109,120]),([0,1,2,3,4,19,36],[1,7,8,15,122]),([0,1,2,3,4,139],[0,1,5,7,8,15,109,116]),([0,1,2,3,4,189],[0,1,5,7,8,15,124]),([0,1,2,3,4,162],[0,1,5,7,8,15,31,58,127]),([0,1,2,3,4,20,162],[0,1,5,7,58]),([0,1,2,3,4,20,70],[0,5,9]),([0,1,2,3,4,20,23],[7,15]),([0,1,2,4,20,25],[1,7,8,31,125]),([0,1,2,3,4,20,36],[1,7,8,15,125]),([0,1,2,3,4,143],[0,1,7,8,15,107]),([0,1,2,3,4,20,143],[1,8,107,125]),([0,1,2,3,4,20,63],[8,107,126]),([0,1,2,4,20,41],[1,7,15,31,126]),([0,1,2,3,4,163],[0,1,7,8,15,126,128,132]),([0,1,2,3,4,20,163],[1,7,15,126]),([0,1,2,3,4,105],[0,8,124,133]),([0,1,2,3,4,20,105],[15,125,133]),([0,1,2,3,4,22,25],[1,7,8,15,135]),([0,1,2,3,4,153],[0,1,5,7,8,15,110,119]),([0,1,2,3,4,174],[0,1,5,7,8,15,126,132]),([0,1,2,3,4,182],[0,1,5,7,8,15,32,59,139]),([0,1,2,3,4,23,182],[0,1,5,15,59]),([0,1,2,3,4,23,72],[0,5,10]),([0,1,2,3,4,23,25],[1,7,8,15,137]),([0,1,2,3,23,36],[1,8,15,32,137]),([0,1,2,3,4,155],[0,1,7,8,15,108]),([0,1,2,3,4,23,155],[1,8,108,137]),([0,1,2,3,4,23,91],[8,108,138])]
+def h7Block6_1 : List NodeSpec := [([0,1,2,3,4,9,42],[1,5,35],[0]),([0,1,3,4,9,17],[0,7,8,36,39],[0]),([0,1,2,3,4,9,29],[7,8,16,36],[0,1,3,4]),([0,1,2,3,4,19],[1,16,43,45],[0,1,2,4]),([0,1,2,3,4,9,19],[5,7,37,45],[0,2]),([0,1,2,3,4,87],[0,1,7,8,16,36,46,47],[0,1,2]),([0,1,2,3,4,9,87],[0,7,8,36],[0,2]),([0,1,2,3,4,10,29],[0,7,8,16,48],[0,1]),([0,1,2,3,4,88],[0,1,5,7,8,16,50,51],[0]),([0,1,2,3,4,12,29],[1,7,8,16,52],[0,1]),([0,1,2,3,4,95],[0,1,5,7,8,16,54],[0]),([0,1,2,3,4,49],[0,1,5,7,8,16,20,34,57],[0,1,2,5]),([0,1,2,3,4,13,49],[0,1,5,8,34],[0]),([0,1,2,3,4,13,42],[0,5,6],[0]),([0,1,2,3,4,13,15],[7,8],[0,2]),([0,1,3,4,13,17],[1,7,8,20,55],[0,2])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test6_1 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket5 6 h7Block6_1 = true := by decide +kernel
-def h7Block6_2 : List NodeSpec := nodesWithIdentity [([0,1,2,3,23,41],[1,7,15,32,138]),([0,1,2,3,4,179],[0,1,7,8,15,124]),([0,1,2,3,4,23,179],[1,7,124,138]),([0,1,2,3,4,23,105],[7,124,137]),([0,1,2,3,4,25,26],[0,7,8,12,144]),([0,1,2,3,4,25,27],[0,12,71]),([0,1,2,3,4,25,28],[0,147]),([0,1,2,3,4,29],[1,7,8,15,148,149]),([0,1,2,3,4,25,29],[0,7,8,148]),([0,1,2,3,4,30],[0,7,8,15,118,131]),([0,1,2,3,4,25,30],[1,7,8,118]),([0,1,2,3,4,25,62],[1,151]),([0,1,2,3,4,25,63],[1,12,107]),([0,1,2,3,4,25,64],[1,7,8,12,152]),([0,1,3,4,25,36],[7,8,12,15,17]),([0,1,2,4,25,41],[7,8,12,15,22]),([0,1,2,3,4,67],[0,1,12,154,155]),([0,1,2,3,4,25,67],[12,15,154]),([0,1,2,3,4,68],[0,1,7,8,12,156,157]),([0,1,2,3,4,25,68],[7,8,12,15,156]),([0,1,2,3,4,36,76],[0,8,15,17,158]),([0,1,2,3,4,36,77],[0,17,75]),([0,1,2,3,4,36,78],[0,161]),([0,1,2,3,4,79],[1,7,8,15,162,163]),([0,1,2,3,4,36,79],[0,8,15,162]),([0,1,2,3,4,80],[0,7,8,15,121,142]),([0,1,2,3,4,36,80],[1,8,15,121]),([0,1,2,3,4,36,90],[1,165]),([0,1,2,3,4,36,91],[1,17,108]),([0,1,2,3,4,36,92],[1,8,15,17,166]),([0,1,2,3,36,41],[7,8,15,17,22]),([0,1,2,3,4,36,67],[7,154,155]),([0,1,2,3,4,93],[0,1,7,8,15,17,168,169]),([0,1,2,3,4,36,93],[7,8,15,17,168]),([0,1,2,3,4,41,97],[0,7,15,22,170]),([0,1,2,3,4,41,98],[0,22,91]),([0,1,2,3,4,41,99],[0,171]),([0,1,2,3,4,100],[1,7,8,15,172,173]),([0,1,2,3,4,41,100],[0,7,15,172]),([0,1,2,3,4,101],[0,7,8,15,134,143]),([0,1,2,3,4,41,101],[1,7,15,134]),([0,1,2,3,4,41,104],[1,175]),([0,1,2,3,4,41,105],[1,22,124]),([0,1,2,3,4,41,106],[1,7,15,22,177]),([0,1,2,3,4,41,67],[8,154,155]),([0,1,2,3,4,116],[0,1,7,8,15,22,178,179]),([0,1,2,3,4,41,116],[7,8,15,22,178])]
+def h7Block6_2 : List NodeSpec := [([0,1,2,3,4,13,29],[1,7,8,16,55],[0,1,3,4]),([0,1,2,3,4,50],[0,1,7,8,16,55,61,62],[0,1,2]),([0,1,2,3,4,13,50],[1,7,8,55],[0]),([0,1,2,3,4,39],[0,16,54,63],[0,1,2,4]),([0,1,2,3,4,13,39],[7,56,63],[0]),([0,1,2,3,4,17,18],[0,7,8,11,65],[0,2]),([0,1,2,3,4,17,19],[0,11,43],[0,2]),([0,1,2,3,4,17,20],[0,68],[0,2]),([0,1,2,3,4,21],[1,7,8,16,69,70],[0,2,3]),([0,1,2,3,4,17,21],[0,7,8,69],[0,2]),([0,1,2,3,4,22],[0,7,8,16,64,71],[0,2,3]),([0,1,2,3,4,17,22],[1,7,8,64],[0,2]),([0,1,2,3,4,17,38],[1,73],[0,2]),([0,1,2,3,4,17,39],[1,11,54],[0,2]),([0,1,2,3,4,17,40],[1,7,8,11,75],[0,2]),([0,1,3,4,17,26],[7,8,11,16,77],[0,1,2,5])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test6_2 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket5 6 h7Block6_2 = true := by decide +kernel
-def h7Nodes6 : List NodeSpec := h7Block6_0 ++ h7Block6_1 ++ h7Block6_2
+def h7Block6_3 : List NodeSpec := [([0,1,2,3,4,43],[0,1,11,79,80],[0,2,3]),([0,1,2,3,4,17,43],[11,16,79],[0,2,3]),([0,1,2,3,4,44],[0,1,7,8,11,81,82],[0,2,3]),([0,1,2,3,4,17,44],[7,8,11,16,81],[0,1,3,4])]
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
+lemma h7Test6_3 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket5 6 h7Block6_3 = true := by decide +kernel
+def h7Nodes6 : List NodeSpec := h7Block6_0 ++ h7Block6_1 ++ h7Block6_2 ++ h7Block6_3
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Check6 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket5 6 h7Nodes6 = true := by
   unfold h7Nodes6 checkNodesBT
   simp only [List.all_append, Bool.and_eq_true]
-  exact ⟨⟨h7Test6_0,h7Test6_1⟩,h7Test6_2⟩
+  exact ⟨⟨⟨h7Test6_0,h7Test6_1⟩,h7Test6_2⟩,h7Test6_3⟩
 def h7Bucket6 : BT (List (List Nat)) := buildBucketsBT h7W h7Nodes6
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Bucket6Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h7G 6 xs.toFinset) h7Bucket6 := buildBucketsBT_sound (by decide) h7Pairs h7WOk h7PoolsOk h7AutosOk h7Bucket5Ok h7Check6
-def h7Block7_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,5],[0,1,2,3,4,5,7,8,15]),([0,1,2,3,4,6],[0,1,5,7,8,15,27,28,29]),([0,1,2,3,4,7],[0,1,7,8,15,51,52,53]),([0,1,2,3,4,8],[0,1,5,7,8,15,54,55,56]),([0,1,2,3,4,9],[0,1,5,7,8,15,63,64]),([0,1,2,3,4,10],[0,1,5,7,8,15,79,80]),([0,1,2,3,4,11],[0,1,5,7,8,15,81,85]),([0,1,2,3,4,12],[0,1,5,7,8,15,95,96]),([0,1,2,3,4,13],[0,1,5,7,8,15,83,97]),([0,1,2,3,4,14],[0,1,5,7,8,15,103,104]),([0,1,2,3,4,16],[0,1,5,7,8,15,105,106]),([0,1,2,3,4,17],[0,1,5,7,8,15,109,110]),([0,1,2,3,4,19],[0,1,5,7,8,15,122,123]),([0,1,2,3,4,20],[0,1,5,7,8,15,125,126]),([0,1,2,3,4,22],[0,1,5,7,8,15,135,136]),([0,1,2,3,4,23],[0,1,5,7,8,15,137,138]),([0,1,2,3,4,25],[0,1,7,8,12,15]),([0,1,2,3,4,36],[0,1,7,8,15,17]),([0,1,2,3,4,41],[0,1,7,8,15,22])]
+def h7Block7_0 : List NodeSpec := [([0,1,2,3,4,5],[0,1,2,3,4,5,7,8,16],[0,1,2,3]),([0,1,2,3,4,6],[0,1,5,7,8,16,17,18,19],[0,1,2,3]),([0,1,2,3,4,7],[0,1,7,8,16,28,29,30],[0,1,2,3]),([0,1,2,3,4,8],[0,1,5,7,8,16,31,32,33],[0,1,2,3]),([0,1,2,3,4,9],[0,1,5,7,8,16,36,37],[0,1]),([0,1,2,3,4,10],[0,1,5,7,8,16,48,49],[0,1]),([0,1,2,3,4,12],[0,1,5,7,8,16,52,53],[0,1]),([0,1,2,3,4,13],[0,1,5,7,8,16,55,56],[0,1,2,5]),([0,1,2,3,4,17],[0,1,7,8,11,16],[0,2,3])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test7_0 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket6 7 h7Block7_0 = true := by decide +kernel
@@ -3775,7 +6501,7 @@ def h7Bucket7 : BT (List (List Nat)) := buildBucketsBT h7W h7Nodes7
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Bucket7Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h7G 7 xs.toFinset) h7Bucket7 := buildBucketsBT_sound (by decide) h7Pairs h7WOk h7PoolsOk h7AutosOk h7Bucket6Ok h7Check7
-def h7Block8_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4],[7,8,15])]
+def h7Block8_0 : List NodeSpec := [([0,1,2,3,4],[7,8,16],[0,1,2,3])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h7Test8_0 : checkNodesBT h7W h7G h7Mask h7Pools h7Autos h7Bucket7 8 h7Block8_0 = true := by decide +kernel
@@ -4033,14 +6759,14 @@ set_option maxHeartbeats 0 in
 lemma h25Bound : Lower h25R h25G 5 := carry_of (swaps := [(4,5)]) (roots2 := h13R) (T2 := h13G) (by decide +kernel) h13Bound
 def h17R : List Nat := varsOf 61
 def h17G : Nat := 0xfffafaaafaaafaa0fffafaaafaaafaa0
-def h17Pos : List Nat := [9,12,5,5,17,12,9,17,33,52,52,56,25,21,56,41,37,17,52,56,12,12,17,5,28,44,28,44,33,28,25,44,41,9,33,33,49,17,21,33,37,28,28,17,44,44,33,49,12,12,12,12]
-def h17Neg : List Nat := [8,8,1,4,20,4,1,1,1,20,36,40,24,20,24,40,36,24,48,48,1,0,16,0,20,36,24,40,36,16,1,32,1,0,32,48,48,48,1,40,1,8,4,0,8,4,0,1,24,36,40,20]
-def h17Mask : Nat := fullMask 52
-def h17Base : List Decor := [(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,0xc9ff50c3b1dd,0x8141401001c4),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,0xf3740afb5262e,0xa240013012638),(0xff00ff00ff00ff00ff00ff00ff00ff00,0xf3603ef38d863,0x512800c02d803),(0xffff0000ffff0000ffff0000ffff0000,0x8e70654e7e90,0x90038254e7210),(0xffffffff00000000ffffffff00000000,0xf19d9a0dcf00,0x600bc9a0d8c00)]
-def h17Steps : List (Nat × Nat × Nat) := [(1,0,1),(2,0,1),(1,0,2),(0,1,2),(1,1,2),(0,3,4),(1,3,4),(2,3,4),(3,3,4),(0,3,5),(2,3,5),(0,3,7),(2,3,7),(0,3,9),(1,3,9),(2,3,9),(3,3,9),(0,4,5),(2,4,5),(0,4,7),(2,4,7),(0,4,9),(1,4,9),(2,4,9),(3,4,9),(0,5,7),(1,5,7),(2,5,9),(2,1,2),(3,1,2),(1,1,3),(3,1,3),(1,1,4),(3,1,4),(3,1,7),(1,2,3),(3,2,3),(1,2,4),(3,2,4),(3,2,5),(3,2,7),(1,2,39),(1,1,44),(0,0,3),(1,0,3),(2,0,3),(3,0,3),(0,0,4),(1,0,4),(2,0,4),(3,0,4),(0,0,9),(3,0,9),(0,3,31),(3,3,31),(0,4,31),(3,4,31),(2,5,45),(1,3,56),(2,3,56),(1,4,56),(2,4,56),(1,0,41),(1,1,41),(1,0,68),(3,0,68),(3,2,68),(3,1,69),(2,5,41),(1,0,43),(1,1,43),(1,0,75),(3,0,75),(3,2,75),(3,1,76),(2,5,43),(1,0,10),(1,1,81),(3,1,81),(1,2,81),(3,2,81),(0,3,81),(0,4,81),(1,1,10),(3,0,88),(1,2,88),(3,2,88),(1,2,10),(3,2,82),(2,5,10),(1,1,14),(1,0,15),(3,1,96),(1,2,96),(3,2,96),(1,1,22),(1,0,23),(3,1,101),(1,2,101),(3,2,101),(3,6,7),(1,2,36),(3,0,106),(3,1,106),(2,7,36),(1,2,38),(3,0,110),(3,1,110),(2,7,38),(3,0,92),(3,1,92),(3,1,84),(2,7,10),(1,2,16),(3,2,67),(1,2,24),(3,2,74),(0,2,95),(1,2,95),(2,2,95),(3,2,95),(0,1,118),(2,1,118),(3,1,118),(1,4,48),(2,4,48),(2,9,48),(1,3,87),(1,8,87),(3,4,49),(0,9,49),(3,9,49),(1,1,136),(1,2,136),(1,1,50),(1,2,139),(3,2,139),(1,2,50),(3,1,142),(2,9,50),(0,2,100),(1,2,100),(2,2,100),(3,2,100),(0,1,120),(2,1,120),(3,1,120),(2,3,52),(2,9,52),(1,8,86),(3,3,53),(0,9,53),(3,9,53),(1,1,157),(1,2,157),(1,1,54),(1,2,160),(3,2,160),(1,2,54),(3,1,163),(2,9,54),(2,31,56),(2,9,10),(2,3,167),(2,4,167),(1,1,12),(1,2,12),(1,9,12),(3,1,172),(3,2,172),(0,3,172),(2,9,12),(1,4,176),(1,1,13),(1,2,13),(1,9,13),(3,1,180),(3,2,180),(0,4,180),(2,9,13),(1,3,184),(3,18,19),(1,4,20),(1,3,169),(1,8,169),(3,26,27),(1,8,168),(0,35,42),(0,37,40)]
-def h17W : BT Decor := buildWiresBT 8 h17Base h17Steps
-def h17AutoList : List (List (Nat × Nat)) := [[]]
-def h17Autos : BT (List (Nat × Nat)) := btOfList 1 h17AutoList
+def h17Pos : List Nat := [9,12,5,5,17,12,9,17,33,52,52,56,25,21,56,41,37,17,52,12,12,17,56,5,28,44,28,44,33,28,25,9,33,33,49,17,28,17,21,49,12,37,12]
+def h17Neg : List Nat := [8,8,1,4,20,4,1,1,1,20,36,40,24,20,24,40,36,24,48,1,0,16,48,0,20,36,24,40,36,16,1,0,32,48,48,48,8,0,1,1,24,1,36]
+def h17Mask : Nat := fullMask 43
+def h17Base : List Decor := [(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,0x2efd0a3b1dd,0x2c0400801c4),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,0x7502f9d262e,0x40013012638),(0xff00ff00ff00ff00ff00ff00ff00ff00,0x510ef58d863,0x1100c02d803),(0xffff0000ffff0000ffff0000ffff0000,0xfc65667e90,0x10e25667210),(0xffffffff00000000ffffffff00000000,0x2871a45cf00,0x40f1a458c00)]
+def h17Steps : List (Nat × Nat × Nat) := [(1,0,1),(2,0,1),(1,0,2),(0,1,2),(1,1,2),(0,3,4),(1,3,4),(2,3,4),(0,3,5),(2,3,5),(0,3,9),(1,3,9),(2,3,9),(3,3,9),(0,5,7),(1,5,7),(2,5,9),(2,1,2),(3,1,2),(1,1,3),(3,1,3),(3,1,7),(3,2,3),(1,2,4),(3,2,5),(3,2,7),(1,2,26),(0,0,3),(1,0,3),(2,0,3),(3,0,3),(0,0,9),(3,0,9),(0,3,20),(3,3,20),(3,4,20),(1,1,30),(2,5,30),(1,3,36),(2,3,36),(1,1,27),(1,0,45),(3,2,45),(2,5,27),(1,0,10),(1,1,49),(3,1,49),(0,4,49),(1,1,10),(3,0,53),(1,2,53),(3,2,53),(1,2,10),(3,2,50),(2,5,10),(1,1,13),(1,0,14),(3,1,61),(3,2,61),(0,2,60),(1,2,60),(2,2,60),(3,2,60),(1,4,32),(2,4,32),(2,9,32),(3,2,33),(1,8,52),(3,4,33),(0,9,33),(3,9,33),(1,2,75),(1,2,25),(3,0,77),(3,1,77),(1,1,34),(1,2,80),(3,2,80),(2,9,34),(2,20,36),(2,9,10),(2,4,85),(1,1,12),(1,9,12),(3,2,88),(2,9,12),(1,4,90),(3,15,16),(1,4,17),(2,4,17),(1,8,86),(3,1,28),(0,24,28)]
+def h17W : BT Decor := buildWiresBT 7 h17Base h17Steps
+def h17AutoList : List (List (Nat × Nat)) := [[],[(4,5)],[(2,3)],[(4,5),(2,3)]]
+def h17Autos : BT (List (Nat × Nat)) := btOfList 2 h17AutoList
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Pairs : goodPairs h17G h17Pos h17Neg := goodPairs_of (by decide +kernel)
@@ -4055,8 +6781,8 @@ set_option maxHeartbeats 0 in
 lemma h17AutosOk : btAll (fun sw => swapsValid sw = true ∧ permWord sw h17G = h17G) h17Autos := btAll_ofList (autos_of (by decide +kernel))
 def h17SliceList : List (Option (Nat × Nat)) := [some (subcubeFast 0 16,5),some (subcubeFast 0 32,5),some (subcubeFast 1 0,5),some (subcubeFast 1 16,4),some (subcubeFast 1 32,4),some (subcubeFast 4 0,6),some (subcubeFast 8 0,6),some (subcubeFast 16 0,5),some (subcubeFast 32 0,5),some (subcubeFast 48 0,4)]
 def h17Slices : BT (Option (Nat × Nat)) := btOfList 4 h17SliceList
-def h17Specs : List PoolSpec := [(5,[]),(2,[]),(6,[(1,0,1)]),(0,[(1,0,1),(1,0,2)]),(1,[(1,0,1),(1,0,2)]),(5,[(1,0,2)]),(6,[]),(3,[]),(4,[]),(7,[]),(0,[]),(8,[]),(1,[]),(0,[(1,0,1)]),(1,[(1,0,1)]),(9,[]),(6,[(1,0,1),(0,3,31)]),(6,[(1,0,1),(0,4,31)]),(5,[(3,2,5)]),(6,[(2,0,1)]),(6,[(3,1,7)]),(0,[(1,0,2)]),(1,[(1,0,2)]),(5,[(1,0,2),(0,3,31)]),(5,[(1,0,2),(0,4,31)]),(5,[(0,0,3)]),(6,[(0,0,3)]),(5,[(0,0,3),(1,4,48)]),(0,[(1,4,48)]),(5,[(0,0,3),(2,4,48)]),(5,[(0,3,5),(1,2,95)]),(5,[(0,0,3),(2,9,48)]),(5,[(0,3,5)]),(6,[(0,3,7)]),(6,[(0,0,3),(1,4,48)]),(6,[(0,0,3),(2,4,48)]),(5,[(1,0,3)]),(6,[(1,0,3)]),(7,[(0,4,81)]),(5,[(1,0,3),(3,4,49)]),(5,[(1,0,3),(0,9,49)]),(5,[(1,0,3),(3,9,49)]),(1,[(1,0,3)]),(8,[(3,1,3)]),(8,[(3,2,3)]),(6,[(1,0,41)]),(2,[(0,3,4)]),(2,[(3,4,49)]),(6,[(1,0,3),(3,4,49)]),(7,[(3,4,49)]),(5,[(2,0,3)]),(6,[(2,0,3)]),(5,[(3,0,3)]),(6,[(3,0,3)]),(5,[(0,0,4)]),(6,[(0,0,4)]),(1,[(1,0,10)]),(5,[(0,0,4),(2,3,52)]),(5,[(0,4,5),(1,2,100)]),(5,[(0,0,4),(2,9,52)]),(5,[(0,4,5)]),(6,[(0,4,7)]),(6,[(0,0,4),(2,3,52)]),(5,[(1,0,4)]),(6,[(1,0,4)]),(8,[(0,3,81)]),(5,[(1,0,4),(3,3,53)]),(5,[(1,0,4),(0,9,53)]),(5,[(1,0,4),(3,9,53)]),(0,[(1,0,4)]),(7,[(3,1,4)]),(7,[(3,2,4)]),(6,[(1,0,43)]),(2,[(3,3,53)]),(6,[(1,0,4),(3,3,53)]),(8,[(3,3,53)]),(5,[(2,0,4)]),(6,[(2,0,4)]),(5,[(3,0,4)]),(6,[(3,0,4)]),(5,[(0,0,9)]),(5,[(0,0,9),(1,3,56)]),(5,[(0,0,9),(2,3,56)]),(5,[(0,0,9),(1,4,56)]),(5,[(0,0,9),(2,4,56)]),(5,[(1,0,2),(3,3,31)]),(5,[(1,0,2),(3,4,31)]),(5,[(2,5,9)]),(5,[(3,0,9)]),(6,[(3,0,9)]),(5,[(0,3,4)]),(5,[(0,3,4),(1,3,4)]),(5,[(1,3,4)]),(5,[(2,3,4)]),(5,[(2,3,4),(1,9,12)]),(5,[(2,3,4),(2,9,12)]),(5,[(3,3,4)]),(5,[(3,3,4),(1,9,13)]),(5,[(3,3,4),(2,9,13)]),(5,[(0,3,9)]),(5,[(0,3,9),(1,3,9)]),(5,[(1,3,9)]),(5,[(2,3,9)]),(6,[(1,1,41)]),(5,[(1,2,36)]),(5,[(2,3,9),(1,4,20)]),(5,[(3,3,9)]),(5,[(0,4,9)]),(5,[(0,4,9),(1,4,9)]),(5,[(1,4,9)]),(5,[(2,4,9)]),(6,[(1,1,43)]),(5,[(1,2,38)]),(5,[(3,4,9)]),(6,[(1,1,3)]),(5,[(3,2,3)]),(8,[(1,1,3)]),(6,[(3,1,3)]),(5,[(1,2,3)]),(8,[(1,2,3)]),(6,[(1,1,4)]),(5,[(3,2,4)]),(7,[(1,1,4)]),(6,[(3,1,4)]),(5,[(1,2,4)]),(7,[(1,2,4)]),(6,[(0,3,4)]),(6,[(0,3,4),(1,3,4)]),(6,[(1,3,4)]),(6,[(2,3,4)]),(6,[(2,3,4),(1,1,12)]),(8,[(1,1,12)]),(5,[(2,3,4),(1,2,12)]),(8,[(1,2,12)]),(6,[(3,3,4)]),(6,[(3,3,4),(1,1,13)]),(7,[(1,1,13)]),(5,[(3,3,4),(1,2,13)]),(7,[(1,2,13)])]
-def h17Pools : BT (Option BoundPool) := buildPoolsBT 8 h17W h17R h17Slices h17Specs
+def h17Specs : List PoolSpec := [(5,[]),(2,[]),(6,[(1,0,1)]),(0,[(1,0,1),(1,0,2)]),(1,[(1,0,1),(1,0,2)]),(5,[(1,0,2)]),(6,[]),(3,[]),(4,[]),(7,[]),(0,[]),(8,[]),(1,[]),(0,[(1,0,1)]),(1,[(1,0,1)]),(9,[]),(6,[(1,0,1),(0,3,20)]),(5,[(3,2,5)]),(6,[(2,0,1)]),(6,[(3,1,7)]),(5,[(0,0,3)]),(6,[(0,0,3)]),(5,[(0,0,3),(1,4,32)]),(0,[(1,4,32)]),(5,[(0,0,3),(2,4,32)]),(5,[(0,3,5),(1,2,60)]),(5,[(0,0,3),(2,9,32)]),(5,[(0,3,5)]),(6,[(0,0,3),(1,4,32)]),(6,[(0,0,3),(2,4,32)]),(5,[(1,0,3)]),(6,[(1,0,3)]),(7,[(0,4,49)]),(5,[(1,0,3),(3,4,33)]),(5,[(1,0,3),(0,9,33)]),(5,[(1,0,3),(3,9,33)]),(1,[(1,0,3)]),(8,[(3,1,3)]),(2,[(0,3,4)]),(2,[(3,4,33)]),(6,[(1,0,3),(3,4,33)]),(7,[(3,4,33)]),(5,[(2,0,3)]),(6,[(2,0,3)]),(5,[(3,0,3)]),(6,[(3,0,3)]),(5,[(0,0,9)]),(5,[(0,0,9),(1,3,36)]),(5,[(0,0,9),(2,3,36)]),(5,[(1,0,2),(0,3,20)]),(5,[(1,0,2),(3,3,20)]),(5,[(2,5,9)]),(5,[(3,0,9)]),(6,[(3,0,9)]),(5,[(0,3,4)]),(5,[(0,3,4),(1,3,4)]),(5,[(1,3,4)]),(5,[(2,3,4)]),(5,[(2,3,4),(1,9,12)]),(5,[(2,3,4),(2,9,12)]),(5,[(0,3,9)]),(5,[(0,3,9),(1,3,9)]),(5,[(1,3,9)]),(5,[(2,3,9)]),(6,[(1,1,27)]),(5,[(2,3,9),(1,4,17)]),(5,[(2,3,9),(2,4,17)]),(5,[(3,3,9)]),(6,[(1,1,3)]),(5,[(3,2,3)]),(8,[(3,2,3)]),(8,[(1,1,3)]),(6,[(3,1,3)]),(5,[(1,2,25)]),(6,[(0,3,4)]),(6,[(0,3,4),(1,3,4)]),(6,[(1,3,4)]),(6,[(2,3,4)]),(6,[(2,3,4),(1,1,12)]),(8,[(1,1,12)])]
+def h17Pools : BT (Option BoundPool) := buildPoolsBT 7 h17W h17R h17Slices h17Specs
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Slice9 : Slice h17R h17G (subcubeFast 48 0) 4 := slice_fast_direct (zDead := 0) (by decide +kernel) h18Bound
@@ -4097,7 +6823,7 @@ def h17Empty : BT (List (List Nat)) := BT.empty
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17EmptyOk : btAll (fun bk => ∀ xs ∈ bk, Impossible h17G (3 - 1) xs.toFinset) h17Empty := trivial
-def h17Block3_0 : List NodeSpec := nodesWithIdentity [([3,9,30,87],[]),([0,3,9,133],[]),([3,4,30,136],[]),([4,9,30,132],[]),([4,9,30,86],[]),([0,4,9,154],[]),([3,4,30,157],[]),([3,9,30,183],[]),([3,9,30,177],[]),([3,9,30,169],[]),([0,3,9,189],[]),([4,9,30,188],[]),([4,9,30,175],[]),([4,9,30,185],[]),([4,9,30,168],[]),([0,4,9,191],[])]
+def h17Block3_0 : List NodeSpec := nodesWithIdentity [([3,9,19,52],[]),([0,3,9,72],[]),([3,4,19,75],[]),([3,9,19,91],[]),([3,9,19,86],[]),([0,3,9,95],[])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Test3_0 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Empty 3 h17Block3_0 = true := by decide +kernel
@@ -4109,65 +6835,84 @@ def h17Bucket3 : BT (List (List Nat)) := buildBucketsBT h17W h17Nodes3
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Bucket3Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h17G 3 xs.toFinset) h17Bucket3 := buildBucketsBT_sound (by decide) h17Pairs h17WOk h17PoolsOk h17AutosOk h17EmptyOk h17Check3
-def h17Block4_0 : List NodeSpec := nodesWithIdentity [([0,2,4,39,58],[]),([0,2,3,39,60],[]),([0,1,4,44,58],[]),([0,1,3,44,60],[]),([0,1,2,58,61],[]),([0,1,2,59,60],[]),([0,1,2,59,61],[]),([0,1,3,4,93],[]),([0,2,3,4,116],[]),([0,3,4,122,123],[30]),([0,3,4,123,126],[30]),([0,3,8,9,87],[]),([2,3,4,30,97],[]),([0,3,4,8,136],[41]),([1,2,3,30,87],[]),([0,1,2,3,133],[]),([0,4,8,9,132],[]),([0,3,4,145,146],[58]),([0,3,4,146,149],[58]),([1,2,4,30,132],[]),([0,4,8,9,86],[]),([2,3,4,30,102],[]),([0,3,4,8,157],[68]),([1,2,4,30,86],[]),([0,1,2,4,154],[]),([1,2,3,4,166],[]),([0,1,2,11,167],[15]),([0,1,2,4,186],[]),([0,1,2,21,187],[15]),([0,3,8,9,183],[]),([0,3,8,9,177],[]),([0,3,8,9,169],[]),([0,1,2,3,190],[]),([0,4,8,9,188],[]),([0,1,2,29,188],[15]),([0,4,8,9,175],[]),([0,4,8,9,185],[]),([0,4,8,9,168],[]),([0,2,10,35,112],[]),([0,1,10,42,71],[]),([0,2,10,37,108],[]),([0,1,10,40,78],[])]
+def h17Block4_0 : List NodeSpec := nodesWithIdentity [([0,2,4,26,38],[]),([0,1,2,38,40],[]),([0,1,2,39,40],[]),([0,1,3,4,58],[]),([0,3,4,64,65],[25]),([0,3,8,9,52],[]),([2,3,4,19,62],[]),([0,3,4,8,75],[35]),([1,2,3,19,52],[]),([0,1,2,3,72],[]),([1,2,3,4,84],[]),([0,1,2,11,85],[15]),([0,1,2,4,92],[]),([0,1,2,18,93],[15]),([0,3,8,9,91],[]),([0,3,8,9,86],[])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Test4_0 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket3 4 h17Block4_0 = true := by decide +kernel
-def h17Nodes4 : List NodeSpec := h17Block4_0
+def h17Block4_1 : List NodeSpec := nodesWithIdentity [([0,2,10,24,96],[])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
-lemma h17Check4 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket3 4 h17Nodes4 = true := h17Test4_0
+lemma h17Test4_1 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket3 4 h17Block4_1 = true := by decide +kernel
+def h17Nodes4 : List NodeSpec := h17Block4_0 ++ h17Block4_1
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
+lemma h17Check4 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket3 4 h17Nodes4 = true := by
+  unfold h17Nodes4 checkNodesBT
+  simp only [List.all_append, Bool.and_eq_true]
+  exact ⟨h17Test4_0,h17Test4_1⟩
 def h17Bucket4 : BT (List (List Nat)) := buildBucketsBT h17W h17Nodes4
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Bucket4Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h17G 4 xs.toFinset) h17Bucket4 := buildBucketsBT_sound (by decide) h17Pairs h17WOk h17PoolsOk h17AutosOk h17Bucket3Ok h17Check4
-def h17Block5_0 : List NodeSpec := nodesWithIdentity [([3,4,5,7,9],[0,1,2,3,4,5,6]),([2,3,4,5,7,39],[1]),([1,3,4,5,7,44],[1]),([0,3,4,5,7,9],[0,1,6]),([0,2,3,4,5,39],[0]),([0,1,3,4,7,44],[0]),([0,1,2,3,4,31],[9,10,11,12]),([1,2,3,4,5,62],[]),([2,3,4,5,9,56],[0]),([2,3,4,5,9,57],[0]),([0,3,4,5,9,44],[0,6]),([0,2,3,4,5,68],[1]),([0,1,3,4,41,44],[10]),([0,1,2,3,4,69],[10]),([0,1,2,3,4,73],[6]),([0,2,3,4,5,75],[1]),([0,1,3,4,43,44],[12]),([0,1,2,3,4,76],[12]),([0,1,2,3,4,80],[6]),([0,1,2,3,4,57],[]),([1,2,3,4,31,57],[0]),([0,1,2,3,4,39],[]),([0,2,3,4,31,39],[0]),([0,1,2,3,4,44],[]),([0,1,3,4,31,44],[0]),([0,1,2,4,31,58],[10,15]),([0,1,2,4,31,59],[9]),([0,1,2,3,31,60],[12,15]),([0,1,2,3,31,61],[11]),([1,2,3,4,5,57],[0]),([0,1,2,4,5,58],[16]),([0,1,2,3,5,60],[17]),([1,2,3,4,5,81],[0,7,8]),([0,2,3,4,5,88],[1,9,11]),([0,1,2,3,4,82],[6,9,10]),([0,1,2,3,4,94],[]),([1,2,3,4,5,96],[0]),([1,2,3,4,5,101],[0]),([1,2,3,4,7,105],[]),([1,3,4,7,9,56],[6]),([1,3,4,7,9,57],[6]),([0,3,4,7,9,39],[0,6]),([0,2,3,4,36,39],[10]),([0,1,3,4,7,106],[1]),([0,1,2,3,4,98],[10]),([0,1,2,3,4,109],[0]),([0,2,3,4,38,39],[12]),([0,1,3,4,7,110],[1]),([0,1,2,3,4,103],[12]),([0,1,2,3,4,113],[0]),([1,2,3,4,7,57],[0]),([0,1,2,4,7,58],[23]),([0,1,2,3,7,60],[24]),([1,2,3,4,7,81],[6,7,8]),([0,1,3,4,7,92],[1,9,11]),([0,1,2,3,4,84],[0,9,10]),([0,1,2,3,4,117],[]),([1,2,3,4,7,67],[0]),([1,2,3,4,7,74],[0]),([0,2,3,4,9,95],[6,9,13]),([0,1,3,4,9,118],[0,9,21]),([0,1,2,3,9,129],[9,27,28]),([0,1,2,3,9,130],[29]),([0,1,2,3,4,123],[9,30]),([0,1,2,3,4,131],[0,6,31]),([0,2,3,4,95,122],[1,8,9,15,32]),([0,2,3,4,95,123],[9,13]),([0,2,3,4,95,124],[]),([0,2,3,4,95,125],[]),([0,2,3,4,34,95],[1])]
+def h17Block5_0 : List NodeSpec := nodesWithIdentity [([3,4,5,7,9],[0,1,2,3,4,5,6]),([2,3,4,5,7,26],[1]),([0,3,4,5,7,9],[0,1,6]),([0,2,3,4,5,26],[0]),([0,1,2,3,4,20],[9,10,11,12]),([1,2,3,4,5,42],[]),([2,3,4,5,9,36],[0]),([2,3,4,5,9,37],[0]),([0,3,4,5,9,29],[0,6]),([0,2,3,4,5,45],[1]),([0,1,3,4,27,29],[10]),([0,1,2,3,4,46],[10]),([0,1,2,3,4,48],[6]),([0,1,2,3,4,37],[]),([1,2,3,4,20,37],[0]),([0,1,2,3,4,26],[])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Test5_0 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket4 5 h17Block5_0 = true := by decide +kernel
-def h17Block5_1 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,125],[1]),([0,1,3,4,118,126],[1,8,9,15,33]),([0,1,3,4,118,123],[9,21,30]),([0,1,3,4,118,127],[]),([0,1,3,4,118,128],[]),([0,1,3,4,33,118],[1]),([0,1,2,3,4,128],[1]),([0,1,2,3,9,87],[10,38]),([0,1,2,3,9,134],[39]),([0,1,2,3,4,135],[1,40]),([0,1,2,3,4,136],[41]),([0,1,2,4,49,106],[15]),([0,1,2,4,36,119],[]),([0,2,3,4,8,97],[10]),([0,2,3,4,34,97],[10]),([0,1,2,4,41,97],[]),([0,1,2,3,4,138],[10]),([0,1,2,4,49,68],[15]),([0,1,3,4,33,119],[10]),([0,1,2,3,4,137],[10]),([0,1,2,3,8,87],[10,11,38,46]),([0,1,2,3,33,87],[10,38]),([0,1,2,3,34,87],[10,38]),([0,2,3,4,9,139],[6]),([0,1,3,4,9,142],[0]),([0,1,2,3,4,140],[10,11,12]),([0,1,2,3,4,144],[]),([0,1,2,3,4,141],[]),([0,1,2,3,4,143],[]),([0,2,3,4,9,100],[6,11,14]),([0,1,3,4,9,120],[0,11,22]),([0,1,2,4,9,132],[11,56]),([0,1,2,4,9,152],[57]),([0,1,2,3,4,146],[11,58]),([0,1,2,3,4,153],[0,6,59]),([0,2,3,4,100,145],[1,7,11,15,60]),([0,2,3,4,100,146],[11,14]),([0,2,3,4,100,147],[]),([0,2,3,4,100,148],[]),([0,2,3,4,34,100],[1]),([0,1,2,3,4,148],[1]),([0,1,3,4,120,149],[1,7,11,15,61]),([0,1,3,4,120,146],[11,22,58]),([0,1,3,4,120,150],[]),([0,1,3,4,120,151],[]),([0,1,3,4,33,120],[1]),([0,1,2,3,4,151],[1]),([0,1,2,4,8,132],[1,10,11,15,56]),([0,1,2,4,33,132],[]),([0,1,2,4,34,132],[]),([0,1,2,4,9,86],[12,65]),([0,1,2,4,9,155],[66]),([0,1,2,3,4,156],[1,67]),([0,1,2,3,4,157],[68]),([0,1,2,3,53,110],[15]),([0,1,2,3,38,121],[]),([0,2,3,4,8,102],[12]),([0,2,3,4,34,102],[12]),([0,1,2,3,43,102],[]),([0,1,2,3,4,159],[12]),([0,1,2,3,53,75],[15]),([0,1,3,4,33,121],[12]),([0,1,2,3,4,158],[12]),([0,1,2,4,8,86],[9,12,46,65]),([0,1,2,4,33,86],[12,65]),([0,1,2,4,34,86],[12,65]),([0,2,3,4,9,160],[6]),([0,1,3,4,9,163],[0]),([0,1,2,3,4,161],[9,10,12]),([0,1,2,3,4,165],[])]
+def h17Block5_1 : List NodeSpec := [([0,2,3,4,20,26],[0],[0,1]),([0,1,2,4,20,38],[10,15],[0,2]),([0,1,2,4,20,39],[9],[0,1]),([1,2,3,4,5,37],[0],[0]),([0,1,2,4,5,38],[16],[0,2]),([1,2,3,4,5,49],[0,7,8],[0]),([0,2,3,4,5,53],[1,9,11],[0]),([0,1,2,3,4,50],[6,9,10],[0]),([0,1,2,3,4,59],[],[0]),([1,2,3,4,5,61],[0],[0]),([0,2,3,4,9,60],[6,9,13],[0]),([0,1,2,3,9,68],[9,22,23],[0]),([0,1,2,3,9,69],[24],[0]),([0,1,2,3,4,65],[9,25],[0]),([0,1,2,3,4,70],[0,6,26],[0]),([0,2,3,4,60,64],[1,8,9,15,27],[0])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Test5_1 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket4 5 h17Block5_1 = true := by decide +kernel
-def h17Block5_2 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,162],[]),([0,1,2,3,4,164],[]),([1,2,3,4,31,56],[]),([0,1,2,4,9,63],[81]),([0,1,2,4,9,64],[82]),([0,1,2,3,9,65],[83]),([0,1,2,3,9,66],[84]),([0,2,3,4,9,39],[0]),([0,1,3,4,9,44],[0]),([0,1,2,4,9,58],[23]),([0,1,2,4,9,59],[85]),([0,1,2,3,9,60],[24]),([0,1,2,3,9,61],[86]),([1,2,3,4,32,57],[]),([0,2,3,4,9,47],[0]),([0,1,3,4,9,46],[0]),([0,2,3,4,9,88],[6]),([0,1,3,4,9,92],[0]),([0,1,2,9,10,11],[9,10,15,91]),([0,1,2,3,4,90],[]),([0,1,2,3,4,167],[9,10]),([0,1,2,3,4,172],[9,94]),([0,1,2,3,4,176],[10,95]),([0,1,2,3,4,180],[9,97]),([0,1,2,3,4,184],[10,98]),([0,1,2,4,18,19],[100]),([0,2,3,4,9,108],[0]),([0,1,3,4,9,71],[0]),([0,2,3,4,9,68],[0,103]),([0,1,3,4,9,106],[0,104]),([0,1,2,4,20,21],[15]),([0,1,2,3,9,187],[9,105]),([0,1,2,3,9,183],[]),([0,1,2,3,9,177],[]),([0,1,2,3,9,169],[10,15]),([0,1,2,3,26,27],[108]),([0,2,3,4,9,112],[0]),([0,1,3,4,9,78],[0]),([0,2,3,4,9,75],[0,111]),([0,1,3,4,9,110],[0,112]),([0,1,2,4,9,188],[11]),([0,1,2,4,9,175],[]),([0,1,2,3,28,29],[15]),([0,1,2,4,9,185],[]),([0,1,2,4,9,168],[12,15]),([0,2,3,4,35,112],[9]),([0,1,3,4,42,71],[10]),([0,1,2,10,35,42],[10]),([0,1,2,3,4,192],[]),([0,1,2,4,10,71],[12]),([0,1,2,4,35,92],[0]),([0,1,2,3,4,99],[]),([0,1,2,3,4,107],[]),([0,2,3,4,37,108],[10]),([0,1,3,4,40,78],[9]),([0,1,2,10,37,40],[10]),([0,1,2,3,4,193],[]),([0,1,2,3,10,78],[10]),([0,1,2,3,37,92],[0]),([0,1,2,3,4,104],[]),([0,1,2,3,4,111],[]),([0,1,2,4,10,108],[12]),([0,1,2,4,40,88],[6]),([0,1,2,3,4,72],[]),([0,1,2,3,4,70],[]),([0,1,2,3,10,112],[10]),([0,1,2,3,42,88],[6]),([0,1,2,3,4,79],[]),([0,1,2,3,4,77],[]),([0,1,2,3,4,83],[])]
+def h17Block5_2 : List NodeSpec := nodesWithIdentity [([0,2,3,4,60,65],[9,13]),([0,2,3,4,60,66],[]),([0,2,3,4,60,67],[]),([0,2,3,4,23,60],[1]),([0,1,2,3,4,67],[1]),([0,1,2,3,9,52],[10,32]),([0,1,2,3,9,73],[33]),([0,1,2,3,4,74],[1,34]),([0,1,2,3,4,75],[35]),([0,1,2,4,33,77],[15]),([0,1,2,4,25,71],[]),([0,2,3,4,8,62],[10]),([0,2,3,4,23,62],[10]),([0,1,2,3,4,76],[10]),([0,1,2,3,8,52],[10,11,32,38]),([0,1,2,3,22,52],[10,32])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Test5_2 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket4 5 h17Block5_2 = true := by decide +kernel
-def h17Block5_3 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,85],[]),([0,1,2,3,4,89],[]),([0,1,2,3,4,91],[]),([0,1,2,3,4,114],[]),([0,1,2,3,4,115],[]),([0,1,2,3,4,174],[9]),([0,1,2,3,4,173],[9]),([0,1,2,3,4,182],[10]),([0,1,2,3,4,181],[10])]
+def h17Block5_3 : List NodeSpec := nodesWithIdentity [([0,2,3,4,9,80],[6]),([0,1,2,3,4,81],[10,11,12]),([0,1,2,3,4,83],[]),([0,1,2,3,4,82],[]),([1,2,3,4,20,36],[]),([0,1,2,4,9,43],[47]),([0,1,2,4,9,44],[48]),([0,2,3,4,9,26],[0]),([0,1,2,4,9,38],[49]),([0,1,2,4,9,39],[50]),([1,2,3,4,21,37],[]),([0,2,3,4,9,41],[0]),([0,2,3,4,9,53],[6]),([0,1,2,9,10,11],[9,10,15,55]),([0,1,2,3,4,55],[]),([0,1,2,3,4,85],[9,10])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Test5_3 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket4 5 h17Block5_3 = true := by decide +kernel
-def h17Nodes5 : List NodeSpec := h17Block5_0 ++ h17Block5_1 ++ h17Block5_2 ++ h17Block5_3
+def h17Block5_4 : List NodeSpec := [([0,1,2,3,4,88],[9,58],[0]),([0,1,2,3,4,90],[10,59],[0]),([0,1,2,4,15,16],[61],[0]),([0,2,3,4,9,79],[0],[0]),([0,2,3,4,9,45],[0,64],[0]),([0,1,2,4,17,18],[15],[0]),([0,1,2,3,9,93],[9,65],[0]),([0,1,2,3,9,94],[66],[0]),([0,1,2,3,9,91],[],[0]),([0,1,2,3,9,86],[10,15],[0]),([0,2,3,4,24,96],[9],[0]),([0,1,2,10,24,28],[10],[0,3]),([0,1,2,3,4,97],[],[0]),([0,1,2,4,10,47],[12],[0,3]),([0,1,2,4,24,57],[0],[0]),([0,1,2,3,4,63],[],[0])]
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
+lemma h17Test5_4 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket4 5 h17Block5_4 = true := by decide +kernel
+def h17Block5_5 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,78],[]),([0,1,2,3,4,51],[]),([0,1,2,3,4,54],[]),([0,1,2,3,4,56],[]),([0,1,2,3,4,89],[9])]
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
+lemma h17Test5_5 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket4 5 h17Block5_5 = true := by decide +kernel
+def h17Nodes5 : List NodeSpec := h17Block5_0 ++ h17Block5_1 ++ h17Block5_2 ++ h17Block5_3 ++ h17Block5_4 ++ h17Block5_5
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Check5 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket4 5 h17Nodes5 = true := by
   unfold h17Nodes5 checkNodesBT
   simp only [List.all_append, Bool.and_eq_true]
-  exact ⟨⟨⟨h17Test5_0,h17Test5_1⟩,h17Test5_2⟩,h17Test5_3⟩
+  exact ⟨⟨⟨⟨⟨h17Test5_0,h17Test5_1⟩,h17Test5_2⟩,h17Test5_3⟩,h17Test5_4⟩,h17Test5_5⟩
 def h17Bucket5 : BT (List (List Nat)) := buildBucketsBT h17W h17Nodes5
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Bucket5Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h17G 5 xs.toFinset) h17Bucket5 := buildBucketsBT_sound (by decide) h17Pairs h17WOk h17PoolsOk h17AutosOk h17Bucket4Ok h17Check5
-def h17Block6_0 : List NodeSpec := nodesWithIdentity [([1,2,3,4,5,7],[0,1,2,5,6,7,8]),([0,1,2,3,4,5,7],[0,1,2,5,6]),([1,2,3,4,5,45],[0,1,2,6,7,8]),([0,2,3,4,5,9],[0,1,2,6,13,14]),([0,1,2,3,4,5,41],[0,6,7,9,10]),([0,1,2,3,4,5,43],[0,6,8,11,12]),([0,1,2,3,4,31],[9,10,11,12]),([0,1,2,3,4,5,31],[2,6,7,8]),([0,1,2,3,4,44],[0,1,2,6,9,10,11,12,18]),([0,1,2,3,4,5,44],[0,1,2,6]),([0,1,2,3,4,5,10],[0,1,7,8,9,10,11,12]),([0,1,2,3,4,5,14],[0,1,7,9,10]),([0,1,2,3,4,5,15],[7,9,10]),([0,1,2,3,4,5,22],[0,1,8,11,12]),([0,1,2,3,4,5,23],[8,11,12]),([1,2,3,4,6,7],[0,1,5,6,7,8,19]),([0,1,2,3,4,46],[0,1,5,6,7,8,9,10,11,12,20]),([0,1,3,4,7,9],[0,1,5,6,21,22]),([0,1,2,3,4,7,36],[0,6,7,9,10]),([0,1,2,3,4,7,38],[0,6,8,11,12]),([0,1,2,3,4,7,31],[0,5,7,8]),([0,1,2,3,4,39],[0,1,5,6,9,10,11,12,20]),([0,1,2,3,4,7,39],[0,1,5,6]),([0,1,2,3,4,7,10],[1,6,7,8,9,10,11,12]),([0,1,2,3,4,7,16],[1,6,7,9,10]),([0,1,2,3,4,7,17],[7,9,10]),([0,1,2,3,4,7,24],[1,6,8,11,12]),([0,1,2,3,4,7,25],[8,11,12]),([0,1,2,3,4,47],[0,1,2,6,7,8,9,10,11,12,18]),([0,1,2,3,4,9,48],[0,1,6,9,10,25]),([0,2,3,4,95],[1,7,8,9,32]),([0,1,2,3,4,95],[0,1,6,7,8,9,11,12,32]),([0,1,3,4,118],[1,7,8,9,33]),([0,1,2,3,4,118],[0,1,6,7,8,9,11,12,33]),([0,1,2,3,129],[1,9,12,27,34]),([0,1,2,3,130],[1,9,11,29,35]),([0,1,2,3,4,9,49],[9,10,36]),([0,1,2,4,36,49],[0,1,9,10,15,36,42,43]),([0,1,2,3,4,97],[0,1,6,7,9,10,11,12]),([0,1,2,4,41,49],[1,6,9,10,15,37,42,44]),([0,1,2,3,4,119],[0,1,6,7,9,10,11,12,45]),([0,1,2,3,87],[7,10,11,15,38,46]),([0,1,2,3,134],[7,10,12,39,47,48,49]),([0,1,2,3,4,9,50],[0,1,6,9,10,50]),([0,1,2,3,4,139],[0,1,6,8,10,11,12,50]),([0,1,2,3,4,142],[0,1,6,8,10,11,12,51]),([0,1,2,3,4,9,51],[7,9,10,52]),([0,1,2,3,4,9,52],[0,1,6,11,12,54]),([0,2,3,4,100],[1,7,11,60]),([0,1,2,3,4,100],[0,1,6,7,9,10,11,60]),([0,1,3,4,120],[1,7,11,61]),([0,1,2,3,4,120],[0,1,6,7,9,10,11,61]),([0,1,2,4,132],[1,10,11]),([0,1,2,4,152],[1,9,11,57,62]),([0,1,2,3,4,9,53],[11,12,63]),([0,1,2,3,38,53],[0,1,11,12,15,63,69,70]),([0,1,2,3,4,102],[0,1,6,8,9,10,11,12]),([0,1,2,3,43,53],[1,6,11,12,15,64,69,71]),([0,1,2,3,4,121],[0,1,6,8,9,10,11,12,72]),([0,1,2,4,86],[8,9,12,15,46,65]),([0,1,2,4,155],[7,10,12,66,73,74,75]),([0,1,2,3,4,9,54],[0,1,6,11,12,76]),([0,1,2,3,4,160],[0,1,6,7,9,10,12,76]),([0,1,2,3,4,163],[0,1,6,7,9,10,12,77]),([0,1,2,3,4,9,55],[8,11,12,78]),([0,1,2,3,4,9,56],[0,1,6,80]),([0,1,2,3,4,9,31],[1,5]),([0,1,2,3,4,9,32],[1,87]),([0,1,2,3,4,57],[0,6,9,10,11,12,88,89]),([0,1,2,3,4,9,57],[0,1,6,88])]
+def h17Block6_0 : List NodeSpec := [([1,2,3,4,5,7],[0,1,2,5,6,7,8],[0,2]),([0,1,2,3,4,5,7],[0,1,2,5,6],[0,2]),([1,2,3,4,5,30],[0,1,2,6,7,8],[0]),([0,2,3,4,5,9],[0,1,2,6,13,14],[0]),([0,1,2,3,4,5,27],[0,6,7,9,10],[0]),([0,1,2,3,4,20],[9,10,11,12],[0,1,2]),([0,1,2,3,4,5,20],[2,6,7,8],[0,1,2]),([0,1,2,3,4,29],[0,1,2,6,9,10,11,12,17],[0,1,2]),([0,1,2,3,4,5,29],[0,1,2,6],[0,2]),([0,1,2,3,4,5,10],[0,1,7,8,9,10,11,12],[0]),([0,1,2,3,4,5,13],[0,1,7,9,10],[0]),([0,1,2,3,4,5,14],[7,9,10],[0]),([0,1,2,3,4,31],[0,1,5,6,7,8,9,10,11,12,19],[0]),([0,1,2,3,4,9,32],[0,1,6,9,10,20],[0,2]),([0,2,3,4,60],[1,7,8,9,27],[0]),([0,1,2,3,4,60],[0,1,6,7,8,9,11,12,27],[0])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Test6_0 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket5 6 h17Block6_0 = true := by decide +kernel
-def h17Block6_1 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,9,10],[0,6,9,10,11,12,90]),([0,1,2,3,4,9,11],[9,10,11,12,15,92]),([0,1,2,3,4,9,12],[9,10,11,12,93]),([0,1,2,3,4,9,13],[9,10,11,12,96]),([0,1,2,3,4,9,18],[9,10,99]),([0,1,2,3,4,9,19],[9,10,101]),([0,1,2,3,4,9,20],[9,10,102]),([0,1,2,3,4,9,21],[9,10,106]),([0,1,2,3,4,9,26],[11,12,107]),([0,1,2,3,4,9,27],[11,12,109]),([0,1,2,3,4,9,28],[11,12,110]),([0,1,2,3,4,9,29],[11,12,113]),([0,1,2,4,35,41],[0,6,7,9,10,44,114,115,116]),([0,1,2,3,4,35,42],[0,6,9,10,11,12]),([0,1,2,3,4,71],[0,1,6,7,9,10,11,12,103,115]),([0,1,2,4,10,35],[0,7,9,10,12,46,90,116]),([0,1,2,3,4,96],[0,1,6,7,9,10,11,12]),([0,1,2,4,36,40],[0,6,7,9,10,43,117,118,119]),([0,1,2,3,4,106],[0,1,6,9,10,11,12,15,104,117]),([0,1,2,3,4,37,40],[0,6,9,10,11,12]),([0,1,2,3,37,43],[0,6,8,11,12,71,120,121,122]),([0,1,2,3,4,78],[0,1,6,8,9,10,11,12,111,121]),([0,1,2,3,10,37],[0,8,10,11,12,46,90,122]),([0,1,2,3,4,101],[0,1,6,8,9,10,11,12]),([0,1,2,3,38,42],[0,6,8,11,12,70,123,124,125]),([0,1,2,3,4,110],[0,1,6,9,10,11,12,15,112,123]),([0,1,2,3,4,108],[0,1,6,7,9,10,11,12,104,117]),([0,1,2,4,10,40],[6,7,9,10,12,46,119,126]),([0,1,2,3,4,67],[0,1,6,7,9,10,11,12,45]),([0,1,2,3,4,68],[0,1,6,9,10,11,12,15,103,115]),([0,1,2,3,4,112],[0,1,6,8,9,10,11,12,112,123]),([0,1,2,3,10,42],[6,8,10,11,12,46,125,126]),([0,1,2,3,4,74],[0,1,6,8,9,10,11,12,72]),([0,1,2,3,4,75],[0,1,6,9,10,11,12,15,111,121]),([0,1,2,3,4,81],[0,1,6,7,8,9,10,11,46]),([0,1,2,3,4,88],[0,1,6,9,10,11,90]),([0,1,2,3,4,92],[0,1,6,9,10,11,126]),([0,1,2,10,11],[7,9,10,15,46,91,127]),([0,1,2,3,4,170],[0,1,6,8,9,10,12,15,93,130,131]),([0,1,2,3,4,171],[0,1,6,8,9,10,12,15,129,132,133]),([0,1,2,3,4,178],[0,1,6,7,9,10,11,15,96,135,136]),([0,1,2,3,4,179],[0,1,6,7,9,10,11,15,134,137,138])]
+def h17Block6_1 : List NodeSpec := [([0,1,2,3,68],[1,9,12,22,28],[0]),([0,1,2,3,69],[1,9,11,24,29],[0]),([0,1,2,3,4,9,33],[9,10,30],[0]),([0,1,2,4,25,33],[0,1,9,10,15,30,36,37],[0]),([0,1,2,3,4,62],[0,1,6,7,9,10,11,12],[0,2]),([0,1,2,3,52],[7,10,11,15,32,38],[0,2]),([0,1,2,3,73],[7,10,12,33,39,40,41],[0]),([0,1,2,3,4,9,34],[0,1,6,9,10,42],[0,2]),([0,1,2,3,4,80],[0,1,6,8,10,11,12,42],[0]),([0,1,2,3,4,9,35],[7,9,10,44],[0]),([0,1,2,3,4,9,36],[0,1,6,46],[0,1,2]),([0,1,2,3,4,9,20],[1,5],[0,1,2]),([0,1,2,3,4,9,21],[1,51],[0,2]),([0,1,2,3,4,37],[0,6,9,10,11,12,52,53],[0]),([0,1,2,3,4,9,37],[0,1,6,52],[0,2]),([0,1,2,3,4,9,10],[0,6,9,10,11,12,54],[0,2])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Test6_1 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket5 6 h17Block6_1 = true := by decide +kernel
-def h17Nodes6 : List NodeSpec := h17Block6_0 ++ h17Block6_1
+def h17Block6_2 : List NodeSpec := [([0,1,2,3,4,9,11],[9,10,11,12,15,56],[0]),([0,1,2,3,4,9,12],[9,10,11,12,57],[0]),([0,1,2,3,4,9,15],[9,10,60],[0]),([0,1,2,3,4,9,16],[9,10,62],[0,2]),([0,1,2,3,4,9,17],[9,10,63],[0,2]),([0,1,2,3,4,9,18],[9,10,67],[0]),([0,1,2,4,24,27],[0,6,7,9,10,68,69,70,71],[0]),([0,1,2,3,4,24,28],[0,6,9,10,11,12],[0,3]),([0,1,2,3,4,47],[0,1,6,7,9,10,11,12,64,69],[0,3]),([0,1,2,4,10,24],[0,7,9,10,12,38,54,71],[0]),([0,1,2,3,4,61],[0,1,6,7,9,10,11,12],[0,2]),([0,1,2,3,4,77],[0,1,6,9,10,11,12,15,72,73],[0,2]),([0,1,2,3,4,49],[0,1,6,7,8,9,10,11,38],[0,2]),([0,1,2,3,4,53],[0,1,6,9,10,11,54],[0,2,3]),([0,1,2,10,11],[7,9,10,15,38,55,75],[0]),([0,1,2,3,4,87],[0,1,6,8,9,10,12,15,57,78,79],[0])]
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
+lemma h17Test6_2 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket5 6 h17Block6_2 = true := by decide +kernel
+def h17Nodes6 : List NodeSpec := h17Block6_0 ++ h17Block6_1 ++ h17Block6_2
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Check6 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket5 6 h17Nodes6 = true := by
   unfold h17Nodes6 checkNodesBT
   simp only [List.all_append, Bool.and_eq_true]
-  exact ⟨h17Test6_0,h17Test6_1⟩
+  exact ⟨⟨h17Test6_0,h17Test6_1⟩,h17Test6_2⟩
 def h17Bucket6 : BT (List (List Nat)) := buildBucketsBT h17W h17Nodes6
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Bucket6Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h17G 6 xs.toFinset) h17Bucket6 := buildBucketsBT_sound (by decide) h17Pairs h17WOk h17PoolsOk h17AutosOk h17Bucket5Ok h17Check6
-def h17Block7_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,5],[0,1,2,6,7,8,9,10,11,12]),([0,1,2,3,4,6],[0,1,6,7,8,9,10,11,12,19]),([0,1,2,3,4,7],[0,1,5,6,7,8,9,10,11,12]),([0,1,2,3,4,45],[0,1,6,7,8,9,10,11,12]),([0,1,2,3,4,48],[0,1,6,7,8,9,11,12,25,26]),([0,1,2,3,4,49],[0,1,6,7,8,9,10,11,12,15,36,37]),([0,1,2,3,4,50],[0,1,6,8,9,10,11,12,50,51]),([0,1,2,3,4,51],[0,1,6,7,8,9,10,11,12,15,52,53]),([0,1,2,3,4,52],[0,1,6,7,9,10,11,54,55]),([0,1,2,3,4,53],[0,1,6,7,8,9,10,11,12,15,63,64]),([0,1,2,3,4,54],[0,1,6,7,9,10,11,12,76,77]),([0,1,2,3,4,55],[0,1,6,7,8,9,10,11,12,15,78,79]),([0,1,2,3,4,9],[0,1,6,9,10,11,12]),([0,1,2,3,4,35],[0,1,6,7,9,10,11,12,15,114]),([0,1,2,3,4,36],[0,1,6,7,9,11,12,15,117]),([0,1,2,3,4,37],[0,1,6,8,9,10,11,12,15,120]),([0,1,2,3,4,38],[0,1,6,8,9,10,11,15,123]),([0,1,2,3,4,40],[0,1,6,7,9,10,11,12,15,118]),([0,1,2,3,4,41],[0,1,6,7,9,11,12,15,115]),([0,1,2,3,4,42],[0,1,6,8,9,10,11,12,15,124]),([0,1,2,3,4,43],[0,1,6,8,9,10,11,15,121]),([0,1,2,3,4,10],[0,1,6,7,8,9,10,11,90,126]),([0,1,2,3,4,11],[0,1,6,7,9,10,11,12,15,92,128]),([0,1,2,3,4,12],[0,1,6,7,8,9,10,11,12,15,93,129]),([0,1,2,3,4,13],[0,1,6,7,9,10,11,15,96,134])]
+def h17Block7_0 : List NodeSpec := [([0,1,2,3,4,5],[0,1,2,6,7,8,9,10,11,12],[0,1]),([0,1,2,3,4,6],[0,1,6,7,8,9,10,11,12,18],[0,2]),([0,1,2,3,4,32],[0,1,6,7,8,9,11,12,20,21],[0,2]),([0,1,2,3,4,33],[0,1,6,7,8,9,10,11,12,15,30,31],[0,2]),([0,1,2,3,4,34],[0,1,6,8,9,10,11,12,42,43],[0,2]),([0,1,2,3,4,35],[0,1,6,7,8,9,10,11,12,15,44,45],[0]),([0,1,2,3,4,9],[0,1,6,9,10,11,12],[0,1,2]),([0,1,2,3,4,24],[0,1,6,7,9,10,11,12,15,68],[0]),([0,1,2,3,4,25],[0,1,6,7,9,11,12,15,72],[0,2]),([0,1,2,3,4,10],[0,1,6,7,8,9,10,11,54,74],[0,1,2,3]),([0,1,2,3,4,11],[0,1,6,7,9,10,11,12,15,56,76],[0]),([0,1,2,3,4,12],[0,1,6,7,8,9,10,11,12,15,57,77],[0,2])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Test7_0 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket6 7 h17Block7_0 = true := by decide +kernel
@@ -4179,7 +6924,7 @@ def h17Bucket7 : BT (List (List Nat)) := buildBucketsBT h17W h17Nodes7
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Bucket7Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h17G 7 xs.toFinset) h17Bucket7 := buildBucketsBT_sound (by decide) h17Pairs h17WOk h17PoolsOk h17AutosOk h17Bucket6Ok h17Check7
-def h17Block8_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4],[0,6])]
+def h17Block8_0 : List NodeSpec := [([0,1,2,3,4],[0,6],[0,1,2,3])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h17Test8_0 : checkNodesBT h17W h17G h17Mask h17Pools h17Autos h17Bucket7 8 h17Block8_0 = true := by decide +kernel
@@ -4256,453 +7001,58 @@ set_option maxHeartbeats 0 in
 lemma h38Bound : Lower h38R h38G 7 := carry_of (swaps := [(1,2)]) (roots2 := h5R) (T2 := h5G) (by decide +kernel) h5Bound
 def h26R : List Nat := varsOf 62
 def h26G : Nat := 0xfffffffcfffcfcc0fffffffcfffcfcc0
-def h26Pos : List Nat := [10,12,6,6,12,10,18,34,48,48,20,18,24,20,34,36,40,36,24,40,10,20,50,44,28,36,6,24,44,28,40,12,18,52,42,6,10,12,52,56,28,48,26,34,6,10,12,52,56,24,42,26,40,50,26,48,50,14,6,10,12,48,48,22,18,34,20,36,18,34,14,34,18,14,36,40,20,24,20,36]
-def h26Neg : List Nat := [8,8,2,4,4,2,2,2,16,32,4,16,8,16,32,4,8,32,16,32,4,2,2,4,4,2,8,2,8,8,2,2,4,4,2,16,16,16,16,16,16,2,2,4,32,32,32,32,32,4,8,8,4,16,16,4,32,8,0,0,0,8,0,16,8,8,8,8,0,0,2,16,32,4,16,16,32,32,0,0]
-def h26Mask : Nat := fullMask 80
-def h26Base : List Decor := [(0xcccccccccccccccccccccccccccccccc,0x3f38f6c3c1d045048ed,0x4000000604ca6000e4),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,0xd64c9600d16ab7a2a41e,0x2000092080301908418),(0xff00ff00ff00ff00ff00ff00ff00ff00,0x2a401a5f65b4f99d1033,0xf220c000034011003),(0xffff0000ffff0000ffff0000ffff0000,0x7115e1eb87c329643f40,0xc80806001f800042900),(0xffffffff00000000ffffffff00000000,0x8caa61b58ac652cbc380,0x31000101f000000a4200)]
-def h26Steps : List (Nat × Nat × Nat) := [(0,0,1),(1,0,1),(2,0,1),(3,0,1),(0,0,2),(1,0,2),(0,1,2),(1,1,2),(0,3,4),(1,3,4),(2,3,4),(3,3,4),(1,3,6),(1,4,10),(1,12,14),(2,12,14),(3,12,14),(1,12,17),(3,12,17),(1,12,18),(3,12,18),(1,14,17),(3,14,17),(1,14,18),(3,14,18),(1,17,18),(2,4,10),(3,4,10),(1,4,12),(3,10,14),(3,10,17),(3,10,33),(2,4,12),(3,4,12),(3,4,17),(0,10,12),(1,10,12),(2,3,6),(3,3,6),(1,3,10),(1,4,6),(2,4,6),(3,4,6),(3,6,14),(3,6,33),(3,6,44),(3,4,44),(0,6,12),(2,3,10),(3,3,10),(1,3,12),(3,4,55),(0,6,10),(2,3,12),(3,3,12),(3,3,45),(3,3,18),(3,3,33),(3,10,26),(0,12,26),(3,12,26),(3,6,28),(0,12,28),(0,6,19),(0,10,19),(1,3,32),(1,3,38),(1,3,39),(1,10,39),(1,12,39),(1,4,43),(1,6,51),(1,4,54),(1,4,59),(1,10,60),(1,12,60),(1,6,61),(2,1,2),(3,1,2),(0,1,3),(1,1,3),(0,2,3),(1,2,3),(1,4,85),(3,4,85),(1,4,87),(2,10,85),(2,45,85),(3,85,90),(3,4,87),(0,10,87),(2,45,87),(0,85,87),(2,47,85),(1,47,94),(1,47,87),(2,6,87),(2,18,87),(3,87,88),(0,6,85),(2,6,85),(2,18,85),(1,32,85),(2,2,3),(3,2,3),(0,2,4),(1,2,4),(2,6,111),(0,10,111),(0,14,85),(3,14,85),(0,14,111),(3,14,111),(2,85,111),(2,44,111),(3,4,111),(3,3,85),(3,3,111),(3,3,88),(3,2,4),(3,2,6),(3,2,10),(3,2,55),(1,4,127),(3,6,127),(3,2,14),(3,2,45),(3,2,18),(3,2,28),(3,2,44),(1,2,47),(1,2,51),(3,2,88),(1,2,89),(1,2,54),(1,2,32),(1,3,89),(1,6,138),(3,1,3),(0,1,4),(1,1,4),(0,6,145),(2,6,145),(2,10,145),(0,14,87),(0,14,145),(2,87,145),(2,17,145),(3,4,145),(2,17,111),(0,111,145),(1,43,122),(1,43,111),(2,44,145),(1,54,145),(3,2,33),(1,3,160),(1,4,160),(3,6,160),(3,2,17),(1,2,43),(1,2,123),(1,4,123),(1,6,166),(1,2,61),(3,1,4),(3,1,10),(3,1,55),(1,4,172),(3,1,14),(3,1,45),(3,1,18),(3,1,26),(3,1,17),(1,1,32),(1,1,39),(3,1,90),(1,1,94),(1,1,43),(1,1,47),(1,3,94),(3,1,33),(1,3,186),(1,4,186),(3,1,44),(1,1,122),(1,4,122),(1,1,54),(1,1,60),(0,2,26),(3,2,26),(0,1,28),(3,1,28),(1,1,164),(1,3,164),(1,4,164),(1,2,39),(3,2,75),(1,2,189),(1,3,189),(1,4,189),(1,1,51),(3,1,77),(1,1,131),(1,3,131),(1,4,131),(1,2,60),(3,2,72),(1,2,176),(1,3,176),(1,4,176),(1,1,61),(3,1,70),(3,0,2),(0,0,3),(1,0,3),(2,12,220),(2,45,220),(2,90,220),(1,4,220),(3,4,220),(0,12,87),(0,87,220),(2,87,220),(2,47,220),(2,94,220),(0,6,220),(2,6,220),(2,33,220),(1,38,220),(0,12,111),(0,14,220),(3,14,220),(3,3,220),(3,3,224),(1,4,134),(0,19,220),(0,2,224),(1,2,59),(1,2,38),(1,3,225),(0,4,41),(3,4,41),(0,85,220),(1,85,131),(1,131,220),(1,6,137),(0,87,111),(0,3,41),(3,3,41),(3,14,41),(1,14,125),(1,134,145),(1,3,133),(1,2,172),(0,1,224),(1,1,125),(2,87,125),(1,2,94),(0,14,24),(0,3,24),(1,1,15),(3,15,41),(2,4,253),(1,4,254),(1,3,247),(1,1,130),(1,4,130),(3,3,210),(1,134,153),(3,1,240),(1,2,174),(1,4,174),(3,3,135),(1,2,177),(1,3,177),(1,4,177),(1,1,133),(3,1,136),(3,0,3),(0,0,4),(1,0,4),(0,6,286),(2,6,286),(2,12,286),(0,14,286),(2,87,286),(2,17,286),(3,4,286),(0,111,286),(2,111,286),(2,55,286),(1,59,286),(1,4,132),(0,19,286),(1,4,239),(1,127,286),(0,145,286),(0,14,22),(0,4,22),(1,2,186),(2,111,125),(1,2,122),(1,1,16),(3,16,41),(2,3,246),(1,3,130),(3,4,199),(1,121,132),(3,1,258),(1,3,174),(3,4,165),(1,82,239),(3,1,169),(3,0,4),(3,0,12),(3,0,44),(1,4,321),(3,0,14),(3,0,45),(0,0,33),(3,0,33),(3,0,26),(3,0,17),(1,0,38),(1,0,39),(0,0,90),(3,0,90),(1,0,94),(1,0,43),(1,0,47),(3,0,18),(1,3,336),(1,4,336),(0,0,55),(3,0,55),(1,0,122),(1,0,59),(1,0,60),(0,0,19),(3,0,19),(1,0,164),(1,2,340),(1,3,340),(1,4,340),(1,0,56),(3,0,78),(1,0,131),(1,2,326),(1,3,326),(1,4,326),(1,0,62),(3,0,71),(1,2,321),(0,0,88),(1,0,125),(1,0,15),(1,0,130),(1,127,293),(3,0,128),(1,2,323),(1,4,323),(1,2,327),(1,3,327),(1,4,327),(1,0,137),(3,0,138),(1,2,336),(1,0,16),(1,160,238),(3,0,161),(1,3,323),(1,123,126),(3,0,166),(1,0,189),(1,1,321),(1,4,380),(3,4,380),(1,4,379),(3,4,379),(1,0,42),(1,1,42),(1,1,345),(1,0,197),(3,1,333),(3,0,182),(2,22,293),(3,15,22),(3,5,99),(1,0,86),(1,1,86),(3,86,99),(1,0,176),(1,1,336),(1,3,398),(3,3,398),(1,3,397),(3,3,397),(1,0,46),(1,1,46),(3,1,341),(3,0,190),(2,24,238),(3,16,24),(3,5,156),(1,0,110),(1,1,110),(3,110,156),(1,0,13),(1,41,413),(1,1,13),(3,13,41),(2,22,253),(1,0,129),(1,1,129),(2,24,246),(1,0,163),(1,1,163),(1,0,177),(1,1,323),(1,2,424),(3,2,424),(1,2,423),(3,2,423),(3,1,362),(3,0,271),(2,26,126),(2,26,82),(2,26,40),(3,5,26),(1,1,59),(1,1,38),(1,1,127),(1,14,171),(3,3,215),(1,111,178),(1,120,178),(3,2,281),(1,87,176),(3,3,179),(3,2,180),(1,1,160),(3,4,204),(1,108,175),(3,2,280),(3,4,192),(1,83,239),(3,2,193),(1,0,54),(1,0,32),(1,4,347),(3,4,347),(1,0,53),(1,0,171),(3,4,346),(3,2,330),(3,9,99),(3,84,99),(1,3,353),(3,3,353),(1,0,31),(3,3,352),(1,9,123),(3,2,343),(3,9,156),(3,144,156),(1,172,293),(3,0,173),(1,186,238),(3,0,187),(3,1,365),(3,0,276),(3,7,28),(2,28,83),(2,28,52),(3,9,28),(1,124,178),(3,4,203),(1,109,175),(3,3,213),(1,134,170),(3,4,198),(1,132,143),(3,3,208),(1,1,320),(1,4,348),(3,4,348),(3,4,342),(3,3,329),(3,11,99),(2,99,219),(2,22,219),(3,2,368),(1,160,219),(1,134,144),(1,110,178),(3,1,337),(1,186,219),(2,26,260),(2,28,242),(3,104,177),(3,95,133),(3,3,355),(1,11,239),(3,11,156),(2,156,285),(2,24,285),(3,2,369),(1,127,285),(1,84,132),(1,86,175),(3,1,322),(1,172,285),(3,146,177),(3,113,133),(1,120,328),(1,108,324),(1,123,218),(1,153,321),(1,121,336),(2,22,339),(2,24,325),(1,124,328),(1,110,328),(1,109,324),(1,127,319),(1,160,284),(1,84,336),(2,26,359),(3,231,327),(1,86,324),(1,144,321),(3,287,327),(1,170,321),(1,172,319),(1,143,336),(1,186,284),(2,28,331),(2,177,415),(2,133,252),(2,327,413)]
-def h26W : BT Decor := buildWiresBT 10 h26Base h26Steps
-def h26AutoList : List (List (Nat × Nat)) := [[]]
-def h26Autos : BT (List (Nat × Nat)) := btOfList 1 h26AutoList
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Pairs : goodPairs h26G h26Pos h26Neg := goodPairs_of (by decide +kernel)
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26BaseOk : ∀ x ∈ h26Base, faithful h26Pos h26Neg x ∧ x.1 < 2^128 := base_of (by decide +kernel)
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26WOk : btAll (fun x => faithful h26Pos h26Neg x ∧ x.1 < 2^128) h26W := buildWiresBT_faithful h26BaseOk
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26AutosOk : btAll (fun sw => swapsValid sw = true ∧ permWord sw h26G = h26G) h26Autos := btAll_ofList (autos_of (by decide +kernel))
-def h26SliceList : List (Option (Nat × Nat)) := [some (subcubeFast 2 0,7),some (subcubeFast 4 0,7),some (subcubeFast 6 0,4),some (subcubeFast 8 0,7),some (subcubeFast 10 0,4),some (subcubeFast 12 0,4),some (subcubeFast 16 0,7),some (subcubeFast 18 0,4),some (subcubeFast 20 0,4),some (subcubeFast 24 0,4),some (subcubeFast 32 0,7),some (subcubeFast 34 0,4),some (subcubeFast 36 0,4),some (subcubeFast 40 0,4),some (subcubeFast 48 0,4)]
-def h26Slices : BT (Option (Nat × Nat)) := btOfList 4 h26SliceList
-def h26Specs : List PoolSpec := [(0,[]),(1,[]),(1,[(1,0,2)]),(6,[(1,0,1),(1,0,2),(1,1,2)]),(8,[]),(7,[]),(12,[]),(11,[]),(1,[(1,3,4)]),(0,[(1,3,4)]),(3,[]),(2,[]),(4,[]),(5,[]),(10,[(1,0,1),(1,0,2),(1,1,2)]),(6,[(1,0,2),(1,1,2),(1,0,1)]),(3,[(1,0,1),(1,3,6)]),(1,[(1,3,6)]),(0,[(1,3,6)]),(3,[(1,0,1)]),(6,[(1,0,1),(1,1,2),(1,0,2)]),(1,[(1,0,2),(1,3,10)]),(9,[]),(0,[(1,3,10)]),(0,[(1,1,2),(1,3,12)]),(1,[(1,3,12)]),(0,[(1,1,2)]),(10,[(1,0,2),(1,1,2),(1,0,1)]),(3,[(1,0,1),(1,4,6)]),(1,[(1,4,6)]),(0,[(1,4,6)]),(10,[(1,0,1),(1,1,2),(1,0,2)]),(1,[(1,0,2),(1,4,10)]),(13,[]),(0,[(1,4,10)]),(0,[(1,1,2),(1,4,12)]),(1,[(1,4,12)]),(3,[(1,0,1),(1,1,3)]),(6,[(1,0,1),(1,0,2)]),(0,[(1,1,3)]),(3,[(1,0,1),(1,3,10),(1,1,3)]),(3,[(1,0,1),(1,1,4)]),(10,[(1,0,1),(1,0,2)]),(0,[(1,1,4)]),(3,[(1,0,1),(1,4,10),(1,1,4)]),(1,[(1,0,2),(1,2,3)]),(0,[(1,2,3)]),(1,[(1,0,2),(1,3,6),(1,2,3)]),(1,[(1,0,2),(1,2,4)]),(0,[(1,2,4)]),(1,[(1,0,2),(1,4,6),(1,2,4)]),(3,[(1,3,4)]),(1,[(1,0,2),(1,3,6)]),(6,[(1,0,2),(1,0,1)]),(3,[(1,0,1),(1,3,6),(3,4,17)]),(1,[(1,0,2),(3,3,6)]),(3,[(1,0,1),(3,3,6)]),(0,[(3,3,6)]),(3,[(1,0,1),(1,3,10)]),(1,[(1,0,2),(1,3,10),(3,4,44)]),(3,[(1,3,10)]),(1,[(1,0,2),(3,3,10)]),(3,[(1,0,1),(3,3,10)]),(0,[(3,3,10)]),(1,[(1,0,2),(1,4,6)]),(10,[(1,0,2),(1,0,1)]),(3,[(1,0,1),(1,4,6),(3,3,45)]),(1,[(1,0,2),(3,4,6)]),(3,[(1,0,1),(3,4,6)]),(0,[(3,4,6)]),(3,[(1,0,1),(1,4,10)]),(1,[(1,0,2),(1,4,10),(3,3,18)]),(3,[(1,4,10)]),(1,[(1,0,2),(3,4,10)]),(3,[(1,0,1),(3,4,10)]),(0,[(3,4,10)]),(1,[(1,0,3)]),(3,[(1,0,1),(1,0,3)]),(6,[(1,0,1),(1,1,2)]),(3,[(1,0,1),(1,3,12),(1,0,3)]),(3,[(1,0,1),(1,1,3),(1,0,3)]),(6,[]),(1,[(1,2,4)]),(10,[(1,0,1),(1,1,3),(1,0,3)]),(3,[(1,10,12),(1,1,3),(1,0,3)]),(6,[(1,0,1)]),(6,[(1,0,1),(1,4,6)]),(0,[(1,1,3),(1,4,85)]),(14,[]),(1,[(1,4,85)]),(1,[(1,0,3),(1,4,220)]),(0,[(1,4,220)]),(6,[(1,0,1),(1,1,4)]),(10,[(1,0,1),(1,0,3)]),(6,[(1,0,1),(1,1,4),(1,4,220)]),(1,[(1,2,3),(1,0,3)]),(1,[(1,0,2),(1,2,3),(1,0,3)]),(6,[(1,2,4)]),(1,[(1,0,2),(1,0,3)]),(3,[(1,10,12),(1,0,3)]),(1,[(3,2,6),(1,0,3)]),(6,[(1,0,1),(3,2,6)]),(0,[(3,2,6)]),(6,[(1,0,2)]),(0,[(1,3,10),(3,2,44)]),(1,[(1,3,4),(1,0,3)]),(1,[(1,3,4),(1,4,6),(1,0,3)]),(1,[(1,4,6),(1,0,3)]),(6,[(1,0,1),(1,4,6),(3,2,45)]),(1,[(3,4,6),(1,0,3)]),(6,[(1,0,1),(3,4,6)]),(6,[(1,0,1),(1,4,220)]),(6,[(1,4,220)]),(1,[(1,0,3),(3,4,220)]),(6,[(1,0,1),(3,4,220)]),(0,[(3,4,220)]),(1,[(1,0,4)]),(3,[(1,0,1),(1,0,4)]),(10,[(1,0,1),(1,1,2)]),(3,[(1,0,1),(1,4,12),(1,0,4)]),(6,[(1,0,1),(1,0,4)]),(10,[(1,0,1),(1,1,3)]),(6,[(1,0,1),(1,4,85),(1,0,4)]),(3,[(1,0,1),(1,1,4),(1,0,4)]),(10,[]),(1,[(1,2,3)]),(6,[(1,0,1),(1,1,4),(1,0,4)]),(3,[(1,10,12),(1,1,4),(1,0,4)]),(10,[(1,0,1)]),(10,[(1,0,1),(1,3,6)]),(10,[(1,2,3)]),(1,[(1,2,4),(1,0,4)]),(1,[(1,0,2),(1,2,4),(1,0,4)]),(1,[(1,0,2),(1,0,4)]),(3,[(1,10,12),(1,0,4)]),(1,[(3,2,6),(1,0,4)]),(10,[(1,0,1),(3,2,6)]),(10,[(1,0,2)]),(0,[(1,4,10),(3,2,18)]),(1,[(1,3,4),(1,0,4)]),(1,[(1,3,4),(1,3,6),(1,0,4)]),(1,[(1,3,6),(1,0,4)]),(10,[(1,0,1),(1,3,6),(3,2,17)]),(1,[(3,3,6),(1,0,4)]),(10,[(1,0,1),(3,3,6)]),(10,[(1,0,3)]),(0,[(1,4,220),(3,3,224)]),(0,[(1,1,2),(1,2,3)]),(0,[(1,1,2),(1,3,6),(1,2,3)]),(0,[(1,1,2),(1,2,4)]),(0,[(1,1,2),(1,4,6),(1,2,4)]),(0,[(1,1,2),(1,3,6)]),(6,[(1,1,2),(1,0,1)]),(0,[(1,1,2),(3,3,6)]),(1,[(3,3,6)]),(3,[(1,0,1),(1,3,12)]),(0,[(1,1,2),(1,3,12),(3,4,55)]),(3,[(1,3,12)]),(0,[(1,1,2),(3,3,12)]),(3,[(1,0,1),(3,3,12)]),(1,[(3,3,12)]),(0,[(1,1,2),(1,4,6)]),(10,[(1,1,2),(1,0,1)]),(0,[(1,1,2),(3,4,6)]),(1,[(3,4,6)]),(3,[(1,0,1),(1,4,12)]),(0,[(1,1,2),(1,4,12),(3,3,33)]),(3,[(1,4,12)]),(0,[(1,1,2),(3,4,12)]),(3,[(1,0,1),(3,4,12)]),(1,[(3,4,12)]),(0,[(1,1,3),(1,2,3)]),(0,[(1,1,2),(1,1,3),(1,2,3)]),(0,[(1,1,2),(1,1,3)]),(3,[(1,10,12),(1,1,3)]),(0,[(1,1,3),(3,2,6)]),(3,[(1,1,3),(1,0,1)]),(1,[(3,2,6)]),(6,[(1,1,2)]),(1,[(1,3,12),(3,2,55)]),(0,[(1,3,4),(1,1,3)]),(0,[(1,3,4),(1,4,6),(1,1,3)]),(0,[(1,4,6),(1,1,3)]),(0,[(3,4,6),(1,1,3)]),(6,[(1,0,1),(1,4,85)]),(0,[(1,1,3),(1,4,85),(3,2,88)]),(6,[(1,4,85)]),(0,[(1,1,3),(3,4,85)]),(6,[(1,0,1),(3,4,85)]),(1,[(3,4,85)]),(0,[(1,2,4),(1,1,4)]),(0,[(1,1,2),(1,2,4),(1,1,4)]),(0,[(1,1,2),(1,1,4)]),(3,[(1,10,12),(1,1,4)]),(0,[(3,2,6),(1,1,4)]),(10,[(1,1,2)]),(1,[(1,4,12),(3,2,33)]),(0,[(1,3,4),(1,1,4)]),(0,[(1,3,4),(1,3,6),(1,1,4)]),(0,[(1,3,6),(1,1,4)]),(0,[(3,3,6),(1,1,4)]),(10,[(1,1,3)]),(1,[(1,4,85),(3,3,88)]),(3,[(1,0,1),(1,3,10),(1,3,12)]),(0,[(1,2,3),(1,2,4)]),(0,[(1,3,4),(1,2,3),(1,2,4)]),(3,[(1,10,12)]),(0,[(1,3,6),(1,1,2),(1,2,3)]),(0,[(1,3,4),(1,2,3)]),(0,[(1,3,6),(1,2,3)]),(1,[(1,3,6),(1,2,3)]),(3,[(1,0,1),(1,4,6),(2,45,87)]),(0,[(1,2,3),(1,4,87)]),(3,[(1,4,87)]),(6,[(1,4,87)]),(0,[(1,2,3),(3,4,87)]),(3,[(3,4,87)]),(6,[(3,4,87)]),(10,[(1,1,2),(1,3,12),(3,0,55)]),(1,[(1,3,6),(1,12,17)]),(10,[(1,0,2),(1,3,10),(3,1,44)]),(3,[(1,0,1),(2,6,87)]),(0,[(1,3,10),(3,6,44)]),(3,[(1,0,1),(1,4,10),(1,4,12)]),(0,[(1,3,4),(1,2,4)]),(3,[(1,0,1),(1,3,6),(2,17,111)]),(0,[(1,2,4),(3,3,111)]),(3,[(3,3,111)]),(10,[(3,3,111)]),(0,[(1,4,6),(1,2,4)]),(1,[(1,4,6),(1,2,4)]),(6,[(1,1,2),(1,4,12),(3,0,33)]),(6,[(1,0,2),(1,4,10),(3,1,18)]),(3,[(1,4,10),(1,12,18)]),(3,[(1,0,1),(2,6,111)]),(1,[(1,4,12),(3,6,33)]),(0,[(1,1,2),(3,3,41)]),(1,[(1,0,2),(3,3,41)]),(3,[(1,10,12),(3,3,41)]),(0,[(1,1,2),(3,4,41)]),(1,[(1,0,2),(3,4,41)]),(3,[(1,10,12),(3,4,41)]),(0,[(1,3,6),(1,1,2)]),(6,[(1,0,1),(3,2,17)]),(10,[(1,0,1),(3,2,45)]),(6,[(1,0,1),(1,4,85),(1,4,220)]),(0,[(1,3,4),(3,1,14)]),(0,[(1,3,4),(3,2,14)]),(6,[(3,2,14)]),(10,[(3,2,14)]),(0,[(1,3,4),(1,3,6)]),(1,[(1,3,4),(1,3,6)]),(0,[(1,3,4),(1,3,6),(1,4,6)]),(0,[(1,3,4),(1,4,6)]),(1,[(1,3,4),(1,4,6)]),(6,[(1,0,1),(1,14,17)]),(3,[(0,0,1),(1,0,1)]),(6,[(1,0,1),(1,14,17),(3,2,26)]),(6,[(1,0,1),(3,14,17)]),(0,[(1,3,4),(3,6,14)]),(0,[(1,3,6),(3,2,17)]),(1,[(1,3,6),(3,2,17)]),(0,[(1,3,6),(3,4,17)]),(1,[(1,3,6),(3,4,17)]),(6,[(1,0,1),(3,4,17)]),(0,[(1,3,6),(1,4,6)]),(0,[(3,3,6),(1,2,43)]),(1,[(3,3,6),(1,2,43)]),(6,[(1,0,1),(1,2,43)]),(0,[(3,3,6),(1,4,43)]),(1,[(3,3,6),(1,4,43)]),(6,[(1,0,1),(1,4,43)]),(0,[(1,4,6),(3,2,45)]),(1,[(1,4,6),(3,2,45)]),(0,[(1,4,6),(3,3,45)]),(1,[(1,4,6),(3,3,45)]),(10,[(1,0,1),(3,3,45)]),(0,[(3,4,6),(1,2,47)]),(1,[(3,4,6),(1,2,47)]),(10,[(1,0,1),(1,2,47)]),(6,[(1,0,2),(1,1,2)]),(3,[(1,0,3)]),(1,[(1,0,2),(1,3,12),(1,0,3)]),(3,[(1,1,3),(1,0,3)]),(3,[(1,1,4)]),(6,[(1,1,4)]),(10,[(1,0,2),(1,0,3)]),(3,[(3,1,10),(1,0,3)]),(6,[(1,0,2),(3,1,10)]),(0,[(3,1,10)]),(0,[(1,3,6),(3,1,17)]),(10,[(1,0,2),(1,2,3),(1,0,3)]),(6,[(1,0,2),(1,4,10)]),(3,[(1,0,3),(1,4,220)]),(6,[(1,0,2),(1,2,4)]),(6,[(1,0,2),(1,2,4),(1,4,220)]),(3,[(1,3,4),(1,0,3)]),(3,[(1,3,4),(1,4,10),(1,0,3)]),(3,[(1,4,10),(1,0,3)]),(3,[(3,4,10),(1,0,3)]),(6,[(1,0,2),(3,4,10)]),(6,[(1,0,2),(1,4,220)]),(3,[(1,0,3),(3,4,220)]),(6,[(1,0,2),(3,4,220)]),(10,[(1,0,2),(1,1,2)]),(3,[(1,0,4)]),(1,[(1,0,2),(1,4,12),(1,0,4)]),(3,[(1,1,3)]),(6,[(1,0,2),(1,0,4)]),(3,[(1,1,4),(1,0,4)]),(3,[(3,1,10),(1,0,4)]),(10,[(1,0,2),(3,1,10)]),(0,[(1,4,6),(3,1,45)]),(10,[(1,0,2),(1,2,3)]),(6,[(1,0,2),(1,4,87),(1,0,4)]),(6,[(1,0,2),(1,2,4),(1,0,4)]),(10,[(1,0,2),(1,3,10)]),(3,[(1,3,4),(1,0,4)]),(3,[(1,3,4),(1,3,10),(1,0,4)]),(3,[(1,3,10),(1,0,4)]),(3,[(3,3,10),(1,0,4)]),(10,[(1,0,2),(3,3,10)]),(0,[(1,1,2),(1,3,10),(1,1,3)]),(0,[(1,1,2),(1,4,10),(1,1,4)]),(0,[(1,1,2),(1,3,10)]),(6,[(1,1,2),(1,0,2)]),(0,[(1,1,2),(3,3,10)]),(3,[(3,3,10)]),(1,[(1,0,2),(1,3,12)]),(1,[(1,0,2),(3,3,12)]),(3,[(3,3,12)]),(0,[(1,1,2),(1,4,10)]),(10,[(1,1,2),(1,0,2)]),(0,[(1,1,2),(3,4,10)]),(3,[(3,4,10)]),(1,[(1,0,2),(1,4,12)]),(1,[(1,0,2),(3,4,12)]),(3,[(3,4,12)]),(1,[(1,0,2),(1,3,6),(1,3,12)]),(0,[(1,1,3),(1,1,4)]),(0,[(1,3,4),(1,1,3),(1,1,4)]),(0,[(1,3,10),(1,1,3)]),(3,[(1,3,10),(1,1,3)]),(1,[(1,0,2),(1,4,10),(2,18,85)]),(6,[(3,4,85)]),(1,[(1,0,2),(2,10,85)]),(0,[(1,3,6),(3,10,17)]),(1,[(1,0,2),(1,4,12),(1,4,6)]),(0,[(1,4,10),(1,1,2),(1,1,4)]),(1,[(1,0,2),(1,3,10),(2,44,145)]),(10,[(1,1,3),(3,3,88)]),(0,[(1,4,10),(1,1,4)]),(3,[(1,4,10),(1,1,4)]),(1,[(1,0,2),(2,10,145)]),(3,[(1,4,12),(3,10,33)]),(0,[(1,4,10),(1,1,2)]),(3,[(3,1,10)]),(0,[(1,2,3),(3,1,10)]),(1,[(1,2,3),(1,0,2)]),(0,[(1,2,4),(3,1,10)]),(1,[(1,2,4),(1,0,2)]),(6,[(1,0,2),(3,1,44)]),(10,[(1,0,2),(3,1,18)]),(3,[(1,3,12),(3,1,55)]),(0,[(1,3,4),(1,4,10),(1,2,3)]),(0,[(1,4,10),(1,2,3)]),(0,[(3,4,10),(1,2,3)]),(6,[(1,0,2),(1,4,87)]),(0,[(1,2,3),(1,4,87),(3,1,90)]),(6,[(1,0,2),(3,4,87)]),(3,[(1,4,12),(3,1,33)]),(0,[(1,3,4),(1,3,10),(1,2,4)]),(0,[(1,3,10),(1,2,4)]),(0,[(3,3,10),(1,2,4)]),(10,[(1,0,2),(3,3,111)]),(6,[(1,0,2),(1,4,87),(1,4,220)]),(6,[(3,1,14)]),(10,[(3,1,14)]),(0,[(1,3,4),(1,3,10)]),(3,[(1,3,4),(1,3,10)]),(0,[(1,3,4),(1,4,10),(1,3,10)]),(0,[(1,3,4),(1,4,10)]),(3,[(1,3,4),(1,4,10)]),(1,[(1,2,3),(1,4,87),(3,0,90)]),(10,[(1,0,2),(1,14,18)]),(1,[(0,0,2),(1,0,2)]),(6,[(1,0,2),(1,4,10),(3,1,28)]),(10,[(1,0,2),(3,14,18)]),(0,[(1,3,4),(3,10,14)]),(0,[(1,3,10),(3,1,44)]),(3,[(1,3,10),(3,1,44)]),(0,[(1,3,10),(3,4,44)]),(3,[(1,3,10),(3,4,44)]),(6,[(1,0,2),(3,4,44)]),(0,[(1,4,10),(1,3,10)]),(0,[(3,3,10),(1,1,54)]),(6,[(1,0,2),(1,1,54)]),(3,[(3,3,10),(1,1,54)]),(0,[(3,3,10),(1,4,54)]),(3,[(3,3,10),(1,4,54)]),(6,[(1,0,2),(1,4,54)]),(0,[(1,4,10),(3,1,18)]),(3,[(1,4,10),(3,1,18)]),(0,[(1,4,10),(3,3,18)]),(3,[(1,4,10),(3,3,18)]),(10,[(1,0,2),(3,3,18)]),(0,[(3,4,10),(1,1,32)]),(10,[(1,0,2),(1,1,32)]),(3,[(3,4,10),(1,1,32)]),(0,[(3,4,10),(1,3,32)]),(3,[(3,4,10),(1,3,32)]),(10,[(1,0,2),(1,3,32)]),(1,[(1,0,3),(1,0,4)]),(1,[(1,3,4),(1,0,3),(1,0,4)]),(6,[(1,0,4)]),(3,[(1,0,3),(1,0,4)]),(10,[(1,1,3),(1,0,3)]),(1,[(1,4,85),(1,0,3),(1,0,4)]),(6,[(1,1,4),(1,0,4)]),(10,[(1,2,3),(1,0,3)]),(3,[(1,4,87),(1,0,3),(1,0,4)]),(6,[(1,2,4),(1,0,4)]),(3,[(1,3,4),(1,0,3),(1,0,4)]),(0,[(1,1,2),(1,3,6),(1,3,10)]),(1,[(1,3,12),(1,0,3)]),(3,[(1,3,12),(1,0,3)]),(0,[(1,1,2),(1,4,12),(2,33,220)]),(6,[(3,4,220)]),(10,[(0,0,3),(1,0,3)]),(0,[(1,1,2),(2,12,220)]),(1,[(1,3,6),(3,12,17)]),(0,[(1,1,3),(1,1,4),(1,4,220)]),(6,[(1,1,2),(3,2,55)]),(3,[(1,1,3),(1,3,10)]),(6,[(1,0,2),(3,2,44)]),(1,[(1,4,85),(1,0,3)]),(1,[(3,4,85),(1,0,3)]),(0,[(1,1,3),(1,4,220)]),(0,[(1,1,3),(3,4,220)]),(1,[(1,4,6),(1,4,85),(1,0,3)]),(0,[(1,3,6),(1,1,4),(1,4,220)]),(10,[(1,1,2),(3,2,33)]),(0,[(1,1,4),(1,4,220)]),(6,[(1,1,4),(1,4,220)]),(10,[(1,0,1),(1,3,6),(3,2,26)]),(0,[(1,4,6),(2,45,220)]),(1,[(1,3,6),(2,17,145)]),(0,[(1,3,6),(1,3,10)]),(0,[(1,3,6),(1,4,220)]),(6,[(1,0,1),(3,1,17)]),(1,[(1,2,3),(1,3,6)]),(6,[(1,1,2),(3,1,55)]),(0,[(1,2,3),(1,2,4),(1,4,220)]),(3,[(1,4,87),(1,0,3)]),(3,[(3,4,87),(1,0,3)]),(0,[(1,2,3),(1,4,220)]),(0,[(1,2,3),(3,4,220)]),(3,[(1,4,10),(1,4,87),(1,0,3)]),(10,[(1,1,2),(3,1,33)]),(0,[(1,3,10),(1,2,4),(1,4,220)]),(0,[(1,2,4),(1,4,220)]),(6,[(1,2,4),(1,4,220)]),(10,[(1,0,2),(1,14,18),(3,1,28)]),(6,[(1,4,87),(2,90,220)]),(3,[(1,3,10),(2,44,111)]),(0,[(1,3,10),(1,4,220)]),(3,[(1,3,10),(1,4,134)]),(10,[(3,1,14),(1,0,3)]),(10,[(3,2,14),(1,0,3)]),(3,[(1,0,3),(1,4,220),(0,1,224)]),(1,[(1,0,3),(1,4,220),(0,2,224)]),(1,[(1,4,12),(1,0,2),(1,0,4)]),(0,[(1,1,2),(1,4,10),(1,4,6)]),(0,[(1,1,2),(1,3,12),(2,55,286)]),(10,[(1,0,3),(3,3,224)]),(1,[(1,4,12),(1,0,4)]),(3,[(1,4,12),(1,0,4)]),(6,[(0,0,4),(1,0,4)]),(0,[(1,1,2),(2,12,286)]),(3,[(1,4,10),(3,12,18)]),(1,[(1,3,6),(1,4,85),(1,0,4)]),(0,[(1,4,6),(1,1,3),(1,4,220)]),(10,[(1,0,2),(3,2,18)]),(1,[(1,4,85),(1,0,4)]),(6,[(1,4,85),(1,0,4)]),(0,[(1,3,6),(2,17,286)]),(1,[(1,4,6),(2,45,85)]),(0,[(1,4,10),(1,4,6)]),(0,[(1,4,6),(1,4,220)]),(10,[(1,0,1),(3,1,45)]),(1,[(1,2,4),(1,4,6)]),(3,[(1,3,10),(1,4,87),(1,0,4)]),(0,[(1,4,10),(1,2,3),(1,4,220)]),(3,[(1,4,87),(1,0,4)]),(6,[(1,4,87),(1,0,4)]),(0,[(1,2,3),(2,87,286)]),(3,[(1,4,10),(2,18,87)]),(3,[(3,3,111),(1,0,4)]),(0,[(1,4,10),(1,4,220)]),(6,[(3,1,14),(1,0,4)]),(6,[(3,2,14),(1,0,4)]),(3,[(1,10,12),(1,3,12)]),(1,[(1,4,12),(1,0,2)]),(3,[(1,10,12),(1,4,12)]),(1,[(3,0,12)]),(3,[(3,0,12)]),(3,[(1,1,3),(3,0,12)]),(0,[(1,1,3),(1,1,2)]),(6,[(1,1,2),(3,0,12)]),(3,[(1,1,4),(3,0,12)]),(0,[(1,1,4),(1,1,2)]),(10,[(1,1,2),(3,0,12)]),(1,[(1,2,3),(3,0,12)]),(0,[(1,2,3),(1,1,2)]),(1,[(1,2,4),(3,0,12)]),(0,[(1,2,4),(1,1,2)]),(6,[(1,1,2),(3,0,55)]),(10,[(1,1,2),(3,0,33)]),(10,[(1,1,2),(1,1,3)]),(1,[(1,3,6),(3,0,17)]),(10,[(1,1,2),(1,1,3),(1,2,3)]),(6,[(1,1,2),(1,4,12)]),(10,[(1,1,2),(1,2,3),(1,1,3)]),(3,[(1,1,3),(1,4,85)]),(1,[(1,2,3),(1,4,87)]),(6,[(1,1,2),(1,2,4)]),(6,[(1,1,2),(1,4,85),(1,2,4)]),(3,[(1,3,4),(1,1,3)]),(3,[(1,3,4),(1,4,12),(1,1,3)]),(3,[(1,4,12),(1,1,3)]),(3,[(3,4,12),(1,1,3)]),(6,[(1,1,2),(3,4,12)]),(6,[(1,1,2),(1,4,85)]),(3,[(1,1,3),(3,4,85)]),(6,[(1,1,2),(3,4,85)]),(6,[(1,1,2),(1,1,4)]),(1,[(1,4,6),(3,0,45)]),(10,[(1,1,2),(1,2,3)]),(6,[(1,1,2),(1,4,87),(1,1,4)]),(6,[(1,1,2),(1,2,4),(1,1,4)]),(10,[(1,1,2),(1,3,12)]),(3,[(1,3,4),(1,1,4)]),(3,[(1,3,4),(1,3,12),(1,1,4)]),(3,[(1,3,12),(1,1,4)]),(3,[(3,3,12),(1,1,4)]),(10,[(1,1,2),(3,3,12)]),(3,[(1,3,10),(3,0,44)]),(1,[(1,3,4),(1,2,3)]),(1,[(1,3,4),(1,4,12),(1,2,3)]),(1,[(1,4,12),(1,2,3)]),(1,[(3,4,12),(1,2,3)]),(6,[(1,1,2),(1,4,87)]),(1,[(1,2,3),(3,4,87)]),(6,[(1,1,2),(3,4,87)]),(3,[(1,4,10),(3,0,18)]),(1,[(1,3,4),(1,2,4)]),(1,[(1,3,4),(1,3,12),(1,2,4)]),(1,[(1,3,12),(1,2,4)]),(1,[(3,3,12),(1,2,4)]),(1,[(1,2,4),(3,3,111)]),(10,[(1,1,2),(3,3,111)]),(1,[(1,3,4),(3,0,14)]),(6,[(3,0,14)]),(10,[(3,0,14)]),(6,[(1,1,2),(1,4,85),(1,4,87)]),(1,[(1,3,4),(3,2,14)]),(1,[(1,3,4),(1,3,12)]),(3,[(1,3,4),(1,3,12)]),(1,[(1,3,4),(1,4,12),(1,3,12)]),(1,[(1,3,4),(1,4,12)]),(3,[(1,3,4),(1,4,12)]),(1,[(1,3,4),(1,12,14)]),(3,[(1,3,4),(1,12,14)]),(6,[(1,1,2),(1,12,14)]),(10,[(1,1,2),(1,12,14)]),(1,[(1,3,4),(1,12,14),(3,0,19)]),(6,[(1,1,2),(1,12,14),(3,0,19)]),(6,[(1,1,2),(2,12,14)]),(1,[(1,3,4),(3,12,14)]),(10,[(1,1,2),(1,3,12),(0,0,55)]),(1,[(1,3,12),(3,0,55)]),(3,[(1,3,12),(3,0,55)]),(1,[(1,3,12),(3,4,55)]),(3,[(1,3,12),(3,4,55)]),(6,[(1,1,2),(3,4,55)]),(1,[(1,4,12),(1,3,12)]),(6,[(1,1,2),(1,0,59)]),(1,[(3,3,12),(1,0,59)]),(3,[(3,3,12),(1,0,59)]),(1,[(3,3,12),(1,4,59)]),(3,[(3,3,12),(1,4,59)]),(6,[(1,1,2),(1,4,59)]),(6,[(1,1,2),(1,4,12),(0,0,33)]),(1,[(1,4,12),(3,0,33)]),(3,[(1,4,12),(3,0,33)]),(1,[(1,4,12),(3,3,33)]),(3,[(1,4,12),(3,3,33)]),(10,[(1,1,2),(3,3,33)]),(10,[(1,1,2),(1,0,38)]),(1,[(3,4,12),(1,0,38)]),(3,[(3,4,12),(1,0,38)]),(1,[(3,4,12),(1,3,38)]),(3,[(3,4,12),(1,3,38)]),(10,[(1,1,2),(1,3,38)]),(1,[(1,3,6),(1,3,12)]),(1,[(1,3,6),(1,4,85)]),(6,[(1,0,1),(3,0,17)]),(0,[(1,1,4),(1,3,6)]),(0,[(1,2,3),(1,3,6)]),(3,[(1,1,3),(1,1,4)]),(0,[(1,1,3),(1,4,6)]),(10,[(1,1,3),(1,2,3)]),(3,[(1,1,3),(1,4,87),(1,1,4)]),(6,[(1,2,4),(1,1,4)]),(3,[(1,1,3),(1,4,12)]),(3,[(1,3,4),(1,1,3),(1,1,4)]),(0,[(1,1,3),(1,3,10)]),(6,[(1,0,2),(3,0,44)]),(1,[(1,2,3),(1,2,4)]),(1,[(1,2,3),(1,4,85),(1,2,4)]),(1,[(1,2,3),(1,4,85)]),(10,[(1,2,3),(1,1,3)]),(1,[(1,2,3),(3,4,85)]),(3,[(1,1,3),(1,4,87)]),(3,[(1,1,3),(3,4,87)]),(10,[(1,0,2),(3,0,18)]),(3,[(1,4,12),(1,1,3),(1,4,87)]),(1,[(1,3,12),(1,4,85),(1,2,4)]),(1,[(1,4,85),(1,2,4)]),(6,[(1,4,85),(1,2,4)]),(3,[(1,3,4),(1,12,14),(3,0,19)]),(3,[(1,1,3),(2,85,111)]),(6,[(1,4,87),(3,85,90)]),(1,[(1,3,12),(1,4,85)]),(3,[(1,3,12),(1,4,127)]),(0,[(1,1,3),(1,3,4)]),(10,[(1,1,3),(3,0,14)]),(10,[(1,1,3),(3,2,14)]),(3,[(1,1,3),(1,3,4)]),(3,[(1,1,3),(1,4,85),(0,0,88)]),(1,[(1,4,85),(3,2,88)]),(6,[(1,4,85),(3,2,88)]),(10,[(1,1,3),(3,2,88)]),(1,[(3,4,85),(1,2,89)]),(6,[(3,4,85),(1,2,89)]),(10,[(1,1,3),(1,2,89)]),(1,[(1,4,12),(1,4,6)]),(1,[(1,4,6),(1,4,85)]),(10,[(1,0,1),(3,0,45)]),(0,[(1,2,4),(1,4,6)]),(3,[(1,3,12),(1,4,87),(1,1,4)]),(1,[(1,4,12),(1,2,3),(1,4,85)]),(3,[(1,4,87),(1,1,4)]),(6,[(1,4,87),(1,1,4)]),(1,[(1,2,3),(2,87,145)]),(6,[(1,4,85),(3,87,88)]),(0,[(1,1,4),(1,4,10)]),(3,[(3,3,111),(1,1,4)]),(6,[(1,2,4),(1,4,85)]),(1,[(1,4,12),(1,4,85)]),(3,[(1,4,12),(1,3,160)]),(0,[(1,1,4),(1,3,4)]),(6,[(1,1,4),(3,0,14)]),(6,[(3,2,14),(1,1,4)]),(6,[(1,4,85),(1,2,123)]),(3,[(1,3,10),(1,3,12)]),(3,[(1,3,10),(1,4,87)]),(0,[(1,3,10),(1,1,321)]),(0,[(1,2,4),(1,3,10)]),(0,[(1,3,10),(1,4,321)]),(3,[(1,3,12),(1,4,87)]),(1,[(1,2,4),(1,3,12)]),(1,[(1,3,12),(1,4,172)]),(0,[(1,2,3),(1,4,10)]),(1,[(1,2,3),(1,4,12)]),(1,[(1,3,4),(1,2,3),(1,2,4)]),(0,[(1,2,3),(1,3,4)]),(10,[(1,2,3),(3,0,14)]),(3,[(1,3,4),(3,0,14)]),(3,[(1,3,4),(3,1,14)]),(10,[(1,2,3),(3,1,14)]),(1,[(1,2,3),(1,3,4)]),(1,[(1,2,3),(1,4,87),(0,0,90)]),(3,[(1,4,87),(3,0,90)]),(6,[(1,4,87),(3,0,90)]),(10,[(1,2,3),(3,0,90)]),(3,[(1,4,87),(3,1,90)]),(6,[(1,4,87),(3,1,90)]),(10,[(1,2,3),(3,1,90)]),(10,[(1,2,3),(1,0,94)]),(3,[(3,4,87),(1,0,94)]),(6,[(3,4,87),(1,0,94)]),(3,[(3,4,87),(1,1,94)]),(6,[(3,4,87),(1,1,94)]),(10,[(1,2,3),(1,1,94)]),(3,[(1,4,10),(1,4,12)]),(3,[(1,4,10),(1,4,87)]),(0,[(1,4,10),(1,1,336)]),(0,[(1,4,10),(1,3,336)]),(3,[(1,4,12),(1,4,87)]),(1,[(1,4,12),(1,3,186)]),(0,[(1,2,4),(1,3,4)]),(6,[(1,2,4),(3,0,14)]),(6,[(1,2,4),(3,1,14)]),(1,[(1,2,4),(1,3,4)]),(6,[(1,2,4),(1,0,122)]),(3,[(3,3,111),(1,0,122)]),(10,[(3,3,111),(1,0,122)]),(3,[(3,3,111),(1,1,122)]),(10,[(3,3,111),(1,1,122)]),(6,[(1,2,4),(1,1,122)]),(6,[(1,4,85),(1,4,220)]),(6,[(1,4,87),(1,4,220)]),(0,[(1,3,4),(1,1,323)]),(6,[(3,0,14),(1,1,323)]),(10,[(3,0,14),(1,1,323)]),(0,[(1,3,4),(1,2,323)]),(6,[(3,0,14),(1,2,323)]),(10,[(3,0,14),(1,2,323)]),(6,[(1,4,85),(1,4,87)]),(6,[(3,1,14),(1,2,174)]),(10,[(3,1,14),(1,2,174)]),(1,[(1,3,4),(1,2,174)]),(3,[(1,3,4),(1,0,130)]),(6,[(3,2,14),(1,0,130)]),(10,[(3,2,14),(1,0,130)]),(6,[(3,2,14),(1,1,130)]),(10,[(3,2,14),(1,1,130)]),(3,[(1,3,4),(1,1,130)])]
-def h26Pools : BT (Option BoundPool) := buildPoolsBT 10 h26W h26R h26Slices h26Specs
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice14 : Slice h26R h26G (subcubeFast 48 0) 4 := slice_fast_direct (zDead := 0) (by decide +kernel) h27Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice13 : Slice h26R h26G (subcubeFast 40 0) 4 := slice_fast_direct (zDead := 0) (by decide +kernel) h28Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice12 : Slice h26R h26G (subcubeFast 36 0) 4 := slice_fast_direct (zDead := 0) (by decide +kernel) h29Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice11 : Slice h26R h26G (subcubeFast 34 0) 4 := slice_fast_direct (zDead := 0) (by decide +kernel) h11Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice10 : Slice h26R h26G (subcubeFast 32 0) 7 := slice_fast_direct (zDead := 0) (by decide +kernel) h30Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice9 : Slice h26R h26G (subcubeFast 24 0) 4 := slice_fast_direct (zDead := 0) (by decide +kernel) h31Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice8 : Slice h26R h26G (subcubeFast 20 0) 4 := slice_fast_direct (zDead := 0) (by decide +kernel) h32Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice7 : Slice h26R h26G (subcubeFast 18 0) 4 := slice_fast_direct (zDead := 0) (by decide +kernel) h23Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice6 : Slice h26R h26G (subcubeFast 16 0) 7 := slice_fast_direct (zDead := 0) (by decide +kernel) h33Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice5 : Slice h26R h26G (subcubeFast 12 0) 4 := slice_fast_direct (zDead := 0) (by decide +kernel) h34Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice4 : Slice h26R h26G (subcubeFast 10 0) 4 := slice_fast_direct (zDead := 0) (by decide +kernel) h35Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice3 : Slice h26R h26G (subcubeFast 8 0) 7 := slice_fast_direct (zDead := 0) (by decide +kernel) h36Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice2 : Slice h26R h26G (subcubeFast 6 0) 4 := slice_fast_direct (zDead := 0) (by decide +kernel) h37Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice1 : Slice h26R h26G (subcubeFast 4 0) 7 := slice_fast_direct (zDead := 0) (by decide +kernel) h38Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Slice0 : Slice h26R h26G (subcubeFast 2 0) 7 := slice_fast_direct (zDead := 0) (by decide +kernel) h5Bound
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26SlicesOk : btAll (fun o => ∀ p, o = some p → Slice h26R h26G p.1 p.2) h26Slices := btAll_ofList (P := fun (o : Option (Nat × Nat)) => ∀ p, o = some p → Slice h26R h26G p.1 p.2) (forall_cons (fun _ h => by cases h; exact h26Slice0) (forall_cons (fun _ h => by cases h; exact h26Slice1) (forall_cons (fun _ h => by cases h; exact h26Slice2) (forall_cons (fun _ h => by cases h; exact h26Slice3) (forall_cons (fun _ h => by cases h; exact h26Slice4) (forall_cons (fun _ h => by cases h; exact h26Slice5) (forall_cons (fun _ h => by cases h; exact h26Slice6) (forall_cons (fun _ h => by cases h; exact h26Slice7) (forall_cons (fun _ h => by cases h; exact h26Slice8) (forall_cons (fun _ h => by cases h; exact h26Slice9) (forall_cons (fun _ h => by cases h; exact h26Slice10) (forall_cons (fun _ h => by cases h; exact h26Slice11) (forall_cons (fun _ h => by cases h; exact h26Slice12) (forall_cons (fun _ h => by cases h; exact h26Slice13) (forall_cons (fun _ h => by cases h; exact h26Slice14) (fun _ h => (List.not_mem_nil h).elim))))))))))))))))
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26PoolsOk : btAll (fun o => ∀ c, o = some c → ValidPool h26R h26G c) h26Pools := buildPoolsBT_sound h26SlicesOk
-def h26Empty : BT (List (List Nat)) := BT.empty
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26EmptyOk : btAll (fun bk => ∀ xs ∈ bk, Impossible h26G (3 - 1) xs.toFinset) h26Empty := trivial
-def h26Block3_0 : List NodeSpec := nodesWithIdentity [([12,14,17,18],[4]),([10,14,17,33],[5]),([12,14,44,45],[6]),([6,14,33,44],[5]),([10,14,45,55],[7]),([6,14,18,55],[7]),([10,45,85,90],[11]),([10,47,85,94],[]),([6,18,87,88],[12]),([6,32,87,89],[]),([44,45,85,111],[6]),([6,44,88,111],[12]),([17,18,87,145],[4]),([10,17,90,145],[11]),([10,43,122,145],[]),([6,54,111,123],[]),([12,45,90,220],[11]),([12,47,94,220],[]),([6,33,87,224],[5]),([6,38,87,225],[]),([45,55,111,220],[7]),([6,55,111,224],[7]),([41,88,111,220],[12]),([41,85,111,224],[13]),([41,90,145,220],[11]),([41,87,145,224],[13]),([125,130,145,220],[]),([6,14,134,160],[]),([17,33,87,286],[5]),([12,17,90,286],[11]),([12,43,122,286],[]),([6,59,111,239],[]),([41,87,88,286],[12]),([41,85,90,286],[11]),([85,125,130,286],[]),([6,14,127,132],[]),([3,4,40,66],[]),([2,4,66,248],[]),([2,3,66,302],[]),([3,6,40,99],[]),([2,6,99,248],[]),([2,3,6,393],[]),([1,87,99,394],[]),([0,87,99,395],[]),([0,1,87,396],[]),([4,6,40,156],[]),([2,6,156,302],[]),([2,4,6,409],[]),([1,111,156,410],[]),([0,111,156,411],[]),([0,1,111,412],[]),([1,2,255,413],[]),([0,2,255,415],[]),([0,1,252,255],[]),([3,4,6,433],[]),([4,6,195,248],[]),([3,6,195,302],[]),([12,18,88,220],[12]),([12,32,89,220],[]),([10,33,85,224],[5]),([10,38,85,225],[]),([18,55,145,220],[7]),([10,55,145,224],[7]),([111,171,174,220],[]),([10,14,178,186],[]),([33,44,85,286],[5]),([12,44,88,286],[12]),([12,54,123,286],[]),([10,59,145,239],[]),([87,171,174,286],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test3_0 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Empty 3 h26Block3_0 = true := by decide +kernel
-def h26Block3_1 : List NodeSpec := nodesWithIdentity [([10,14,172,175],[]),([3,4,52,63],[]),([1,4,63,227],[]),([1,3,63,294],[]),([3,10,52,99],[]),([1,10,99,227],[]),([1,3,10,461],[]),([2,85,99,231],[]),([0,85,99,226],[]),([0,2,85,462],[]),([4,10,52,156],[]),([1,10,156,294],[]),([1,4,10,469],[]),([2,145,156,287],[]),([0,145,156,235],[]),([0,2,145,470],[]),([3,4,10,479],[]),([4,10,197,227],[]),([3,10,197,294],[]),([127,132,145,220],[]),([85,134,160,286],[]),([87,178,186,286],[]),([111,172,175,220],[]),([3,4,57,65],[]),([0,4,65,97],[]),([0,3,65,155],[]),([3,12,57,99],[]),([0,12,97,99],[]),([0,3,12,494],[]),([2,99,104,220],[]),([1,95,99,220],[]),([1,2,220,495],[]),([4,12,57,156],[]),([0,12,155,156],[]),([0,4,12,509],[]),([2,146,156,286],[]),([1,113,156,286],[]),([1,2,286,510],[]),([85,111,320,323],[]),([87,145,320,323],[]),([12,14,328,336],[]),([12,14,321,324],[]),([87,145,328,336],[]),([85,111,321,324],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test3_1 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Empty 3 h26Block3_1 = true := by decide +kernel
-def h26Nodes3 : List NodeSpec := h26Block3_0 ++ h26Block3_1
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Check3 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Empty 3 h26Nodes3 = true := by
-  unfold h26Nodes3 checkNodesBT
-  simp only [List.all_append, Bool.and_eq_true]
-  exact ⟨h26Test3_0,h26Test3_1⟩
-def h26Bucket3 : BT (List (List Nat)) := buildBucketsBT h26W h26Nodes3
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Bucket3Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h26G 3 xs.toFinset) h26Bucket3 := buildBucketsBT_sound (by decide) h26Pairs h26WOk h26PoolsOk h26AutosOk h26EmptyOk h26Check3
-def h26Block4_0 : List NodeSpec := nodesWithIdentity [([4,10,12,14,17],[]),([4,6,12,14,44],[]),([4,6,10,14,55],[]),([3,10,12,14,45],[]),([3,6,12,14,18],[]),([3,6,10,14,33],[]),([3,4,10,12,26],[10]),([3,4,6,12,28],[1]),([3,4,6,10,19],[0]),([3,4,12,17,18],[4]),([3,4,12,17,32],[]),([3,4,10,17,33],[5]),([3,4,10,17,38],[]),([3,4,10,12,39],[]),([3,4,10,12,17],[10]),([3,4,12,18,43],[]),([3,4,12,32,43],[]),([3,4,10,33,43],[]),([3,4,10,38,43],[]),([3,4,10,12,75],[]),([3,4,12,44,45],[6]),([3,4,12,44,47],[]),([3,4,6,33,44],[5]),([3,4,6,38,44],[]),([3,4,6,12,51],[]),([3,4,6,12,44],[1]),([3,4,12,45,54],[]),([3,4,12,47,54],[]),([3,4,6,33,54],[]),([3,4,6,38,54],[]),([3,4,6,12,77],[]),([3,4,10,45,55],[7]),([3,4,10,47,55],[]),([3,4,6,18,55],[7]),([3,4,6,32,55],[]),([3,4,6,10,56],[]),([3,4,6,10,55],[0]),([3,4,10,45,59],[]),([3,4,10,47,59],[]),([3,4,6,18,59],[]),([3,4,6,32,59],[]),([3,4,6,10,78],[]),([3,4,10,12,60],[]),([3,4,10,12,72],[]),([3,4,10,12,45],[10]),([3,4,6,12,61],[]),([3,4,6,12,70],[]),([3,4,6,12,18],[1]),([3,4,6,10,62],[]),([3,4,6,10,71],[]),([3,4,6,10,33],[0]),([4,10,45,85,87],[22]),([4,10,47,85,87],[11]),([4,6,18,85,87],[4]),([4,6,32,85,87],[12]),([4,6,10,87,88],[12]),([4,6,10,87,89],[12]),([4,6,10,85,90],[11]),([4,6,10,85,94],[11]),([6,10,14,85,111],[]),([4,6,44,85,111],[]),([3,10,45,85,111],[]),([3,6,10,88,111],[12]),([2,10,14,45,85],[]),([2,6,14,18,85],[4]),([2,4,6,28,85],[1]),([2,4,44,45,85],[6]),([2,4,44,47,85],[]),([2,4,6,51,85],[]),([2,4,6,44,88],[12])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_0 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_0 = true := by decide +kernel
-def h26Block4_1 : List NodeSpec := nodesWithIdentity [([2,4,6,44,89],[]),([2,4,6,44,85],[1]),([2,3,6,18,88],[12]),([2,4,6,70,85],[1]),([2,3,6,32,89],[]),([3,4,6,10,138],[0]),([6,10,14,87,145],[]),([4,10,17,87,145],[]),([3,6,18,87,145],[]),([3,6,10,90,145],[11]),([3,10,17,111,145],[33]),([3,10,43,111,145],[11]),([3,6,44,111,145],[6]),([3,6,54,111,145],[12]),([3,6,10,122,145],[11]),([3,6,10,111,123],[12]),([2,10,14,17,145],[]),([2,6,14,44,145],[6]),([2,3,6,28,145],[1]),([2,3,17,18,145],[4]),([2,3,18,43,145],[]),([2,4,6,54,123],[]),([2,3,6,77,145],[1]),([3,4,6,10,166],[0]),([2,3,6,18,123],[]),([2,3,6,61,145],[]),([2,3,6,18,145],[1]),([1,10,14,45,87],[22]),([1,6,14,18,87],[]),([1,4,10,26,87],[10]),([1,4,17,18,87],[4]),([1,4,17,32,87],[]),([1,4,10,39,87],[]),([1,4,10,17,90],[11]),([1,4,10,17,94],[]),([1,4,10,17,87],[10]),([1,3,10,45,90],[11]),([1,4,10,72,87],[10]),([1,3,10,47,94],[]),([3,4,6,10,182],[0]),([1,10,14,17,111],[33]),([1,6,14,44,111],[]),([1,3,10,26,111],[10]),([1,4,10,43,122],[]),([1,3,10,75,111],[10]),([1,3,44,45,111],[6]),([1,3,45,54,111],[]),([3,4,6,10,190],[0]),([1,3,10,45,122],[]),([1,3,10,60,111],[]),([1,3,10,45,111],[10]),([1,2,14,17,18],[4]),([1,2,14,44,45],[6]),([4,12,45,87,220],[22]),([4,12,47,87,220],[11]),([4,6,33,87,220],[5]),([4,6,38,87,220],[5]),([4,6,12,90,220],[11]),([4,6,12,94,220],[11]),([4,6,12,87,224],[13]),([4,6,12,87,225],[5]),([6,12,14,111,220],[]),([4,6,55,111,220],[]),([3,12,45,111,220],[]),([3,6,12,111,224],[13]),([2,12,14,45,220],[]),([2,6,14,33,220],[5]),([2,4,6,19,220],[0]),([2,4,45,55,220],[7]),([2,4,47,55,220],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_1 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_1 = true := by decide +kernel
-def h26Block4_2 : List NodeSpec := nodesWithIdentity [([2,4,6,56,220],[]),([2,4,6,55,224],[7]),([2,4,6,55,225],[]),([2,4,6,55,220],[0]),([2,3,6,33,224],[5]),([2,4,6,71,220],[0]),([2,3,6,38,225],[]),([3,4,6,12,136],[1]),([4,41,85,111,220],[]),([2,45,85,111,220],[]),([2,6,88,111,220],[]),([2,6,85,111,224],[]),([2,4,24,85,220],[81]),([2,4,85,220,247],[]),([2,4,41,88,220],[12]),([2,4,41,89,220],[]),([2,4,41,85,224],[13]),([2,4,41,85,225],[]),([2,4,41,85,220],[81]),([2,4,88,125,220],[]),([2,4,89,125,220],[]),([2,4,85,210,220],[]),([2,4,85,125,224],[]),([2,4,85,125,225],[]),([2,4,45,127,220],[]),([2,4,47,127,220],[]),([2,4,6,128,220],[]),([2,4,6,127,224],[]),([2,4,6,127,225],[]),([2,4,45,85,134],[]),([2,4,47,85,134],[]),([2,4,6,88,134],[]),([2,4,6,89,134],[]),([2,4,6,85,240],[]),([2,4,85,131,220],[]),([2,4,85,135,220],[]),([2,4,45,85,220],[81]),([2,4,6,137,220],[]),([2,4,6,138,220],[]),([2,4,6,88,220],[0]),([2,4,6,85,133],[]),([2,4,6,85,136],[]),([2,4,6,85,224],[1]),([6,87,111,145,220],[]),([4,41,87,145,220],[]),([2,6,90,145,220],[11]),([2,6,87,145,224],[]),([3,41,111,145,220],[]),([2,14,41,145,220],[88]),([2,3,41,145,224],[13]),([2,14,125,145,220],[11]),([2,3,125,145,224],[]),([3,4,6,134,160],[]),([2,6,14,160,220],[5]),([2,4,6,161,220],[0]),([2,3,6,160,224],[]),([2,6,14,134,145],[5]),([2,3,6,145,240],[1]),([2,6,130,145,220],[11]),([2,3,6,133,145],[]),([2,3,6,145,224],[1]),([1,45,87,111,220],[22]),([1,6,87,111,224],[]),([1,4,24,87,220],[81]),([1,4,87,220,247],[]),([1,4,41,90,220],[11]),([1,4,41,94,220],[]),([1,4,41,87,224],[13]),([1,4,41,87,225],[]),([1,4,41,87,220],[81])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_2 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_2 = true := by decide +kernel
-def h26Block4_3 : List NodeSpec := nodesWithIdentity [([1,2,45,90,220],[11]),([1,4,87,135,220],[81]),([1,2,47,94,220],[]),([2,4,6,182,220],[0]),([1,14,41,111,220],[88]),([1,3,41,111,224],[13]),([1,2,14,24,220],[81]),([4,41,85,87,220],[]),([2,4,41,220,266],[81]),([1,4,41,220,263],[81]),([1,2,15,220,247],[]),([1,2,41,220,264],[]),([1,4,125,130,220],[]),([1,2,14,210,220],[81]),([2,4,6,134,141],[]),([1,2,14,45,134],[]),([2,4,6,220,271],[0]),([1,2,45,130,220],[]),([1,2,14,131,220],[]),([1,2,14,45,220],[81]),([3,4,6,82,133],[]),([6,12,14,87,286],[]),([4,12,17,87,286],[]),([3,6,33,87,286],[]),([3,6,12,90,286],[11]),([3,12,17,111,286],[33]),([3,12,43,111,286],[11]),([3,6,55,111,286],[7]),([3,6,59,111,286],[7]),([3,6,12,122,286],[11]),([3,6,12,111,239],[7]),([2,12,14,17,286],[]),([2,6,14,55,286],[7]),([2,3,6,19,286],[0]),([2,3,17,33,286],[5]),([2,3,33,43,286],[]),([2,4,6,59,239],[]),([2,3,6,78,286],[0]),([3,4,6,12,169],[1]),([2,3,6,33,239],[]),([2,3,6,62,286],[]),([2,3,6,33,286],[0]),([6,85,87,111,286],[]),([4,41,85,87,286],[]),([2,6,87,88,286],[]),([2,6,85,90,286],[11]),([3,41,85,111,286],[]),([2,14,41,85,286],[88]),([2,3,41,88,286],[12]),([2,14,85,125,286],[11]),([2,3,88,125,286],[]),([3,4,6,127,132],[]),([2,6,14,127,286],[7]),([2,3,6,128,286],[0]),([2,6,14,85,132],[7]),([2,4,6,85,258],[1]),([2,3,6,88,132],[]),([2,6,85,130,286],[11]),([2,3,6,137,286],[]),([2,3,6,88,286],[0]),([3,41,87,145,286],[]),([2,17,87,145,286],[]),([2,3,22,145,286],[124]),([2,3,145,254,286],[]),([2,3,41,123,286],[]),([2,3,41,145,239],[]),([2,3,41,145,286],[124]),([2,3,145,199,286],[]),([2,3,123,125,286],[]),([2,3,125,145,239],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_3 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_3 = true := by decide +kernel
-def h26Block4_4 : List NodeSpec := nodesWithIdentity [([2,3,17,160,286],[]),([2,3,43,160,286],[]),([2,3,6,161,286],[]),([2,3,6,160,239],[]),([2,3,17,132,145],[]),([2,3,43,132,145],[]),([2,3,6,145,258],[]),([2,3,6,123,132],[]),([2,3,145,164,286],[]),([2,3,145,165,286],[]),([2,3,17,145,286],[124]),([2,3,6,166,286],[]),([2,3,6,145,169],[]),([1,17,87,111,286],[33]),([1,3,22,111,286],[124]),([1,14,41,87,286],[88]),([1,3,41,90,286],[11]),([1,2,14,22,286],[124]),([1,2,17,90,286],[11]),([1,3,111,254,286],[]),([1,3,41,122,286],[]),([1,3,41,111,239],[]),([1,3,41,111,286],[124]),([1,3,111,165,286],[124]),([1,2,43,122,286],[]),([2,3,6,190,286],[0]),([3,41,111,145,286],[]),([2,3,41,286,308],[124]),([1,3,41,286,307],[124]),([1,2,16,254,286],[]),([1,2,41,286,303],[]),([1,3,125,130,286],[]),([1,2,14,199,286],[124]),([2,3,6,132,167],[]),([1,2,14,17,132],[]),([2,3,6,271,286],[0]),([1,2,17,130,286],[]),([1,2,14,164,286],[]),([1,2,14,17,286],[124]),([2,3,6,162,239],[]),([0,12,14,45,87],[22]),([0,6,14,33,87],[]),([0,4,12,26,87],[10]),([0,4,17,33,87],[5]),([0,4,17,38,87],[]),([0,4,12,39,87],[]),([0,4,12,17,90],[11]),([0,4,12,17,94],[]),([0,4,12,17,87],[10]),([0,3,12,45,90],[11]),([0,4,12,72,87],[10]),([0,3,12,47,94],[]),([3,4,6,12,333],[1]),([0,12,14,17,111],[33]),([0,6,14,55,111],[]),([0,3,12,26,111],[10]),([0,4,12,43,122],[]),([0,3,12,75,111],[10]),([0,3,45,55,111],[7]),([0,3,45,59,111],[]),([3,4,6,12,341],[1]),([0,3,12,45,122],[]),([0,3,12,60,111],[]),([0,3,12,45,111],[10]),([0,2,14,17,33],[5]),([0,2,14,45,55],[7]),([0,45,85,87,111],[22]),([0,6,87,88,111],[]),([0,4,24,85,87],[81]),([0,4,85,87,247],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_4 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_4 = true := by decide +kernel
-def h26Block4_5 : List NodeSpec := nodesWithIdentity [([0,4,41,87,88],[12]),([0,4,41,87,89],[]),([0,4,41,85,90],[11]),([0,4,41,85,94],[]),([0,4,41,85,87],[81]),([0,2,45,85,90],[11]),([0,4,85,87,135],[81]),([0,2,47,85,94],[]),([2,4,6,85,333],[1]),([0,14,41,85,111],[88]),([0,3,41,88,111],[12]),([0,2,14,24,85],[81]),([2,4,41,85,361],[81]),([0,4,41,85,263],[81]),([0,2,15,85,247],[]),([0,2,41,85,264],[]),([0,4,85,125,130],[]),([0,2,14,85,210],[81]),([2,4,6,127,245],[]),([0,2,14,45,127],[]),([2,4,6,85,362],[1]),([0,2,45,85,130],[]),([0,2,14,85,131],[]),([0,2,14,45,85],[81]),([0,17,87,111,145],[33]),([0,3,22,111,145],[124]),([0,14,41,87,145],[88]),([0,3,41,90,145],[11]),([0,2,14,22,145],[124]),([0,2,17,90,145],[11]),([0,3,111,145,254],[]),([0,3,41,122,145],[]),([0,3,41,111,123],[]),([0,3,41,111,145],[124]),([0,3,111,145,165],[124]),([0,2,43,122,145],[]),([2,3,6,145,341],[1]),([2,3,41,145,373],[124]),([0,3,41,145,307],[124]),([0,2,16,145,254],[]),([0,2,41,145,303],[]),([0,3,125,130,145],[]),([0,2,14,145,199],[124]),([2,3,6,160,300],[]),([0,2,14,17,160],[]),([2,3,6,145,362],[1]),([0,2,17,130,145],[]),([0,2,14,145,164],[]),([0,2,14,17,145],[124]),([2,3,6,123,298],[]),([0,1,2,3,99],[]),([0,1,26,87,111],[10]),([0,1,14,22,111],[124]),([0,1,14,24,87],[81]),([1,4,41,87,361],[81]),([0,4,41,87,266],[81]),([0,1,15,87,247],[]),([0,1,41,87,264],[]),([1,4,41,87,385],[10,81]),([0,4,41,87,386],[10,81]),([1,2,3,4,345],[]),([0,2,3,4,197],[]),([0,1,3,4,195],[]),([0,1,2,4,156],[]),([2,3,4,5,66],[]),([1,2,3,4,391],[]),([0,1,2,4,392],[]),([0,1,2,254,304],[]),([1,2,3,304,340],[]),([0,2,3,189,304],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_5 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_5 = true := by decide +kernel
-def h26Block4_6 : List NodeSpec := nodesWithIdentity [([0,1,3,164,304],[]),([2,3,5,6,99],[]),([0,1,86,87,99],[]),([1,3,41,111,373],[124]),([0,3,41,111,308],[124]),([0,1,16,111,254],[]),([0,1,41,111,303],[]),([1,3,41,111,403],[10,124]),([0,3,41,111,404],[10,124]),([1,2,3,4,407],[]),([0,1,2,3,408],[]),([1,2,4,265,326],[]),([0,2,4,176,265],[]),([0,1,4,131,265],[]),([0,1,2,247,265],[]),([2,4,5,6,156],[]),([0,1,110,111,156],[]),([1,2,14,41,413],[]),([1,2,4,254,413],[]),([1,2,3,247,413],[]),([0,2,14,41,415],[]),([0,2,4,254,415],[]),([0,2,3,247,415],[]),([0,1,14,41,252],[]),([0,1,4,252,254],[]),([0,1,3,247,252],[]),([0,1,2,14,414],[88]),([0,1,2,13,255],[]),([0,1,2,22,264],[88]),([0,1,2,4,417],[]),([0,1,2,24,303],[88]),([0,1,2,3,420],[]),([1,2,3,4,431],[]),([1,3,4,194,327],[]),([0,2,3,4,432],[]),([0,3,4,177,194],[]),([0,1,4,60,194],[]),([0,1,3,39,194],[]),([3,4,6,26,40],[12]),([3,4,5,6,195],[]),([2,4,6,26,248],[12]),([2,3,6,26,302],[12]),([2,3,4,6,434],[]),([4,12,18,85,220],[4]),([4,12,32,85,220],[12]),([4,10,33,85,220],[5]),([4,10,38,85,220],[5]),([4,10,12,88,220],[12]),([4,10,12,89,220],[12]),([4,10,12,85,224],[13]),([4,10,12,85,225],[5]),([10,12,14,145,220],[]),([4,10,55,145,220],[]),([3,12,18,145,220],[]),([3,10,12,145,224],[13]),([1,12,14,18,220],[]),([1,10,14,33,220],[5]),([1,4,10,19,220],[0]),([1,4,18,55,220],[7]),([1,4,32,55,220],[]),([1,4,10,56,220],[]),([1,4,10,55,224],[7]),([1,4,10,55,225],[]),([1,4,10,55,220],[0]),([1,3,10,33,224],[5]),([1,4,10,71,220],[0]),([1,3,10,38,225],[]),([3,4,10,12,180],[10]),([10,85,111,145,220],[]),([2,18,85,145,220],[4])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_6 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_6 = true := by decide +kernel
-def h26Block4_7 : List NodeSpec := nodesWithIdentity [([2,10,85,145,224],[]),([1,10,88,111,220],[12]),([1,10,85,111,224],[]),([1,2,18,88,220],[12]),([2,4,85,179,220],[81]),([1,2,32,89,220],[]),([1,4,10,138,220],[0]),([1,18,87,145,220],[]),([1,10,90,145,220],[]),([1,10,87,145,224],[]),([1,4,90,171,220],[]),([1,4,94,171,220],[]),([1,4,87,215,220],[]),([1,4,87,171,224],[]),([1,4,87,171,225],[]),([1,14,111,171,220],[12]),([1,3,111,171,224],[]),([2,4,171,174,220],[]),([1,2,14,215,220],[81]),([1,4,18,87,178],[]),([1,4,32,87,178],[]),([1,4,10,90,178],[]),([1,4,10,94,178],[]),([1,4,10,87,281],[]),([3,4,10,178,186],[]),([1,10,14,111,178],[5]),([1,3,10,111,281],[10]),([1,4,10,178,185],[]),([1,2,14,18,178],[]),([1,4,18,172,220],[]),([1,4,32,172,220],[]),([1,4,10,173,220],[]),([1,4,10,172,224],[]),([1,4,10,172,225],[]),([1,4,87,176,220],[]),([1,4,87,179,220],[]),([1,4,18,87,220],[81]),([1,4,10,181,220],[]),([1,4,10,182,220],[]),([1,4,10,90,220],[0]),([1,4,10,87,177],[]),([1,4,10,87,180],[]),([1,4,10,87,224],[10]),([1,10,14,186,220],[5]),([1,4,10,187,220],[0]),([1,3,10,186,224],[]),([1,10,111,174,220],[12]),([1,3,10,111,177],[]),([1,3,10,111,224],[10]),([1,4,10,220,276],[0]),([1,2,18,174,220],[]),([1,2,14,176,220],[]),([1,2,14,18,220],[81]),([3,4,10,83,177],[]),([10,12,14,85,286],[]),([4,12,44,85,286],[]),([3,10,33,85,286],[]),([3,10,12,88,286],[12]),([3,12,44,145,286],[6]),([3,12,54,145,286],[12]),([3,10,55,145,286],[7]),([3,10,59,145,286],[7]),([3,10,12,123,286],[12]),([3,10,12,145,239],[7]),([1,12,14,44,286],[]),([1,10,14,55,286],[7]),([1,3,10,19,286],[0]),([1,3,33,44,286],[5]),([1,3,33,54,286],[]),([1,4,10,59,239],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_7 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_7 = true := by decide +kernel
-def h26Block4_8 : List NodeSpec := nodesWithIdentity [([1,3,10,78,286],[0]),([3,4,10,12,193],[10]),([1,3,10,33,239],[]),([1,3,10,62,286],[]),([1,3,10,33,286],[0]),([10,85,87,145,286],[]),([2,44,85,145,286],[6]),([1,10,87,88,286],[12]),([1,10,85,90,286],[]),([1,44,85,111,286],[]),([1,2,44,88,286],[12]),([2,3,145,192,286],[124]),([1,2,54,123,286],[]),([1,3,10,166,286],[0]),([1,14,87,171,286],[12]),([1,3,90,171,286],[]),([1,3,122,171,286],[]),([1,3,111,204,286],[]),([1,3,111,171,239],[]),([2,3,171,174,286],[]),([1,2,14,204,286],[124]),([3,4,10,172,175],[]),([1,10,14,87,175],[7]),([1,4,10,87,280],[10]),([1,3,10,90,175],[]),([1,3,10,175,191],[]),([1,3,44,111,175],[]),([1,3,54,111,175],[]),([1,3,10,122,175],[]),([1,3,10,111,280],[]),([1,2,14,44,175],[]),([1,10,14,172,286],[7]),([1,3,10,173,286],[0]),([1,10,87,174,286],[12]),([1,3,10,181,286],[]),([1,3,10,90,286],[0]),([1,3,44,186,286],[]),([1,3,54,186,286],[]),([1,3,10,187,286],[]),([1,3,10,186,239],[]),([1,3,111,189,286],[]),([1,3,111,192,286],[]),([1,3,44,111,286],[124]),([1,3,10,190,286],[]),([1,3,10,111,193],[]),([1,3,10,276,286],[0]),([1,2,44,174,286],[]),([1,2,14,189,286],[]),([1,2,14,44,286],[124]),([1,3,10,188,239],[]),([0,12,14,18,85],[4]),([0,10,14,33,85],[]),([0,4,12,28,85],[1]),([0,4,33,44,85],[5]),([0,4,38,44,85],[]),([0,4,12,51,85],[]),([0,4,12,44,88],[12]),([0,4,12,44,89],[]),([0,4,12,44,85],[1]),([0,3,12,18,88],[12]),([0,4,12,70,85],[1]),([0,3,12,32,89],[]),([3,4,10,12,330],[10]),([0,12,14,44,145],[6]),([0,10,14,55,145],[]),([0,3,12,28,145],[1]),([0,4,12,54,123],[]),([0,3,12,77,145],[1]),([0,3,18,55,145],[7]),([0,3,18,59,145],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_8 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_8 = true := by decide +kernel
-def h26Block4_9 : List NodeSpec := nodesWithIdentity [([3,4,10,12,343],[10]),([0,3,12,18,123],[]),([0,3,12,61,145],[]),([0,3,12,18,145],[1]),([0,1,14,33,44],[5]),([0,1,14,18,55],[7]),([0,18,85,87,145],[4]),([0,10,85,90,145],[]),([0,44,85,111,145],[6]),([0,2,28,85,145],[1]),([2,4,41,85,457],[1,81]),([0,4,41,85,358],[1,81]),([0,1,18,87,88],[12]),([0,4,85,87,179],[81]),([0,1,32,87,89],[]),([1,4,10,87,330],[10]),([0,1,44,88,111],[12]),([1,3,4,9,63],[]),([1,3,9,10,99],[]),([0,2,84,85,99],[]),([2,3,41,145,465],[1,124]),([0,3,41,145,372],[1,124]),([0,3,111,145,192],[124]),([0,1,54,111,123],[]),([1,3,10,111,343],[10]),([3,4,10,52,123],[]),([1,4,10,123,227],[0]),([1,3,10,123,294],[]),([1,3,4,10,467],[]),([1,4,9,10,156],[]),([0,2,144,145,156],[]),([0,4,87,171,174],[]),([0,1,14,87,215],[81]),([0,3,111,171,174],[]),([0,1,14,111,204],[124]),([1,4,10,172,245],[]),([0,1,14,18,172],[]),([1,4,10,87,423],[10]),([0,1,18,87,174],[]),([0,1,14,87,176],[]),([0,1,14,18,87],[81]),([1,3,10,186,300],[]),([0,1,14,44,186],[]),([1,3,10,111,423],[10]),([0,1,44,111,174],[]),([0,1,14,111,189],[]),([0,1,14,44,111],[124]),([1,2,3,4,477],[]),([0,1,3,4,478],[]),([2,3,4,196,332],[]),([0,3,4,133,196],[]),([0,2,4,61,196],[]),([0,2,3,51,196],[]),([3,4,10,28,52],[11]),([3,4,9,10,197],[]),([1,4,10,28,227],[11]),([1,3,10,28,294],[11]),([1,3,4,10,480],[]),([12,85,111,220,286],[]),([2,33,85,220,286],[5]),([2,12,88,220,286],[]),([12,87,145,220,286],[]),([2,55,145,220,286],[7]),([1,33,87,220,286],[5]),([1,12,90,220,286],[]),([1,55,111,220,286],[7]),([1,2,19,220,286],[0]),([2,127,145,220,286],[7]),([2,85,160,220,286],[5]),([2,85,134,145,286],[5])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_9 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_9 = true := by decide +kernel
-def h26Block4_10 : List NodeSpec := nodesWithIdentity [([2,85,132,145,220],[7]),([1,4,127,132,220],[]),([1,2,128,220,286],[0]),([1,2,88,134,286],[]),([2,4,85,208,220],[81]),([1,2,88,132,220],[]),([1,2,137,220,286],[]),([1,2,88,220,286],[0]),([1,3,134,160,286],[]),([1,2,161,220,286],[0]),([2,3,145,198,286],[124]),([1,87,111,178,286],[5]),([1,2,90,178,286],[]),([2,3,178,186,286],[]),([1,3,111,203,286],[124]),([1,2,178,286,311],[]),([1,2,14,203,286],[]),([1,2,14,132,178],[]),([1,2,130,178,286],[]),([2,4,172,175,220],[]),([1,87,111,175,220],[7]),([1,4,87,213,220],[81]),([1,2,90,175,220],[]),([1,2,175,220,272],[]),([1,2,14,213,220],[]),([1,2,14,134,175],[]),([1,2,130,175,220],[]),([1,111,172,220,286],[7]),([1,2,173,220,286],[0]),([1,87,186,220,286],[5]),([1,2,181,220,286],[]),([1,2,90,220,286],[0]),([1,2,187,220,286],[0]),([1,2,134,286,315],[]),([1,2,14,198,286],[]),([1,2,134,174,286],[]),([1,2,132,220,277],[]),([1,2,14,208,220],[]),([1,2,132,174,220],[]),([1,2,220,276,286],[]),([1,2,220,271,286],[]),([2,4,41,220,437],[0,81]),([1,4,41,220,259],[0,81]),([0,12,88,111,220],[]),([0,12,85,111,224],[13]),([0,2,33,85,224],[5]),([2,4,85,220,329],[81]),([0,2,38,85,225],[]),([0,4,12,85,136],[1]),([0,12,90,145,220],[]),([0,12,87,145,224],[13]),([0,55,111,145,220],[]),([0,2,55,145,224],[7]),([0,1,33,87,224],[5]),([1,4,87,220,329],[81]),([0,1,38,87,225],[]),([0,4,12,87,180],[10]),([0,1,55,111,224],[7]),([0,3,4,11,65],[]),([0,3,11,12,99],[]),([2,4,22,104,220],[7]),([1,4,22,95,220],[7]),([1,2,99,219,220],[]),([1,2,22,220,290],[7]),([1,2,4,220,496],[]),([0,2,127,145,224],[]),([2,4,85,220,352],[81]),([0,4,85,134,160],[]),([0,2,85,160,224],[]),([0,2,85,145,240],[1])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_10 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_10 = true := by decide +kernel
-def h26Block4_11 : List NodeSpec := nodesWithIdentity [([0,2,85,133,145],[]),([0,2,85,145,224],[1]),([2,4,127,184,220],[]),([2,4,85,134,335],[]),([0,4,82,85,133],[]),([2,4,104,160,220],[]),([1,4,95,160,220],[0]),([1,2,160,220,290],[]),([1,2,4,220,498],[]),([1,2,14,220,352],[81]),([0,1,14,134,160],[]),([2,3,134,145,287],[]),([0,3,134,145,235],[1]),([0,2,114,134,145],[]),([0,2,3,145,499],[]),([0,2,14,145,198],[124]),([0,3,82,133,145],[]),([0,4,87,178,186],[]),([0,1,87,111,281],[10]),([1,4,87,178,454],[]),([1,3,111,178,410],[]),([0,3,111,178,411],[10]),([0,1,111,149,178],[]),([0,1,3,111,500],[]),([0,2,14,178,186],[]),([0,1,14,111,203],[124]),([1,2,14,178,465],[]),([1,4,140,172,220],[]),([0,1,111,172,224],[]),([1,4,87,220,397],[81]),([0,1,87,186,224],[]),([0,1,87,111,177],[]),([0,1,87,111,224],[10]),([0,4,83,87,177],[]),([2,4,104,186,220],[0]),([1,4,95,186,220],[]),([1,2,186,220,290],[]),([1,2,4,220,502],[]),([1,2,14,220,397],[81]),([0,3,83,111,177],[]),([1,2,14,134,403],[]),([0,3,4,26,67],[13]),([0,2,3,4,503],[]),([2,3,4,57,177],[]),([0,2,4,97,177],[]),([0,2,3,155,177],[]),([0,3,4,28,64],[13]),([0,1,3,4,504],[]),([1,3,4,57,133],[]),([0,1,4,97,133],[]),([0,1,3,133,155],[]),([2,4,104,177,220],[]),([1,4,95,177,220],[]),([1,2,177,220,290],[]),([1,2,4,220,505],[]),([2,4,104,133,220],[]),([1,4,95,133,220],[]),([1,2,133,220,290],[]),([1,2,4,220,506],[]),([2,3,41,286,446],[0,124]),([1,3,41,286,305],[0,124]),([0,33,85,87,286],[]),([0,12,87,88,286],[]),([0,12,85,90,286],[]),([2,3,145,286,342],[124]),([0,2,59,145,239],[]),([0,3,12,145,169],[1]),([1,3,111,286,342],[124]),([0,1,59,111,239],[]),([0,3,12,111,193],[10])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_11 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_11 = true := by decide +kernel
-def h26Block4_12 : List NodeSpec := nodesWithIdentity [([3,4,12,57,239],[]),([0,4,12,97,239],[1]),([0,3,12,155,239],[]),([0,3,4,12,508],[]),([0,4,11,12,156],[]),([2,3,24,146,286],[5]),([1,3,24,113,286],[5]),([1,2,156,285,286],[]),([1,2,24,236,286],[5]),([1,2,3,286,511],[]),([2,3,145,286,346],[124]),([0,3,127,132,145],[]),([0,2,85,145,258],[1]),([2,3,127,146,286],[]),([1,3,113,127,286],[0]),([1,2,127,236,286],[]),([1,2,3,286,513],[]),([1,2,14,286,346],[124]),([0,1,14,127,132],[]),([2,4,85,132,231],[]),([0,4,85,132,226],[1]),([0,2,85,132,150],[]),([0,2,4,85,514],[]),([0,2,14,85,208],[81]),([2,3,160,183,286],[]),([2,3,132,145,334],[]),([2,3,123,261,286],[]),([2,3,145,239,360],[]),([1,4,87,175,394],[]),([0,4,87,175,395],[10]),([0,1,87,116,175],[]),([0,1,4,87,515],[]),([0,3,111,172,175],[]),([0,2,14,172,175],[]),([0,1,87,111,280],[10]),([0,1,14,87,213],[81]),([1,3,111,175,453],[]),([1,2,14,175,457],[]),([2,3,146,172,286],[0]),([1,3,113,172,286],[]),([1,2,172,236,286],[]),([1,2,3,286,517],[]),([1,3,111,286,379],[124]),([1,2,14,286,379],[124]),([1,3,139,186,286],[]),([1,3,111,239,458],[]),([1,2,14,132,385],[]),([2,3,146,177,286],[]),([1,3,113,177,286],[]),([1,2,177,236,286],[]),([1,2,3,286,518],[]),([2,3,133,146,286],[]),([1,3,113,133,286],[]),([1,2,133,236,286],[]),([1,2,3,286,519],[]),([0,4,87,88,320],[]),([0,4,87,89,320],[]),([0,4,85,90,320],[]),([0,4,85,94,320],[]),([0,4,85,87,355],[]),([0,14,85,111,320],[13]),([0,3,88,111,320],[]),([2,4,85,320,323],[]),([0,2,14,85,355],[81]),([0,14,87,145,320],[13]),([0,3,90,145,320],[]),([0,3,122,145,320],[]),([0,3,111,123,320],[]),([0,3,111,145,348],[]),([2,3,145,320,323],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_12 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_12 = true := by decide +kernel
-def h26Block4_13 : List NodeSpec := nodesWithIdentity [([0,2,14,145,348],[124]),([1,4,87,320,323],[]),([0,1,14,87,355],[81]),([1,3,111,320,323],[]),([0,1,14,111,348],[124]),([0,4,33,87,328],[]),([0,4,38,87,328],[]),([0,4,12,90,328],[]),([0,4,12,94,328],[]),([0,4,12,87,369],[]),([3,4,12,328,336],[]),([0,12,14,111,328],[4]),([0,3,12,111,369],[10]),([0,4,12,185,328],[]),([0,2,14,33,328],[]),([0,4,33,85,321],[]),([0,4,38,85,321],[]),([0,4,12,88,321],[]),([0,4,12,89,321],[]),([0,4,12,85,322],[]),([0,4,85,87,326],[]),([0,4,85,87,329],[]),([0,4,33,85,87],[81]),([0,4,12,87,327],[]),([0,4,12,87,330],[]),([0,4,12,87,88],[10]),([0,4,12,85,332],[]),([0,4,12,85,333],[]),([0,4,12,85,90],[1]),([0,12,14,85,336],[4]),([0,4,12,85,337],[1]),([0,3,12,88,336],[]),([0,12,85,111,323],[13]),([0,3,12,111,327],[]),([0,3,12,88,111],[10]),([0,4,12,85,365],[1]),([0,2,33,85,323],[]),([0,2,14,85,326],[]),([0,2,14,33,85],[81]),([3,4,12,218,327],[]),([3,4,12,321,324],[]),([0,12,14,87,324],[6]),([0,4,12,87,368],[10]),([0,3,12,90,324],[]),([0,3,12,191,324],[]),([0,3,55,111,324],[]),([0,3,59,111,324],[]),([0,3,12,122,324],[]),([0,3,12,111,368],[]),([0,2,14,55,324],[]),([0,12,14,145,321],[6]),([0,3,12,145,322],[1]),([0,12,87,145,323],[13]),([0,3,12,145,332],[]),([0,3,12,90,145],[1]),([0,3,55,145,336],[]),([0,3,59,145,336],[]),([0,3,12,123,336],[]),([0,3,12,145,337],[]),([0,3,111,145,340],[]),([0,3,111,145,342],[]),([0,3,55,111,145],[124]),([0,3,12,145,341],[]),([0,3,12,111,343],[]),([0,3,12,145,365],[1]),([0,2,55,145,323],[]),([0,2,14,145,340],[]),([0,2,14,55,145],[124]),([0,3,12,123,338],[]),([0,4,12,141,321],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_13 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_13 = true := by decide +kernel
-def h26Block4_14 : List NodeSpec := nodesWithIdentity [([0,1,14,33,321],[]),([0,4,12,87,424],[10]),([0,1,33,87,323],[]),([0,1,14,87,326],[]),([0,1,14,33,87],[81]),([0,3,12,167,336],[]),([0,1,14,55,336],[]),([0,3,12,111,424],[10]),([0,1,55,111,323],[]),([0,1,14,111,340],[]),([0,1,14,55,111],[124]),([2,3,4,181,344],[]),([1,3,4,137,344],[]),([1,2,4,62,344],[]),([1,2,3,56,344],[]),([1,2,3,22,299],[7]),([1,2,3,4,525],[]),([1,2,4,24,241],[5]),([1,2,3,4,526],[]),([0,87,111,145,328],[4]),([0,2,90,145,328],[]),([2,3,145,328,336],[]),([0,3,111,145,347],[124]),([0,2,145,311,328],[]),([0,2,14,160,328],[]),([0,2,14,145,347],[]),([0,2,130,145,328],[]),([1,4,87,328,336],[]),([0,1,87,111,369],[10]),([0,4,87,328,436],[]),([1,3,111,328,410],[10]),([0,3,111,328,411],[]),([0,1,111,149,328],[]),([0,1,3,111,528],[]),([1,2,14,328,336],[]),([0,1,14,111,347],[124]),([0,2,14,328,446],[]),([2,4,85,321,324],[]),([0,85,87,111,324],[6]),([0,4,85,87,353],[81]),([0,2,85,90,324],[]),([0,2,85,272,324],[]),([0,2,14,127,324],[]),([0,2,14,85,353],[]),([0,2,85,130,324],[]),([0,85,111,145,321],[6]),([0,2,85,145,322],[1]),([0,85,87,145,336],[4]),([0,2,85,145,332],[]),([0,2,85,90,145],[1]),([0,2,85,145,337],[1]),([0,2,127,145,376],[]),([0,2,14,145,346],[]),([0,2,127,145,323],[]),([0,2,85,160,366],[]),([0,2,14,85,352],[]),([0,2,85,160,323],[]),([0,2,85,145,365],[]),([0,2,85,145,362],[]),([0,4,85,244,321],[]),([0,1,88,111,321],[]),([0,4,85,87,398],[81]),([0,1,87,88,336],[]),([0,1,87,111,327],[]),([0,1,87,88,111],[10]),([1,4,87,218,327],[]),([2,4,85,231,336],[1]),([0,4,85,226,336],[]),([0,2,85,150,336],[]),([0,2,4,85,532],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_14 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_14 = true := by decide +kernel
-def h26Block4_15 : List NodeSpec := nodesWithIdentity [([0,2,14,85,398],[81]),([1,3,111,218,327],[]),([0,2,14,127,404],[]),([1,3,4,26,69],[12]),([1,2,3,4,533],[]),([2,3,4,52,327],[]),([1,2,4,227,327],[]),([1,2,3,294,327],[]),([2,4,85,231,327],[]),([0,4,85,226,327],[]),([0,2,85,150,327],[]),([0,2,4,85,534],[]),([1,4,87,324,394],[10]),([0,4,87,324,395],[]),([0,1,87,116,324],[]),([0,1,4,87,535],[]),([1,3,111,321,324],[]),([1,2,14,321,324],[]),([0,1,87,111,368],[10]),([0,1,14,87,353],[81]),([0,3,111,324,435],[]),([0,2,14,324,437],[]),([2,3,145,287,321],[1]),([0,3,145,235,321],[]),([0,2,114,145,321],[]),([0,2,3,145,536],[]),([0,3,111,145,380],[124]),([0,2,14,145,380],[124]),([0,3,145,243,336],[]),([0,3,111,123,489],[]),([0,2,14,160,386],[]),([2,3,145,287,327],[]),([0,3,145,235,327],[]),([0,2,114,145,327],[]),([0,2,3,145,537],[]),([0,1,111,315,321],[]),([0,1,14,305,321],[]),([0,1,14,111,380],[]),([0,1,14,186,321],[]),([0,1,111,174,321],[]),([0,1,111,172,376],[]),([0,1,14,172,372],[]),([0,1,14,111,379],[]),([0,1,14,172,336],[]),([0,1,111,172,323],[]),([0,1,87,277,336],[]),([0,1,14,87,398],[]),([0,1,87,174,336],[]),([0,1,87,186,366],[]),([0,1,14,87,397],[]),([0,1,87,186,323],[]),([0,1,87,111,424],[]),([0,1,87,111,423],[]),([2,3,4,28,68],[11]),([1,2,3,4,542],[]),([0,1,14,259,336],[]),([0,1,14,186,358],[]),([1,2,14,177,413],[]),([0,2,14,177,415],[]),([0,1,14,177,252],[]),([0,1,2,14,543],[]),([1,2,14,133,413],[]),([0,2,14,133,415],[]),([0,1,14,133,252],[]),([0,1,2,14,544],[]),([1,2,14,327,413],[]),([0,2,14,327,415],[]),([0,1,14,252,327],[]),([0,1,2,14,545],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test4_15 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Block4_15 = true := by decide +kernel
-def h26Nodes4 : List NodeSpec := h26Block4_0 ++ h26Block4_1 ++ h26Block4_2 ++ h26Block4_3 ++ h26Block4_4 ++ h26Block4_5 ++ h26Block4_6 ++ h26Block4_7 ++ h26Block4_8 ++ h26Block4_9 ++ h26Block4_10 ++ h26Block4_11 ++ h26Block4_12 ++ h26Block4_13 ++ h26Block4_14 ++ h26Block4_15
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Check4 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket3 4 h26Nodes4 = true := by
-  unfold h26Nodes4 checkNodesBT
-  simp only [List.all_append, Bool.and_eq_true]
-  exact ⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨h26Test4_0,h26Test4_1⟩,h26Test4_2⟩,h26Test4_3⟩,h26Test4_4⟩,h26Test4_5⟩,h26Test4_6⟩,h26Test4_7⟩,h26Test4_8⟩,h26Test4_9⟩,h26Test4_10⟩,h26Test4_11⟩,h26Test4_12⟩,h26Test4_13⟩,h26Test4_14⟩,h26Test4_15⟩
-def h26Bucket4 : BT (List (List Nat)) := buildBucketsBT h26W h26Nodes4
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Bucket4Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h26G 4 xs.toFinset) h26Bucket4 := buildBucketsBT_sound (by decide) h26Pairs h26WOk h26PoolsOk h26AutosOk h26Bucket3Ok h26Check4
-def h26Block5_0 : List NodeSpec := nodesWithIdentity [([3,4,6,10,12,14],[3,8,9,11,12,13]),([3,4,10,12,17],[4,5,10,11,15,16]),([3,4,6,10,12,17],[4,5,11,15,17,18,19]),([3,4,10,12,43],[11,12,13]),([3,4,6,12,44],[1,5,12,20,21,22]),([3,4,6,10,12,44],[2,5,12,20,21,22,23]),([3,4,6,12,54],[11,12,13]),([3,4,6,10,55],[0,3,4,13,22,24]),([3,4,6,10,12,55],[3,4,13,22,24,25,26]),([3,4,6,10,59],[11,12,13]),([3,4,10,12,45],[6,7,10,11,27,28]),([3,4,6,10,12,45],[6,7,11,19,27,29,30]),([3,4,10,12,47],[11,12,13]),([3,4,6,12,18],[1,7,12,31,32,33]),([3,4,6,10,12,18],[2,7,12,31,32,33,34]),([3,4,6,12,32],[11,12,13]),([3,4,6,10,33],[0,6,13,14,33,35]),([3,4,6,10,12,33],[6,13,14,26,33,35,36]),([3,4,6,10,38],[11,12,13]),([4,6,10,85,87],[4,11,12,22]),([3,4,6,10,85,111],[]),([2,3,4,6,10,55],[0]),([3,4,6,10,55,85],[4,13,39]),([2,3,4,6,10,127],[0]),([2,4,6,10,14,85],[]),([2,4,6,44,85],[1,5,12,21,22,40]),([2,3,4,6,44,85],[1]),([2,4,6,10,44,85],[2,5,12]),([2,3,4,6,54,85],[1]),([2,3,4,10,45,85],[]),([2,3,4,10,47,85],[]),([2,3,4,6,18,85],[4]),([2,3,4,6,32,85],[12]),([2,3,4,6,10,88],[12]),([2,3,4,6,10,89],[12]),([3,4,6,10,87,145],[]),([3,6,10,111,145],[6,11,12,33]),([2,3,4,6,10,33],[0]),([3,4,6,10,33,145],[6,13,43]),([2,3,4,6,10,160],[0]),([2,3,6,10,14,145],[]),([2,3,4,10,17,145],[]),([2,3,4,10,43,145],[]),([2,3,4,6,44,145],[6]),([2,3,4,6,54,145],[12]),([2,3,4,6,10,123],[12]),([2,3,6,18,145],[1,7,12,32,33,44]),([2,3,4,6,18,145],[1]),([2,3,6,10,18,145],[2,7,12]),([2,3,4,6,32,145],[1]),([1,3,4,6,10,55],[0]),([3,4,6,10,55,87],[13,22,46]),([1,3,4,6,10,172],[0]),([1,4,6,10,14,87],[]),([1,4,10,17,87],[4,5,10,11,16,47]),([1,3,4,10,17,87],[10]),([1,4,6,10,17,87],[5,11,19]),([1,3,4,10,43,87],[10]),([1,3,4,10,45,87],[22]),([1,3,4,10,47,87],[11]),([1,3,4,6,18,87],[]),([1,3,4,6,32,87],[]),([1,3,4,6,10,90],[11]),([1,3,4,6,10,94],[11]),([1,3,4,6,10,33],[0]),([3,4,6,10,33,111],[13,33,49]),([1,3,4,6,10,186],[0]),([1,3,6,10,14,111],[]),([1,3,4,10,17,111],[33]),([1,3,4,10,43,111],[11])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_0 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_0 = true := by decide +kernel
-def h26Block5_1 : List NodeSpec := nodesWithIdentity [([1,3,4,6,44,111],[]),([1,3,4,6,54,111],[]),([1,3,4,6,10,122],[11]),([1,3,10,45,111],[6,7,10,11,28,50]),([1,3,4,10,45,111],[10]),([1,3,6,10,45,111],[7,11,19]),([1,3,4,10,47,111],[10]),([1,2,4,10,14,17],[]),([1,2,4,6,14,44],[]),([1,2,3,10,14,45],[]),([1,2,3,6,14,18],[]),([1,2,3,4,10,26],[10]),([1,2,3,4,6,28],[1]),([1,3,4,10,17,164],[5,10,11]),([1,2,3,4,17,18],[4]),([1,2,3,4,17,32],[]),([1,2,3,4,10,39],[10,54]),([1,3,4,6,10,164],[5,10]),([1,2,3,4,10,17],[10,18]),([1,2,3,4,18,43],[]),([1,2,3,4,32,43],[]),([1,2,3,4,10,75],[10]),([2,3,4,6,44,189],[1,5,12]),([1,2,3,4,44,45],[6]),([1,2,3,4,44,47],[]),([1,2,3,4,6,51],[1,59]),([2,3,4,6,10,189],[1,5]),([1,2,3,4,6,44],[1,23]),([1,2,3,4,45,54],[]),([1,2,3,4,47,54],[]),([1,2,3,4,6,77],[1]),([1,3,4,10,45,131],[7,10,11]),([1,2,3,4,10,60],[10,66]),([1,3,4,6,10,131],[7,10]),([1,2,3,4,10,72],[10]),([1,2,3,4,10,45],[10,30]),([2,3,4,6,18,176],[1,7,12]),([1,2,3,4,6,61],[1,71]),([2,3,4,6,10,176],[1,7]),([1,2,3,4,6,70],[1]),([1,2,3,4,6,18],[1,34]),([4,6,12,87,220],[5,11,13,22]),([3,4,6,12,111,220],[]),([2,3,4,6,12,44],[1]),([3,4,6,12,44,220],[5,12,76]),([2,3,4,6,12,134],[1]),([2,4,6,12,14,220],[]),([2,4,6,55,220],[0,4,13,22,24,79]),([2,3,4,6,55,220],[0]),([2,4,6,12,55,220],[4,13,26]),([2,3,4,6,59,220],[0]),([2,3,4,12,45,220],[]),([2,3,4,12,47,220],[]),([2,3,4,6,33,220],[5]),([2,3,4,6,38,220],[5]),([2,3,4,6,12,224],[13]),([2,3,4,6,12,225],[5]),([2,4,6,85,111,220],[4,5,11,49,80,82]),([2,4,41,85,220],[11,12,13,81,84]),([2,4,6,41,85,220],[2,11,12,13,26,84,85]),([2,4,85,125,220],[4,5,11]),([2,4,6,55,85,220],[4,13,22,24,25,39,79]),([2,4,6,127,220],[4,11,12]),([2,4,6,44,85,220],[5,12,21,22,23,40,76]),([2,4,6,85,134],[5,11,13]),([2,4,45,85,220],[6,7,11,81,83,86]),([2,4,6,45,85,220],[6,7,11,29,30,83,85]),([2,4,47,85,220],[4,5,11]),([2,4,6,88,220],[0,4,6,83,87,88]),([2,4,6,85,88,220],[4,6,39,83,87,88,89])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_1 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_1 = true := by decide +kernel
-def h26Block5_2 : List NodeSpec := nodesWithIdentity [([2,4,6,89,220],[4,5,11]),([2,4,6,85,224],[1,5,7,83,88,90]),([2,4,6,85,220,224],[5,7,76,83,88,90,91]),([2,4,6,85,225],[4,5,11]),([2,4,6,87,145,220],[]),([2,3,6,111,145,220],[]),([2,3,4,41,145,220],[]),([2,3,4,125,145,220],[]),([2,3,4,6,160,220],[5]),([2,3,4,6,134,145],[5]),([2,6,14,145,220],[5,6,11,88]),([2,3,4,6,88,220],[0]),([2,4,6,88,145,220],[4,6,43]),([2,3,4,6,123,220],[0]),([2,3,6,145,224],[1,5,7,88,90,94]),([2,3,4,6,145,224],[1]),([2,3,6,145,220,224],[5,7,76]),([2,3,4,6,145,225],[1]),([1,2,4,6,55,220],[0]),([2,4,6,55,87,220],[4,22,46]),([1,2,4,6,172,220],[0]),([1,4,6,87,111,220],[]),([1,4,41,87,220],[11,12,13,81,96]),([1,2,4,41,87,220],[81]),([1,4,6,41,87,220],[11,12,85]),([1,2,4,87,125,220],[81]),([1,2,4,45,87,220],[22]),([1,2,4,47,87,220],[11]),([1,2,4,6,90,220],[11]),([1,2,4,6,94,220],[11]),([1,2,4,6,87,224],[]),([1,2,4,6,87,225],[]),([1,3,4,41,111,220],[]),([1,2,6,14,111,220],[]),([1,2,3,45,111,220],[]),([1,2,3,6,111,224],[]),([1,2,3,4,24,220],[81]),([2,3,4,41,85,220],[81,84]),([1,3,4,41,87,220],[81,96]),([1,2,4,14,41,220],[88]),([1,2,4,15,41,220],[81]),([1,2,4,41,220,253],[11,12]),([1,2,4,41,220,254],[11,12,81]),([1,2,3,4,220,247],[81]),([1,2,3,4,41,224],[13]),([1,2,3,4,41,225],[]),([1,2,4,6,220,254],[12,81]),([1,2,3,4,41,220],[26,81]),([1,2,4,14,125,220],[11]),([1,2,3,4,210,220],[81]),([1,2,3,4,125,224],[]),([1,2,3,4,125,225],[]),([2,3,4,6,189,220],[1,12]),([1,2,4,6,85,134],[1]),([2,3,4,6,134,153],[1]),([1,2,4,6,14,134],[]),([1,2,3,4,45,134],[]),([1,2,3,4,47,134],[]),([1,2,3,4,6,240],[1]),([1,2,4,6,88,220],[0]),([2,4,6,14,88,220],[4,9,88]),([1,2,4,6,174,220],[0]),([1,2,4,6,130,220],[11]),([1,2,14,45,220],[6,7,11,81,86,106]),([1,2,4,14,45,220],[81]),([1,2,6,14,45,220],[7,11,85]),([1,2,4,14,47,220],[81]),([1,2,3,4,131,220],[81,108]),([1,2,4,45,60,220],[7,11,81]),([1,2,4,6,60,220],[7,81])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_2 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_2 = true := by decide +kernel
-def h26Block5_3 : List NodeSpec := nodesWithIdentity [([1,2,3,4,135,220],[81]),([1,2,3,4,45,220],[30,81]),([2,3,4,6,177,224],[1,5,7]),([1,2,3,4,6,133],[1]),([2,3,4,6,177,220],[1,7]),([1,2,3,4,6,136],[1]),([1,2,3,4,6,224],[1,91]),([3,4,6,12,87,286],[]),([3,6,12,111,286],[7,11,13,33]),([2,3,4,6,12,18],[1]),([3,4,6,12,18,286],[7,12,116]),([2,3,4,6,12,132],[1]),([2,3,6,12,14,286],[]),([2,3,4,12,17,286],[]),([2,3,4,12,43,286],[]),([2,3,4,6,55,286],[7]),([2,3,4,6,59,286],[7]),([2,3,4,6,12,239],[7]),([2,3,6,33,286],[0,6,13,33,35,119]),([2,3,4,6,33,286],[0]),([2,3,6,12,33,286],[6,13,26]),([2,3,4,6,38,286],[0]),([2,4,6,85,87,286],[]),([2,3,6,85,111,286],[]),([2,3,4,41,85,286],[]),([2,3,4,85,125,286],[]),([2,3,4,6,127,286],[7]),([2,3,4,6,85,132],[7]),([2,6,14,85,286],[4,7,11,88]),([2,3,4,6,85,224],[1]),([2,4,6,85,224,286],[5,7,116]),([2,3,4,6,85,239],[1]),([2,3,6,88,286],[0,4,6,87,88,122]),([2,3,4,6,88,286],[0]),([2,3,6,85,88,286],[4,6,39]),([2,3,4,6,89,286],[0]),([2,3,6,87,145,286],[6,7,11,46,123,125]),([2,3,41,145,286],[11,12,13,124,127]),([2,3,6,41,145,286],[2,11,12,13,26,127,128]),([2,3,125,145,286],[6,7,11]),([2,3,6,33,145,286],[6,13,33,35,36,43,119]),([2,3,6,160,286],[6,11,12]),([2,3,6,18,145,286],[7,12,32,33,34,44,116]),([2,3,6,132,145],[7,11,13]),([2,3,17,145,286],[4,5,11,124,126,129]),([2,3,6,17,145,286],[4,5,11,17,18,126,128]),([2,3,43,145,286],[6,7,11]),([2,3,6,88,145,286],[4,6,43,87,88,89,122]),([2,3,6,123,286],[5,6,11]),([2,3,6,145,224,286],[5,7,88,90,91,94,116]),([2,3,6,145,239],[4,7,11]),([1,3,6,87,111,286],[]),([1,3,4,41,87,286],[]),([1,2,6,14,87,286],[]),([1,2,4,17,87,286],[]),([1,2,3,6,90,286],[11]),([1,2,3,4,22,286],[124]),([1,2,3,6,33,286],[0]),([2,3,6,33,111,286],[6,33,49]),([1,2,3,6,186,286],[0]),([1,3,41,111,286],[11,12,13,124,132]),([1,2,3,41,111,286],[124]),([1,3,6,41,111,286],[11,12,128]),([1,2,3,111,125,286],[124]),([1,2,3,17,111,286],[33]),([1,2,3,43,111,286],[11]),([1,2,3,6,122,286],[11]),([1,2,3,6,111,239],[]),([2,3,4,41,145,286],[124,127]),([1,3,4,41,111,286],[124,132])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_3 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_3 = true := by decide +kernel
-def h26Block5_4 : List NodeSpec := nodesWithIdentity [([1,2,3,14,41,286],[88]),([1,2,3,16,41,286],[124]),([1,2,3,4,254,286],[124]),([1,2,3,4,41,239],[]),([1,2,3,41,246,286],[11,12]),([1,2,3,41,247,286],[11,12,124]),([1,2,3,6,247,286],[12,124]),([1,2,3,4,41,286],[26,124]),([1,2,3,14,125,286],[11]),([1,2,3,4,199,286],[124]),([1,2,3,4,125,239],[]),([2,3,4,6,176,286],[1,12]),([2,3,4,6,121,132],[1]),([1,2,3,6,132,145],[1]),([1,2,3,6,14,132],[]),([1,2,3,4,17,132],[]),([1,2,3,4,43,132],[]),([1,2,3,4,6,258],[1]),([1,2,3,6,88,286],[0]),([2,3,6,14,88,286],[6,9,88]),([1,2,3,6,174,286],[0]),([1,2,3,6,130,286],[11]),([1,2,14,17,286],[4,5,11,124,129,140]),([1,2,3,14,17,286],[124]),([1,2,6,14,17,286],[5,11,128]),([1,2,3,14,43,286],[124]),([1,2,3,4,164,286],[124,142]),([1,2,3,17,39,286],[5,11,124]),([1,2,3,6,39,286],[5,124]),([1,2,3,4,165,286],[124]),([1,2,3,4,17,286],[18,124]),([2,3,4,6,177,286],[1,5]),([2,3,4,6,82,239],[1]),([1,2,3,6,145,239],[1]),([1,2,3,4,6,169],[1]),([0,3,4,6,12,44],[1]),([3,4,6,12,44,87],[12,22,125]),([0,3,4,6,12,321],[1]),([0,4,6,12,14,87],[]),([0,4,12,17,87],[4,5,10,11,16,148]),([0,3,4,12,17,87],[10]),([0,4,6,12,17,87],[4,11,19]),([0,3,4,12,43,87],[10]),([0,3,4,12,45,87],[22]),([0,3,4,12,47,87],[11]),([0,3,4,6,33,87],[]),([0,3,4,6,38,87],[]),([0,3,4,6,12,90],[11]),([0,3,4,6,12,94],[11]),([0,3,4,6,12,18],[1]),([3,4,6,12,18,111],[12,33,82]),([0,3,4,6,12,336],[1]),([0,3,6,12,14,111],[]),([0,3,4,12,17,111],[33]),([0,3,4,12,43,111],[11]),([0,3,4,6,55,111],[]),([0,3,4,6,59,111],[]),([0,3,4,6,12,122],[11]),([0,3,12,45,111],[6,7,10,11,28,150]),([0,3,4,12,45,111],[10]),([0,3,6,12,45,111],[6,11,19]),([0,3,4,12,47,111],[10]),([0,2,4,12,14,17],[]),([0,2,4,6,14,55],[]),([0,2,3,12,14,45],[]),([0,2,3,6,14,33],[]),([0,2,3,4,12,26],[10]),([0,2,3,4,6,19],[0]),([0,3,4,12,17,164],[4,10,11]),([0,2,3,4,17,33],[5])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_4 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_4 = true := by decide +kernel
-def h26Block5_5 : List NodeSpec := nodesWithIdentity [([0,2,3,4,17,38],[]),([0,2,3,4,12,39],[10,54]),([0,3,4,6,12,164],[4,10]),([0,2,3,4,12,17],[10,151]),([0,2,3,4,33,43],[]),([0,2,3,4,38,43],[]),([0,2,3,4,12,75],[10]),([2,3,4,6,55,340],[0,4,13]),([0,2,3,4,45,55],[7]),([0,2,3,4,47,55],[]),([0,2,3,4,6,56],[0,156]),([2,3,4,6,12,340],[0,4]),([0,2,3,4,6,55],[0,24]),([0,2,3,4,45,59],[]),([0,2,3,4,47,59],[]),([0,2,3,4,6,78],[0]),([0,3,4,12,45,131],[6,10,11]),([0,2,3,4,12,60],[10,66]),([0,3,4,6,12,131],[6,10]),([0,2,3,4,12,72],[10]),([0,2,3,4,12,45],[10,161]),([2,3,4,6,33,326],[0,6,13]),([0,2,3,4,6,62],[0,166]),([2,3,4,6,12,326],[0,6]),([0,2,3,4,6,71],[0]),([0,2,3,4,6,33],[0,35]),([0,2,4,6,44,85],[1]),([2,4,6,44,85,87],[5,22,125]),([0,2,4,6,85,321],[1]),([0,4,6,85,87,111],[]),([0,4,41,85,87],[11,12,13,81,172]),([0,2,4,41,85,87],[81]),([0,4,6,41,85,87],[11,13,85]),([0,2,4,85,87,125],[81]),([0,2,4,45,85,87],[22]),([0,2,4,47,85,87],[11]),([0,2,4,6,87,88],[]),([0,2,4,6,87,89],[]),([0,2,4,6,85,90],[11]),([0,2,4,6,85,94],[11]),([0,3,4,41,85,111],[]),([0,2,6,14,85,111],[]),([0,2,3,45,85,111],[]),([0,2,3,6,88,111],[]),([0,2,3,4,24,85],[81]),([0,3,4,41,85,87],[81,172]),([0,2,4,14,41,85],[88]),([0,2,4,15,41,85],[81]),([0,2,4,41,85,253],[11,13]),([0,2,4,41,85,254],[11,13,81]),([0,2,3,4,85,247],[81]),([0,2,3,4,41,88],[12]),([0,2,3,4,41,89],[]),([0,2,4,6,85,254],[13,81]),([0,2,3,4,41,85],[81,173]),([0,2,4,14,85,125],[11]),([0,2,3,4,88,125],[]),([0,2,3,4,89,125],[]),([0,2,3,4,85,210],[81]),([2,3,4,6,85,340],[0,13]),([0,2,4,6,127,220],[0]),([2,3,4,6,127,293],[0]),([0,2,4,6,14,127],[]),([0,2,3,4,45,127],[]),([0,2,3,4,47,127],[]),([0,2,3,4,6,128],[0]),([0,2,4,6,85,224],[1]),([2,4,6,14,85,224],[5,8,88]),([0,2,4,6,85,323],[1]),([0,2,4,6,85,130],[11])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_5 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_5 = true := by decide +kernel
-def h26Block5_6 : List NodeSpec := nodesWithIdentity [([0,2,14,45,85],[6,7,11,81,86,181]),([0,2,4,14,45,85],[81]),([0,2,6,14,45,85],[6,11,85]),([0,2,4,14,47,85],[81]),([0,2,3,4,85,131],[81,108]),([0,2,4,45,60,85],[6,11,81]),([0,2,4,6,60,85],[6,81]),([0,2,3,4,85,135],[81]),([0,2,3,4,45,85],[81,182]),([2,3,4,6,88,327],[0,4,6]),([0,2,3,4,6,137],[0,185]),([2,3,4,6,85,327],[0,6]),([0,2,3,4,6,138],[0]),([0,2,3,4,6,88],[0,87]),([0,3,6,87,111,145],[]),([0,3,4,41,87,145],[]),([0,2,6,14,87,145],[]),([0,2,4,17,87,145],[]),([0,2,3,6,90,145],[11]),([0,2,3,4,22,145],[124]),([0,2,3,6,18,145],[1]),([2,3,6,18,111,145],[7,33,82]),([0,2,3,6,145,336],[1]),([0,3,41,111,145],[11,12,13,124,191]),([0,2,3,41,111,145],[124]),([0,3,6,41,111,145],[11,13,128]),([0,2,3,111,125,145],[124]),([0,2,3,17,111,145],[33]),([0,2,3,43,111,145],[11]),([0,2,3,6,122,145],[11]),([0,2,3,6,111,123],[]),([0,3,4,41,111,145],[124,191]),([0,2,3,14,41,145],[88]),([0,2,3,16,41,145],[124]),([0,2,3,4,145,254],[124]),([0,2,3,4,41,123],[]),([0,2,3,41,145,246],[11,13]),([0,2,3,41,145,247],[11,13,124]),([0,2,3,6,145,247],[13,124]),([0,2,3,4,41,145],[124,192]),([0,2,3,14,125,145],[11]),([0,2,3,4,145,199],[124]),([0,2,3,4,123,125],[]),([2,3,4,6,145,326],[0,13]),([2,3,4,6,160,238],[0]),([0,2,3,6,160,286],[0]),([0,2,3,6,14,160],[]),([0,2,3,4,17,160],[]),([0,2,3,4,43,160],[]),([0,2,3,4,6,161],[0]),([0,2,3,6,145,224],[1]),([2,3,6,14,145,224],[7,8,88]),([0,2,3,6,145,323],[1]),([0,2,3,6,130,145],[11]),([0,2,14,17,145],[4,5,11,124,129,198]),([0,2,3,14,17,145],[124]),([0,2,6,14,17,145],[4,11,128]),([0,2,3,14,43,145],[124]),([0,2,3,4,145,164],[124,142]),([0,2,3,17,39,145],[4,11,124]),([0,2,3,6,39,145],[4,124]),([0,2,3,4,145,165],[124]),([0,2,3,4,17,145],[124,199]),([2,3,4,6,145,327],[0,4]),([2,3,4,6,123,126],[0]),([0,2,3,6,123,286],[0]),([0,2,3,4,6,166],[0]),([0,2,3,4,6,189],[0]),([0,1,2,3,4,22],[124]),([2,3,4,6,44,55],[12,23,25,203])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_6 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_6 = true := by decide +kernel
-def h26Block5_7 : List NodeSpec := nodesWithIdentity [([0,2,3,4,6,380],[0]),([1,2,3,4,6,340],[0]),([1,2,3,4,6,379],[0]),([0,1,6,14,87,111],[19,22,33,85,88,205]),([0,1,4,17,87,111],[33]),([0,1,3,45,87,111],[22]),([0,1,3,4,22,111],[124]),([0,1,3,4,24,87],[81]),([0,1,4,14,41,87],[88]),([0,1,4,15,41,87],[81]),([0,1,4,41,87,253],[12,13]),([0,1,4,41,87,254],[12,13,81]),([0,1,3,4,87,247],[81]),([0,1,3,4,41,90],[11]),([0,1,3,4,41,94],[]),([0,1,2,4,87,254],[0,10]),([0,1,4,17,41,87],[12,85,206,207]),([0,1,4,41,42,87],[10,81]),([0,1,3,4,41,87],[81,147]),([0,1,2,4,87,199],[0,10]),([0,1,2,14,45,87],[22]),([0,1,2,4,26,87],[10]),([0,1,2,4,14,22],[124]),([0,1,4,17,87,164],[4,5,10]),([0,1,2,4,39,87],[10,54]),([0,1,2,4,17,90],[11]),([0,1,2,4,17,94],[]),([0,1,3,4,87,164],[0,10]),([0,1,3,4,87,165],[0,10]),([0,1,2,4,17,87],[10,209]),([0,1,2,3,45,90],[11]),([0,1,2,3,4,30],[]),([0,1,2,3,4,96],[211]),([0,1,3,4,87,135],[81]),([0,1,2,4,72,87],[10]),([0,1,2,3,47,94],[]),([0,1,2,3,4,100],[]),([0,1,2,3,4,66],[]),([1,2,3,4,6,333],[1]),([0,2,3,4,6,182],[0]),([0,1,2,3,4,76],[]),([1,2,3,4,22,293],[124]),([0,1,2,3,4,340],[]),([1,2,3,4,22,340],[0,218]),([0,1,2,3,4,189],[]),([0,2,3,4,22,189],[0,220]),([0,1,2,3,4,164],[]),([0,1,3,4,22,164],[0,142]),([0,1,2,4,15,22],[124]),([0,1,2,3,4,254],[]),([0,1,2,4,22,254],[0]),([0,1,2,3,22,304],[]),([0,1,2,3,99],[]),([0,1,2,3,4,99],[]),([0,1,2,3,22,99],[124]),([0,1,2,3,6,99],[]),([0,1,2,3,87,99],[]),([0,2,3,4,6,176],[0]),([0,1,2,3,4,24],[81]),([2,3,4,6,18,33],[12,34,36,223]),([0,2,3,4,6,398],[0]),([1,2,3,4,6,326],[0]),([1,2,3,4,6,397],[0]),([0,1,3,14,41,111],[88]),([0,1,3,16,41,111],[124]),([0,1,3,4,111,254],[124]),([0,1,3,4,41,122],[]),([0,1,3,41,111,246],[12,13]),([0,1,3,41,111,247],[12,13,124]),([0,1,2,3,111,247],[0,10])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_7 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_7 = true := by decide +kernel
-def h26Block5_8 : List NodeSpec := nodesWithIdentity [([0,1,3,41,45,111],[12,128,150,206]),([0,1,3,41,46,111],[10,124]),([0,1,3,4,41,111],[124,149]),([0,1,2,3,111,210],[0,10]),([0,1,2,14,17,111],[33]),([0,1,2,3,26,111],[10]),([0,1,2,3,14,24],[81]),([0,1,2,3,4,154],[225]),([0,1,3,4,111,165],[124]),([0,1,2,4,43,122],[]),([0,1,2,3,75,111],[10]),([0,1,2,3,4,157],[]),([1,2,3,4,6,341],[1]),([0,2,3,4,6,190],[0]),([0,1,2,3,45,122],[]),([0,1,2,3,4,81],[]),([0,1,3,45,111,131],[6,7,10]),([0,1,2,3,60,111],[10,66]),([0,1,3,4,111,131],[0,10]),([0,1,3,4,111,135],[0,10]),([0,1,2,3,45,111],[10,229]),([1,2,3,4,24,238],[81]),([0,1,2,3,4,326],[]),([1,2,3,4,24,326],[0,231]),([0,1,2,3,4,176],[]),([0,2,3,4,24,176],[0,232]),([0,1,2,3,4,131],[]),([0,1,3,4,24,131],[0,108]),([0,1,2,3,16,24],[81]),([0,1,2,4,24,265],[]),([0,1,2,4,156],[]),([0,1,2,3,4,156],[]),([0,1,2,4,24,156],[81]),([0,1,2,3,4,247],[]),([0,1,2,3,24,247],[0]),([0,1,2,4,6,156],[]),([0,1,2,4,111,156],[]),([1,2,3,4,41,413],[81,124]),([0,2,3,4,41,415],[81,124]),([0,1,3,4,41,252],[81,124]),([0,1,2,13,14,41],[81,88]),([0,1,2,4,13,254],[]),([0,1,2,3,13,247],[]),([0,1,2,3,4,414],[81,124]),([0,1,2,3,4,416],[0,1,10]),([0,1,2,3,4,255],[]),([1,2,3,4,41,361],[81]),([0,2,3,4,41,266],[81]),([0,1,3,4,41,263],[81]),([0,1,2,3,15,247],[]),([0,1,2,3,4,142],[]),([0,1,2,3,4,267],[81]),([1,2,3,4,41,373],[124]),([0,2,3,4,41,308],[124]),([0,1,3,4,41,307],[124]),([0,1,2,4,16,254],[]),([0,1,2,3,4,168],[]),([0,1,2,3,4,309],[81]),([0,1,2,4,22,253],[88]),([0,1,2,3,41,264],[81]),([0,1,2,3,41,268],[]),([1,2,3,4,41,340],[0]),([0,2,3,4,41,189],[0]),([0,1,3,4,41,164],[0]),([0,1,2,3,41,304],[88]),([0,1,2,3,41,99],[]),([1,2,3,4,41,418],[0,81]),([0,2,3,4,41,419],[0,81]),([0,1,3,4,41,262],[0,81]),([0,1,2,4,129,254],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_8 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_8 = true := by decide +kernel
-def h26Block5_9 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,269],[]),([0,1,2,4,41,303],[124]),([0,1,2,4,41,310],[]),([0,1,2,3,24,246],[88]),([1,2,3,4,41,326],[0]),([0,2,3,4,41,176],[0]),([0,1,3,4,41,131],[0]),([0,1,2,4,41,265],[88]),([0,1,2,4,41,156],[]),([1,2,3,4,41,421],[0,124]),([0,2,3,4,41,422],[0,124]),([0,1,3,4,41,306],[0,124]),([0,1,2,3,163,247],[]),([0,1,2,3,4,270],[]),([0,1,2,4,17,254],[0]),([1,2,3,4,41,385],[10,81]),([0,2,3,4,41,386],[10,81]),([0,1,2,4,42,254],[]),([0,1,2,3,45,247],[0]),([1,2,3,4,41,403],[10,124]),([0,2,3,4,41,404],[10,124]),([0,1,2,3,46,247],[]),([0,1,3,4,125,130],[]),([0,1,2,4,14,199],[124]),([0,1,2,3,14,210],[81]),([0,1,2,3,4,256],[]),([0,1,2,3,4,312],[]),([0,1,2,3,4,273],[]),([0,2,3,4,6,177],[0]),([0,1,2,3,4,26],[10]),([2,3,4,6,88,224],[5,89,91,245]),([0,2,3,4,6,424],[0]),([1,2,3,4,6,327],[0]),([1,2,3,4,6,423],[0]),([1,2,3,4,6,362],[1]),([0,2,3,4,6,271],[0]),([0,1,2,4,17,130],[]),([0,1,2,3,45,130],[]),([0,1,2,3,4,251],[]),([0,1,2,4,14,164],[124,142]),([0,1,2,14,17,39],[4,5,124]),([0,1,2,3,14,39],[0,81]),([0,1,2,14,17,45],[5,85,128,252]),([0,1,2,4,14,17],[124,250]),([0,1,2,3,14,75],[0,81]),([0,1,2,3,14,131],[81,108]),([0,1,2,14,45,60],[6,7,81]),([0,1,2,4,14,60],[0,81]),([0,1,2,4,14,72],[0,81]),([0,1,2,3,14,45],[81,253]),([1,2,3,4,26,126],[10]),([0,1,2,3,4,327],[]),([1,2,3,4,26,327],[0]),([0,2,3,4,26,82],[10]),([0,1,2,3,4,177],[]),([0,2,3,4,26,177],[0]),([0,1,3,4,26,194],[]),([0,1,3,4,195],[]),([0,1,2,3,4,195],[]),([0,1,3,4,26,195],[10]),([0,1,2,3,4,60],[]),([0,1,2,4,26,60],[0,66]),([0,1,2,3,4,39],[]),([0,1,2,3,26,39],[0,54]),([2,3,4,5,6,26],[256]),([0,1,3,4,6,195],[]),([0,1,3,4,14,195],[257]),([1,2,3,4,17,340],[0]),([0,2,3,4,17,189],[0]),([0,1,2,3,17,99],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_9 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_9 = true := by decide +kernel
-def h26Block5_10 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,200],[]),([1,2,3,4,17,327],[0]),([0,2,3,4,17,177],[0]),([0,1,3,4,17,195],[]),([0,1,2,4,17,60],[0]),([0,1,2,3,4,201],[]),([0,1,2,3,39,45],[0]),([0,1,2,3,4,316],[]),([0,1,2,3,4,202],[]),([1,2,3,4,45,326],[0]),([0,2,3,4,45,176],[0]),([0,1,2,4,45,156],[]),([0,1,2,3,4,209],[]),([1,2,3,4,45,327],[0]),([0,2,3,4,45,177],[0]),([0,1,3,4,45,195],[]),([0,1,2,3,4,211],[]),([0,1,2,3,4,278],[]),([0,1,2,3,4,212],[]),([4,10,12,85,220],[4,5,12,13]),([3,4,10,12,145,220],[]),([1,3,4,10,12,17],[10]),([3,4,10,12,17,220],[5,11,281]),([1,3,4,10,12,178],[10]),([1,4,10,12,14,220],[]),([1,4,10,55,220],[0,4,13,22,24,282]),([1,3,4,10,55,220],[0]),([1,4,10,12,55,220],[13,22,26]),([1,3,4,10,59,220],[0]),([1,3,4,12,18,220],[]),([1,3,4,12,32,220],[]),([1,3,4,10,33,220],[5]),([1,3,4,10,38,220],[5]),([1,3,4,10,12,224],[13]),([1,3,4,10,12,225],[5]),([2,4,10,85,145,220],[]),([1,2,4,41,85,220],[81]),([2,4,10,41,85,220],[11,12,103]),([1,2,4,85,171,220],[81]),([1,4,10,85,111,220],[]),([1,2,4,10,55,220],[0]),([1,4,10,55,85,220],[4,22,39]),([1,2,4,10,127,220],[0]),([1,2,4,18,85,220],[4]),([1,2,4,32,85,220],[12]),([1,2,4,10,88,220],[12]),([1,2,4,10,89,220],[12]),([1,2,4,10,85,224],[]),([1,2,4,10,85,225],[]),([1,4,10,87,145,220],[5,12,22,43,96,284]),([1,3,10,111,145,220],[]),([1,2,10,14,145,220],[]),([1,2,3,18,145,220],[]),([1,2,3,10,145,224],[]),([1,4,10,41,87,220],[11,12,13,26,96,103,206]),([1,2,4,10,220,254],[11,81]),([1,4,87,171,220],[4,5,12]),([1,3,4,111,171,220],[]),([1,2,4,14,171,220],[12]),([1,2,3,4,215,220],[81]),([1,2,3,4,171,224],[]),([1,2,3,4,171,225],[]),([1,4,10,17,87,220],[4,5,11,16,18,47,281]),([1,3,4,10,164,220],[10,11]),([1,4,10,87,178],[5,12,13]),([1,2,4,10,87,178],[10]),([1,3,4,10,111,178],[5]),([1,3,4,10,120,178],[10]),([1,2,4,10,14,178],[]),([1,2,3,4,18,178],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_10 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_10 = true := by decide +kernel
-def h26Block5_11 : List NodeSpec := nodesWithIdentity [([1,2,3,4,32,178],[]),([1,2,3,4,10,281],[10]),([1,4,10,55,87,220],[4,13,22,24,46,157,282]),([1,4,10,172,220],[11,22]),([1,4,18,87,220],[7,12,33,81,291,292]),([1,4,10,18,87,220],[7,12,33,34,72,103,291]),([1,4,32,87,220],[5,12,22]),([1,4,10,90,220],[0,22,33,88,212,291]),([1,4,10,87,90,220],[22,33,46,88,212,213,291]),([1,4,10,94,220],[5,12,22]),([1,4,10,87,224],[5,7,10,88,291,293]),([1,4,10,87,220,224],[5,7,88,91,281,291,293]),([1,4,10,87,225],[5,12,22]),([1,3,4,10,186,220],[5]),([1,10,14,111,220],[5,12,33,88]),([1,3,4,10,90,220],[0]),([1,4,10,90,111,220],[22,33,49]),([1,3,4,10,122,220],[0]),([1,3,10,111,224],[5,7,10,88,293,295]),([1,3,4,10,111,224],[10]),([1,3,10,111,220,224],[5,7,281]),([1,3,4,10,111,225],[10]),([1,2,4,10,174,220],[12]),([1,2,4,10,90,220],[0]),([1,4,10,14,90,220],[9,22,88]),([1,2,4,10,130,220],[0]),([1,2,14,18,220],[7,12,33,81,292,297]),([1,2,4,14,18,220],[81]),([1,2,10,14,18,220],[7,12,103]),([1,2,4,14,32,220],[81]),([1,2,3,4,176,220],[81,232]),([1,2,4,18,61,220],[7,12,81]),([1,2,4,10,61,220],[7,81]),([1,2,3,4,179,220],[81]),([1,2,3,4,18,220],[34,81]),([1,2,3,4,10,177],[10]),([1,3,4,10,133,224],[5,7,10]),([1,3,4,10,133,220],[7,10]),([1,2,3,4,10,180],[10]),([1,2,3,4,10,224],[10,91]),([3,4,10,12,85,286],[]),([3,10,12,145,286],[6,7,12,13]),([1,3,4,10,12,45],[10]),([3,4,10,12,45,286],[7,11,305]),([1,3,4,10,12,175],[10]),([1,3,10,12,14,286],[]),([1,3,4,12,44,286],[]),([1,3,4,12,54,286],[]),([1,3,4,10,55,286],[7]),([1,3,4,10,59,286],[7]),([1,3,4,10,12,239],[7]),([1,3,10,33,286],[0,6,13,33,35,306]),([1,3,4,10,33,286],[0]),([1,3,10,12,33,286],[13,26,33]),([1,3,4,10,38,286],[0]),([2,3,10,85,145,286],[]),([1,4,10,85,87,286],[]),([1,3,10,85,111,286],[7,12,33,39,132,307]),([1,2,10,14,85,286],[]),([1,2,4,44,85,286],[]),([1,2,3,10,88,286],[12]),([1,2,3,41,145,286],[124]),([2,3,10,41,145,286],[11,12,137]),([1,2,3,145,171,286],[124]),([1,3,10,87,145,286],[]),([1,2,3,10,33,286],[0]),([1,3,10,33,145,286],[6,33,43]),([1,2,3,10,160,286],[0]),([1,2,3,44,145,286],[6]),([1,2,3,54,145,286],[12])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_11 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_11 = true := by decide +kernel
-def h26Block5_12 : List NodeSpec := nodesWithIdentity [([1,2,3,10,123,286],[12]),([1,2,3,10,145,239],[]),([1,3,10,41,111,286],[11,12,13,26,132,137,206]),([1,2,3,10,247,286],[11,124]),([1,3,4,87,171,286],[]),([1,3,111,171,286],[6,7,12]),([1,2,3,14,171,286],[12]),([1,2,3,4,204,286],[124]),([1,2,3,4,171,239],[]),([1,3,10,45,111,286],[6,7,11,28,30,50,305]),([1,3,4,10,131,286],[10,11]),([1,3,4,10,87,175],[7]),([1,3,4,10,108,175],[10]),([1,3,10,111,175],[7,12,13]),([1,2,3,10,111,175],[10]),([1,2,3,10,14,175],[]),([1,2,3,4,44,175],[]),([1,2,3,4,54,175],[]),([1,2,3,4,10,280],[10]),([1,3,4,10,172,286],[7]),([1,10,14,87,286],[7,12,22,88]),([1,3,4,10,87,224],[10]),([1,4,10,87,224,286],[5,7,305]),([1,3,4,10,87,239],[10]),([1,3,10,90,286],[0,22,33,88,212,314]),([1,3,4,10,90,286],[0]),([1,3,10,87,90,286],[22,33,46]),([1,3,4,10,94,286],[0]),([1,3,10,33,111,286],[6,13,33,35,49,167,306]),([1,3,10,186,286],[11,33]),([1,3,44,111,286],[5,12,22,124,315,316]),([1,3,10,44,111,286],[5,12,22,23,60,137,315]),([1,3,54,111,286],[7,12,33]),([1,3,10,90,111,286],[22,33,49,88,212,213,314]),([1,3,10,122,286],[5,12,33]),([1,3,10,111,224,286],[5,7,88,91,293,295,305]),([1,3,10,111,239],[7,12,22]),([1,2,3,10,174,286],[12]),([1,2,3,10,90,286],[0]),([1,3,10,14,90,286],[9,33,88]),([1,2,3,10,130,286],[0]),([1,2,14,44,286],[5,12,22,124,316,318]),([1,2,3,14,44,286],[124]),([1,2,10,14,44,286],[5,12,137]),([1,2,3,14,54,286],[124]),([1,2,3,4,189,286],[124,220]),([1,2,3,44,51,286],[5,12,124]),([1,2,3,10,51,286],[5,124]),([1,2,3,4,192,286],[124]),([1,2,3,4,44,286],[23,124]),([1,3,4,10,133,286],[5,10]),([1,3,4,10,83,239],[10]),([1,2,3,4,10,193],[10]),([1,2,3,10,111,239],[10]),([0,3,4,10,12,17],[10]),([3,4,10,12,17,85],[4,11,307]),([0,3,4,10,12,328],[10]),([0,4,10,12,14,85],[]),([0,4,12,44,85],[1,5,12,21,22,322]),([0,3,4,12,44,85],[1]),([0,4,10,12,44,85],[2,12,22]),([0,3,4,12,54,85],[1]),([0,3,4,12,18,85],[4]),([0,3,4,12,32,85],[12]),([0,3,4,10,33,85],[]),([0,3,4,10,38,85],[]),([0,3,4,10,12,88],[12]),([0,3,4,10,12,89],[12]),([0,3,4,10,12,45],[10]),([3,4,10,12,45,145],[6,11,284])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_12 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_12 = true := by decide +kernel
-def h26Block5_13 : List NodeSpec := nodesWithIdentity [([0,3,4,10,12,324],[10]),([0,3,10,12,14,145],[]),([0,3,4,12,44,145],[6]),([0,3,4,12,54,145],[12]),([0,3,4,10,55,145],[]),([0,3,4,10,59,145],[]),([0,3,4,10,12,123],[12]),([0,3,12,18,145],[1,7,12,32,33,323]),([0,3,4,12,18,145],[1]),([0,3,10,12,18,145],[2,12,33]),([0,3,4,12,32,145],[1]),([0,1,4,12,14,44],[]),([0,1,4,10,14,55],[]),([0,1,3,12,14,18],[]),([0,1,3,10,14,33],[]),([0,1,3,4,12,28],[1]),([0,1,3,4,10,19],[0]),([0,3,4,12,44,189],[1,12,22]),([0,1,3,4,33,44],[5]),([0,1,3,4,38,44],[]),([0,1,3,4,12,51],[1,59]),([0,3,4,10,12,189],[1,22]),([0,1,3,4,12,44],[1,324]),([0,1,3,4,33,54],[]),([0,1,3,4,38,54],[]),([0,1,3,4,12,77],[1]),([1,3,4,10,55,340],[0,13,22]),([0,1,3,4,18,55],[7]),([0,1,3,4,32,55],[]),([0,1,3,4,10,56],[0,156]),([1,3,4,10,12,340],[0,22]),([0,1,3,4,10,55],[0,24]),([0,1,3,4,18,59],[]),([0,1,3,4,32,59],[]),([0,1,3,4,10,78],[0]),([0,3,4,12,18,176],[1,12,33]),([0,1,3,4,12,61],[1,71]),([0,3,4,10,12,176],[1,33]),([0,1,3,4,12,70],[1]),([0,1,3,4,12,18],[1,331]),([1,3,4,10,33,326],[0,13,33]),([0,1,3,4,10,62],[0,166]),([1,3,4,10,12,326],[0,33]),([0,1,3,4,10,71],[0]),([0,1,3,4,10,33],[0,35]),([0,1,3,4,10,164],[0]),([1,4,10,17,85,87],[4,5,307]),([1,3,4,10,17,55],[11,18,157,338]),([0,1,3,4,10,347],[0]),([0,4,10,85,87,145],[]),([0,3,10,85,111,145],[]),([0,2,10,14,85,145],[2,4,6,88,103,340]),([0,2,4,44,85,145],[6]),([0,2,3,18,85,145],[4]),([0,1,2,4,85,254],[0,1]),([0,4,10,41,85,87],[12,13,103]),([0,2,4,41,44,85],[2,11,103,322]),([0,2,4,41,53,85],[1,81]),([0,1,2,4,85,204],[0,1]),([0,1,4,10,17,87],[10]),([0,1,4,10,87,328],[10]),([0,1,4,41,85,87],[81]),([0,1,4,85,87,171],[81]),([0,1,4,18,85,87],[4]),([0,1,4,32,85,87],[12]),([0,1,4,10,87,88],[12]),([0,1,4,10,87,89],[12]),([0,1,4,10,85,90],[]),([0,1,4,10,85,94],[]),([0,1,10,14,85,111],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_13 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_13 = true := by decide +kernel
-def h26Block5_14 : List NodeSpec := nodesWithIdentity [([0,1,4,44,85,111],[]),([0,1,3,10,88,111],[12]),([1,2,3,4,10,340],[0]),([1,2,3,4,10,346],[0]),([0,1,2,14,18,85],[4]),([0,1,2,4,28,85],[1]),([0,2,4,44,85,189],[1,5,22]),([0,1,2,4,51,85],[1,59]),([0,1,2,4,44,88],[12]),([0,1,2,4,44,89],[]),([0,2,3,4,85,189],[0,1]),([0,2,3,4,85,192],[0,1]),([0,1,2,4,44,85],[1,341]),([0,1,2,3,18,88],[12]),([0,1,2,3,4,106],[343]),([0,2,3,4,85,179],[81]),([0,1,2,4,70,85],[1]),([0,1,2,3,32,89],[]),([0,1,2,3,4,107],[]),([0,1,2,3,4,63],[]),([1,2,3,4,10,330],[10]),([0,1,3,4,10,138],[0]),([0,1,2,3,4,73],[]),([0,1,2,3,10,99],[]),([0,1,2,3,85,99],[]),([0,1,3,4,10,131],[0]),([1,3,10,45,111,145],[6,7,284]),([1,3,4,10,33,45],[11,30,167,347]),([0,1,3,4,10,353],[0]),([0,1,2,3,145,247],[0,1]),([0,3,10,41,111,145],[12,13,137]),([0,2,3,18,41,145],[2,11,137,348]),([0,2,3,31,41,145],[1,124]),([0,1,2,3,145,215],[0,1]),([0,1,10,14,87,145],[]),([0,1,3,18,87,145],[]),([0,1,3,10,90,145],[]),([0,1,3,10,45,111],[10]),([0,1,3,10,111,324],[10]),([0,1,3,41,111,145],[124]),([0,1,3,111,145,171],[124]),([0,1,3,44,111,145],[6]),([0,1,3,54,111,145],[12]),([0,1,3,10,122,145],[]),([0,1,3,10,111,123],[12]),([1,2,3,4,10,326],[0]),([1,2,3,4,10,352],[0]),([0,1,2,14,44,145],[6]),([0,1,2,3,28,145],[1]),([0,1,2,3,4,158],[349]),([0,2,3,4,145,192],[124]),([0,1,2,4,54,123],[]),([0,1,2,3,77,145],[1]),([0,1,2,3,4,159],[]),([1,3,4,9,10,123],[0]),([1,2,3,4,10,343],[10]),([0,1,3,4,10,166],[0]),([0,1,2,3,18,123],[]),([0,1,2,3,4,79],[]),([0,2,3,18,145,176],[1,7,33]),([0,1,2,3,61,145],[1,71]),([0,2,3,4,145,176],[0,1]),([0,2,3,4,145,179],[0,1]),([0,1,2,3,18,145],[1,351]),([0,1,2,4,10,156],[]),([0,1,2,4,145,156],[]),([0,1,4,10,87,254],[13,81]),([0,1,3,10,111,247],[13,124]),([0,1,2,4,44,254],[0]),([1,2,3,4,41,457],[1,81])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_14 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_14 = true := by decide +kernel
-def h26Block5_15 : List NodeSpec := nodesWithIdentity [([0,1,3,4,41,358],[1,81,324]),([0,1,2,4,53,254],[]),([0,1,2,3,18,247],[0]),([1,2,3,4,41,465],[1,124]),([0,1,3,4,41,372],[1,124,331]),([0,1,2,3,31,247],[]),([0,1,4,14,87,171],[12]),([0,1,3,4,90,171],[]),([0,1,3,4,94,171],[]),([0,1,3,4,87,215],[81]),([0,1,3,14,111,171],[12]),([0,1,3,4,122,171],[]),([0,1,3,4,111,204],[124]),([0,2,3,4,171,174],[]),([0,1,2,4,14,204],[124]),([0,1,2,3,14,215],[81]),([0,1,2,3,4,438],[]),([0,1,2,3,4,447],[]),([0,1,2,3,4,439],[]),([1,3,4,10,87,340],[0,13]),([0,1,4,10,172,220],[0]),([1,3,4,10,172,293],[0]),([0,1,4,10,14,172],[]),([0,1,3,4,18,172],[]),([0,1,3,4,32,172],[]),([0,1,3,4,10,173],[0]),([0,1,4,10,87,224],[10]),([1,4,10,14,87,224],[5,51,88]),([0,1,4,10,87,323],[10]),([0,1,4,10,87,174],[12]),([0,1,14,18,87],[7,12,33,81,292,364]),([0,1,4,14,18,87],[81]),([0,1,10,14,18,87],[12,33,103]),([0,1,4,14,32,87],[81]),([0,1,3,4,87,176],[81,232]),([0,1,4,18,61,87],[12,33,81]),([0,1,4,10,61,87],[33,81]),([0,1,3,4,87,179],[81]),([0,1,3,4,18,87],[81,365]),([1,3,4,10,90,332],[0,22,33]),([0,1,3,4,10,181],[0,368]),([1,3,4,10,87,332],[0,33]),([0,1,3,4,10,182],[0]),([0,1,3,4,10,90],[0,212]),([1,3,4,10,111,326],[0,13]),([1,3,4,10,186,238],[0]),([0,1,3,10,186,286],[0]),([0,1,3,10,14,186],[]),([0,1,3,4,44,186],[]),([0,1,3,4,54,186],[]),([0,1,3,4,10,187],[0]),([0,1,3,10,111,224],[10]),([1,3,10,14,111,224],[7,51,88]),([0,1,3,10,111,323],[10]),([0,1,3,10,111,174],[12]),([0,1,14,44,111],[5,12,22,124,316,371]),([0,1,3,14,44,111],[124]),([0,1,10,14,44,111],[12,22,137]),([0,1,3,14,54,111],[124]),([0,1,3,4,111,189],[124,220]),([0,1,3,44,51,111],[12,22,124]),([0,1,3,10,51,111],[22,124]),([0,1,3,4,111,192],[124]),([0,1,3,4,44,111],[124,372]),([1,3,4,10,111,332],[0,22]),([0,1,3,4,10,190],[0]),([0,1,3,4,10,133],[0]),([0,1,2,3,4,28],[1]),([1,3,4,10,90,224],[5,91,213,375]),([0,1,3,4,10,365],[0])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_15 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_15 = true := by decide +kernel
-def h26Block5_16 : List NodeSpec := nodesWithIdentity [([1,2,3,4,10,423],[10]),([0,1,3,4,10,276],[0]),([0,1,2,4,44,174],[]),([0,1,2,3,18,174],[]),([0,1,2,3,4,427],[]),([1,2,3,4,10,332],[0]),([1,2,3,4,10,362],[0]),([0,1,2,4,14,189],[124,220]),([0,1,2,14,44,51],[5,22,124]),([0,1,2,3,14,51],[0,81]),([0,1,2,14,18,44],[5,103,137,380]),([0,1,2,4,14,44],[124,378]),([0,1,2,3,14,77],[0,81]),([0,1,2,3,14,176],[81,232]),([0,1,2,14,18,61],[7,33,81]),([0,1,2,4,14,61],[0,81]),([0,1,2,4,14,70],[0,81]),([0,1,2,3,14,18],[81,381]),([1,2,3,4,7,28],[1]),([0,1,2,3,4,332],[]),([1,2,3,4,28,332],[0,383]),([0,1,3,4,28,83],[1]),([0,2,3,4,28,196],[]),([0,2,3,4,197],[]),([0,1,2,3,4,197],[]),([0,2,3,4,28,197],[1]),([0,1,2,3,4,133],[]),([0,1,3,4,28,133],[0]),([0,1,2,3,4,61],[]),([0,1,2,4,28,61],[0,71]),([0,1,2,3,4,51],[]),([0,1,2,3,28,51],[0,59]),([1,3,4,9,10,28],[385]),([0,2,3,4,10,197],[]),([0,2,3,4,14,197],[386]),([1,2,3,4,44,340],[0]),([0,1,3,4,44,164],[0]),([0,1,2,3,44,99],[]),([0,1,2,3,4,205],[]),([1,2,3,4,44,332],[0]),([0,2,3,4,44,197],[]),([0,1,3,4,44,133],[0]),([0,1,2,4,44,61],[0]),([0,1,2,3,4,206],[]),([0,1,2,3,18,51],[0]),([0,1,2,3,4,450],[]),([0,1,2,3,4,207],[]),([1,2,3,4,18,326],[0]),([0,1,3,4,18,131],[0]),([0,1,2,4,18,156],[]),([0,1,2,3,4,214],[]),([1,2,3,4,18,332],[0]),([0,2,3,4,18,197],[]),([0,1,3,4,18,133],[0]),([0,1,2,3,4,216],[]),([0,1,2,3,4,444],[]),([0,1,2,3,4,217],[]),([2,4,12,85,220,286],[]),([2,3,12,145,220,286],[]),([1,4,12,87,220,286],[]),([1,3,12,111,220,286],[]),([1,2,12,14,220,286],[5,7,26,88,178,413]),([1,2,4,55,220,286],[7]),([1,2,3,33,220,286],[5]),([2,85,145,220,286],[4,5,6,7]),([1,2,4,45,85,220],[81]),([2,4,45,85,220,286],[7,11,414]),([1,2,4,85,175,220],[81]),([1,2,85,111,220,286],[]),([1,2,4,127,220,286],[7])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_16 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_16 = true := by decide +kernel
-def h26Block5_17 : List NodeSpec := nodesWithIdentity [([1,2,4,85,134,286],[]),([1,2,4,85,132,220],[7]),([1,2,88,220,286],[0,4,6,87,88,417]),([1,2,4,88,220,286],[0]),([1,2,85,88,220,286],[4,39,88]),([1,2,4,89,220,286],[0]),([1,2,3,17,145,286],[124]),([2,3,17,145,220,286],[5,11,145]),([1,2,3,145,178,286],[124]),([1,2,87,145,220,286],[]),([1,2,3,160,220,286],[5]),([1,2,3,134,145,286],[5]),([1,2,3,132,145,220],[]),([1,2,3,88,220,286],[0]),([1,2,88,145,220,286],[6,43,88]),([1,2,3,123,220,286],[0]),([1,2,14,17,220,286],[4,5,11,18,85,140,145]),([1,2,3,39,220,286],[11,124]),([1,2,4,87,178,286],[]),([1,2,3,111,178,286],[5]),([1,2,3,124,178,286],[124]),([1,2,3,4,203,286],[124]),([1,2,3,4,132,178],[]),([1,2,14,178,286],[5,6,7]),([1,2,4,14,178,286],[124]),([1,2,14,45,220,286],[6,7,11,30,86,106,414]),([1,2,4,60,220,286],[11,81]),([1,2,4,87,175,220],[7]),([1,2,4,109,175,220],[81]),([1,2,3,111,175,220],[]),([1,2,3,4,213,220],[81]),([1,2,3,4,134,175],[]),([1,2,14,175,220],[4,5,7]),([1,2,3,14,175,220],[81]),([1,2,4,172,220,286],[7]),([1,87,111,220,286],[5,7,22,33]),([1,2,4,18,87,220],[81]),([1,4,18,87,220,286],[7,12,414]),([1,2,4,87,132,220],[81]),([1,2,90,220,286],[0,22,33,88,212,420]),([1,2,4,90,220,286],[0]),([1,2,87,90,220,286],[22,46,88]),([1,2,4,94,220,286],[0]),([1,2,3,186,220,286],[5]),([1,2,3,44,111,286],[124]),([1,3,44,111,220,286],[5,12,145]),([1,2,3,111,134,286],[124]),([1,2,3,90,220,286],[0]),([1,2,90,111,220,286],[33,49,88]),([1,2,3,122,220,286],[0]),([1,2,14,44,220,286],[5,12,22,23,103,145,318]),([1,2,3,51,220,286],[12,124]),([1,2,3,134,170,286],[124]),([1,2,3,4,198,286],[124]),([1,2,14,134,286],[5,7,33]),([1,2,4,14,134,286],[124]),([1,2,14,18,220,286],[7,12,33,34,292,297,414]),([1,2,4,61,220,286],[12,81]),([1,2,4,132,143,220],[81]),([1,2,3,4,208,220],[81]),([1,2,14,132,220],[5,7,22]),([1,2,3,14,132,220],[81]),([1,2,14,88,220,286],[4,6,9,87,88,186,417]),([1,2,174,220,286],[11,88]),([1,2,14,90,220,286],[9,22,33,88,212,214,420]),([1,2,130,220,286],[12,88]),([0,1,2,4,220,254],[0]),([2,4,12,41,85,220],[11,13,178]),([1,4,12,41,87,220],[12,13,178]),([1,2,4,41,55,220],[11,26,178,282])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_17 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_17 = true := by decide +kernel
-def h26Block5_18 : List NodeSpec := nodesWithIdentity [([1,2,4,41,58,220],[0,81]),([0,1,2,4,220,348],[0]),([0,2,4,41,85,220],[81]),([0,2,4,85,220,320],[81]),([0,4,12,85,111,220],[]),([0,2,4,12,44,85],[1]),([0,4,12,44,85,220],[5,22,76]),([0,2,4,12,85,134],[1]),([0,2,4,33,85,220],[5]),([0,2,4,38,85,220],[5]),([0,2,4,12,88,220],[]),([0,2,4,12,89,220],[]),([0,2,4,12,85,224],[13]),([0,2,4,12,85,225],[5]),([0,4,12,87,145,220],[]),([0,3,12,111,145,220],[6,13,33,76,191,281]),([0,2,12,14,145,220],[]),([0,2,4,55,145,220],[]),([0,2,3,12,145,224],[13]),([0,1,3,4,12,164],[0,1]),([0,4,12,17,87,220],[4,5,281]),([0,3,4,12,17,44],[11,17,60,423]),([0,1,3,4,12,203],[0,1]),([0,1,4,41,87,220],[81]),([0,1,4,87,220,320],[81]),([0,1,4,12,17,87],[10]),([0,1,4,12,87,178],[10]),([0,1,4,33,87,220],[5]),([0,1,4,38,87,220],[5]),([0,1,4,12,90,220],[]),([0,1,4,12,94,220],[]),([0,1,4,12,87,224],[13]),([0,1,4,12,87,225],[5]),([0,1,12,14,111,220],[]),([0,1,4,55,111,220],[]),([0,1,3,12,111,224],[13]),([0,2,3,4,12,189],[0,1]),([0,2,3,4,12,198],[0,1]),([0,1,2,14,33,220],[5]),([0,1,2,4,19,220],[0]),([1,2,4,55,220,340],[0,4,22]),([0,1,2,4,56,220],[0,156]),([0,1,2,4,55,224],[7]),([0,1,2,4,55,225],[]),([1,2,3,4,220,340],[0]),([1,2,3,4,220,342],[0]),([0,1,2,4,55,220],[0,24]),([0,1,2,3,33,224],[5]),([0,1,2,3,4,233],[426]),([1,2,3,4,220,329],[81]),([0,1,2,4,71,220],[0]),([0,1,2,3,38,225],[]),([0,1,2,3,4,234],[]),([0,1,2,3,4,65],[]),([0,2,3,4,12,180],[10]),([0,1,3,4,12,136],[1]),([0,1,2,3,4,74],[]),([0,1,2,3,12,99],[]),([1,2,4,22,219,220],[428]),([0,1,2,3,99,220],[]),([0,2,4,45,85,220],[81]),([2,4,45,85,145,220],[6,11,285]),([0,2,4,85,220,324],[81]),([0,2,85,111,145,220],[]),([0,2,4,127,145,220],[]),([0,2,4,85,160,220],[5]),([0,2,4,85,134,145],[5]),([0,2,85,145,224],[1,5,7,88,90,431]),([0,2,4,85,145,224],[1]),([0,2,85,145,220,224],[5,76,88])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_18 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_18 = true := by decide +kernel
-def h26Block5_19 : List NodeSpec := nodesWithIdentity [([0,2,4,85,145,225],[1]),([0,1,2,88,111,220],[]),([0,1,2,85,111,224],[]),([1,2,4,85,220,340],[0,22]),([1,2,4,127,220,293],[0]),([0,1,2,4,128,220],[0]),([0,1,2,4,127,224],[]),([0,1,2,4,127,225],[]),([0,2,4,85,189,220],[1,22]),([0,2,4,85,134,153],[1]),([0,1,2,4,88,134],[]),([0,1,2,4,89,134],[]),([0,1,2,4,85,240],[1]),([1,2,4,88,220,327],[0,4,88]),([0,1,2,4,137,220],[0,185]),([1,2,4,85,220,327],[0,88]),([0,1,2,4,138,220],[0]),([0,1,2,4,88,220],[0,87]),([0,2,4,85,177,224],[1,5,88]),([0,1,2,4,85,133],[1]),([0,2,4,85,177,220],[1,88]),([0,1,2,4,85,136],[1]),([0,1,2,4,85,224],[1,437]),([0,1,2,4,60,220],[0]),([1,2,14,45,145,220],[6,7,285]),([1,2,4,45,88,220],[11,30,186,439]),([0,1,2,4,220,368],[0]),([0,1,2,3,39,145],[0,1]),([0,2,14,17,145,220],[4,5,145]),([0,2,3,17,145,224],[11,17,145,440]),([0,1,2,3,145,281],[0,1]),([0,1,87,111,145,220],[]),([0,1,2,90,145,220],[]),([0,1,2,87,145,224],[]),([1,2,4,160,219,220],[0]),([1,2,3,4,220,352],[81]),([0,1,3,4,134,160],[]),([0,1,2,14,160,220],[5]),([0,1,2,4,161,220],[0]),([0,1,2,3,160,224],[]),([0,1,2,3,4,250],[]),([0,2,3,134,144,145],[1]),([0,2,3,4,145,198],[124]),([0,1,2,14,134,145],[5]),([0,1,2,3,145,240],[1]),([0,1,2,3,4,257],[]),([0,1,2,14,45,220],[81]),([0,1,2,14,220,324],[81]),([0,1,2,14,17,145],[124]),([0,1,2,14,145,178],[124]),([0,1,2,130,145,220],[]),([1,2,3,4,220,327],[0]),([1,2,3,4,220,343],[0]),([0,2,3,145,177,224],[1,7,88]),([0,1,2,3,133,145],[1]),([0,2,3,4,145,177],[0,1]),([0,2,3,4,145,180],[0,1]),([0,1,2,3,145,224],[1,442]),([0,1,3,4,145,195],[444]),([0,1,3,4,195,220],[257]),([0,1,4,87,164,220],[4,10]),([0,1,2,14,39,220],[4,124]),([0,1,2,3,39,224],[0]),([0,1,4,87,111,178],[5]),([0,1,4,87,120,178],[10]),([0,1,2,4,90,178],[]),([0,1,2,4,94,178],[]),([0,1,2,4,87,281],[10]),([1,2,3,4,178,410],[]),([0,2,3,4,178,411],[10])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_19 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_19 = true := by decide +kernel
-def h26Block5_20 : List NodeSpec := nodesWithIdentity [([0,1,3,110,111,178],[10]),([0,1,2,4,149,178],[]),([0,1,2,3,4,500],[1]),([0,2,3,4,178,186],[]),([0,1,3,4,111,203],[124]),([0,1,2,14,111,178],[5]),([0,1,2,3,111,281],[10]),([0,1,2,3,4,440],[]),([1,2,3,4,178,454],[]),([0,1,3,4,120,203],[]),([0,1,2,4,178,185],[]),([0,1,2,3,4,441],[]),([1,2,3,4,178,465],[]),([0,1,2,14,124,178],[124]),([0,1,2,4,178,311],[]),([0,1,2,3,124,281],[]),([0,1,2,3,4,481],[]),([0,1,2,4,14,203],[124]),([0,1,2,3,4,482],[]),([0,1,2,4,130,178],[]),([0,1,2,3,170,281],[]),([0,1,2,3,4,442],[]),([1,2,4,87,220,340],[0,4]),([1,2,4,172,220,293],[0]),([0,1,4,111,172,220],[]),([0,1,2,4,173,220],[0]),([0,1,2,4,172,224],[]),([0,1,2,4,172,225],[]),([0,1,4,18,87,220],[81]),([1,4,18,87,111,220],[12,33,97]),([0,1,4,87,220,336],[81]),([0,1,4,87,186,220],[5]),([0,1,87,111,224],[5,7,10,88,293,452]),([0,1,4,87,111,224],[10]),([0,1,87,111,220,224],[5,88,281]),([0,1,4,87,111,225],[10]),([1,2,4,90,220,332],[0,22,88]),([0,1,2,4,181,220],[0,368]),([1,2,4,87,220,332],[0,88]),([0,1,2,4,182,220],[0]),([0,1,2,4,90,220],[0,212]),([0,1,2,4,87,177],[10]),([0,1,4,87,133,224],[5,10,88]),([0,1,4,87,133,220],[10,88]),([0,1,2,4,87,180],[10]),([0,1,2,4,87,224],[10,455]),([0,1,2,4,61,220],[0]),([1,2,14,18,111,220],[7,33,97]),([1,2,4,18,90,220],[12,34,214,457]),([0,1,2,4,220,337],[0]),([1,2,4,186,219,220],[0]),([1,2,3,4,220,397],[81]),([0,1,2,14,186,220],[5]),([0,1,2,4,187,220],[0]),([0,1,2,3,186,224],[]),([0,1,2,3,4,401],[]),([0,1,2,3,51,111],[0,10]),([0,1,14,44,111,220],[5,22,145]),([0,1,3,44,111,224],[12,60,145,459]),([0,1,2,3,111,240],[0,10]),([0,1,2,14,18,220],[81]),([0,1,2,14,220,336],[81]),([0,1,2,111,174,220],[]),([0,1,2,14,44,111],[124]),([0,1,2,14,111,134],[124]),([1,2,3,4,220,332],[0]),([1,2,3,4,220,341],[0]),([0,1,2,3,111,177],[10]),([0,1,3,111,133,224],[7,10,88]),([0,1,3,4,111,133],[0,10])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_20 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_20 = true := by decide +kernel
-def h26Block5_21 : List NodeSpec := nodesWithIdentity [([0,1,3,4,111,136],[0,10]),([0,1,2,3,111,224],[10,460]),([0,2,3,4,111,197],[462]),([0,2,3,4,197,220],[386]),([0,1,2,14,51,220],[22,124]),([0,1,2,3,51,224],[0]),([1,2,3,4,134,287],[]),([0,1,3,4,134,235],[1]),([0,1,2,4,114,134],[]),([0,1,2,3,4,499],[1]),([1,2,3,4,134,335],[]),([0,2,3,4,153,198],[]),([0,1,2,4,134,141],[]),([0,1,2,3,4,274],[]),([1,2,3,4,134,403],[]),([0,1,2,14,134,170],[124]),([0,1,2,4,134,315],[]),([0,1,2,3,170,240],[]),([0,1,2,3,4,485],[]),([0,1,2,4,14,198],[124]),([0,1,2,3,4,486],[]),([0,1,2,4,134,174],[]),([0,1,2,3,4,275],[]),([1,2,4,14,220,327],[0,4]),([0,1,2,4,220,276],[0]),([1,2,4,14,220,332],[0,22]),([0,1,2,4,220,271],[0]),([1,2,3,4,224,327],[0]),([0,2,3,4,26,260],[469]),([0,1,3,4,195,224],[]),([0,1,2,4,60,224],[0]),([0,2,3,4,8,177],[]),([1,2,3,4,126,177],[]),([0,2,3,4,11,177],[]),([0,2,3,4,83,177],[]),([0,2,3,4,85,177],[0,1]),([0,2,3,4,121,177],[]),([0,2,3,4,153,177],[]),([0,1,2,4,109,177],[]),([0,1,2,3,124,177],[]),([0,1,2,3,4,279],[]),([0,2,3,4,177,229],[]),([1,2,3,4,224,332],[0]),([0,2,3,4,197,224],[]),([0,1,3,4,28,242],[470]),([0,1,2,4,61,224],[0]),([1,2,3,4,7,133],[]),([0,1,3,4,133,218],[]),([0,1,3,4,11,133],[]),([0,1,3,4,82,133],[]),([0,1,2,4,133,143],[]),([0,1,2,3,133,170],[]),([0,1,2,3,4,282],[]),([0,1,3,4,87,133],[0,10]),([0,1,3,4,108,133],[]),([0,1,3,4,120,133],[]),([0,1,3,4,133,230],[]),([1,2,4,177,219,220],[0]),([0,2,3,4,177,232],[]),([1,2,4,133,219,220],[0]),([0,1,3,4,133,228],[]),([0,1,2,3,4,445],[]),([0,1,2,3,4,283],[]),([0,1,2,3,247,286],[0]),([2,3,12,41,145,286],[11,13,195]),([1,3,12,41,111,286],[12,13,195]),([1,2,3,33,41,286],[11,26,195,471]),([1,2,3,37,41,286],[0,124]),([0,1,2,3,286,355],[0]),([0,4,12,85,87,286],[4,13,22,116,172,305])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_21 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_21 = true := by decide +kernel
-def h26Block5_22 : List NodeSpec := nodesWithIdentity [([0,3,12,85,111,286],[]),([0,2,12,14,85,286],[]),([0,2,3,33,85,286],[]),([0,2,3,12,88,286],[]),([0,2,3,41,145,286],[124]),([0,2,3,145,286,320],[124]),([0,3,12,87,145,286],[]),([0,2,3,12,18,145],[1]),([0,3,12,18,145,286],[7,33,116]),([0,2,3,12,132,145],[1]),([0,2,3,55,145,286],[7]),([0,2,3,59,145,286],[7]),([0,2,3,12,123,286],[]),([0,2,3,12,145,239],[7]),([0,1,3,4,12,131],[0,1]),([0,3,12,45,111,286],[6,7,305]),([0,3,4,12,18,45],[11,29,72,472]),([0,1,3,4,12,213],[0,1]),([0,1,12,14,87,286],[]),([0,1,3,33,87,286],[]),([0,1,3,12,90,286],[]),([0,1,3,41,111,286],[124]),([0,1,3,111,286,320],[124]),([0,1,3,12,45,111],[10]),([0,1,3,12,111,175],[10]),([0,1,3,55,111,286],[7]),([0,1,3,59,111,286],[7]),([0,1,3,12,122,286],[]),([0,1,3,12,111,239],[7]),([0,2,3,4,12,176],[0,1]),([0,2,3,4,12,208],[0,1]),([0,1,2,14,55,286],[7]),([0,1,2,3,19,286],[0]),([0,1,2,3,4,296],[473]),([1,2,3,4,286,342],[124]),([0,1,2,4,59,239],[]),([0,1,2,3,78,286],[0]),([0,1,2,3,4,297],[]),([0,3,4,11,12,239],[1]),([0,2,3,4,12,193],[10]),([0,1,3,4,12,169],[1]),([0,1,2,3,33,239],[]),([0,1,2,3,4,80],[]),([1,2,3,33,286,326],[0,6,33]),([0,1,2,3,62,286],[0,166]),([1,2,3,4,286,326],[0]),([1,2,3,4,286,329],[0]),([0,1,2,3,33,286],[0,35]),([0,1,2,4,12,156],[]),([1,2,3,24,285,286],[477]),([0,1,2,4,156,286],[]),([0,1,2,3,39,286],[0]),([2,3,17,85,145,286],[4,11,201]),([1,2,14,17,85,286],[4,5,201]),([1,2,3,17,88,286],[11,18,201,480]),([0,1,2,3,286,369],[0]),([0,2,3,17,145,286],[124]),([0,2,3,145,286,328],[124]),([0,2,85,87,145,286],[]),([0,2,3,127,145,286],[7]),([0,2,3,85,160,286],[]),([0,2,3,85,132,145],[7]),([0,2,3,85,145,224],[1]),([0,2,85,145,224,286],[7,88,116]),([0,2,3,85,145,239],[1]),([0,1,2,4,60,85],[0,1]),([0,2,14,45,85,286],[6,7,414]),([0,2,4,45,85,224],[11,29,112,481]),([0,1,2,4,85,280],[0,1]),([0,1,85,87,111,286],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_22 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_22 = true := by decide +kernel
-def h26Block5_23 : List NodeSpec := nodesWithIdentity [([0,1,2,87,88,286],[]),([0,1,2,85,90,286],[]),([1,2,3,127,285,286],[0]),([1,2,3,4,286,346],[124]),([0,1,3,4,127,132],[]),([0,1,2,14,127,286],[7]),([0,1,2,3,128,286],[0]),([0,1,2,3,4,301],[]),([0,2,4,84,85,132],[1]),([0,2,3,4,85,208],[81]),([0,1,2,14,85,132],[7]),([0,1,2,4,85,258],[1]),([0,1,2,3,88,132],[]),([0,1,2,3,4,249],[]),([0,1,2,14,17,286],[124]),([0,1,2,14,286,328],[124]),([0,1,2,14,45,85],[81]),([0,1,2,14,85,175],[81]),([0,1,2,85,130,286],[]),([0,2,3,4,85,193],[0,1]),([1,2,3,88,286,327],[0,6,88]),([0,1,2,3,137,286],[0,185]),([1,2,3,4,286,327],[0]),([1,2,3,4,286,330],[0]),([0,1,2,3,88,286],[0,87]),([0,1,3,4,85,195],[257]),([0,1,3,4,195,286],[444]),([1,2,3,145,286,326],[0,33]),([1,2,3,160,238,286],[0]),([0,1,2,3,161,286],[0]),([0,1,2,3,160,239],[]),([0,2,3,145,176,286],[1,33]),([0,2,3,121,132,145],[1]),([0,1,2,3,145,258],[1]),([0,1,2,3,123,132],[]),([1,2,3,145,286,327],[0,88]),([1,2,3,123,126,286],[0]),([0,1,2,3,166,286],[0]),([0,2,3,145,177,286],[1,88]),([0,2,3,82,145,239],[1]),([0,1,2,3,145,169],[1]),([0,1,3,111,131,286],[6,10]),([0,1,2,14,60,286],[6,81]),([1,2,3,4,175,394],[]),([0,2,3,4,175,395],[10]),([0,1,4,86,87,175],[10]),([0,1,2,3,116,175],[]),([0,1,2,3,4,515],[1]),([0,2,3,4,172,175],[]),([0,1,3,87,111,175],[7]),([0,1,3,4,87,213],[81]),([0,1,2,14,87,175],[7]),([0,1,2,4,87,280],[10]),([0,1,2,3,90,175],[]),([0,1,2,3,4,443],[]),([1,2,3,4,175,453],[]),([0,1,3,108,111,175],[10]),([0,1,3,4,108,213],[]),([0,1,2,3,175,191],[]),([0,1,2,3,4,448],[]),([1,2,3,4,175,457],[]),([0,1,2,14,109,175],[81]),([0,1,2,4,109,280],[]),([0,1,2,3,175,272],[]),([0,1,2,3,4,483],[]),([0,1,2,3,122,175],[]),([0,1,2,3,111,280],[10]),([0,1,2,3,14,213],[81]),([0,1,2,3,4,484],[]),([0,1,2,3,130,175],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_23 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_23 = true := by decide +kernel
-def h26Block5_24 : List NodeSpec := nodesWithIdentity [([0,1,2,4,143,280],[]),([0,1,2,3,4,449],[]),([0,1,2,3,51,286],[0]),([1,3,44,87,111,286],[12,22,130]),([1,2,14,44,87,286],[5,22,130]),([1,2,3,44,90,286],[12,23,130,491]),([0,1,2,3,286,322],[0]),([1,2,3,172,285,286],[0]),([1,2,3,4,286,379],[124]),([0,1,3,111,172,286],[7]),([0,1,2,14,172,286],[7]),([0,1,2,3,173,286],[0]),([0,1,2,3,4,383],[]),([0,1,3,44,111,286],[124]),([0,1,3,111,286,321],[124]),([0,1,3,87,186,286],[]),([0,1,3,87,111,224],[10]),([0,1,87,111,224,286],[7,88,305]),([0,1,3,87,111,239],[10]),([0,1,2,4,61,87],[0,10]),([0,1,14,18,87,286],[7,33,414]),([0,1,4,18,87,224],[12,72,112,492]),([0,1,2,4,87,258],[0,10]),([0,1,2,14,44,286],[124]),([0,1,2,14,286,321],[124]),([0,1,2,87,174,286],[]),([0,1,2,14,18,87],[81]),([0,1,2,14,87,132],[81]),([0,1,3,4,87,169],[0,10]),([1,2,3,90,286,332],[0,33,88]),([0,1,2,3,181,286],[0,368]),([1,2,3,4,286,332],[0]),([1,2,3,4,286,333],[0]),([0,1,2,3,90,286],[0,212]),([0,2,3,4,87,197],[386]),([0,2,3,4,197,286],[462]),([1,2,3,111,286,326],[0,6]),([1,2,3,186,238,286],[0]),([0,1,2,3,187,286],[0]),([0,1,2,3,186,239],[]),([1,2,3,111,286,332],[0,88]),([0,1,2,3,190,286],[0]),([0,1,3,111,133,286],[10,88]),([0,1,3,83,111,239],[10]),([0,1,2,3,111,193],[10]),([0,1,2,14,61,286],[33,81]),([1,2,3,4,132,231],[]),([0,1,3,4,132,226],[1]),([0,1,2,3,132,150],[]),([0,1,2,3,4,514],[1]),([1,2,3,4,132,334],[]),([0,2,3,4,121,208],[]),([0,1,2,3,132,167],[]),([0,1,2,3,4,313],[]),([1,2,3,4,132,385],[]),([0,1,2,14,132,143],[81]),([0,1,2,4,143,258],[]),([0,1,2,3,132,277],[]),([0,1,2,3,4,487],[]),([0,1,2,3,14,208],[81]),([0,1,2,3,4,488],[]),([0,1,2,3,132,174],[]),([0,1,2,3,4,314],[]),([0,1,2,4,109,258],[]),([1,2,3,14,286,327],[0,6]),([0,1,2,3,276,286],[0]),([1,2,3,14,286,332],[0,33]),([0,1,2,3,271,286],[0]),([1,2,3,177,285,286],[0]),([0,2,3,4,177,288],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_24 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_24 = true := by decide +kernel
-def h26Block5_25 : List NodeSpec := nodesWithIdentity [([1,2,3,133,285,286],[0]),([0,1,3,4,133,295],[]),([1,2,3,4,57,239],[]),([0,1,2,4,97,239],[1]),([0,1,2,3,155,239],[]),([0,1,2,3,4,508],[1]),([1,2,3,4,239,360],[]),([0,2,3,4,82,193],[]),([0,1,2,3,162,239],[]),([0,1,2,3,4,317],[]),([1,2,3,4,239,458],[]),([0,1,3,4,83,169],[]),([0,1,2,3,188,239],[]),([0,1,2,3,4,451],[]),([0,1,2,3,4,452],[]),([0,1,2,3,4,318],[]),([0,4,12,41,85,87],[2,11,12,13,172,178,206]),([0,2,4,12,85,254],[11,81]),([0,3,12,41,111,145],[2,11,12,13,191,195,206]),([0,2,3,12,145,247],[11,124]),([0,1,4,12,87,254],[12,81]),([0,1,3,12,111,247],[12,124]),([0,1,2,4,55,254],[0]),([0,2,3,4,41,437],[0,81,501]),([0,1,3,4,41,259],[0,81,328]),([0,1,2,4,58,254],[]),([0,1,2,3,33,247],[0]),([0,2,3,4,41,446],[0,124,503]),([0,1,3,4,41,305],[0,124,335]),([0,1,2,3,37,247],[]),([0,4,85,87,320],[5,13]),([0,3,4,85,111,320],[]),([0,2,4,14,85,320],[13]),([0,2,3,4,88,320],[]),([0,2,3,4,89,320],[]),([0,2,3,4,85,355],[81]),([0,3,4,87,145,320],[]),([0,3,111,145,320],[7,13]),([0,2,3,14,145,320],[13]),([0,2,3,4,123,320],[]),([0,2,3,4,145,348],[124]),([0,1,4,14,87,320],[13]),([0,1,3,4,90,320],[]),([0,1,3,4,94,320],[]),([0,1,3,4,87,355],[81]),([0,1,3,14,111,320],[13]),([0,1,3,4,122,320],[]),([0,1,3,4,111,348],[124]),([1,2,3,4,320,323],[]),([0,1,2,4,14,348],[124]),([0,1,2,3,14,355],[81]),([0,1,2,3,4,490],[]),([0,1,2,3,4,491],[]),([0,1,2,3,4,507],[]),([0,4,12,17,85,87],[4,5,11,16,17,148,307]),([0,3,4,12,85,164],[10,11]),([0,4,12,87,328],[4,12]),([0,2,4,12,87,328],[10]),([0,3,4,12,111,328],[4]),([0,3,4,12,120,328],[10]),([0,2,4,12,14,328],[]),([0,2,3,4,33,328],[]),([0,2,3,4,38,328],[]),([0,2,3,4,12,369],[10]),([0,4,12,44,85,87],[5,12,21,22,60,125,322]),([0,4,12,85,321],[11,22]),([0,4,33,85,87],[6,13,33,81,520,521]),([0,4,12,33,85,87],[6,13,33,36,167,178,520]),([0,4,38,85,87],[4,13,22]),([0,4,12,87,88],[4,6,10,88,522,523])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_25 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_25 = true := by decide +kernel
-def h26Block5_26 : List NodeSpec := nodesWithIdentity [([0,4,12,85,87,88],[4,6,88,89,307,522,523]),([0,4,12,87,89],[4,13,22]),([0,4,12,85,90],[1,22,33,88,520,524]),([0,4,12,85,87,90],[22,33,88,125,213,520,524]),([0,4,12,85,94],[4,13,22]),([0,3,4,12,85,336],[4]),([0,12,14,85,111],[4,13,33,88]),([0,3,4,12,85,90],[1]),([0,4,12,85,90,111],[22,33,82]),([0,3,4,12,85,122],[1]),([0,3,12,88,111],[4,6,10,88,523,526]),([0,3,4,12,88,111],[10]),([0,3,12,85,88,111],[4,6,307]),([0,3,4,12,89,111],[10]),([0,2,4,12,85,323],[13]),([0,2,4,12,85,90],[1]),([0,4,12,14,85,90],[8,22,88]),([0,2,4,12,85,130],[1]),([0,2,14,33,85],[6,13,33,81,521,528]),([0,2,4,14,33,85],[81]),([0,2,12,14,33,85],[6,13,178]),([0,2,4,14,38,85],[81]),([0,2,3,4,85,326],[81,231]),([0,2,4,33,62,85],[6,13,81]),([0,2,4,12,62,85],[6,81]),([0,2,3,4,85,329],[81]),([0,2,3,4,33,85],[36,81]),([0,2,3,4,12,327],[10]),([0,3,4,12,88,137],[4,6,10]),([0,3,4,12,85,137],[6,10]),([0,2,3,4,12,330],[10]),([0,2,3,4,12,88],[10,89]),([0,3,12,45,111,145],[6,7,11,28,29,150,284]),([0,3,4,12,131,145],[10,11]),([0,3,4,12,87,324],[6]),([0,3,4,12,108,324],[10]),([0,3,12,111,324],[6,12]),([0,2,3,12,111,324],[10]),([0,2,3,12,14,324],[]),([0,2,3,4,55,324],[]),([0,2,3,4,59,324],[]),([0,2,3,4,12,368],[10]),([0,3,4,12,145,321],[6]),([0,12,14,87,145],[6,13,22,88]),([0,3,4,12,87,88],[10]),([0,4,12,87,88,145],[4,6,284]),([0,3,4,12,87,123],[10]),([0,3,12,90,145],[1,22,33,88,524,538]),([0,3,4,12,90,145],[1]),([0,3,12,87,90,145],[22,33,125]),([0,3,4,12,94,145],[1]),([0,3,12,18,111,145],[7,12,32,33,72,82,323]),([0,3,12,145,336],[11,33]),([0,3,55,111,145],[4,13,22,124,539,540]),([0,3,12,55,111,145],[4,13,22,25,157,195,539]),([0,3,59,111,145],[6,13,33]),([0,3,12,90,111,145],[22,33,82,88,213,524,538]),([0,3,12,122,145],[4,13,33]),([0,3,12,88,111,145],[4,6,88,89,284,523,526]),([0,3,12,111,123],[6,13,22]),([0,2,3,12,145,323],[13]),([0,2,3,12,90,145],[1]),([0,3,12,14,90,145],[8,33,88]),([0,2,3,12,130,145],[1]),([0,2,14,55,145],[4,13,22,124,540,542]),([0,2,3,14,55,145],[124]),([0,2,12,14,55,145],[4,13,195]),([0,2,3,14,59,145],[124]),([0,2,3,4,145,340],[124,218]),([0,2,3,55,56,145],[4,13,124])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_26 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_26 = true := by decide +kernel
-def h26Block5_27 : List NodeSpec := nodesWithIdentity [([0,2,3,12,56,145],[4,124]),([0,2,3,4,145,342],[124]),([0,2,3,4,55,145],[25,124]),([0,3,4,12,137,145],[4,10]),([0,3,4,12,123,218],[10]),([0,2,3,4,12,343],[10]),([0,2,3,12,111,123],[10]),([0,3,4,12,87,189],[1,12]),([0,1,4,12,85,321],[1]),([0,3,4,12,153,321],[1]),([0,1,4,12,14,321],[]),([0,1,3,4,33,321],[]),([0,1,3,4,38,321],[]),([0,1,3,4,12,322],[1]),([0,1,4,12,87,323],[13]),([0,1,4,12,87,88],[10]),([0,4,12,14,87,88],[4,51,88]),([0,1,4,12,87,174],[10]),([0,1,14,33,87],[6,13,33,81,521,548]),([0,1,4,14,33,87],[81]),([0,1,12,14,33,87],[13,33,178]),([0,1,4,14,38,87],[81]),([0,1,3,4,87,326],[81,231]),([0,1,4,33,62,87],[13,33,81]),([0,1,4,12,62,87],[33,81]),([0,1,3,4,87,329],[81]),([0,1,3,4,33,87],[81,549]),([0,1,3,4,12,332],[1,383]),([0,3,4,12,90,181],[1,22,33]),([0,3,4,12,87,181],[1,33]),([0,1,3,4,12,333],[1]),([0,1,3,4,12,90],[1,524]),([0,3,4,12,111,176],[1,12]),([0,3,4,12,121,336],[1]),([0,1,3,12,145,336],[1]),([0,1,3,12,14,336],[]),([0,1,3,4,55,336],[]),([0,1,3,4,59,336],[]),([0,1,3,4,12,337],[1]),([0,1,3,12,111,323],[13]),([0,1,3,12,88,111],[10]),([0,3,12,14,88,111],[6,51,88]),([0,1,3,12,111,174],[10]),([0,1,14,55,111],[4,13,22,124,540,556]),([0,1,3,14,55,111],[124]),([0,1,12,14,55,111],[13,22,195]),([0,1,3,14,59,111],[124]),([0,1,3,4,111,340],[124,218]),([0,1,3,55,56,111],[13,22,124]),([0,1,3,12,56,111],[22,124]),([0,1,3,4,111,342],[124]),([0,1,3,4,55,111],[124,557]),([0,3,4,12,111,181],[1,22]),([0,1,3,4,12,341],[1]),([0,2,3,4,12,424],[10]),([0,1,3,4,12,365],[1]),([0,1,2,4,55,323],[]),([0,1,2,3,33,323],[]),([0,1,2,3,4,425],[]),([0,1,3,4,12,137],[0,1]),([0,1,2,3,4,19],[0]),([0,3,4,12,88,90],[4,89,213,564]),([0,1,3,4,12,276],[0,1]),([0,2,3,4,12,181],[0,1]),([0,2,3,4,12,271],[0,1]),([0,1,2,4,14,340],[124,218]),([0,1,2,14,55,56],[4,22,124]),([0,1,2,3,14,56],[0,81]),([0,1,2,14,33,55],[4,178,195,568]),([0,1,2,4,14,55],[124,566])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_27 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_27 = true := by decide +kernel
-def h26Block5_28 : List NodeSpec := nodesWithIdentity [([0,1,2,3,14,78],[0,81]),([0,1,2,3,14,326],[81,231]),([0,1,2,14,33,62],[6,33,81]),([0,1,2,4,14,62],[0,81]),([0,1,2,4,14,71],[0,81]),([0,1,2,3,14,33],[81,569]),([1,2,3,4,19,344],[]),([1,2,3,4,345],[]),([0,1,2,3,4,345],[]),([1,2,3,4,19,345],[0]),([0,1,2,3,4,181],[]),([0,2,3,4,19,181],[0,368]),([0,1,2,3,4,137],[]),([0,1,3,4,19,137],[0,185]),([0,1,2,3,4,62],[]),([0,1,2,4,19,62],[0,166]),([0,1,2,3,4,56],[]),([0,1,2,3,19,56],[0,156]),([1,2,3,4,12,345],[575]),([1,2,3,4,14,345],[576]),([1,2,3,4,22,339],[579]),([0,2,3,4,55,189],[0]),([0,1,3,4,55,164],[0]),([0,1,2,3,55,99],[]),([0,1,2,3,4,349],[]),([1,2,3,4,55,345],[]),([0,2,3,4,55,181],[0]),([0,1,3,4,55,137],[0]),([0,1,2,4,55,62],[0]),([0,1,2,3,4,350],[]),([0,1,2,3,33,56],[0]),([0,1,2,3,4,492],[]),([0,1,2,3,4,351],[]),([1,2,3,4,24,325],[592]),([0,2,3,4,33,176],[0]),([0,1,3,4,33,131],[0]),([0,1,2,4,33,156],[]),([0,1,2,3,4,354],[]),([1,2,3,4,33,345],[]),([0,2,3,4,33,181],[0]),([0,1,3,4,33,137],[0]),([0,1,2,3,4,356],[]),([0,1,2,3,4,493],[]),([0,1,2,3,4,357],[]),([0,2,14,17,85,145],[4,5,11,17,85,198,201]),([0,2,3,39,85,145],[11,124]),([0,1,4,85,87,164],[5,10]),([0,1,2,14,39,85],[5,124]),([0,1,2,3,39,88],[0]),([0,2,4,87,145,328],[]),([0,2,3,111,145,328],[4]),([0,2,3,124,145,328],[124]),([0,2,3,4,160,328],[]),([0,2,3,4,145,347],[124]),([0,2,14,145,328],[4,7]),([0,2,4,14,145,328],[124]),([0,1,4,87,111,328],[4]),([0,1,4,87,120,328],[10]),([0,1,2,4,90,328],[]),([0,1,2,4,94,328],[]),([0,1,2,4,87,369],[10]),([1,2,3,4,328,410],[10]),([0,2,3,4,328,411],[]),([0,1,3,110,111,328],[10]),([0,1,2,4,149,328],[]),([0,1,2,3,4,528],[0]),([1,2,3,4,328,336],[]),([0,1,3,4,111,347],[124]),([0,1,2,14,111,328],[4]),([0,1,2,3,111,369],[10])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_28 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_28 = true := by decide +kernel
-def h26Block5_29 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,455],[]),([0,2,3,4,328,436],[]),([0,1,3,4,120,347],[]),([0,1,2,4,185,328],[]),([0,1,2,3,4,520],[]),([0,2,3,4,328,446],[]),([0,1,2,14,124,328],[124]),([0,1,2,4,311,328],[]),([0,1,2,3,124,369],[]),([0,1,2,3,4,527],[]),([0,1,2,4,14,347],[124]),([0,1,2,3,4,456],[]),([0,1,2,4,130,328],[]),([0,1,2,3,319,369],[]),([0,1,2,3,4,512],[]),([0,2,14,45,85,145],[6,7,11,29,86,181,285]),([0,2,4,60,85,145],[11,81]),([0,2,4,85,87,324],[6]),([0,2,4,85,109,324],[81]),([0,2,3,85,111,324],[]),([0,2,3,4,127,324],[]),([0,2,3,4,85,353],[81]),([0,2,14,85,324],[5,6]),([0,2,3,14,85,324],[81]),([0,2,4,85,145,321],[6]),([0,85,87,111,145],[4,6,22,33]),([0,2,4,33,85,87],[81]),([0,4,33,85,87,145],[6,13,285]),([0,2,4,85,87,160],[81]),([0,2,85,90,145],[1,22,33,88,524,612]),([0,2,4,85,90,145],[1]),([0,2,85,87,90,145],[22,88,125]),([0,2,4,85,94,145],[1]),([0,2,3,85,145,336],[4]),([0,2,3,55,111,145],[124]),([0,3,55,85,111,145],[4,13,201]),([0,2,3,111,127,145],[124]),([0,2,3,85,90,145],[1]),([0,2,85,90,111,145],[33,82,88]),([0,2,3,85,122,145],[1]),([0,2,14,55,85,145],[4,13,22,25,178,201,542]),([0,2,3,56,85,145],[13,124]),([0,2,3,127,145,319],[124]),([0,2,3,4,145,346],[124]),([0,2,14,127,145],[4,6,33]),([0,2,4,14,127,145],[124]),([0,2,14,33,85,145],[6,13,33,36,285,521,528]),([0,2,4,62,85,145],[13,81]),([0,2,4,85,160,284],[81]),([0,2,3,4,85,352],[81]),([0,2,14,85,160],[4,6,22]),([0,2,3,14,85,160],[81]),([0,2,14,85,145,224],[5,7,8,88,90,112,431]),([0,2,85,145,323],[11,88]),([0,2,14,85,90,145],[8,22,33,88,214,524,612]),([0,2,85,130,145],[13,88]),([0,2,4,85,87,189],[1,5]),([0,2,4,85,153,321],[1]),([0,1,4,85,111,321],[]),([0,1,2,4,88,321],[]),([0,1,2,4,89,321],[]),([0,1,2,4,85,322],[1]),([0,1,4,85,87,336],[4]),([0,1,4,33,85,87],[81]),([0,4,33,85,87,111],[13,33,97]),([0,1,4,85,87,186],[81]),([0,1,87,88,111],[4,6,10,88,523,619]),([0,1,4,87,88,111],[10]),([0,1,85,87,88,111],[4,88,307]),([0,1,4,87,89,111],[10])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_29 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_29 = true := by decide +kernel
-def h26Block5_30 : List NodeSpec := nodesWithIdentity [([0,1,2,4,87,327],[10]),([0,1,4,87,88,137],[4,10,88]),([0,1,4,85,87,137],[10,88]),([0,1,2,4,87,330],[10]),([0,1,2,4,87,88],[10,620]),([0,1,2,4,85,332],[1,383]),([0,2,4,85,90,181],[1,22,88]),([0,2,4,85,87,181],[1,88]),([0,1,2,4,85,333],[1]),([0,1,2,4,85,90],[1,524]),([0,2,4,84,85,336],[1]),([0,2,3,4,85,398],[81]),([0,1,2,14,85,336],[4]),([0,1,2,4,85,337],[1]),([0,1,2,3,88,336],[]),([0,1,2,3,4,399],[]),([0,1,2,4,62,85],[0,1]),([0,2,14,33,85,111],[6,33,97]),([0,2,4,33,85,90],[13,36,214,626]),([0,1,2,4,85,187],[0,1]),([0,1,2,3,56,111],[0,10]),([0,1,14,55,85,111],[4,22,201]),([0,1,3,55,88,111],[13,157,201,627]),([0,1,2,3,111,128],[0,10]),([0,1,2,85,111,323],[]),([0,1,2,14,33,85],[81]),([0,1,2,14,85,186],[81]),([0,1,2,14,55,111],[124]),([0,1,2,14,111,127],[124]),([0,2,3,4,85,181],[0,1]),([0,2,3,4,85,190],[0,1]),([0,1,2,3,111,327],[10]),([0,1,3,88,111,137],[6,10,88]),([0,1,3,4,111,137],[0,10]),([0,1,3,4,111,138],[0,10]),([0,1,2,3,88,111],[10,628]),([1,2,3,4,85,345],[575]),([1,2,3,4,111,345],[630]),([0,1,2,14,56,85],[22,124]),([0,1,2,3,56,88],[0]),([0,2,3,4,127,146],[]),([0,1,3,4,113,127],[0]),([0,1,2,4,127,236],[]),([0,1,2,3,4,513],[0]),([1,2,3,4,293,346],[]),([0,2,3,4,127,184],[]),([0,1,2,4,127,245],[]),([0,1,2,3,4,363],[]),([0,2,3,4,127,404],[]),([0,1,2,14,127,319],[124]),([0,1,2,4,127,376],[]),([0,1,2,3,128,319],[]),([0,1,2,3,4,530],[]),([0,1,2,4,14,346],[124]),([0,1,2,3,4,459],[]),([0,1,2,4,127,323],[]),([0,1,2,3,4,364],[]),([0,2,4,14,85,177],[1,5]),([0,1,2,4,85,365],[1]),([0,2,4,14,85,181],[1,22]),([0,1,2,4,85,362],[1]),([1,2,3,4,26,359],[639]),([0,2,3,4,88,177],[0]),([0,1,3,4,88,195],[]),([0,1,2,4,60,88],[0]),([1,2,3,4,7,327],[]),([1,2,3,4,9,327],[]),([1,2,3,4,218,327],[]),([1,2,3,4,238,327],[]),([1,2,3,4,293,327],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_30 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_30 = true := by decide +kernel
-def h26Block5_31 : List NodeSpec := nodesWithIdentity [([0,2,3,4,82,327],[]),([0,1,2,4,109,327],[]),([0,1,2,3,124,327],[]),([0,1,2,3,4,367],[]),([1,2,3,4,98,327],[]),([1,2,3,4,88,345],[]),([0,2,3,4,88,181],[0]),([0,1,2,4,62,88],[0]),([0,1,2,3,4,370],[]),([1,2,3,4,105,327],[]),([0,2,4,84,85,327],[1]),([0,1,2,3,4,460],[]),([0,1,2,3,4,371],[]),([0,1,3,111,131,145],[7,10]),([0,1,2,14,60,145],[7,81]),([1,2,3,4,324,394],[10]),([0,2,3,4,324,395],[]),([0,1,4,86,87,324],[10]),([0,1,2,3,116,324],[]),([0,1,2,3,4,535],[0]),([1,2,3,4,321,324],[]),([0,1,3,87,111,324],[6]),([0,1,3,4,87,353],[81]),([0,1,2,14,87,324],[6]),([0,1,2,4,87,368],[10]),([0,1,2,3,90,324],[]),([0,1,2,3,4,463],[]),([0,2,3,4,324,435],[]),([0,1,3,108,111,324],[10]),([0,1,3,4,108,353],[]),([0,1,2,3,191,324],[]),([0,1,2,3,4,521],[]),([0,2,3,4,324,437],[]),([0,1,2,14,109,324],[81]),([0,1,2,4,109,368],[]),([0,1,2,3,272,324],[]),([0,1,2,3,4,529],[]),([0,1,2,3,122,324],[]),([0,1,2,3,111,368],[10]),([0,1,2,3,14,353],[81]),([0,1,2,3,4,464],[]),([0,1,2,3,130,324],[]),([0,1,2,4,284,368],[]),([0,1,2,3,4,497],[]),([0,2,3,144,145,321],[1]),([0,2,3,4,145,380],[124]),([0,1,3,111,145,321],[6]),([0,1,2,14,145,321],[6]),([0,1,2,3,145,322],[1]),([0,1,2,3,4,381],[]),([0,1,2,3,56,145],[0,1]),([0,3,55,87,111,145],[13,22,130]),([0,2,14,55,87,145],[4,22,130]),([0,2,3,55,90,145],[13,25,130,650]),([0,1,2,3,145,173],[0,1]),([0,1,3,87,145,336],[]),([0,1,3,55,111,145],[124]),([0,1,3,111,145,172],[124]),([0,1,3,87,88,111],[10]),([0,1,87,88,111,145],[6,88,284]),([0,1,3,87,111,123],[10]),([0,1,2,4,62,87],[0,10]),([0,1,14,33,87,145],[6,33,285]),([0,1,4,33,87,88],[13,167,186,651]),([0,1,2,4,87,161],[0,10]),([0,1,2,87,145,323],[]),([0,1,2,14,55,145],[124]),([0,1,2,14,145,172],[124]),([0,1,2,14,33,87],[81]),([0,1,2,14,87,160],[81])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_31 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_31 = true := by decide +kernel
-def h26Block5_32 : List NodeSpec := nodesWithIdentity [([0,1,3,4,87,137],[0,10]),([0,1,3,4,87,166],[0,10]),([0,1,2,3,145,332],[1,383]),([0,2,3,90,145,181],[1,33,88]),([0,2,3,4,145,181],[0,1]),([0,2,3,4,145,182],[0,1]),([0,1,2,3,90,145],[1,524]),([1,2,3,4,87,345],[630]),([1,2,3,4,145,345],[575]),([0,2,3,111,145,176],[1,7]),([0,2,3,121,145,336],[1]),([0,1,2,3,123,336],[]),([0,1,2,3,145,337],[1]),([0,2,3,111,145,181],[1,88]),([0,1,2,3,145,341],[1]),([0,1,3,111,137,145],[10,88]),([0,1,3,111,123,218],[10]),([0,1,2,3,111,343],[10]),([0,1,2,14,62,145],[33,81]),([0,2,3,4,104,160],[]),([0,1,3,4,95,160],[0]),([0,1,2,3,160,290],[]),([0,1,2,3,4,498],[0]),([1,2,3,4,238,352],[]),([0,2,3,4,160,183],[]),([0,1,2,3,160,300],[]),([0,1,2,3,4,374],[]),([0,2,3,4,160,386],[]),([0,1,2,14,160,284],[81]),([0,1,2,4,161,284],[]),([0,1,2,3,160,366],[]),([0,1,2,3,4,531],[]),([0,1,2,3,14,352],[81]),([0,1,2,3,4,466],[]),([0,1,2,3,160,323],[]),([0,1,2,3,4,375],[]),([0,2,3,14,145,177],[1,7]),([0,1,2,3,145,365],[1]),([0,2,3,14,145,181],[1,33]),([0,1,2,3,145,362],[1]),([1,2,3,4,147,327],[]),([0,2,3,144,145,327],[1]),([0,2,3,4,52,123],[]),([0,1,2,4,123,227],[0]),([0,1,2,3,123,294],[]),([0,1,2,3,4,467],[0]),([1,2,3,4,126,343],[]),([0,2,3,4,123,261],[]),([0,1,2,3,123,298],[]),([0,1,2,3,4,377],[]),([0,2,3,4,123,489],[]),([0,1,3,4,166,218],[]),([0,1,2,3,123,338],[]),([0,1,2,3,4,522],[]),([0,1,2,3,4,468],[]),([0,1,2,3,4,378],[]),([0,1,14,44,87,111],[5,12,22,60,103,130,371]),([0,1,3,51,87,111],[12,124]),([0,1,2,14,51,87],[5,124]),([0,1,2,3,51,90],[0]),([1,2,3,4,287,321],[1]),([0,1,3,4,235,321],[]),([0,1,2,4,114,321],[]),([0,1,2,3,4,536],[0]),([0,2,3,4,153,380],[]),([0,1,3,4,244,321],[]),([0,1,2,4,141,321],[]),([0,1,2,3,4,523],[]),([0,1,3,111,170,321],[124]),([0,1,3,4,305,321],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_32 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_32 = true := by decide +kernel
-def h26Block5_33 : List NodeSpec := nodesWithIdentity [([0,1,2,14,170,321],[124]),([0,1,2,4,315,321],[]),([0,1,2,3,170,322],[]),([0,1,2,3,4,538],[]),([0,1,3,4,111,380],[124]),([0,1,2,4,14,380],[124]),([0,1,2,3,4,382],[]),([0,1,3,4,186,321],[]),([0,1,14,111,321],[7,22]),([0,1,4,14,111,321],[124]),([0,1,2,4,174,321],[]),([0,1,2,3,4,516],[]),([0,1,14,55,87,111],[4,13,22,130,157,178,556]),([0,1,3,56,87,111],[13,124]),([0,1,2,14,56,87],[4,124]),([0,1,2,3,56,90],[0]),([0,2,3,4,146,172],[0]),([0,1,3,4,113,172],[]),([0,1,2,4,172,236],[]),([0,1,2,3,4,517],[0]),([1,2,3,4,293,379],[]),([0,1,3,4,140,172],[]),([0,1,2,4,172,245],[]),([0,1,2,3,4,471],[]),([0,1,3,111,172,319],[124]),([0,1,3,4,172,372],[]),([0,1,2,14,172,319],[124]),([0,1,2,4,172,376],[]),([0,1,2,3,173,319],[]),([0,1,2,3,4,539],[]),([0,1,3,4,111,379],[124]),([0,1,2,4,14,379],[124]),([0,1,2,3,4,384],[]),([0,1,3,4,172,336],[]),([0,1,14,111,172],[6,22]),([0,1,4,14,111,172],[124]),([0,1,2,4,172,323],[]),([0,1,2,3,4,472],[]),([0,1,14,18,87,111],[7,12,33,72,97,292,364]),([0,1,4,61,87,111],[12,81]),([0,1,4,87,143,336],[81]),([0,1,3,4,87,398],[81]),([0,1,14,87,336],[5,33]),([0,1,3,14,87,336],[81]),([0,1,14,33,87,111],[6,13,33,97,167,521,548]),([0,1,4,62,87,111],[13,81]),([0,1,4,87,186,284],[81]),([0,1,3,4,87,397],[81]),([0,1,14,87,186],[4,33]),([0,1,3,14,87,186],[81]),([0,1,14,87,111,224],[5,7,51,88,112,293,452]),([0,1,87,111,323],[12,88]),([0,1,14,87,88,111],[4,6,51,88,186,523,619]),([0,1,87,111,174],[13,88]),([0,1,4,14,87,133],[5,10]),([0,1,2,4,87,424],[10]),([0,1,4,14,87,137],[4,10]),([0,1,2,4,87,423],[10]),([1,2,3,4,28,331],[682]),([0,2,3,4,90,197],[]),([0,1,3,4,90,133],[0]),([0,1,2,4,61,90],[0]),([0,1,2,3,4,387],[]),([1,2,3,4,90,345],[]),([0,1,3,4,90,137],[0]),([0,1,2,4,62,90],[0]),([0,1,2,3,4,388],[]),([0,1,2,3,4,389],[]),([0,1,2,3,4,390],[]),([0,1,2,14,61,111],[7,81])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_33 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_33 = true := by decide +kernel
-def h26Block5_34 : List NodeSpec := nodesWithIdentity [([1,2,3,4,231,336],[1]),([0,1,3,4,226,336],[]),([0,1,2,3,150,336],[]),([0,1,2,3,4,532],[0]),([0,2,3,4,121,398],[]),([0,1,3,4,243,336],[]),([0,1,2,3,167,336],[]),([0,1,2,3,4,524],[]),([0,1,3,4,259,336],[]),([0,1,2,14,143,336],[81]),([0,1,2,4,143,337],[]),([0,1,2,3,277,336],[]),([0,1,2,3,4,540],[]),([0,1,2,3,14,398],[81]),([0,1,2,3,4,400],[]),([0,1,2,3,174,336],[]),([0,1,2,3,4,501],[]),([0,1,2,14,62,111],[6,81]),([0,2,3,4,104,186],[0]),([0,1,3,4,95,186],[]),([0,1,2,3,186,290],[]),([0,1,2,3,4,502],[0]),([1,2,3,4,238,397],[]),([0,1,3,4,139,186],[]),([0,1,2,3,186,300],[]),([0,1,2,3,4,473],[]),([0,1,3,4,186,358],[]),([0,1,2,14,186,284],[81]),([0,1,2,4,187,284],[]),([0,1,2,3,186,366],[]),([0,1,2,3,4,541],[]),([0,1,2,3,14,397],[81]),([0,1,2,3,4,402],[]),([0,1,2,3,186,323],[]),([0,1,2,3,4,474],[]),([0,1,3,14,111,133],[7,10]),([0,1,2,3,111,424],[10]),([0,1,3,14,111,137],[6,10]),([0,1,2,3,111,423],[10]),([0,1,2,3,4,405],[]),([0,1,2,3,4,406],[]),([0,2,3,4,115,177],[]),([0,1,2,13,14,177],[81]),([0,1,3,4,117,133],[]),([0,1,2,13,14,133],[81]),([0,1,2,3,4,426],[]),([0,1,2,3,4,475],[]),([1,2,3,4,237,327],[]),([0,1,2,13,14,327],[81]),([1,2,3,4,7,423],[]),([1,2,3,4,126,423],[]),([0,1,2,3,4,428],[]),([0,1,2,3,4,476],[]),([0,1,2,3,4,429],[]),([0,1,2,3,4,430],[])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test5_34 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Block5_34 = true := by decide +kernel
-def h26Nodes5 : List NodeSpec := h26Block5_0 ++ h26Block5_1 ++ h26Block5_2 ++ h26Block5_3 ++ h26Block5_4 ++ h26Block5_5 ++ h26Block5_6 ++ h26Block5_7 ++ h26Block5_8 ++ h26Block5_9 ++ h26Block5_10 ++ h26Block5_11 ++ h26Block5_12 ++ h26Block5_13 ++ h26Block5_14 ++ h26Block5_15 ++ h26Block5_16 ++ h26Block5_17 ++ h26Block5_18 ++ h26Block5_19 ++ h26Block5_20 ++ h26Block5_21 ++ h26Block5_22 ++ h26Block5_23 ++ h26Block5_24 ++ h26Block5_25 ++ h26Block5_26 ++ h26Block5_27 ++ h26Block5_28 ++ h26Block5_29 ++ h26Block5_30 ++ h26Block5_31 ++ h26Block5_32 ++ h26Block5_33 ++ h26Block5_34
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Check5 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket4 5 h26Nodes5 = true := by
-  unfold h26Nodes5 checkNodesBT
-  simp only [List.all_append, Bool.and_eq_true]
-  exact ⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨h26Test5_0,h26Test5_1⟩,h26Test5_2⟩,h26Test5_3⟩,h26Test5_4⟩,h26Test5_5⟩,h26Test5_6⟩,h26Test5_7⟩,h26Test5_8⟩,h26Test5_9⟩,h26Test5_10⟩,h26Test5_11⟩,h26Test5_12⟩,h26Test5_13⟩,h26Test5_14⟩,h26Test5_15⟩,h26Test5_16⟩,h26Test5_17⟩,h26Test5_18⟩,h26Test5_19⟩,h26Test5_20⟩,h26Test5_21⟩,h26Test5_22⟩,h26Test5_23⟩,h26Test5_24⟩,h26Test5_25⟩,h26Test5_26⟩,h26Test5_27⟩,h26Test5_28⟩,h26Test5_29⟩,h26Test5_30⟩,h26Test5_31⟩,h26Test5_32⟩,h26Test5_33⟩,h26Test5_34⟩
-def h26Bucket5 : BT (List (List Nat)) := buildBucketsBT h26W h26Nodes5
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Bucket5Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h26G 5 xs.toFinset) h26Bucket5 := buildBucketsBT_sound (by decide) h26Pairs h26WOk h26PoolsOk h26AutosOk h26Bucket4Ok h26Check5
-def h26Block6_0 : List NodeSpec := nodesWithIdentity [([3,4,6,10,12],[0,1,2,3,10,11,12,13,14,19,26]),([2,3,4,6,10,85],[0,1,2,4,11,12,37,38,39]),([2,3,4,6,10,145],[0,1,2,6,11,12,41,42,43]),([1,3,4,6,10,87],[0,10,11,12,19,22,38,45,46]),([1,3,4,6,10,111],[0,10,11,12,19,33,42,48,49]),([1,2,3,4,6,10,14],[2,8,11,12,19,38,51]),([1,2,3,4,10,17],[4,5,10,11,16,18,52,53]),([1,2,3,4,6,10,17],[4,5,11,16,17,19,53]),([1,2,3,4,10,43],[0,10,11,12,53,55,56,57]),([1,2,3,4,6,44],[1,5,12,21,22,23,38,58]),([1,2,3,4,6,10,44],[2,5,12,21,22,38,60]),([1,2,3,4,6,54],[0,1,11,12,38,61,62,63]),([1,2,3,4,10,45],[6,7,10,11,28,30,64,65]),([1,2,3,4,6,10,45],[6,7,11,19,28,29,65]),([1,2,3,4,10,47],[0,10,11,12,65,67,68,69]),([1,2,3,4,6,18],[1,7,12,32,33,34,42,70]),([1,2,3,4,6,10,18],[2,7,12,32,33,42,72]),([1,2,3,4,6,32],[0,1,11,12,42,73,74,75]),([2,3,4,6,12,220],[0,1,5,11,13,26,76,77,78]),([2,4,6,85,220],[0,1,4,5,11,39,76,80,81,83,85]),([2,3,4,6,145,220],[0,1,5,6,11,43,76,92,93]),([1,2,4,6,87,220],[0,5,11,22,46,77,81,85,95]),([1,2,3,4,6,111,220],[5,11,76,77,82,85,97]),([1,2,3,4,41,220],[11,12,13,26,81,98,99]),([1,2,3,4,6,41,220],[2,11,12,13,85,99]),([1,2,3,4,125,220],[0,5,11,77,81,100,101,102]),([1,2,3,4,6,44,220],[5,12,21,22,58,76,103]),([1,2,3,4,6,134],[0,1,5,11,58,104]),([1,2,4,6,14,220],[0,5,9,11,81,85,88,93,105]),([1,2,3,4,45,220],[6,7,11,30,81,86,93,107]),([1,2,3,4,6,45,220],[6,7,11,29,85,86,93]),([1,2,3,4,47,220],[0,5,11,69,81,93,109,110]),([1,2,3,4,6,224],[1,5,7,88,90,91,93,111]),([1,2,3,4,6,220,224],[5,7,76,88,90,93,112]),([1,2,3,4,6,225],[0,1,5,11,93,113,114,115]),([2,3,4,6,12,286],[0,1,7,11,13,26,116,117,118]),([2,3,4,6,85,286],[0,1,4,7,11,39,116,120,121]),([2,3,6,145,286],[0,1,6,7,11,43,116,123,124,126,128]),([1,2,3,4,6,87,286],[7,11,116,117,125,128,130]),([1,2,3,6,111,286],[0,7,11,33,49,117,124,128,131]),([1,2,3,4,41,286],[11,12,13,26,124,133,134]),([1,2,3,4,6,41,286],[2,11,12,13,128,134]),([1,2,3,4,125,286],[0,7,11,102,117,124,135,136]),([1,2,3,4,6,18,286],[7,12,32,33,70,116,137]),([1,2,3,4,6,132],[0,1,7,11,70,138]),([1,2,3,6,14,286],[0,7,9,11,88,120,124,128,139]),([1,2,3,4,17,286],[4,5,11,18,120,124,129,141]),([1,2,3,4,6,17,286],[4,5,11,17,120,128,129]),([1,2,3,4,43,286],[0,7,11,57,120,124,143,144]),([1,2,3,4,6,224,286],[5,7,88,90,111,116,145]),([1,2,3,4,6,239],[0,1,7,11,111,146]),([0,3,4,6,12,87],[1,10,11,13,19,22,78,125,147]),([0,3,4,6,12,111],[1,10,11,13,19,33,82,118,149]),([0,2,3,4,6,12,14],[9,11,13,19,26,51,78]),([0,2,3,4,12,17],[4,5,10,11,16,17,151,152]),([0,2,3,4,6,12,17],[4,5,11,16,18,19,152]),([0,2,3,4,12,43],[1,10,11,13,56,152,153,154]),([0,2,3,4,6,55],[0,4,13,22,24,25,78,155]),([0,2,3,4,6,12,55],[4,13,22,24,26,78,157]),([0,2,3,4,6,59],[0,1,11,13,78,158,159,160]),([0,2,3,4,12,45],[6,7,10,11,28,29,161,162]),([0,2,3,4,6,12,45],[6,7,11,19,28,30,162]),([0,2,3,4,12,47],[1,10,11,13,68,162,163,164]),([0,2,3,4,6,33],[0,6,13,33,35,36,118,165]),([0,2,3,4,6,12,33],[6,13,26,33,35,118,167]),([0,2,3,4,6,38],[0,1,11,13,118,168,169,170]),([0,2,4,6,85,87],[1,4,11,22,37,81,85,125,171]),([0,2,3,4,6,85,111],[4,11,37,39,49,85,97]),([0,2,3,4,41,85],[2,11,12,13,81,173,174]),([0,2,3,4,6,41,85],[11,12,13,26,85,174])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_0 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_0 = true := by decide +kernel
-def h26Block6_1 : List NodeSpec := nodesWithIdentity [([0,2,3,4,85,125],[1,4,11,81,101,175,176,177]),([0,2,3,4,6,55,85],[4,13,22,24,39,155,178]),([0,2,3,4,6,127],[0,1,4,11,155,179]),([0,2,4,6,14,85],[1,4,8,11,81,85,88,121,180]),([0,2,3,4,45,85],[6,7,11,29,81,86,121,182]),([0,2,3,4,6,45,85],[6,7,11,30,85,86,121]),([0,2,3,4,47,85],[1,4,11,81,110,121,164,183]),([0,2,3,4,6,88],[0,4,6,87,88,89,121,184]),([0,2,3,4,6,85,88],[4,6,39,87,88,121,186]),([0,2,3,4,6,89],[0,1,4,11,121,187,188,189]),([0,2,3,4,6,87,145],[6,11,41,43,46,128,130]),([0,2,3,6,111,145],[1,6,11,33,41,82,124,128,190]),([0,2,3,4,41,145],[2,11,12,13,124,192,193]),([0,2,3,4,6,41,145],[11,12,13,26,128,193]),([0,2,3,4,125,145],[1,6,11,41,124,136,177,194]),([0,2,3,4,6,33,145],[6,13,33,35,43,165,195]),([0,2,3,4,6,160],[0,1,6,11,165,196]),([0,2,3,6,14,145],[1,6,8,11,88,92,124,128,197]),([0,2,3,4,17,145],[4,5,11,17,92,124,129,199]),([0,2,3,4,6,17,145],[4,5,11,18,92,128,129]),([0,2,3,4,43,145],[1,6,11,92,124,144,154,200]),([0,2,3,4,6,88,145],[4,6,43,87,88,184,201]),([0,2,3,4,6,123],[0,1,6,11,184,202]),([0,1,2,3,4,6,44],[1,22,23]),([1,2,3,4,6,44,87],[0,5,12,21,22,58,125]),([0,1,2,3,4,6,321],[1,22,23]),([0,1,2,3,4,6,55],[0,22,24,25]),([0,2,3,4,6,55,87],[1,4,13,22,24,46,155]),([0,1,2,3,4,6,172],[0,22,25]),([0,1,3,4,6,87,111],[22,33,85,97,128,130,204]),([0,1,3,4,41,87],[11,12,13,45,81,147,206]),([0,1,2,3,4,41,87],[11,81,206]),([0,1,3,4,6,41,87],[10,11,12,13,85,147]),([0,1,2,3,4,87,125],[11,19,81]),([0,1,2,4,6,14,87],[19,22,51,88,128,130,208]),([0,1,2,4,17,87],[4,5,10,11,16,85,209,210]),([0,1,2,3,4,17,87],[10,11,16,85]),([0,1,2,4,6,17,87],[4,5,11,16,19,81,209]),([0,1,2,3,4,43,87],[10,11,56,85]),([0,1,2,3,4,45,87],[10,22,28,29,30,81,128]),([0,1,2,3,4,47,87],[10,11,22,68,69,81,128,164]),([0,1,2,3,4,6,90],[0,1,11,130,212,213,214]),([0,1,2,3,4,6,94],[0,1,11,22,130,215,216,217]),([0,1,2,3,4,22],[16,124,219]),([0,1,2,3,4,6,22],[22,128,219]),([0,1,2,3,4,22,87],[11,16,130]),([0,1,2,3,4,87,101],[221]),([0,1,2,3,4,6,50],[222]),([0,1,2,3,4,6,18],[1,33,34]),([1,2,3,4,6,18,111],[0,7,12,32,33,70,82]),([0,1,2,3,4,6,336],[1,33,34]),([0,1,2,3,4,6,33],[0,33,35,36]),([0,2,3,4,6,33,111],[1,6,13,33,35,49,165]),([0,1,2,3,4,6,186],[0,33,36]),([0,1,3,4,41,111],[11,12,13,48,124,149,206]),([0,1,2,3,4,41,111],[11,124,206]),([0,1,3,4,6,41,111],[10,11,12,13,128,149]),([0,1,2,3,4,111,125],[11,19,124]),([0,1,2,3,6,14,111],[19,33,51,85,88,97,224]),([0,1,2,3,4,17,111],[10,16,17,18,33,85,124]),([0,1,2,3,4,43,111],[10,11,33,56,57,85,124,154]),([0,1,2,3,4,6,122],[0,1,11,33,97,226,227,228]),([0,1,2,3,45,111],[6,7,10,11,28,128,229,230]),([0,1,2,3,4,45,111],[10,11,28,128]),([0,1,2,3,6,45,111],[6,7,11,19,28,124,229]),([0,1,2,3,4,47,111],[10,11,68,128]),([0,1,2,3,4,24],[32,81,233]),([0,1,2,3,4,6,24],[32,33,85]),([0,1,2,3,4,24,111],[11,97,233]),([0,1,2,3,4,111,112],[234])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_1 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_1 = true := by decide +kernel
-def h26Block6_2 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,6,49],[235]),([0,1,2,3,4,13,41],[2,26,81,124,206]),([0,1,2,3,4,14,41],[2,26,81,88,124,206]),([0,1,2,3,4,15,41],[2,26,81,124,206]),([0,1,2,3,4,16,41],[2,26,81,124,206]),([0,1,2,3,4,41,253],[2,11,12,13,26,81,206]),([0,1,2,3,4,22,41],[81]),([0,1,2,3,4,41,129],[81]),([0,1,2,3,4,254],[0,1,10,11,12,13,124,236,237,238]),([0,1,2,3,4,41,254],[2,11,12,13,26,81,206]),([0,1,2,3,4,41,246],[2,11,12,13,26,124,206]),([0,1,2,3,4,24,41],[124]),([0,1,2,3,4,41,163],[124]),([0,1,2,3,4,247],[0,1,10,11,12,13,81,239,240,241]),([0,1,2,3,4,41,247],[2,11,12,13,26,124,206]),([0,1,2,3,4,17,41],[10,12,81,85,206,242]),([0,1,2,3,4,41,42],[10,12,81,206]),([0,1,2,3,4,6,254],[0,1,10,11,12,13,81,236]),([0,1,2,3,4,41,45],[10,12,124,128,161,206]),([0,1,2,3,4,41,46],[10,12,124,206]),([0,1,2,3,4,6,247],[0,1,10,11,12,13,124,239]),([0,1,2,3,4,41],[11,26,81,124]),([0,1,2,3,4,14,125],[11,19,81,88,101,102,124,177]),([0,1,2,3,4,199],[0,1,10,11,16,124,243]),([0,1,2,3,4,210],[0,1,10,11,28,81,244]),([0,1,2,3,4,6,224],[1,88,91]),([1,2,3,4,6,14,224],[0,5,7,8,88,90,111]),([0,1,2,3,4,6,323],[1,9,88]),([0,1,2,3,4,6,88],[0,87,88,89]),([0,2,3,4,6,14,88],[1,4,6,9,87,88,184]),([0,1,2,3,4,6,174],[0,8,88,246]),([0,1,2,3,4,6,130],[0,1,11,51,88,247,248,249]),([0,1,2,4,14,17],[4,5,11,85,124,129,250,251]),([0,1,2,3,4,14,17],[11,85,124]),([0,1,2,4,6,14,17],[4,5,11,81,128,129,250]),([0,1,2,3,4,14,43],[11,85,124]),([0,1,2,3,14,45],[6,7,11,81,86,128,253,254]),([0,1,2,3,4,14,45],[11,81,86,128]),([0,1,2,3,6,14,45],[6,7,11,85,86,124,253]),([0,1,2,3,4,14,47],[11,81,110,128]),([0,1,2,3,4,26],[10,129,255]),([0,1,2,3,4,6,26],[19,88]),([0,1,2,3,4,14,26],[11,51,255]),([0,1,2,3,4,14,27],[258]),([0,1,2,3,4,6,48],[259]),([0,1,2,3,4,17,22],[10,16,129]),([0,1,2,3,4,164],[0,1,4,5,10,11,16,124,142,243,260,261]),([0,1,2,3,4,17,164],[4,5,10,11,16,17,18]),([0,1,2,3,4,17,26],[16,124,129]),([0,1,2,3,4,39],[0,1,4,5,10,11,54,81,262,263,264]),([0,1,2,3,4,17,39],[4,5,11,17,18,85,124,129]),([0,1,2,3,4,6,164],[0,1,4,5,10,11,16,81,260]),([0,1,2,3,4,17,45],[5,81,85,124,128,265]),([0,1,2,3,4,6,39],[0,1,4,5,11,81,124,129,262]),([0,1,2,3,4,165],[0,1,10,11,56,124,266,267,268]),([0,1,2,3,4,17],[10,11,18,124]),([0,1,2,3,4,75],[0,1,10,11,81,144,269,270,271]),([0,1,2,3,4,24,45],[10,86,233]),([0,1,2,3,4,131],[0,1,6,7,10,11,28,81,108,244,272,273]),([0,1,2,3,4,45,131],[6,7,10,11,28,29,30]),([0,1,2,3,4,26,45],[28,81,255]),([0,1,2,3,4,60],[0,1,6,7,10,11,66,81,86,274,275,276]),([0,1,2,3,4,45,60],[6,7,11,29,30,81,86]),([0,1,2,3,4,6,131],[0,1,6,7,10,11,28,124,272]),([0,1,2,3,4,6,60],[0,1,6,7,11,81,86,124,274]),([0,1,2,3,4,135],[0,1,10,11,68,81,277,278,279]),([0,1,2,3,4,72],[0,1,10,11,81,129,264]),([0,1,2,3,4,45],[10,11,30,81]),([1,3,4,10,12,220],[0,5,10,12,13,26,98,280,281]),([1,2,4,10,85,220],[0,4,5,12,39,81,98,103,283])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_2 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_2 = true := by decide +kernel
-def h26Block6_3 : List NodeSpec := nodesWithIdentity [([1,2,3,4,10,145,220],[5,12,98,103,281,284,285]),([1,2,3,4,10,41,220],[11,12,13,98,103,206]),([1,2,3,4,171,220],[0,5,12,81,98,287,288,289]),([1,2,3,4,10,17,220],[4,5,11,16,52,85,281]),([1,2,3,4,10,178],[0,5,10,12,52,290]),([1,4,10,87,220],[0,5,10,12,22,46,81,96,103,281,291]),([1,3,4,10,111,220],[0,5,10,12,33,49,281,286,294]),([1,2,4,10,14,220],[0,5,9,12,81,88,103,286,296]),([1,2,3,4,18,220],[7,12,33,34,81,286,292,298]),([1,2,3,4,10,18,220],[7,12,33,72,103,286,292]),([1,2,3,4,32,220],[0,5,12,75,81,286,299,300]),([1,2,3,4,10,224],[5,7,10,88,91,286,293,301]),([1,2,3,4,10,220,224],[5,7,88,112,281,286,293]),([1,2,3,4,10,225],[0,5,10,12,115,286,302,303]),([1,3,4,10,12,286],[0,7,10,12,13,26,133,304,305]),([1,2,3,4,10,85,286],[7,12,133,137,201,305,307]),([1,2,3,10,145,286],[0,6,7,12,43,124,133,137,309]),([1,2,3,4,10,41,286],[11,12,13,133,137,206]),([1,2,3,4,171,286],[0,7,12,124,133,289,310,311]),([1,2,3,4,10,45,286],[6,7,11,28,64,128,305]),([1,2,3,4,10,175],[0,7,10,12,64,312]),([1,3,4,10,87,286],[0,7,10,12,22,46,305,308,313]),([1,3,10,111,286],[0,7,10,12,33,49,124,132,137,305,315]),([1,2,3,10,14,286],[0,7,9,12,88,124,137,308,317]),([1,2,3,4,44,286],[5,12,22,23,124,308,316,319]),([1,2,3,4,10,44,286],[5,12,22,60,137,308,316]),([1,2,3,4,54,286],[0,7,12,63,124,308,320,321]),([1,2,3,4,10,224,286],[5,7,88,145,293,301,305]),([1,2,3,4,10,239],[0,7,10,12,146,301]),([0,3,4,10,12,85],[1,2,4,10,12,13,173,280,307]),([0,3,4,10,12,145],[1,2,6,10,12,13,192,284,304]),([0,1,3,4,10,12,14],[2,8,9,12,13,26,280]),([0,1,3,4,12,44],[1,5,12,21,22,60,324,325]),([0,1,3,4,10,12,44],[2,5,12,21,22,23,325]),([0,1,3,4,12,54],[1,10,12,13,61,325,326,327]),([0,1,3,4,10,55],[0,4,13,22,24,157,280,328]),([0,1,3,4,10,12,55],[4,13,22,24,25,26,280]),([0,1,3,4,10,59],[0,10,12,13,158,280,329,330]),([0,1,3,4,12,18],[1,7,12,32,33,72,331,332]),([0,1,3,4,10,12,18],[2,7,12,32,33,34,332]),([0,1,3,4,12,32],[1,10,12,13,73,332,333,334]),([0,1,3,4,10,33],[0,6,13,33,35,167,304,335]),([0,1,3,4,10,12,33],[6,13,26,33,35,36,304]),([0,1,3,4,10,38],[0,10,12,13,168,304,336,337]),([0,1,2,3,4,10,17],[4,10,18]),([1,2,3,4,10,17,85],[0,4,5,11,16,52,307]),([0,1,2,3,4,10,328],[4,10,18]),([0,2,3,4,10,85,145],[4,6,103,137,201,285,339]),([0,1,2,3,4,41,85],[2,12,81]),([0,2,3,4,10,41,85],[1,11,12,13,103,173]),([0,1,2,3,4,85,171],[2,12,81]),([0,1,4,10,85,87],[4,10,12,22,45,81,103,171,307]),([0,1,3,4,10,85,111],[12,33,39,48,49,137,201]),([0,1,2,3,4,10,55],[0,4,24,157]),([0,1,3,4,10,55,85],[4,10,13,22,24,39,328]),([0,1,2,3,4,10,127],[0,4,157]),([0,1,2,4,10,14,85],[2,4,8,88,137,180,201]),([0,1,2,4,44,85],[1,5,12,21,22,103,341,342]),([0,1,2,3,4,44,85],[1,12,21,103]),([0,1,2,4,10,44,85],[2,5,12,21,22,81,341]),([0,1,2,3,4,54,85],[1,12,61,103]),([0,1,2,3,4,18,85],[1,4,32,34,72,81,137]),([0,1,2,3,4,32,85],[1,4,12,73,75,81,137,334]),([0,1,2,3,4,10,88],[0,10,12,87,89,186,201]),([0,1,2,3,4,10,89],[0,4,10,12,187,189,201,344]),([0,1,2,3,4,10,22],[4,16,137]),([0,1,2,3,4,22,85],[12,201,219]),([0,1,2,3,4,85,91],[345]),([0,1,2,3,4,10,35],[346]),([0,1,2,3,4,10,45],[6,10,30])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_3 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_3 = true := by decide +kernel
-def h26Block6_4 : List NodeSpec := nodesWithIdentity [([1,2,3,4,10,45,145],[0,6,7,11,28,64,284]),([0,1,2,3,4,10,324],[6,10,30]),([0,1,2,3,4,41,145],[2,12,124]),([0,2,3,4,10,41,145],[1,11,12,13,137,192]),([0,1,2,3,4,145,171],[2,12,124]),([0,1,3,4,10,87,145],[12,22,43,45,46,103,285]),([0,1,3,10,111,145],[6,10,12,33,48,124,137,190,284]),([0,1,2,3,4,10,33],[0,6,35,167]),([0,1,3,4,10,33,145],[6,10,13,33,35,43,335]),([0,1,2,3,4,10,160],[0,6,167]),([0,1,2,3,10,14,145],[2,6,8,88,103,197,285]),([0,1,2,3,4,44,145],[1,6,21,23,60,103,124]),([0,1,2,3,4,54,145],[1,6,12,61,63,103,124,327]),([0,1,2,3,4,10,123],[0,6,10,12,186,202,350]),([0,1,2,3,18,145],[1,7,12,32,33,137,351,352]),([0,1,2,3,4,18,145],[1,12,32,137]),([0,1,2,3,10,18,145],[2,7,12,32,33,124,351]),([0,1,2,3,4,32,145],[1,12,73,137]),([0,1,2,3,4,10,24],[6,103,233]),([0,1,2,3,4,24,145],[12,32,285]),([0,1,2,3,4,145,148],[353]),([0,1,2,3,4,10,36],[354]),([0,1,3,4,10,41,87],[11,12,13,26,45,103]),([0,1,3,4,10,41,111],[11,12,13,26,48,137]),([0,1,2,3,4,41,44],[1,2,11,81,103,324]),([0,1,2,3,4,41,53],[1,2,11,81]),([0,1,2,3,4,10,254],[0,1,10,11,12,13,81,236]),([0,1,2,3,4,18,41],[1,2,11,124,137,355]),([0,1,2,3,4,31,41],[1,2,11,124]),([0,1,2,3,4,10,247],[0,1,10,11,12,13,124,239]),([0,1,3,4,87,171],[4,10,12,81,288,356,357,358]),([0,1,3,4,111,171],[6,10,12,124,311,356,359,360]),([0,1,2,3,4,14,171],[2,12,81,88,124,288,289,356]),([0,1,2,3,4,204],[0,1,12,21,124,361]),([0,1,2,3,4,215],[0,1,12,32,81,362]),([0,1,3,4,10,55,87],[4,13,22,24,46,178,328]),([0,1,3,4,10,172],[0,10,11,22,328,363]),([0,1,4,10,14,87],[10,12,22,51,81,88,103,208,313]),([0,1,3,4,18,87],[7,12,33,72,81,292,313,365]),([0,1,3,4,10,18,87],[7,12,33,34,103,292,313]),([0,1,3,4,32,87],[10,12,22,81,300,313,334,366]),([0,1,3,4,10,90],[0,22,33,88,212,213,313,367]),([0,1,3,4,10,87,90],[22,33,46,88,212,214,313]),([0,1,3,4,10,94],[0,10,12,22,215,216,313,369]),([0,1,3,4,10,33,111],[6,13,33,35,49,195,335]),([0,1,3,4,10,186],[0,10,11,33,335,370]),([0,1,3,10,14,111],[10,12,33,51,88,124,137,224,294]),([0,1,3,4,44,111],[5,12,22,60,124,294,316,372]),([0,1,3,4,10,44,111],[5,12,22,23,137,294,316]),([0,1,3,4,54,111],[10,12,33,124,294,321,327,373]),([0,1,3,4,10,90,111],[22,33,49,88,130,212,367]),([0,1,3,4,10,122],[0,10,12,33,226,227,294,374]),([0,1,2,3,4,10,224],[10,88,91]),([1,2,3,4,10,14,224],[0,5,7,51,88,293,301]),([0,1,2,3,4,10,323],[9,10,88]),([0,1,2,3,4,10,174],[0,8,10,12,88,246,376,377]),([0,1,2,3,4,10,90],[0,88,212,213]),([0,1,3,4,10,14,90],[9,10,22,33,88,212,367]),([0,1,2,3,4,10,130],[0,51,88,247]),([0,1,2,4,14,44],[5,12,22,103,124,316,378,379]),([0,1,2,3,4,14,44],[12,103,124]),([0,1,2,4,10,14,44],[5,12,22,81,137,316,378]),([0,1,2,3,4,14,54],[12,103,124]),([0,1,2,3,14,18],[7,12,33,81,137,292,381,382]),([0,1,2,3,4,14,18],[12,81,137,292]),([0,1,2,3,10,14,18],[7,12,33,103,124,292,381]),([0,1,2,3,4,14,32],[12,81,137,300]),([0,1,2,3,4,28],[1,292,384]),([0,1,2,3,4,10,28],[2,88]),([0,1,2,3,4,14,28],[8,12,292])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_4 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_4 = true := by decide +kernel
-def h26Block6_5 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,14,29],[387]),([0,1,2,3,4,10,34],[388]),([0,1,2,3,4,22,44],[1,219,316]),([0,1,2,3,4,189],[0,1,5,12,21,22,124,220,361,389,390]),([0,1,2,3,4,44,189],[1,5,12,21,22,23]),([0,1,2,3,4,28,44],[21,124,384]),([0,1,2,3,4,51],[0,1,5,10,12,22,59,81,391,392,393]),([0,1,2,3,4,44,51],[5,12,22,23,60,103,124,316]),([0,1,2,3,4,10,189],[0,1,2,5,11,21,22,81,389]),([0,1,2,3,4,18,44],[5,81,103,124,137,394]),([0,1,2,3,4,10,51],[0,5,10,12,22,81,124,316,391]),([0,1,2,3,4,192],[0,1,10,11,12,61,124,395,396,397]),([0,1,2,3,4,44],[1,12,23,124]),([0,1,2,3,4,77],[0,1,10,12,81,321,398,399,400]),([0,1,2,3,4,18,24],[1,32,292]),([0,1,2,3,4,176],[0,1,7,12,32,33,81,232,362,401,402]),([0,1,2,3,4,18,176],[1,7,12,32,33,34]),([0,1,2,3,4,18,28],[32,81,292]),([0,1,2,3,4,61],[0,1,7,10,12,33,71,81,292,403,404,405]),([0,1,2,3,4,18,61],[7,12,33,34,72,81,292]),([0,1,2,3,4,10,176],[0,1,2,7,11,32,33,124,401]),([0,1,2,3,4,10,61],[0,7,10,12,33,81,124,292,403]),([0,1,2,3,4,179],[0,1,10,11,12,73,81,406,407,408]),([0,1,2,3,4,70],[0,1,10,12,81,300,409,410,411]),([0,1,2,3,4,18],[1,12,34,81]),([1,2,3,4,12,220,286],[5,7,145,178,195,412,414]),([1,2,4,85,220,286],[0,4,5,7,39,81,412,414,416]),([1,2,3,145,220,286],[0,5,6,7,43,124,145,412,418]),([1,2,3,4,17,220,286],[4,5,11,85,129,141,145]),([1,2,3,4,178,286],[0,5,7,124,141,290]),([1,2,3,4,45,220,286],[6,7,11,86,107,128,414]),([1,2,3,4,175,220],[0,5,7,81,107,312]),([1,2,4,87,220,286],[0,5,7,22,46,81,414,415,419]),([1,2,3,111,220,286],[0,5,7,33,49,124,145,415,421]),([1,2,3,4,44,220,286],[5,12,22,103,145,316,319]),([1,2,3,4,134,286],[0,5,7,104,124,319]),([1,2,3,4,18,220,286],[7,12,33,137,292,298,414]),([1,2,3,4,132,220],[0,5,7,81,138,298]),([1,2,14,220,286],[0,5,7,9,81,88,124,145,413,414,422]),([0,1,2,3,4,41,220],[13,26,81]),([1,2,3,4,12,41,220],[0,11,12,13,98,178]),([0,1,2,3,4,220,320],[13,26,81]),([0,2,4,12,85,220],[1,4,5,13,76,81,173,178,283]),([0,2,3,4,12,145,220],[6,13,145,192,195,281,284]),([0,1,2,3,4,12,17],[5,10,17]),([0,2,3,4,12,17,220],[1,4,5,11,16,151,281]),([0,1,2,3,4,12,178],[5,10,17]),([0,1,4,12,87,220],[5,10,13,22,81,95,147,178,281]),([0,1,3,4,12,111,220],[13,33,76,82,145,149,195]),([0,1,2,3,4,12,44],[1,5,21,60]),([0,1,3,4,12,44,220],[5,10,12,21,22,76,324]),([0,1,2,3,4,12,134],[1,5,60]),([0,1,2,4,12,14,220],[5,9,26,88,105,145,195]),([0,1,2,4,55,220],[0,4,13,22,24,178,424,425]),([0,1,2,3,4,55,220],[0,13,24,178]),([0,1,2,4,12,55,220],[4,13,22,24,26,81,424]),([0,1,2,3,4,59,220],[0,13,158,178]),([0,1,2,3,4,33,220],[0,5,35,36,81,167,195]),([0,1,2,3,4,38,220],[0,5,13,81,168,170,195,337]),([0,1,2,3,4,12,224],[1,10,13,90,91,112,145]),([0,1,2,3,4,12,225],[1,5,10,13,113,115,145,427]),([0,1,2,3,4,12,22],[5,195,219]),([0,1,2,3,4,22,220],[13,145]),([0,1,2,3,4,220,221],[429]),([0,1,2,3,4,12,23],[430]),([0,2,4,85,145,220],[1,4,5,6,76,81,285,339,416]),([0,1,2,4,85,111,220],[4,5,39,49,76,82,283]),([0,1,2,4,55,85,220],[4,13,22,24,25,39,425]),([0,1,2,4,127,220],[0,4,12,81,425,432]),([0,1,2,4,44,85,220],[5,12,21,22,23,76,342])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_5 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_5 = true := by decide +kernel
-def h26Block6_6 : List NodeSpec := nodesWithIdentity [([0,1,2,4,85,134],[1,5,13,81,433,434]),([0,1,2,4,88,220],[0,4,6,87,88,186,416,435]),([0,1,2,4,85,88,220],[4,6,39,87,88,89,416]),([0,1,2,4,89,220],[0,4,5,81,187,344,416,436]),([0,1,2,4,85,224],[1,5,7,88,90,112,416,437]),([0,1,2,4,85,220,224],[5,7,76,88,90,91,416]),([0,1,2,4,85,225],[1,4,5,81,113,416,427,438]),([0,1,2,3,4,45,220],[6,30,81]),([1,2,3,4,45,145,220],[0,6,7,11,86,107,285]),([0,1,2,3,4,220,324],[6,30,81]),([0,1,2,3,4,17,145],[5,17,124]),([0,2,3,4,17,145,220],[1,4,5,11,129,145,199]),([0,1,2,3,4,145,178],[5,17,124]),([0,1,2,4,87,145,220],[5,22,43,46,95,281,284]),([0,1,2,3,111,145,220],[6,33,76,82,190,281,284]),([0,1,2,3,4,160,220],[0,5,6,81,167,196,441]),([0,1,2,3,4,134,145],[1,5,6,60,104,124,434]),([0,1,2,14,145,220],[5,6,81,88,105,124,145,197,285]),([0,1,2,3,4,88,220],[0,6,87,186]),([0,1,2,4,88,145,220],[4,6,43,81,87,88,435]),([0,1,2,3,4,123,220],[0,6,186]),([0,1,2,3,145,224],[1,5,7,88,90,145,442,443]),([0,1,2,3,4,145,224],[1,5,90,145]),([0,1,2,3,145,220,224],[5,7,76,88,90,124,442]),([0,1,2,3,4,145,225],[1,5,113,145]),([0,1,2,3,4,26,145],[5,129,284]),([0,1,2,3,4,26,220],[6,255,281]),([0,1,2,3,4,220,222],[445]),([0,1,2,3,4,145,152],[446]),([0,1,2,4,17,87,220],[4,5,11,16,18,210,281]),([0,1,2,3,4,164,220],[0,1,4,10,11,12,16,260,281]),([0,1,2,3,4,17,44],[1,10,11,17,60,447]),([0,1,2,4,14,17,220],[4,5,11,18,129,145,251]),([0,1,2,3,4,39,220],[0,1,4,5,11,81,124,129,262]),([0,1,2,3,4,17,224],[1,11,17,124,145,448]),([0,1,2,4,87,178],[5,10,13,81,449,450]),([0,1,2,3,4,110,178],[5,10,17,290,449]),([0,1,2,3,4,111,178],[5,10,17,33,124,290,449]),([0,1,2,3,4,120,178],[5,10,290,449]),([0,1,2,3,4,124,178],[5,124,290,449]),([0,1,2,3,4,203],[0,1,5,12,21,124,390]),([0,1,2,4,14,178],[5,6,81,124,251,449]),([0,1,2,3,4,281],[0,1,5,10]),([0,1,2,4,55,87,220],[4,13,22,24,46,157,424]),([0,1,2,4,172,220],[0,11,22,81,424,451]),([0,1,4,87,111,220],[5,10,22,33,81,97,204,281,419]),([0,1,2,4,90,220],[0,22,33,88,212,214,419,453]),([0,1,2,4,87,90,220],[22,33,46,88,212,213,419]),([0,1,2,4,94,220],[0,5,22,81,215,217,419,454]),([0,1,2,4,87,224],[5,7,10,88,112,293,419,455]),([0,1,2,4,87,220,224],[5,7,88,91,281,293,419]),([0,1,2,4,87,225],[5,10,22,81,302,419,427,456]),([0,1,2,3,4,18,220],[33,34,81]),([1,2,3,4,18,111,220],[0,7,12,33,97,292,298]),([0,1,2,3,4,220,336],[33,34,81]),([0,1,2,3,4,186,220],[0,5,33,36,81,370,458]),([0,1,2,3,4,44,111],[5,60,124]),([0,1,3,4,44,111,220],[5,10,12,22,145,316,372]),([0,1,2,3,4,111,134],[5,60,124]),([0,1,2,14,111,220],[5,33,81,88,97,124,145,224,296]),([0,1,2,3,4,90,220],[0,33,212,214]),([0,1,2,4,90,111,220],[22,33,49,81,88,212,453]),([0,1,2,3,4,122,220],[0,33,97,226]),([0,1,2,3,111,224],[5,7,10,88,145,293,460,461]),([0,1,2,3,4,111,224],[5,10,145,293]),([0,1,2,3,111,220,224],[5,7,88,124,281,293,460]),([0,1,2,3,4,111,225],[5,10,145,302]),([0,1,2,3,4,28,111],[5,82,384]),([0,1,2,3,4,28,220],[33,76,292]),([0,1,2,3,4,220,223],[463])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_6 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_6 = true := by decide +kernel
-def h26Block6_7 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,111,119],[464]),([0,1,2,3,4,189,220],[0,1,10,11,12,21,22,76,389]),([0,1,2,4,14,44,220],[5,12,22,23,145,316,379]),([0,1,2,3,4,51,220],[0,5,10,12,22,81,124,316,391]),([0,1,2,3,4,44,224],[10,12,60,124,145,465]),([0,1,2,3,4,134,144],[1,5,60,104,434]),([0,1,2,3,4,134,153],[1,5,104,434]),([0,1,2,3,4,134,170],[5,104,124,434]),([0,1,2,3,4,198],[0,1,5,10,11,16,124,261]),([0,1,2,4,14,134],[5,33,81,124,379,434]),([0,1,2,3,4,240],[0,1,5,10,466]),([0,1,2,4,14,88,220],[4,6,9,87,88,201,435]),([0,1,2,4,174,220],[0,11,81,88,105,246,376,467]),([0,1,2,4,14,90,220],[9,22,33,88,130,212,453]),([0,1,2,4,130,220],[0,12,81,88,247,248,296,468]),([0,1,2,3,4,26,224],[1,293]),([0,1,2,3,4,177],[0,1,5,7,10,88]),([0,1,2,3,4,177,224],[1,5,7,88,90,91]),([0,1,2,3,4,28,224],[10,90]),([0,1,2,3,4,133],[0,1,5,7,10,88]),([0,1,2,3,4,133,224],[5,7,10,88,91,293]),([0,1,2,3,4,177,220],[0,1,7,11,76,88,124]),([0,1,2,3,4,133,220],[0,7,10,12,88,124,281]),([0,1,2,3,4,180],[0,1,5,10,11,81,129,263]),([0,1,2,3,4,136],[0,1,5,10,12,81,316,392]),([0,1,2,3,4,224],[1,5,10,91]),([0,1,2,3,4,41,286],[13,26,124]),([1,2,3,4,12,41,286],[0,11,12,13,133,195]),([0,1,2,3,4,286,320],[13,26,124]),([0,2,3,4,12,85,286],[4,13,173,178,305,307,414]),([0,2,3,12,145,286],[1,6,7,13,116,124,192,195,309]),([0,1,2,3,4,12,45],[7,10,29]),([0,2,3,4,12,45,286],[1,6,7,11,28,161,305]),([0,1,2,3,4,12,175],[7,10,29]),([0,1,3,4,12,87,286],[13,22,116,125,147,178,414]),([0,1,3,12,111,286],[7,10,13,33,124,131,149,195,305]),([0,1,2,3,4,12,18],[1,7,32,72]),([0,1,3,4,12,18,286],[7,10,12,32,33,116,331]),([0,1,2,3,4,12,132],[1,7,72]),([0,1,2,3,12,14,286],[7,9,26,88,139,178,414]),([0,1,2,3,4,55,286],[0,7,24,25,124,157,178]),([0,1,2,3,4,59,286],[0,7,13,124,158,160,178,330]),([0,1,2,3,4,12,239],[1,7,10,13,112,146,474]),([0,1,2,3,33,286],[0,6,13,33,35,195,475,476]),([0,1,2,3,4,33,286],[0,13,35,195]),([0,1,2,3,12,33,286],[6,13,26,33,35,124,475]),([0,1,2,3,4,38,286],[0,13,168,195]),([0,1,2,3,4,12,24],[7,32,178]),([0,1,2,3,4,24,286],[13,414]),([0,1,2,3,4,286,289],[478]),([0,1,2,3,4,12,25],[479]),([0,1,2,3,4,17,286],[4,18,124]),([1,2,3,4,17,85,286],[0,4,5,11,129,141,201]),([0,1,2,3,4,286,328],[4,18,124]),([0,2,3,85,145,286],[1,4,6,7,116,124,201,339,418]),([0,1,2,3,4,45,85],[7,29,81]),([0,2,3,4,45,85,286],[1,6,7,11,86,182,414]),([0,1,2,3,4,85,175],[7,29,81]),([0,1,2,4,85,87,286],[4,22,116,125,171,305,307]),([0,1,2,3,85,111,286],[7,33,39,49,131,305,307]),([0,1,2,3,4,127,286],[0,4,7,124,157,179,432]),([0,1,2,3,4,85,132],[1,4,7,72,81,138,482]),([0,1,2,14,85,286],[4,7,81,88,124,139,180,201,414]),([0,1,2,3,4,85,224],[1,7,90,112]),([0,1,2,4,85,224,286],[5,7,81,88,90,116,437]),([0,1,2,3,4,85,239],[1,7,112]),([0,1,2,3,88,286],[0,4,6,87,88,201,483,484]),([0,1,2,3,4,88,286],[0,4,87,201]),([0,1,2,3,85,88,286],[4,6,39,87,88,124,483]),([0,1,2,3,4,89,286],[0,4,187,201])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_7 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_7 = true := by decide +kernel
-def h26Block6_8 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,26,85],[7,255,307]),([0,1,2,3,4,26,286],[4,129,305]),([0,1,2,3,4,286,292],[485]),([0,1,2,3,4,85,92],[486]),([0,1,2,3,87,145,286],[6,7,43,46,116,125,309]),([0,1,2,3,33,145,286],[6,13,33,35,36,43,476]),([0,1,2,3,160,286],[0,6,12,124,441,476]),([0,1,2,3,18,145,286],[7,12,32,33,34,116,352]),([0,1,2,3,132,145],[1,7,13,124,352,482]),([0,1,2,3,88,145,286],[4,6,43,87,88,89,484]),([0,1,2,3,123,286],[0,5,6,124,350,484]),([0,1,2,3,145,224,286],[5,7,88,90,91,116,443]),([0,1,2,3,145,239],[1,4,7,124,443,474]),([0,1,2,3,45,111,286],[6,7,11,28,30,230,305]),([0,1,2,3,4,131,286],[0,1,6,10,11,12,28,272,305]),([0,1,2,3,4,18,45],[1,10,11,29,72,487]),([0,1,2,3,14,45,286],[6,7,11,30,86,254,414]),([0,1,2,3,4,60,286],[0,1,5,6,11,81,86,274,414]),([0,1,2,3,4,45,224],[1,11,29,81,112,488]),([0,1,2,3,4,86,175],[7,10,29,312,489]),([0,1,2,3,4,87,175],[7,10,22,29,81,312,489]),([0,1,2,3,4,108,175],[7,10,312,489]),([0,1,2,3,4,109,175],[7,81,312,489]),([0,1,2,3,111,175],[7,10,13,124,489,490]),([0,1,2,3,4,213],[0,1,7,12,32,81,402]),([0,1,2,3,14,175],[4,7,81,124,254,489]),([0,1,2,3,4,280],[0,1,5,7,10]),([0,1,2,3,4,44,286],[22,23,124]),([1,2,3,4,44,87,286],[0,5,12,22,130,316,319]),([0,1,2,3,4,286,321],[22,23,124]),([0,1,2,3,4,172,286],[0,7,22,25,124,363,451]),([0,1,3,87,111,286],[7,10,22,33,124,130,204,305,421]),([0,1,2,3,4,18,87],[7,72,81]),([0,1,3,4,18,87,286],[7,10,12,33,292,365,414]),([0,1,2,3,4,87,132],[7,72,81]),([0,1,2,14,87,286],[7,22,81,88,124,130,208,317,414]),([0,1,2,3,4,87,224],[7,10,112,293]),([0,1,2,4,87,224,286],[5,7,81,88,293,305,455]),([0,1,2,3,4,87,239],[7,10,112]),([0,1,2,3,90,286],[0,22,33,88,130,212,493,494]),([0,1,2,3,4,90,286],[0,22,130,212]),([0,1,2,3,87,90,286],[22,33,46,88,124,212,493]),([0,1,2,3,4,94,286],[0,22,130,215]),([0,1,2,3,4,28,87],[7,125,292]),([0,1,2,3,4,28,286],[22,116,384]),([0,1,2,3,4,286,291],[495]),([0,1,2,3,4,87,102],[496]),([0,1,2,3,33,111,286],[6,13,33,35,49,167,475]),([0,1,2,3,186,286],[0,11,33,124,458,475]),([0,1,2,3,90,111,286],[22,33,49,88,212,213,494]),([0,1,2,3,122,286],[0,5,33,124,226,228,421,497]),([0,1,2,3,111,224,286],[5,7,88,91,293,305,461]),([0,1,2,3,111,239],[7,10,22,124,461,474]),([0,1,2,3,4,176,286],[0,1,10,11,12,32,33,116,401]),([0,1,2,3,14,18,286],[7,12,33,34,292,382,414]),([0,1,2,3,4,61,286],[0,5,10,12,33,81,292,403,414]),([0,1,2,3,4,18,224],[10,12,72,81,112,498]),([0,1,2,3,4,84,132],[1,7,72,138,482]),([0,1,2,3,4,121,132],[1,7,138,482]),([0,1,2,3,4,132,143],[7,81,138,482]),([0,1,2,3,4,208],[0,1,7,10,11,28,81,273]),([0,1,2,3,14,132],[7,22,81,124,382,482]),([0,1,2,3,4,258],[0,1,5,7,10]),([0,1,2,3,14,88,286],[4,6,9,87,88,186,483]),([0,1,2,3,174,286],[0,11,88,124,139,246,377,499]),([0,1,2,3,14,90,286],[9,22,33,88,212,214,493]),([0,1,2,3,130,286],[0,12,88,124,247,249,317,500]),([0,1,2,3,4,177,286],[0,1,5,11,81,88,116]),([0,1,2,3,4,133,286],[0,5,10,12,81,88,305]),([0,1,2,3,4,11,239],[1,7,112,146,474])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_8 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_8 = true := by decide +kernel
-def h26Block6_9 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,82,239],[1,7,146,474]),([0,1,2,3,4,83,239],[7,10,146,474]),([0,1,2,3,4,193],[0,1,7,10,11,81,86,275]),([0,1,2,3,4,169],[0,1,7,10,12,81,292,404]),([0,2,3,4,12,41,85],[11,12,13,173,178,206]),([0,2,3,4,12,41,145],[11,12,13,192,195,206]),([0,1,3,4,12,41,87],[2,11,12,13,147,178]),([0,1,3,4,12,41,111],[2,11,12,13,149,195]),([0,1,2,3,4,41,55],[0,11,26,81,178,328]),([0,1,2,3,4,41,58],[0,11,26,81]),([0,1,2,3,4,12,254],[0,1,10,11,12,13,81,237]),([0,1,2,3,4,33,41],[0,11,26,124,195,502]),([0,1,2,3,4,37,41],[0,11,26,124]),([0,1,2,3,4,12,247],[0,1,10,11,12,13,124,240]),([0,2,3,4,85,320],[1,5,13,81,504,506,507,508]),([0,2,3,4,145,320],[1,7,13,124,504,509,510,511]),([0,1,3,4,87,320],[5,10,13,81,505,508,512,513]),([0,1,3,4,111,320],[7,10,13,124,505,511,514,515]),([0,1,2,3,4,14,320],[13,26,81,88,124,504,505,508]),([0,1,2,3,4,348],[0,13,24,124,516]),([0,1,2,3,4,355],[0,13,35,81,517]),([0,2,3,4,12,17,85],[4,5,11,16,85,151,307]),([0,2,3,4,12,328],[1,4,10,12,151,519]),([0,4,12,85,87],[1,4,10,13,22,81,125,172,178,307,520]),([0,3,4,12,85,111],[1,4,10,13,33,82,307,518,525]),([0,2,4,12,14,85],[1,4,8,13,81,88,178,518,527]),([0,2,3,4,33,85],[6,13,33,36,81,518,521,529]),([0,2,3,4,12,33,85],[6,13,33,167,178,518,521]),([0,2,3,4,38,85],[1,4,13,81,170,518,530,531]),([0,2,3,4,12,88],[4,6,10,88,89,518,523,532]),([0,2,3,4,12,85,88],[4,6,88,186,307,518,523]),([0,2,3,4,12,89],[1,4,10,13,189,518,533,534]),([0,2,3,4,12,45,145],[6,7,11,28,128,161,284]),([0,2,3,4,12,324],[1,6,10,12,161,536]),([0,3,4,12,87,145],[1,6,10,13,22,125,284,535,537]),([0,3,12,111,145],[1,6,10,13,33,82,124,191,195,284,539]),([0,2,3,12,14,145],[1,6,8,13,88,124,195,535,541]),([0,2,3,4,55,145],[4,13,22,25,124,535,540,543]),([0,2,3,4,12,55,145],[4,13,22,157,195,535,540]),([0,2,3,4,59,145],[1,6,13,124,160,535,544,545]),([0,2,3,4,12,88,145],[4,6,88,201,284,523,532]),([0,2,3,4,12,123],[1,6,10,13,202,532]),([0,1,3,4,12,44,87],[5,12,21,22,103,125,324]),([0,1,3,4,12,321],[1,10,11,22,324,546]),([0,1,4,12,14,87],[10,13,22,51,81,88,178,537,547]),([0,1,3,4,33,87],[6,13,33,81,167,521,537,549]),([0,1,3,4,12,33,87],[6,13,33,36,178,521,537]),([0,1,3,4,38,87],[10,13,22,81,337,531,537,550]),([0,1,3,4,12,90],[1,22,33,88,213,524,537,551]),([0,1,3,4,12,87,90],[22,33,88,125,214,524,537]),([0,1,3,4,12,94],[1,10,13,22,216,537,552,553]),([0,1,3,4,12,18,111],[7,12,32,33,82,137,331]),([0,1,3,4,12,336],[1,10,11,33,331,554]),([0,1,3,12,14,111],[10,13,33,51,88,124,195,525,555]),([0,1,3,4,55,111],[4,13,22,124,157,525,540,557]),([0,1,3,4,12,55,111],[4,13,22,25,195,525,540]),([0,1,3,4,59,111],[10,13,33,124,330,525,545,558]),([0,1,3,4,12,90,111],[22,33,82,88,130,524,551]),([0,1,3,4,12,122],[1,10,13,33,227,525,559,560]),([0,1,2,3,4,12,323],[1,9,10,13,88,561,562,563]),([0,1,2,3,4,12,88],[10,88,89]),([0,2,3,4,12,14,88],[1,4,6,51,88,523,532]),([0,1,2,3,4,12,174],[8,10,88]),([0,1,2,3,4,12,90],[1,88,213,524]),([0,1,3,4,12,14,90],[8,10,22,33,88,524,551]),([0,1,2,3,4,12,130],[1,51,88,565]),([0,1,2,4,14,55],[4,13,22,124,178,540,566,567]),([0,1,2,3,4,14,55],[13,124,178]),([0,1,2,4,12,14,55],[4,13,22,81,195,540,566]),([0,1,2,3,4,14,59],[13,124,178])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_9 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_9 = true := by decide +kernel
-def h26Block6_10 : List NodeSpec := nodesWithIdentity [([0,1,2,3,14,33],[6,13,33,81,195,521,569,570]),([0,1,2,3,4,14,33],[13,81,195,521]),([0,1,2,3,12,14,33],[6,13,33,124,178,521,569]),([0,1,2,3,4,14,38],[13,81,195,531]),([0,1,2,3,4,19],[0,571,572,573,574]),([0,1,2,3,4,12,19],[26,88,571]),([0,1,2,3,4,14,19],[9,13,573]),([0,1,2,3,4,14,20],[577]),([0,1,2,3,4,12,21],[578]),([0,1,2,3,4,22,55],[0,540]),([0,1,2,3,4,340],[0,4,13,22,24,124,218,516,580,581]),([0,1,2,3,4,55,340],[0,4,13,22,24]),([0,1,2,3,4,19,55],[24,124,574]),([0,1,2,3,4,56],[0,1,4,10,13,22,81,156,582,583,584]),([0,1,2,3,4,55,56],[4,13,22,25,124,157,178,540]),([0,1,2,3,4,12,340],[0,4,11,22,24,26,81,580]),([0,1,2,3,4,33,55],[4,81,124,178,195,585]),([0,1,2,3,4,12,56],[1,4,10,13,22,81,124,540,582]),([0,1,2,3,4,342],[0,1,10,11,12,13,124,158,586,587,588]),([0,1,2,3,4,55],[0,13,24,25,124]),([0,1,2,3,4,78],[0,1,10,13,81,545,589,590,591]),([0,1,2,3,4,24,33],[0,521]),([0,1,2,3,4,326],[0,6,13,33,35,81,231,517,593,594]),([0,1,2,3,4,33,326],[0,6,13,33,35]),([0,1,2,3,4,19,33],[35,81,573]),([0,1,2,3,4,62],[0,1,6,10,13,33,81,166,521,595,596,597]),([0,1,2,3,4,33,62],[6,13,33,36,81,167,521]),([0,1,2,3,4,12,326],[0,6,11,26,33,35,124,593]),([0,1,2,3,4,12,62],[1,6,10,13,33,81,124,521,595]),([0,1,2,3,4,329],[0,1,10,11,12,13,81,168,598,599,600]),([0,1,2,3,4,71],[0,1,10,13,81,531,601,602,603]),([0,1,2,3,4,33],[0,13,35,36,81]),([0,2,3,4,17,85,145],[4,5,11,85,129,199,201]),([0,1,2,4,17,85,87],[4,5,11,16,17,209,307]),([0,1,2,3,4,85,164],[0,1,5,10,11,13,16,261,307]),([0,1,2,3,4,17,55],[0,10,11,18,157,604]),([0,1,2,4,14,17,85],[4,5,11,17,129,201,250]),([0,1,2,3,4,39,85],[0,1,4,5,11,81,124,129,263]),([0,1,2,3,4,17,88],[0,11,18,124,201,605]),([0,2,3,4,145,328],[1,4,7,124,519,607]),([0,1,2,4,87,328],[4,10,12,81,606,608]),([0,1,2,3,4,110,328],[4,10,18,519,606]),([0,1,2,3,4,111,328],[4,10,18,33,124,519,606]),([0,1,2,3,4,120,328],[4,10,519,606]),([0,1,2,3,4,124,328],[4,124,519,606]),([0,1,2,3,4,347],[0,4,13,24,124,581]),([0,1,2,4,14,328],[4,7,81,124,250,606]),([0,1,2,3,4,369],[0,4,10]),([0,2,3,4,45,85,145],[6,7,11,86,128,182,285]),([0,2,3,4,85,324],[1,5,6,81,536,610]),([0,2,4,85,87,145],[1,4,6,22,81,125,285,609,611]),([0,2,3,85,111,145],[1,4,6,33,82,124,201,609,613]),([0,2,3,4,55,85,145],[4,13,22,178,201,540,543]),([0,2,3,4,127,145],[1,4,6,124,179,543]),([0,2,3,4,33,85,145],[6,13,33,195,285,521,529]),([0,2,3,4,85,160],[1,4,6,81,196,614]),([0,2,14,85,145],[1,4,6,8,81,88,124,201,285,340,615]),([0,1,2,4,44,85,87],[5,12,21,22,60,125,341]),([0,1,2,4,85,321],[1,11,22,81,616,617]),([0,1,4,85,87,111],[4,10,22,33,81,97,307,611,618]),([0,1,2,4,87,88],[4,6,10,88,186,523,620,621]),([0,1,2,4,85,87,88],[4,6,88,89,307,523,621]),([0,1,2,4,87,89],[4,10,22,81,344,533,621,622]),([0,1,2,4,85,90],[1,22,33,88,214,524,611,623]),([0,1,2,4,85,87,90],[22,33,88,125,213,524,611]),([0,1,2,4,85,94],[1,4,22,81,217,552,611,624]),([0,1,2,3,4,85,336],[1,4,33,34,81,554,625]),([0,1,2,3,4,33,85],[33,36,81]),([0,2,3,4,33,85,111],[1,6,13,33,97,521,529]),([0,1,2,3,4,85,186],[33,36,81])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_10 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_10 = true := by decide +kernel
-def h26Block6_11 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,55,111],[4,124,157]),([0,1,3,4,55,85,111],[4,10,13,22,201,540,557]),([0,1,2,3,4,111,127],[4,124,157]),([0,1,2,14,85,111],[4,33,81,88,97,124,201,527,555]),([0,1,2,3,4,85,90],[1,33,214,524]),([0,1,2,4,85,90,111],[22,33,81,82,88,524,623]),([0,1,2,3,4,85,122],[1,33,97,559]),([0,1,2,3,88,111],[4,6,10,88,201,523,628,629]),([0,1,2,3,4,88,111],[4,10,201,523]),([0,1,2,3,85,88,111],[4,6,88,124,307,523,628]),([0,1,2,3,4,89,111],[4,10,201,533]),([0,1,2,3,4,19,85],[33,39,571]),([0,1,2,3,4,19,111],[4,49,572]),([0,1,2,3,4,111,118],[631]),([0,1,2,3,4,85,93],[632]),([0,1,2,3,4,85,340],[0,10,11,13,22,24,39,580]),([0,1,2,4,14,55,85],[4,13,22,25,201,540,567]),([0,1,2,3,4,56,85],[1,4,10,13,22,81,124,540,582]),([0,1,2,3,4,55,88],[10,13,124,157,201,633]),([0,1,2,3,4,127,285],[0,4,157,179,432]),([0,1,2,3,4,127,293],[0,4,179,432]),([0,1,2,3,4,127,319],[4,124,179,432]),([0,1,2,3,4,346],[0,1,4,5,10,11,16,124,260]),([0,1,2,4,14,127],[4,33,81,124,432,567]),([0,1,2,3,4,128],[0,1,4,10,634]),([0,1,2,4,14,85,224],[5,7,8,88,90,145,437]),([0,1,2,4,85,323],[1,11,81,88,561,562,635,636]),([0,1,2,4,14,85,90],[8,22,33,88,130,524,623]),([0,1,2,4,85,130],[1,13,81,88,248,565,637,638]),([0,1,2,3,4,26,88],[0,523]),([0,1,2,3,4,327],[0,4,6,10,88]),([0,1,2,3,4,88,327],[0,4,6,87,88]),([0,1,2,3,4,19,88],[10,87,572]),([0,1,2,3,4,137],[0,1,4,6,10,88,185,523,640,641,642]),([0,1,2,3,4,88,137],[4,6,10,88,89,523]),([0,1,2,3,4,85,327],[0,6,11,39,88,124]),([0,1,2,3,4,85,137],[1,6,10,13,88,124,307,523,640]),([0,1,2,3,4,330],[0,1,4,5,10,11,81,129,262]),([0,1,2,3,4,138],[0,1,4,10,13,81,533,643,644,645]),([0,1,2,3,4,88],[0,4,10,87,89]),([0,1,2,3,45,111,145],[6,7,11,28,29,229,284]),([0,1,2,3,4,131,145],[0,1,7,10,11,13,28,273,284]),([0,1,2,3,4,33,45],[0,10,11,30,167,646]),([0,1,2,3,14,45,145],[6,7,11,29,86,253,285]),([0,1,2,3,4,60,145],[0,1,4,7,11,81,86,275,285]),([0,1,2,3,4,45,88],[0,11,30,81,186,647]),([0,1,2,3,4,86,324],[6,10,30,536,648]),([0,1,2,3,4,87,324],[6,10,22,30,81,536,648]),([0,1,2,3,4,108,324],[6,10,536,648]),([0,1,2,3,4,109,324],[6,81,536,648]),([0,1,2,3,111,324],[6,10,12,124,648,649]),([0,1,2,3,4,353],[0,6,13,35,81,594]),([0,1,2,3,14,324],[5,6,81,124,253,648]),([0,1,2,3,4,368],[0,4,6,10]),([0,1,2,3,4,145,321],[1,6,22,23,124,546,617]),([0,1,2,3,4,55,145],[22,25,124]),([0,2,3,4,55,87,145],[1,4,13,22,130,540,543]),([0,1,2,3,4,145,172],[22,25,124]),([0,1,3,87,111,145],[6,10,22,33,124,130,284,613,618]),([0,1,2,3,4,33,87],[6,81,167]),([0,1,3,4,33,87,145],[6,10,13,33,285,521,549]),([0,1,2,3,4,87,160],[6,81,167]),([0,1,2,14,87,145],[6,22,81,88,124,130,285,541,547]),([0,1,2,3,4,87,88],[6,10,186,523]),([0,1,2,4,87,88,145],[4,6,81,88,284,523,620]),([0,1,2,3,4,87,123],[6,10,186]),([0,1,2,3,90,145],[1,22,33,88,130,524,652,653]),([0,1,2,3,4,90,145],[1,22,130,524]),([0,1,2,3,87,90,145],[22,33,88,124,125,524,652]),([0,1,2,3,4,94,145],[1,22,130,552])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_11 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_11 = true := by decide +kernel
-def h26Block6_12 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,19,87],[6,46,572]),([0,1,2,3,4,19,145],[22,43,571]),([0,1,2,3,4,145,151],[654]),([0,1,2,3,4,87,103],[655]),([0,1,2,3,18,111,145],[7,12,32,33,72,82,351]),([0,1,2,3,145,336],[1,11,33,124,625,656]),([0,1,2,3,90,111,145],[22,33,82,88,213,524,653]),([0,1,2,3,122,145],[1,4,33,124,228,559,613,657]),([0,1,2,3,88,111,145],[4,6,88,89,284,523,629]),([0,1,2,3,111,123],[6,10,22,124,350,658]),([0,1,2,3,4,145,326],[0,10,11,13,33,35,43,593]),([0,1,2,3,14,33,145],[6,13,33,36,285,521,570]),([0,1,2,3,4,62,145],[1,4,10,13,33,81,285,521,595]),([0,1,2,3,4,33,88],[10,13,81,167,186,659]),([0,1,2,3,4,160,219],[0,6,167,196,441]),([0,1,2,3,4,160,238],[0,6,196,441]),([0,1,2,3,4,160,284],[6,81,196,441]),([0,1,2,3,4,352],[0,1,6,7,10,11,28,81,272]),([0,1,2,3,14,160],[6,22,81,124,441,570]),([0,1,2,3,4,161],[0,1,4,6,10,660]),([0,1,2,3,14,145,224],[5,7,8,88,90,112,442]),([0,1,2,3,145,323],[1,11,88,124,561,563,661,662]),([0,1,2,3,14,90,145],[8,22,33,88,214,524,652]),([0,1,2,3,130,145],[1,13,88,124,249,541,565,663]),([0,1,2,3,4,145,327],[0,4,11,43,81,88]),([0,1,2,3,4,137,145],[1,4,10,13,81,88,284,523,640]),([0,1,2,3,4,9,123],[0,6,186,202,350]),([0,1,2,3,4,123,126],[0,6,202,350]),([0,1,2,3,4,123,218],[6,10,202,350]),([0,1,2,3,4,343],[0,1,6,7,10,11,81,86,274]),([0,1,2,3,4,166],[0,1,6,10,13,81,664]),([0,1,2,3,4,87,189],[0,1,5,12,13,21,125,390]),([0,1,2,3,4,44,55],[0,1,12,23,25,665]),([0,1,3,4,44,87,111],[5,12,22,103,130,316,372]),([0,1,2,4,14,44,87],[5,12,22,60,130,316,378]),([0,1,2,3,4,51,87],[0,5,10,12,22,81,124,316,392]),([0,1,2,3,4,44,90],[0,12,23,124,130,666]),([0,1,2,3,4,144,321],[1,22,23,546,617]),([0,1,2,3,4,153,321],[1,22,546,617]),([0,1,2,3,4,170,321],[22,124,546,617]),([0,1,2,3,4,380],[0,4,13,22,124,667]),([0,1,3,4,111,321],[7,10,22,124,546,668]),([0,1,2,4,14,321],[7,22,81,124,378,617]),([0,1,2,3,4,322],[0,1,22,669]),([0,1,2,3,4,87,340],[0,1,4,12,13,24,46,581]),([0,1,3,4,55,87,111],[4,13,22,130,178,540,557]),([0,1,2,4,14,55,87],[4,13,22,130,157,540,566]),([0,1,2,3,4,56,87],[1,4,10,13,22,81,124,540,583]),([0,1,2,3,4,55,90],[1,13,25,124,130,670]),([0,1,2,3,4,172,285],[0,22,25,363,451]),([0,1,2,3,4,172,293],[0,22,363,451]),([0,1,2,3,4,172,319],[22,124,363,451]),([0,1,2,3,4,379],[0,1,5,12,21,22,124,389]),([0,1,3,4,111,172],[6,10,22,124,363,671]),([0,1,2,4,14,172],[6,22,81,124,451,566]),([0,1,2,3,4,173],[0,1,22,672]),([0,1,3,4,18,87,111],[7,12,33,97,137,292,365]),([0,1,3,4,87,336],[5,10,33,81,554,673]),([0,1,3,4,33,87,111],[6,13,33,97,195,521,549]),([0,1,3,4,87,186],[4,10,33,81,370,674]),([0,1,14,87,111],[10,22,33,51,81,88,97,124,130,205,675]),([0,1,2,4,14,87,224],[5,7,51,88,145,293,455]),([0,1,2,4,87,323],[10,12,81,88,562,676,677,678]),([0,1,2,4,14,87,88],[4,6,51,88,201,523,620]),([0,1,2,4,87,174],[10,13,81,88,376,679,680,681]),([0,1,2,3,4,28,90],[0,524]),([0,1,2,3,4,332],[0,1,22,33,88,212,383,683,684,685]),([0,1,2,3,4,90,332],[0,22,33,88,212]),([0,1,2,3,4,19,90],[1,212,571]),([0,1,2,3,4,181],[0,1,22,33,88,368,524,686,687,688])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_12 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_12 = true := by decide +kernel
-def h26Block6_13 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,90,181],[1,22,33,88,524]),([0,1,2,3,4,87,332],[0,12,33,46,88,124,212,683]),([0,1,2,3,4,87,181],[1,13,33,88,124,125,524,686]),([0,1,2,3,4,333],[0,1,5,10,12,22,81,215,689,690,691]),([0,1,2,3,4,182],[0,1,4,10,13,22,81,552,692,693,694]),([0,1,2,3,4,90],[0,1,22,212,213,524]),([0,1,2,3,4,111,176],[0,1,7,12,13,32,82,402]),([0,1,2,3,4,18,33],[0,1,12,34,36,695]),([0,1,2,3,14,18,111],[7,12,33,72,97,292,381]),([0,1,2,3,4,61,111],[0,7,10,12,22,81,97,292,404]),([0,1,2,3,4,18,90],[0,12,34,81,214,696]),([0,1,2,3,4,84,336],[1,33,34,554,625]),([0,1,2,3,4,121,336],[1,33,554,625]),([0,1,2,3,4,143,336],[33,81,554,625]),([0,1,2,3,4,398],[0,6,13,33,81,697]),([0,1,2,3,14,336],[5,33,81,124,381,625]),([0,1,2,3,4,337],[0,1,22,33,698]),([0,1,2,3,4,111,326],[0,1,6,12,13,35,49,594]),([0,1,2,3,14,33,111],[6,13,33,97,167,521,569]),([0,1,2,3,4,62,111],[1,6,10,13,22,81,97,521,596]),([0,1,2,3,4,33,90],[1,13,36,81,214,699]),([0,1,2,3,4,186,219],[0,33,36,370,458]),([0,1,2,3,4,186,238],[0,33,370,458]),([0,1,2,3,4,186,284],[33,81,370,458]),([0,1,2,3,4,397],[0,1,7,12,32,33,81,401]),([0,1,2,3,14,186],[4,33,81,124,458,569]),([0,1,2,3,4,187],[0,1,22,33,700]),([0,1,2,3,14,111,224],[5,7,51,88,112,293,460]),([0,1,2,3,111,323],[10,12,88,124,563,678,701,702]),([0,1,2,3,14,88,111],[4,6,51,88,186,523,628]),([0,1,2,3,111,174],[10,13,88,124,377,679,703,704]),([0,1,2,3,4,111,332],[0,12,22,49,81,88,212,683]),([0,1,2,3,4,111,181],[1,13,22,81,82,88,524,686]),([0,1,2,3,4,341],[0,1,7,10,12,33,81,226,705,706,707]),([0,1,2,3,4,190],[0,1,6,10,13,33,81,559,708,709,710]),([0,1,2,3,4,88,224],[0,1,5,89,91,711]),([0,1,2,3,4,14,177],[0,1,4,5,7,8]),([0,1,2,3,4,90,224],[0,5,10,91,213,712]),([0,1,2,3,4,14,133],[0,5,7,10,22,51]),([0,1,2,3,4,424],[0,4,6,10,88,561,713,714,715]),([0,1,2,3,4,365],[0,1,22,33,88,678,716,717,718]),([0,1,2,3,4,14,327],[0,1,4,5,6,9]),([0,1,2,3,4,88,90],[1,4,10,89,213,719]),([0,1,2,3,4,14,137],[1,4,6,10,22,51,523,641]),([0,1,2,3,4,423],[0,1,5,7,10,88]),([0,1,2,3,4,276],[0,1,22,33,88,679,720,721,722]),([0,1,2,3,4,14,332],[0,5,9,10,22,33,212,684]),([0,1,2,3,4,14,181],[1,4,8,10,22,33,524,687]),([0,1,2,3,4,362],[0,1,5,7,10,88,247,723,724,725]),([0,1,2,3,4,271],[0,1,4,6,10,88,565,726,727,728])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test6_13 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Block6_13 = true := by decide +kernel
-def h26Nodes6 : List NodeSpec := h26Block6_0 ++ h26Block6_1 ++ h26Block6_2 ++ h26Block6_3 ++ h26Block6_4 ++ h26Block6_5 ++ h26Block6_6 ++ h26Block6_7 ++ h26Block6_8 ++ h26Block6_9 ++ h26Block6_10 ++ h26Block6_11 ++ h26Block6_12 ++ h26Block6_13
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Check6 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket5 6 h26Nodes6 = true := by
-  unfold h26Nodes6 checkNodesBT
-  simp only [List.all_append, Bool.and_eq_true]
-  exact ⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨h26Test6_0,h26Test6_1⟩,h26Test6_2⟩,h26Test6_3⟩,h26Test6_4⟩,h26Test6_5⟩,h26Test6_6⟩,h26Test6_7⟩,h26Test6_8⟩,h26Test6_9⟩,h26Test6_10⟩,h26Test6_11⟩,h26Test6_12⟩,h26Test6_13⟩
-def h26Bucket6 : BT (List (List Nat)) := buildBucketsBT h26W h26Nodes6
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Bucket6Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h26G 6 xs.toFinset) h26Bucket6 := buildBucketsBT_sound (by decide) h26Pairs h26WOk h26PoolsOk h26AutosOk h26Bucket5Ok h26Check6
-def h26Block7_0 : List NodeSpec := nodesWithIdentity [([1,2,3,4,6,10],[0,1,2,10,11,12,19,38,42]),([1,2,3,4,6,220],[0,1,5,11,76,77,81,85,93]),([1,2,3,4,6,286],[0,1,7,11,116,117,120,124,128]),([0,2,3,4,6,12],[0,1,10,11,13,19,26,78,118]),([0,2,3,4,6,85],[0,1,4,11,37,39,81,85,121]),([0,2,3,4,6,145],[0,1,6,11,41,43,92,124,128]),([0,1,2,3,4,6,87],[0,1,10,11,19,22,46,81,85,125,128,130]),([0,1,2,3,4,6,111],[0,1,10,11,19,33,49,82,85,97,124,128]),([0,1,2,3,4,41],[2,11,12,13,26,81,124,206]),([0,1,2,3,4,6,41],[2,10,11,12,13,19,26,85,128,206]),([0,1,2,3,4,125],[0,1,11,19,81,101,102,124,136,177]),([0,1,2,3,4,6,14],[0,1,8,9,11,19,51,81,85,88,124,128]),([0,1,2,3,4,17],[4,5,10,11,16,17,18,85,124,129]),([0,1,2,3,4,6,17],[4,5,11,16,17,18,19,81,85,128,129]),([0,1,2,3,4,43],[0,1,10,11,56,57,85,124,144,154]),([0,1,2,3,4,45],[6,7,10,11,28,29,30,81,86,128]),([0,1,2,3,4,6,45],[6,7,11,19,28,29,30,85,86,124,128]),([0,1,2,3,4,47],[0,1,10,11,68,69,81,110,128,164]),([1,2,3,4,10,220],[0,5,10,12,81,98,103,281,286]),([1,2,3,4,10,286],[0,7,10,12,124,133,137,305,308]),([0,1,3,4,10,12],[0,1,2,10,12,13,26,280,304]),([0,1,2,3,4,10,85],[0,1,2,4,10,12,39,81,103,137,201,307]),([0,1,2,3,4,10,145],[0,1,2,6,10,12,43,103,124,137,284,285]),([0,1,2,3,4,10,41],[1,2,11,12,13,26,103,137,206]),([0,1,2,3,4,171],[0,1,2,10,12,81,124,288,289,311,356]),([0,1,3,4,10,87],[0,10,12,22,45,46,81,103,313]),([0,1,3,4,10,111],[0,10,12,33,48,49,124,137,294]),([0,1,2,3,4,10,14],[0,2,8,9,10,12,51,81,88,103,124,137]),([0,1,2,3,4,44],[1,5,12,21,22,23,60,103,124,316]),([0,1,2,3,4,10,44],[2,5,12,21,22,23,60,81,103,137,316]),([0,1,2,3,4,54],[0,1,10,12,61,63,103,124,321,327]),([0,1,2,3,4,18],[1,7,12,32,33,34,72,81,137,292]),([0,1,2,3,4,10,18],[2,7,12,32,33,34,72,103,124,137,292]),([0,1,2,3,4,32],[0,1,10,12,73,75,81,137,300,334]),([1,2,3,4,220,286],[0,5,7,81,124,145,412,414,415]),([0,1,2,3,4,12,220],[0,1,5,10,13,26,76,81,145,178,195,281]),([0,1,2,4,85,220],[0,1,4,5,39,76,81,283,416]),([0,1,2,3,4,145,220],[0,1,5,6,43,76,81,124,145,281,284,285]),([0,1,2,3,4,17,220],[1,4,5,11,16,17,18,76,85,129,145,281]),([0,1,2,3,4,178],[0,1,5,10,17,81,124,290,449]),([0,1,2,4,87,220],[0,5,10,22,46,81,95,281,419]),([0,1,2,3,4,111,220],[0,5,10,33,49,76,81,82,97,124,145,281]),([0,1,2,3,4,44,220],[5,10,12,21,22,23,60,76,103,145,281,316]),([0,1,2,3,4,134],[0,1,5,10,60,81,104,124,434]),([0,1,2,4,14,220],[0,5,9,81,88,105,124,145,296]),([0,1,2,3,4,224],[1,5,7,10,88,90,91,112,145,293]),([0,1,2,3,4,220,224],[5,7,76,88,90,91,112,124,145,281,293]),([0,1,2,3,4,225],[0,1,5,10,81,113,115,145,302,427]),([0,1,2,3,4,12,286],[0,1,7,10,13,26,116,124,178,195,305,414]),([0,1,2,3,4,85,286],[0,1,4,7,39,81,116,124,201,305,307,414]),([0,1,2,3,145,286],[0,1,6,7,43,116,124,309,418]),([0,1,2,3,4,45,286],[1,6,7,11,28,29,30,86,116,128,305,414]),([0,1,2,3,4,175],[0,1,7,10,29,81,124,312,489]),([0,1,2,3,4,87,286],[0,7,10,22,46,81,116,124,125,130,305,414]),([0,1,2,3,111,286],[0,7,10,33,49,124,131,305,421]),([0,1,2,3,4,18,286],[7,10,12,32,33,34,72,116,137,292,305,414]),([0,1,2,3,4,132],[0,1,7,10,72,81,124,138,482]),([0,1,2,3,14,286],[0,7,9,81,88,124,139,317,414]),([0,1,2,3,4,224,286],[5,7,81,88,90,91,112,116,145,293,305,414]),([0,1,2,3,4,239],[0,1,7,10,81,112,124,146,474]),([0,1,2,3,4,12,41],[0,2,11,12,13,26,178,195,206]),([0,1,2,3,4,320],[0,1,10,13,26,81,124,504,505,508,511]),([0,2,3,4,12,85],[1,4,10,13,81,173,178,307,518]),([0,2,3,4,12,145],[1,6,10,13,124,192,195,284,535]),([0,1,3,4,12,87],[1,10,13,22,81,125,147,178,537]),([0,1,3,4,12,111],[1,10,13,33,82,124,149,195,525]),([0,1,2,3,4,12,14],[1,8,9,10,13,26,51,81,88,124,178,195]),([0,1,2,3,4,55],[0,4,13,22,24,25,124,157,178,540]),([0,1,2,3,4,12,55],[4,13,22,24,25,26,81,157,178,195,540]),([0,1,2,3,4,59],[0,1,10,13,124,158,160,178,330,545])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test7_0 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket6 7 h26Block7_0 = true := by decide +kernel
-def h26Block7_1 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,33],[0,6,13,33,35,36,81,167,195,521]),([0,1,2,3,4,12,33],[6,13,26,33,35,36,124,167,178,195,521]),([0,1,2,3,4,38],[0,1,10,13,81,168,170,195,337,531]),([0,1,2,3,4,17,85],[0,4,5,11,16,17,18,39,85,129,201,307]),([0,1,2,3,4,328],[0,1,4,10,18,81,124,519,606]),([0,2,3,4,85,145],[1,4,6,81,124,201,285,339,609]),([0,1,2,4,85,87],[1,4,10,22,81,125,171,307,611]),([0,1,2,3,4,85,111],[1,4,10,33,39,49,81,82,97,124,201,307]),([0,1,2,3,4,55,85],[4,10,13,22,24,25,39,157,178,201,307,540]),([0,1,2,3,4,127],[0,1,4,10,81,124,157,179,432]),([0,1,2,4,14,85],[1,4,8,81,88,124,180,201,527]),([0,1,2,3,4,88],[0,4,6,10,87,88,89,186,201,523]),([0,1,2,3,4,85,88],[4,6,39,87,88,89,124,186,201,307,523]),([0,1,2,3,4,89],[0,1,4,10,81,187,189,201,344,533]),([0,1,2,3,4,45,145],[0,6,7,11,28,29,30,43,86,128,284,285]),([0,1,2,3,4,324],[0,1,6,10,30,81,124,536,648]),([0,1,2,3,4,87,145],[1,6,10,22,43,46,81,124,125,130,284,285]),([0,1,2,3,111,145],[1,6,10,33,82,124,190,284,613]),([0,1,2,3,4,33,145],[6,10,13,33,35,36,43,167,195,284,285,521]),([0,1,2,3,4,160],[0,1,6,10,81,124,167,196,441]),([0,1,2,3,14,145],[1,6,8,81,88,124,197,285,541]),([0,1,2,3,4,88,145],[4,6,43,81,87,88,89,186,201,284,285,523]),([0,1,2,3,4,123],[0,1,6,10,81,124,186,202,350]),([0,1,2,3,4,44,87],[0,5,12,21,22,23,46,60,103,125,130,316]),([0,1,2,3,4,321],[0,1,10,22,23,81,124,546,617]),([0,1,2,3,4,55,87],[1,4,13,22,24,25,46,125,130,157,178,540]),([0,1,2,3,4,172],[0,1,10,22,25,81,124,363,451]),([0,1,3,4,87,111],[10,22,33,81,97,124,130,204,618]),([0,1,2,4,14,87],[10,22,51,81,88,124,130,208,547]),([0,1,2,3,4,90],[0,1,22,33,88,130,212,213,214,524]),([0,1,2,3,4,87,90],[22,33,46,88,124,125,130,212,213,214,524]),([0,1,2,3,4,94],[0,1,10,22,81,130,215,216,217,552]),([0,1,2,3,4,18,111],[0,7,12,32,33,34,49,72,82,97,137,292]),([0,1,2,3,4,336],[0,1,10,33,34,81,124,554,625]),([0,1,2,3,4,33,111],[1,6,13,33,35,36,49,82,97,167,195,521]),([0,1,2,3,4,186],[0,1,10,33,36,81,124,370,458]),([0,1,2,3,14,111],[10,33,51,81,88,97,124,224,555]),([0,1,2,3,4,90,111],[22,33,49,81,82,88,97,130,212,213,214,524]),([0,1,2,3,4,122],[0,1,10,33,81,97,124,226,227,228,559]),([0,1,2,3,4,14,224],[0,5,7,8,9,51,88,90,91,112,145,293]),([0,1,2,3,4,323],[0,1,9,10,81,88,124,561,562,563,678]),([0,1,2,3,4,14,88],[1,4,6,8,9,51,87,88,89,186,201,523]),([0,1,2,3,4,174],[0,1,8,10,81,88,124,246,376,377,679]),([0,1,2,3,4,14,90],[8,9,10,22,33,51,88,130,212,213,214,524]),([0,1,2,3,4,130],[0,1,10,51,81,88,124,247,248,249,565])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test7_1 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket6 7 h26Block7_1 = true := by decide +kernel
-def h26Nodes7 : List NodeSpec := h26Block7_0 ++ h26Block7_1
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Check7 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket6 7 h26Nodes7 = true := by
-  unfold h26Nodes7 checkNodesBT
-  simp only [List.all_append, Bool.and_eq_true]
-  exact ⟨h26Test7_0,h26Test7_1⟩
-def h26Bucket7 : BT (List (List Nat)) := buildBucketsBT h26W h26Nodes7
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Bucket7Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h26G 7 xs.toFinset) h26Bucket7 := buildBucketsBT_sound (by decide) h26Pairs h26WOk h26PoolsOk h26AutosOk h26Bucket6Ok h26Check7
-def h26Block8_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,6],[0,1,10,11,19,81,85,124,128]),([0,1,2,3,4,10],[0,1,2,10,12,81,103,124,137]),([0,1,2,3,4,220],[0,1,5,10,76,81,124,145,281]),([0,1,2,3,4,286],[0,1,7,10,81,116,124,305,414]),([0,1,2,3,4,12],[0,1,10,13,26,81,124,178,195]),([0,1,2,3,4,85],[0,1,4,10,39,81,124,201,307]),([0,1,2,3,4,145],[0,1,6,10,43,81,124,284,285]),([0,1,2,3,4,87],[0,1,10,22,46,81,124,125,130]),([0,1,2,3,4,111],[0,1,10,33,49,81,82,97,124]),([0,1,2,3,4,14],[0,1,8,9,10,51,81,88,124])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test8_0 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket7 8 h26Block8_0 = true := by decide +kernel
-def h26Nodes8 : List NodeSpec := h26Block8_0
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Check8 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket7 8 h26Nodes8 = true := h26Test8_0
-def h26Bucket8 : BT (List (List Nat)) := buildBucketsBT h26W h26Nodes8
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Bucket8Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h26G 8 xs.toFinset) h26Bucket8 := buildBucketsBT_sound (by decide) h26Pairs h26WOk h26PoolsOk h26AutosOk h26Bucket7Ok h26Check8
-def h26Block9_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4],[0,1,10,81,124])]
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Test9_0 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket8 9 h26Block9_0 = true := by decide +kernel
-def h26Nodes9 : List NodeSpec := h26Block9_0
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Check9 : checkNodesBT h26W h26G h26Mask h26Pools h26Autos h26Bucket8 9 h26Nodes9 = true := h26Test9_0
-def h26Bucket9 : BT (List (List Nat)) := buildBucketsBT h26W h26Nodes9
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Bucket9Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h26G 9 xs.toFinset) h26Bucket9 := buildBucketsBT_sound (by decide) h26Pairs h26WOk h26PoolsOk h26AutosOk h26Bucket8Ok h26Check9
-set_option maxRecDepth 200000 in
-set_option maxHeartbeats 0 in
-lemma h26Bound : Lower h26R h26G 10 := lower_of_forestBT (essPairs := [(VAR 1,4,6),(VAR 2,2,6),(VAR 3,2,10),(VAR 4,2,18),(VAR 5,2,34)]) (by decide +kernel) h26Bucket9Ok (by decide +kernel)
+
+private lemma rescueReach {roots : List Wire} {p : Nat} {bank : List Wire}
+    (h : Reach roots p bank) : RescueK5.Reach true roots p bank := by
+  have avail {pool : List Wire} {w : Wire} (hw : Avail pool w) :
+      RescueK5.Available true pool w := by
+    rcases hw with a | a | a
+    · exact Or.inl a
+    · exact Or.inr (Or.inl a)
+    · exact Or.inr (Or.inr ⟨rfl, a⟩)
+  induction p generalizing bank with
+  | zero =>
+    obtain rfl := h
+    exact RescueK5.Reach.start
+  | succ p ih =>
+    obtain ⟨op, prev, a, b, h, ha, hb, rfl⟩ := h
+    exact RescueK5.Reach.two op (ih h) (avail ha) (avail hb)
+
+private lemma rescueObs (a : Nat) : RescueK5.observe (RescueK5.W a) = obs a :=
+  funext fun r => RescueK5.bit_W r a
+
+private lemma rescueK5Bound :
+    Lower (varsOf 31) 0xfffefee8fffefee8fffefee8fffefee8 10 := by
+  intro p bank h ha
+  apply RescueK5.s7_L p bank
+  · have hR : (RescueK5.rootsW RescueK5.s7_R).map RescueK5.observe = (varsOf 31).map obs := by
+      simp only [RescueK5.rootsW, List.map_map, Function.comp_def, rescueObs]
+      have h := congrArg (List.map obs) (by decide +kernel : RescueK5.s7_R.map RescueK5.xN = varsOf 31)
+      simpa only [List.map_map, Function.comp_def] using h
+    exact rescueReach (hR ▸ h)
+  · change RescueK5.Available true bank (RescueK5.observe (RescueK5.W RescueK5.s7_T))
+    rw [rescueObs]
+    rcases ha with h | h | h
+    · exact Or.inl h
+    · exact Or.inr (Or.inl h)
+    · exact Or.inr (Or.inr ⟨rfl, h⟩)
+
+set_option maxRecDepth 200000 in
+set_option maxHeartbeats 0 in
+lemma h26Bound : Lower h26R h26G 10 := by
+  exact carry_of (swaps := [(4,5),(3,4),(2,3),(1,2),(0,1)])
+    (roots2 := varsOf 31) (T2 := 0xfffefee8fffefee8fffefee8fffefee8)
+    (by decide +kernel) rescueK5Bound
 def h0R : List Nat := varsOf 63
 def h0G : Nat := 0xeeeaeaa8eaa8e880eeeaeaa8eaa8e880
-def h0Pos : List Nat := [13,14,7,7,11,14,7,14,11,54,19,19,54,35,35,11,13,7,13,21,30,37,46,21,37,25,25,41,41,11,49,54,58,19,30,46,30,46]
-def h0Neg : List Nat := [12,12,5,6,10,10,3,6,3,38,3,18,22,3,34,9,9,1,5,5,28,5,44,17,33,9,17,9,33,1,48,50,50,17,26,42,22,38]
-def h0Mask : Nat := fullMask 38
-def h0Base : List Decor := [(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,0x27fafed5d,0x23fafa544),(0xcccccccccccccccccccccccccccccccc,0x3fa052fffe,0x3d80007ff8),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,0x3c81ff12ef,0x30007c128f),(0xff00ff00ff00ff00ff00ff00ff00ff00,0x3d3e5581b3,0xc0a518033),(0xffff0000ffff0000ffff0000ffff0000,0x17c6981e00,0x17c4901800),(0xffffffff00000000ffffffff00000000,0x29d9607200,0x29d1404200)]
-def h0Steps : List (Nat × Nat × Nat) := [(2,1,2),(2,1,3),(1,2,3),(0,0,8)]
+def h0Pos : List Nat := [13,14,7,7,11,14,7,14,11,54,19,19,54,35,35,11,13,7,13,21,30,37,46,21,37,25,25,41,41,49,54,58,19,30,46,30,46]
+def h0Neg : List Nat := [12,12,5,6,10,10,3,6,3,38,3,18,22,3,34,9,9,1,5,5,28,5,44,17,33,9,17,9,33,48,50,50,17,26,42,22,38]
+def h0Mask : Nat := fullMask 37
+def h0Base : List Decor := [(0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,0x13fafed5d,0x11fafa544),(0xcccccccccccccccccccccccccccccccc,0x1fc052fffe,0x1ec0007ff8),(0xf0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0,0x1e41ff12ef,0x18007c128f),(0xff00ff00ff00ff00ff00ff00ff00ff00,0x1e9e5581b3,0x60a518033),(0xffff0000ffff0000ffff0000ffff0000,0xbe6981e00,0xbe4901800),(0xffffffff00000000ffffffff00000000,0x14f9607200,0x14f1404200)]
+def h0Steps : List (Nat × Nat × Nat) := [(2,1,2),(1,2,3),(0,0,7)]
 def h0W : BT Decor := buildWiresBT 4 h0Base h0Steps
-def h0AutoList : List (List (Nat × Nat)) := [[]]
-def h0Autos : BT (List (Nat × Nat)) := btOfList 1 h0AutoList
+def h0AutoList : List (List (Nat × Nat)) := [[],[(4,5)],[(2,3)],[(4,5),(2,3)]]
+def h0Autos : BT (List (Nat × Nat)) := btOfList 2 h0AutoList
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h0Pairs : goodPairs h0G h0Pos h0Neg := goodPairs_of (by decide +kernel)
@@ -4717,7 +7067,7 @@ set_option maxHeartbeats 0 in
 lemma h0AutosOk : btAll (fun sw => swapsValid sw = true ∧ permWord sw h0G = h0G) h0Autos := btAll_ofList (autos_of (by decide +kernel))
 def h0SliceList : List (Option (Nat × Nat)) := [some (subcubeFast 0 1,10),some (subcubeFast 0 2,9),some (subcubeFast 0 4,8),some (subcubeFast 0 8,8),some (subcubeFast 0 16,9),some (subcubeFast 0 32,9),some (subcubeFast 2 0,8),some (subcubeFast 2 1,7),some (subcubeFast 4 0,9),some (subcubeFast 8 0,9),some (subcubeFast 16 0,9),some (subcubeFast 32 0,9)]
 def h0Slices : BT (Option (Nat × Nat)) := btOfList 4 h0SliceList
-def h0Specs : List PoolSpec := [(0,[]),(8,[]),(1,[]),(0,[(2,1,2)]),(6,[]),(7,[]),(9,[(2,1,2)]),(4,[(2,1,2)]),(10,[(2,1,2)]),(5,[(2,1,2)]),(11,[(2,1,2)]),(9,[]),(3,[]),(10,[]),(4,[]),(11,[]),(5,[]),(0,[(2,1,3)]),(8,[(2,1,3)]),(4,[(2,1,3)]),(10,[(2,1,3)]),(5,[(2,1,3)]),(11,[(2,1,3)]),(2,[]),(0,[(1,2,3)]),(1,[(1,2,3)]),(10,[(1,2,3)]),(4,[(1,2,3)]),(11,[(1,2,3)]),(5,[(1,2,3)])]
+def h0Specs : List PoolSpec := [(0,[]),(8,[]),(1,[]),(0,[(2,1,2)]),(6,[]),(7,[]),(9,[(2,1,2)]),(4,[(2,1,2)]),(10,[(2,1,2)]),(5,[(2,1,2)]),(11,[(2,1,2)]),(9,[]),(3,[]),(10,[]),(4,[]),(11,[]),(5,[]),(0,[(1,2,3)]),(2,[]),(1,[(1,2,3)]),(10,[(1,2,3)]),(4,[(1,2,3)]),(11,[(1,2,3)]),(5,[(1,2,3)])]
 def h0Pools : BT (Option BoundPool) := buildPoolsBT 5 h0W h0R h0Slices h0Specs
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
@@ -4765,7 +7115,7 @@ def h0Empty : BT (List (List Nat)) := BT.empty
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h0EmptyOk : btAll (fun bk => ∀ xs ∈ bk, Impossible h0G (9 - 1) xs.toFinset) h0Empty := trivial
-def h0Block9_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,5,9],[0,1,2,4,11,13,14,15,16,23,24])]
+def h0Block9_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,5,8],[0,1,2,4,11,13,14,15,16,17,18])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h0Test9_0 : checkNodesBT h0W h0G h0Mask h0Pools h0Autos h0Empty 9 h0Block9_0 = true := by decide +kernel
@@ -4777,7 +7127,7 @@ def h0Bucket9 : BT (List (List Nat)) := buildBucketsBT h0W h0Nodes9
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h0Bucket9Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h0G 9 xs.toFinset) h0Bucket9 := buildBucketsBT_sound (by decide) h0Pairs h0WOk h0PoolsOk h0AutosOk h0EmptyOk h0Check9
-def h0Block10_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,5,6],[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]),([0,1,2,3,4,5,7],[0,1,2,4,5,11,13,14,15,16,17,18,19,20,21,22,23]),([0,1,2,3,4,5,8],[0,1,2,4,11,13,14,15,16,23,24,25,26,27,28,29])]
+def h0Block10_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,5,6],[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]),([0,1,2,3,4,5,7],[0,1,2,4,11,13,14,15,16,17,18,19,20,21,22,23])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h0Test10_0 : checkNodesBT h0W h0G h0Mask h0Pools h0Autos h0Bucket9 10 h0Block10_0 = true := by decide +kernel
@@ -4789,7 +7139,7 @@ def h0Bucket10 : BT (List (List Nat)) := buildBucketsBT h0W h0Nodes10
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h0Bucket10Ok : btAll (fun bk => ∀ xs ∈ bk, Impossible h0G 10 xs.toFinset) h0Bucket10 := buildBucketsBT_sound (by decide) h0Pairs h0WOk h0PoolsOk h0AutosOk h0Bucket9Ok h0Check10
-def h0Block11_0 : List NodeSpec := nodesWithIdentity [([0,1,2,3,4,5],[0,1,2,11,13,14,15,16])]
+def h0Block11_0 : List NodeSpec := [([0,1,2,3,4,5],[0,1,2,11,13,14,15,16],[0,2])]
 set_option maxRecDepth 200000 in
 set_option maxHeartbeats 0 in
 lemma h0Test11_0 : checkNodesBT h0W h0G h0Mask h0Pools h0Autos h0Bucket10 11 h0Block11_0 = true := by decide +kernel
