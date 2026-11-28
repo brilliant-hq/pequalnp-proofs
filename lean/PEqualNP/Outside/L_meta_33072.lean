@@ -1062,8 +1062,8 @@ lemma chrom {e : Bool} {k t : ℕ} {S : Finset ℕ} (hl : Live R m T k t S) (hm 
             · have := ht_bi hab he2 hl h1 h2 (fun e => absurd e q1) (fun _ => hb) (fun e => absurd e q2) (fun _ => hb) hh
               simp only [q1, q2, if_false, false_or] at this f1 f2 ⊢
               refine hc _ (by simpa [q1] using mem h1) _ (by simpa [q2] using mem h2) ?_ this
-              have h1' : c1 = b ∨ c1 ∈ U := by simp at h1; tauto
-              have h2' : c2 = b ∨ c2 ∈ U := by simp at h2; tauto
+              have h1' : c1 = b ∨ c1 ∈ U := by simp at h1; clear * - h1 q1; tauto
+              have h2' : c2 = b ∨ c2 ∈ U := by simp at h2; clear * - h2 q2; tauto
               split_ifs with p q q
               · exact absurd (p.trans q.symm) h12
               · intro e; exact hf (e ▸ h2'.resolve_left q)
@@ -1088,8 +1088,8 @@ lemma chrom {e : Bool} {k t : ℕ} {S : Finset ℕ} (hl : Live R m T k t S) (hm 
             · have := ht_bi hab he2 hl h1 h2 (fun _ => ha) (fun e => absurd e q1) (fun _ => ha) (fun e => absurd e q2) hh
               simp only [q1, q2, if_false, or_false] at this f1 f2 ⊢
               refine hc _ (by simpa [q1] using mem h1) _ (by simpa [q2] using mem h2) ?_ this
-              have h1' : c1 = a ∨ c1 ∈ U := by simp at h1; tauto
-              have h2' : c2 = a ∨ c2 ∈ U := by simp at h2; tauto
+              have h1' : c1 = a ∨ c1 ∈ U := by simp at h1; clear * - h1 q1; tauto
+              have h2' : c2 = a ∨ c2 ∈ U := by simp at h2; clear * - h2 q2; tauto
               split_ifs with p q q
               · exact absurd (p.trans q.symm) h12
               · intro e; exact hf (e ▸ h2'.resolve_left q)
@@ -2448,8 +2448,8 @@ lemma nk_ok {k k' t z : ℕ} {v : List W} {S : Finset ℕ} (hs : StOk P T l k t 
     have m2 := phi_mem (g := op d a b) hq
     have hne : (if p = a ∨ p = b then op d a b else p) ≠ (if q = a ∨ q = b then op d a b else q) := by
       simp only [hpa, hqa, false_or]
-      have h1' : p = b ∨ p ∈ U := by simp at hp; tauto
-      have h2' : q = b ∨ q ∈ U := by simp at hq; tauto
+      have h1' : p = b ∨ p ∈ U := by simp at hp; clear * - hp hpa; tauto
+      have h2' : q = b ∨ q ∈ U := by simp at hq; clear * - hq hqa; tauto
       split_ifs with r s s
       · exact absurd (r.trans s.symm) hpq
       · intro e; exact hf (e ▸ h2'.resolve_left s)
@@ -3197,8 +3197,8 @@ lemma front {m T : ℕ} (hR : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R d a b) {
           exact this
       refine Or.inr ⟨k0 + 1, d, x, y, insert a (insert (op d x y) (V.erase (a ^^^ m))), rfl, hx, hy,
         ⟨hxy, insert a (V.erase (a ^^^ m)), ?_, ?_, hal⟩, ?_⟩
-      · rw [eU]; ext z; simp only [Finset.mem_insert]; tauto
-      · ext z; simp only [Finset.mem_insert]; tauto
+      · rw [eU]; ext z; simp only [Finset.mem_insert]; clear * - z; tauto
+      · ext z; simp only [Finset.mem_insert]; clear * - z; tauto
       · refine .un ?_
         have : insert (a ^^^ m) (insert (op d x y) (V.erase (a ^^^ m))) = insert (op d x y) V := by
           rw [Finset.insert_comm, Finset.insert_erase hmV]
@@ -4089,28 +4089,16 @@ set_option maxHeartbeats 0 in
 theorem root_p : pOk 0 rt = true := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root_0 : chk [] rt 0 13 0 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem root_1 : chk [] rt 0 13 1 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem root_2 : chk [] rt 0 13 2 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem root_3 : chk [] rt 0 13 3 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem root_hi : okT [] rt 0 14 [4, 5, 6, 7, 8, 9, 10, 11, 12, 13] = true := by decide +kernel
+theorem root_all : okT [] rt 0 14 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] = true := by decide +kernel
 lemma iroot : Imp [] 0 14 := imp_ts (Or.inl rfl) root_p (by norm_num) ir (fun t ht => by
-  have h := root_hi
+  have h := root_all
   simp only [okT, List.all_cons, List.all_nil, Bool.and_true, Bool.and_eq_true, Bool.not_eq_true'] at h
-  obtain ⟨h4, h5, h6, h7, h8, h9, h10, h11, h12, h13⟩ := h
+  obtain ⟨h0, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11, h12, h13⟩ := h
   interval_cases t
-  · exact one root_0
-  · exact one root_1
-  · exact one root_2
-  · exact one root_3
+  · exact one h0
+  · exact one h1
+  · exact one h2
+  · exact one h3
   · exact one h4
   · exact one h5
   · exact one h6
@@ -4514,11 +4502,31 @@ theorem onWitBasis : ∀ g ∈ onWit,
   simp only [onWit, List.mem_cons, List.not_mem_nil, or_false] at hg
   rcases hg with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> simp
 
+def ttM : ℕ := 2 ^ 256 - 1
+def ttV : List ℕ := [Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xaaaaaaaaaaaaaaaa) 64) 0xaaaaaaaaaaaaaaaa) 64) 0xaaaaaaaaaaaaaaaa) 64) 0xaaaaaaaaaaaaaaaa, Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xcccccccccccccccc) 64) 0xcccccccccccccccc) 64) 0xcccccccccccccccc) 64) 0xcccccccccccccccc, Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xf0f0f0f0f0f0f0f0) 64) 0xf0f0f0f0f0f0f0f0) 64) 0xf0f0f0f0f0f0f0f0) 64) 0xf0f0f0f0f0f0f0f0, Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xff00ff00ff00ff00) 64) 0xff00ff00ff00ff00) 64) 0xff00ff00ff00ff00) 64) 0xff00ff00ff00ff00, Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xffff0000ffff0000) 64) 0xffff0000ffff0000) 64) 0xffff0000ffff0000) 64) 0xffff0000ffff0000, Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xffffffff00000000) 64) 0xffffffff00000000) 64) 0xffffffff00000000) 64) 0xffffffff00000000, Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xffffffffffffffff) 64) 0x0) 64) 0xffffffffffffffff) 64) 0x0, Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xffffffffffffffff) 64) 0xffffffffffffffff) 64) 0x0) 64) 0x0]
+def ttF : ℕ := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xfffffffffffffffe) 64) 0xfffffffffffefffe) 64) 0xfffffffefffffffa) 64) 0xfefefefceeeeaa00
+def ttE (x0 x1 x2 x3 x4 x5 x6 x7 : Bool) : ℕ := x0.toNat + 2 * x1.toNat + 4 * x2.toNat + 8 * x3.toNat + 16 * x4.toNat + 32 * x5.toNat + 64 * x6.toNat + 128 * x7.toNat
 set_option maxRecDepth 12000 in
 set_option maxHeartbeats 0 in
+theorem onWitPt : ∀ x0 x1 x2 x3 x4 x5 x6 x7 : Bool, (ttV.map fun v => v.testBit (ttE x0 x1 x2 x3 x4 x5 x6 x7)) = [x0, x1, x2, x3, x4, x5, x6, x7] ∧ ttM.testBit (ttE x0 x1 x2 x3 x4 x5 x6 x7) = true ∧
+    ttF.testBit (ttE x0 x1 x2 x3 x4 x5 x6 x7) = ((x0 && x3) || (x0 && x4) || (x1 && x4) || (x1 && x5) || (x2 && x5) || (x0 && x6) || (x2 && x6) || (x3 && x6) || (x4 && x6) || (x0 && x7) || (x1 && x7) || (x2 && x7) || (x3 && x7) || (x5 && x7)) := by
+  decide +kernel
+set_option maxRecDepth 12000 in
+set_option maxHeartbeats 0 in
+theorem onWitEx : (ex ttM onWit ttV).getD 22 0 = ttF := by
+  decide +kernel
 theorem onWitCorrect : ∀ x : Fin 8 → Bool,
     Circuit.eval ⟨onWit, 22⟩ (List.ofFn x) = f x := by
-  decide +kernel
+  intro x
+  obtain ⟨h1, h2, h3⟩ := onWitPt (x 0) (x 1) (x 2) (x 3) (x 4) (x 5) (x 6) (x 7)
+  have hb : ∀ g ∈ onWit, g.op ∈ ({GateOp.and, GateOp.or, GateOp.not} : Set GateOp) ∧ g.inputs.length ≤ 2 := fun g hg => by
+    obtain ⟨ho, hl⟩ := onWitBasis g hg
+    exact ⟨by rcases ho with h | h <;> simp [h], hl⟩
+  have e8 : List.ofFn x = [x 0, x 1, x 2, x 3, x 4, x 5, x 6, x 7] := rfl
+  rw [e8, ← h1]
+  show ((onWit.foldl (fun w g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)])
+    (ttV.map fun v => v.testBit (ttE (x 0) (x 1) (x 2) (x 3) (x 4) (x 5) (x 6) (x 7)))).getD 22 false) = f x
+  rw [← ex_bit ttM h2 onWit ttV hb, getD_map, onWitEx, h3]; rfl
 
 set_option maxRecDepth 12000 in
 set_option maxHeartbeats 0 in
