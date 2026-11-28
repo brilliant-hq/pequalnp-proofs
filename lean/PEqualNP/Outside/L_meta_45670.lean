@@ -1098,8 +1098,9 @@ def node (f : Nat → List W → Bool) (d : Bool) (l m g e n z : Nat) (v : List 
     (mkX d l (wst d l v) v))
   (mid f m g e (Nat.pred n) z v)
 def prd (t : Nat) (h : Nat → Bool) : Bool := Nat.rec (motive := fun _ => Bool) false (fun s _ => h s) t
+-- Every retained true/false sample pair needs a separating live wire.
 def cv (d : Bool) (l : Nat) (v : List W) (b : Bool) : Bool :=
-  Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false b (Nat.beq (cov d l v) l)) b d
+  Bool.rec (motive := fun _ => Bool) false b (Nat.beq (cov d l v) l)
 def tst (d : Bool) (l e : Nat) (v : List W) (F : Nat → Bool) : Bool :=
   (fun n => Bool.rec (motive := fun _ => Bool)
     (Bool.rec (motive := fun _ => Bool) (F 0) (Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) (F 1) (F 0) (flk l (wst d l v) v star)) false (bip l (wst d l v) v []))
@@ -1120,12 +1121,12 @@ def mv (F : Nat → Nat → Nat → List W → Bool) (l m g k t z : Nat) (v : Li
   mvP v F l m g k t z v y
 def look (l m g : Nat) (fuel : Nat) : Nat → Nat → Nat → List W → Bool :=
   Nat.rec (motive := fun _ => Nat → Nat → Nat → List W → Bool) (fun _ _ _ _ => true)
-    (fun _ ih k t z v => Bool.rec (motive := fun _ => Bool) (tst (pos t) l (Nat.sub (Nat.succ k) t) v (fun y => mv ih l m g k t z v y)) true (Nat.ble v.length 1)) fuel
+    (fun _ ih k t z v => cv (pos t) l v (Bool.rec (motive := fun _ => Bool) (tst (pos t) l (Nat.sub (Nat.succ k) t) v (fun y => mv ih l m g k t z v y)) true (Nat.ble v.length 1))) fuel
 def look1 (l m g K : Nat) (fuel : Nat) : Nat → Nat → Nat → List W → Bool :=
   Nat.rec (motive := fun _ => Nat → Nat → Nat → List W → Bool) (fun _ _ _ _ => true)
-    (fun _ ih k t z v => Bool.rec (motive := fun _ => Bool) (tst (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
+    (fun _ ih k t z v => cv (pos t) l v (Bool.rec (motive := fun _ => Bool) (tst (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
       Bool.rec (motive := fun _ => Bool) (mv (look l m g K) l m g k t z v y) true
-        (node (ih (Nat.sub k 1) t) (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v pairsS))) true (Nat.ble v.length 1)) fuel
+        (node (ih (Nat.sub k 1) t) (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v pairsS))) true (Nat.ble v.length 1))) fuel
 end core
 lemma bR (c e t : Bool) : (Bool.rec (motive := fun _ => Bool) e t c : Bool) = bif c then t else e := by cases c <;> rfl
 lemma st_eq (n : ℕ) (f : ℕ → Bool) : st n f = f n := by cases n <;> rfl
@@ -2281,8 +2282,7 @@ lemma cv_ok {t k k' z : ℕ} {v : List W} {S : Finset ℕ} {b : Bool} (hs : StOk
       obtain ⟨w, hw, hs1⟩ := hl.cov m1 m2 t1 t2
       obtain ⟨w', hw', rfl⟩ := hs.rep.mem.1 hw
       exact ⟨w', hw', by rw [sp_bit, hli, hs1]; rfl⟩
-  simp only [cv, bR, hcov, cond_true] at h
-  cases hp : pos' t <;> rw [hp] at h <;> simpa using h
+  simpa only [cv, hcov] using h
 end sound
 section sound
 variable {P : List ℕ} {l m g T : ℕ} (X : Ctx P l m g T)
@@ -2783,8 +2783,10 @@ theorem look_sound (hR : RR R) : ∀ (fuel k t z : ℕ) (v : List W) (S : Finset
   | zero => intro k t z v S h; simp [look] at h
   | succ fuel ih =>
     intro k t z v S h hs hcod k' hk hm
-    change (Bool.rec (motive := fun _ => Bool) (tst (pos t) l (k + 1 - t) v (fun y => mv (look l m g fuel) l m g k t z v y)) true (Nat.ble v.length 1) : Bool) = false at h
-    rw [bR, pos_eq] at h
+    change cv (pos t) l v (Bool.rec (motive := fun _ => Bool) (tst (pos t) l (k + 1 - t) v (fun y => mv (look l m g fuel) l m g k t z v y)) true (Nat.ble v.length 1) : Bool) = false at h
+    rw [pos_eq] at h
+    have h := cv_ok X hs hm.1 h
+    rw [bR] at h
     cases h0 : Nat.ble v.length 1 with
     | true => rw [h0] at h; simp at h
     | false =>
@@ -2978,9 +2980,11 @@ theorem look1_sound (hR : RR R) (hR2 : ∀ d a b, (R a = 0 ∨ R b = 0) → Al R
   | zero => intro k t z v S h; simp [look1] at h
   | succ fuel ih =>
     intro k t z v S h hs hcod k' hk hl hmW
-    change (Bool.rec (motive := fun _ => Bool) (tst (pos t) l (k + 1 - t) v (fun y => Bool.rec (motive := fun _ => Bool) (mv (look l m g K) l m g k t z v y) true
+    change cv (pos t) l v (Bool.rec (motive := fun _ => Bool) (tst (pos t) l (k + 1 - t) v (fun y => Bool.rec (motive := fun _ => Bool) (mv (look l m g K) l m g k t z v y) true
         (node (look1 l m g K fuel (k - 1) t) (pos t) l m g (k - t - y) v.length z v pairsS))) true (Nat.ble v.length 1) : Bool) = false at h
-    rw [bR, pos_eq] at h
+    rw [pos_eq] at h
+    have h := cv_ok X hs hl h
+    rw [bR] at h
     cases h0 : Nat.ble v.length 1 with
     | true => rw [h0] at h; simp at h
     | false =>
