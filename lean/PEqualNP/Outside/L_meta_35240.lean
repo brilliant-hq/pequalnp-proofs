@@ -1103,18 +1103,7 @@ def pairsS (h : XW → XW → Bool) (xs : List XW) : Bool := pairs h (fs xs)
 def nots (f : Nat → Nat → List W → Bool) (m g e n z q : Nat) (v r : List W) : Bool :=
   (List.rec (motive := fun _ => Bool) (false) (fun a _ ih => (Bool.rec (motive := fun _ => Bool) (ih) (true) ((Bool.rec (motive := fun _ => Bool) ((st (Nat.xor a.s m) (fun s => (st (Nat.sub z a.c) (fun z => ins ⟨s, a.b, a.a, a.c, 0⟩ v (fun v => (Bool.rec (motive := fun _ => Bool) ((Bool.rec (motive := fun _ => Bool) (false) (child (f s) g (fun h => h v) (Nat.sub z a.c)) (Nat.ble (Nat.succ n) e))) (true) ((Bool.rec (motive := fun _ => Bool) (false) (child (f s) g (rm a.s a.s v) z) (Nat.ble n e)))))))))) (false) (Nat.beq (Nat.succ a.s) q))))) (r))
 def pos (t : Nat) : Bool := Nat.rec (motive := fun _ => Bool) false (fun _ _ => true) t
-noncomputable def forceNat (value : ℕ) (next : ℕ → ℕ) : ℕ :=
-  Nat.rec (motive := fun _ => ℕ) (next 0) (fun n _ => next n) (Nat.succ value)
-
-noncomputable def coverageTwice (nn : ℕ) (d : Bool) (l : ℕ) (words : List W) : ℕ → ℕ → ℕ :=
-  List.rec (motive := fun _ => ℕ → ℕ → ℕ) (fun _ twice => twice)
-    (fun w _ next seen twice =>
-      forceNat (spC nn d l w.s) fun bits =>
-      forceNat (Nat.lor seen bits) fun more =>
-      forceNat (Nat.lor twice (Nat.land seen bits)) fun overlap =>
-      next more overlap) words
-
-def wstC (NN : Nat) (d : Bool) (l : Nat) (v : List W) : Nat := Nat.xor l (coverageTwice NN d l v 0 0)
+def wstC (NN : Nat) (d : Bool) (l : Nat) (v : List W) : Nat := Nat.xor l (twiceC NN d l v)
 def nodeC (NN : Nat) (f : Nat → List W → Bool) (d : Bool) (l m g e n z : Nat) (v : List W) (go : (XW → XW → Bool) → List XW → Bool) : Bool :=
   (fun h => (fun xs => Bool.rec (motive := fun _ => Bool) (go (pair (f0 h)) xs)
     (Bool.rec (motive := fun _ => Bool) (go (pair (f1 h)) xs) (go (pair (f2 h)) xs) (Nat.ble (Nat.succ n) e)) (Nat.ble n e))
@@ -1146,24 +1135,24 @@ def look1C (NN AA HX HY : Nat) (l m g K : Nat) (fuel : Nat) : Nat → Nat → Na
         (nodeC NN (ih (Nat.sub k 1) t) (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v pairsS))) true (Nat.ble v.length 1)) fuel
 end coreC
 
-def bigNat_0 : Nat := 0x3fffffffffffffffffffbf7fffffffffffffffffff7fffffffffffffffffff7bfffffffffffffffffffbdfffffffffffffffffffdef6fffffffffffffffffffef7fffffffffffffffffff7bddfffffffffffffffffffdefffffffffffffffffffef7b7fffffffffffffffffff7bddfffffffffffffffffffdef77b77ffbbdddbb7bbbeebbafbb5ddf7deddb5bef5df77df7bb5dbeebbefafbdef76daf6bdef7bb7af6f5ed7bd7ffef6def7bdbdef7af7ffedef7bdebfff7bdefffdefffdfffbf7ddfbddfbf6efdefdfbeefddfbf7f77efdefdfdfb77edfefdfdeff7efefdfddfbf7bf7f7bfff7efefefffdfbddfb7efdbfdfbf7fbf7eefdfbf7eefdfbbfff7efffdefdfbfdfbf7efdfbfff7efdfbfff0000000000000000
-def bigNat_1 : Nat := 0x4422244844411445044a220821224a410a208820844a24114410504210892509421084485090a1284280010921084242108508001210842140008421000210002000408220422040910210204110220408088102102020488120102021008101020220408408084000810101000204220481024020408040811020408110204400081000210204020408102040008102040000000000000000000
-def bigNat_2 : Nat := 0x4000000000000000000040800000000000000000008000000000000000000084000000000000000000042000000000000000000021090000000000000000000108000000000000000000084220000000000000000000210000000000000000000108480000000000000000000842200000000000000000002108848800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-def bigNat_3 : Nat := 0x1fffffffffffffffffffc0fffffffffffffffffffe0780000000000000000000000000000000000000000000000000000000000000000007fffffffffffffffffff03c000000000000000000000000fffffffffffffffffffe0783c3800000400c0c042008000c00210600a184478629863894004430c53c1c470080003420280400000216140030a28220240cab13c383122128120018934470628706280c580120300420783123183490004206001891e01a0ed42926303220f1a9b121e14a45a80c881c3091d123f0c281402080022c0a4c10cc0131021401102a09c30a130c2c50a958a011b524fc31225268c3130000000000000000044a8952aaa1089520928112a10840aaaa4b25055511250840a4b2ab2484cd0bded5f787b5fd5576f7e81ef76daabddbedad577dc0f020a8884154488aaaad6a11044a410a25244aab9a708444105244285248a526d9c2f7db6b59ef6b6dafb7ae07810410548a10a92159b4f0845efb6d6abdeed5bbaeebc0f0787022801c03878380038203841c07c01c3180f1c0701f0384180e380f8f81e070c206800f0380206040c7810000f0c0078181e078f0000c0f03c08000781e0001e0001fff807c1f81c03f0e01e01fbe001c03f00700fc0fdfdf8700c00fc01e007e00fc01c03f03f00780007e00fe0001f81c0300fd801f807f807ee01f807eefc0380007efffde01fbfc03f7e01f80007efdfbfff3f0ef1585efb8acf
-def bigNat_4 : Nat := 0x3fffffffffffffffffff80000000000000000000000fffffffffffffffffffef000000000000000000000003fffffffffffffffffff81e0000000000000000000000000000000000000000000003fffffffffffffffffff81e0fffffffffffffffffffef003d800000a00401440471cc15c82638a2200800280008a101c824f10cf142ce22802411005001d955912f23ce054619012800461014005466b189e702a52ce20a9870a9c1530a80054a048a902052a51f72ae6ca8939f2a22e244c801255100052989002a26eec98979f885252b3f1214984ca02495084a60401549807564c937276fc85463f15183260ca64c0130e4c5473314fc54a000000000000000008931264ccc2112605210224c210814ccc92498a627bb67fe176db32fedfea0084984109262999a421705f7bb6aadeed76f6675f9e004131108298910cd348b427beeceb97767e6df2d7e03c08206488506490ca436f0420823212423248c91af81097bedb66d77bcdb79cdfa03c1f7d75acdef759ddcb7e9e007b004103c01807b800e3b803b01df000c03400f40077c003b01be03be00fbc0f00d80601e003b02f005e07bc0000f600f001bc007a00000de003de00007bc00001efffc0003f001fbc003f6001efc03ee01df800077e000fc01fb000dfe0001eff0000fdfddf8003f7f000007efe000001fbc0037e01bfc0007fbf00efc0007e0fdf800007e0001efc03fdf807efdfbfff7e01f80005be7684b6603dbb8
-def bigNat_5 : Nat := 0xfffffffffffffffffffe07fffffffffffffffffff7803fffffffffffffffffffbc00fffffffffffffffffffef7b800000040000400000100000400000006640011821800080c860100430c0400199000b460080c8c080236040001e7b6718c4de738c100366779c62001d1ce7007c2007800f018620000041810600004310600400008306002003d98700306043078707060061c79c1810001d070707007c3c661c0306c1e1c380c00230e3c38300e1dc01f020078f1e3c1e2850f7e280360f7e2803a0000000000000000111c23870f0422384a3c044704210270f11c8e338822381082471c3c48e9701108e08212384e1e474a4084223803088e47387989021281c22104e1221f1c72c042087082243848f13ce441089efb78ee9df8fdf3fb8d80fbebbc5cf7bd7ef3dcccf007df5d78e7bdf1fbeee6c7801fbe79cf1f7b9feef3b31ef700008c38001bb00000e80003b5c00000dd8000f5df000003b5c0003befa0000f760006bc0003b780005ed0000000f6de0001bdef0000000def780000007bdefffc000000003f7dc000003f6efc00003eefc00000077efde0001fb77e0000001eff7efe0001dfbf78000000007efefefffdfbddf80001bfdfbf000000efdfbf000fdfbbfff000001efdf8000007efc000007efc00000b30c1d1d21bba9df
-def bigNat_6 : Nat := 0x7fffffffffffffffffff03fffffffffffffffffffbc00fffffffffffffffffffef000000000000000000000003fffffffffffffffffffbdee000000000000000000000000000000c622000000130440c0000080064400300010000008860300020000007b36d380c31099bd3b386008400d4534d798e144200000e44e51cc70076088001d0001d003a078c60c621c0000c00608631e21c18380600004002990d00f0c0e0050404000043851c3038007602040001d0e9ec758f1c07430a03050863ce9f8e7145000d4080350a746874fce0a48000e41a58700ec000000000000000021e03c07f00843c093c088780842047f01e0f05c0143c02104781fc08f1181220f010423c08fe07883890843c00c10f0783f8211c424f7fc3de8fe3fefe07cfa07df7f0bc7bf9f7e3f0777801f7d7f0f1eff1efc73f1de4103c06083c18f021f0e0107ef9e7f07defe3df0f8f7bdc41041f00843e10f03c3c010081110bbddc0000000ebbaf800000000ddb5be0000000003b5dbee800000000f76daf0000003b7af6f0000000000f6def7bc00000000000def7bdebfff00000000000000003f7ddfbddf80000000003eefddfbf7f0000000001fb77edfefdfc00000000001dfbf7bf7f7bfff0000000001fbddfb7efc000000000000efdfbf7ee00000000000001efdfbfdfbf0000000007efdfbfff0bd66019dfeee46b
-def bigNat_7 : Nat := 0x3fffffffffffffffffff8000000000000000000001fffffffffffffffffffde000000000000000000000007fffffffffffffffffff7800000000000000000000000fffffffffffffffffffef7fffffffffffffffffff7bd800000000000000000000000000000000000000000000000000001d4e69ca88cb000028004041444e504f506791469c00400200028100453b496a5ea79c0282220040000a98626e53ce98e3a838ab80461000055810041560015602ac153eea94eb55275ea54ac00540915120205445048b13be4aa6e7ea56363f545801161080010a581400242960b14ed92a76958f9faa963f028b1208408010a98002a60c58f158b1fac70b0ab80c6000ab000000000000000003e003ff800107c001c01107ff07fe87ffe00ff9ff27c0042087fe000f01e0203effe17c3ff0fff80f3f3d07c00301f007fc0041e0800fbffc1f0ffc3cfff80fcf40f800c07c0107fc00780101fbe7ff01f7fe0ff83fe1efdf3ff80fbfe0ffc1ff0f7b2081f80041f003e00ff000808207e00107c01f003fc02001102013bdddbb7bbbe00000000000000ddb5bef5df77df78000000000000000f76daf6bdef780000000000000000f6def7bdbdef7af7ffe0000000000000000000000000003f7ddfbddfbf6efdefdf800000000000000000001fb77edfefdfdeff7efefdfc000000000000000000000001fbddfb7efdbfdfbf7fbf7e00000000000000000000001efdfbfdfbf7efdfbfff0000000008e3ec0cb31a9d095
-def bigNat_8 : Nat := 0x3fffffffffffffffffffbfffffffffffffffffffbc000000000000000000000000000000000000000000007fffffffffffffffffff7bfffffffffffffffffffbdee000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019ea6d0b0c8d614c3d0864698700000a00040184100000a00080020806226d7018f51d1317338c028e0ce00008610800000000cc00800084066000001980019803301e28ccdead983468c66c94678ad999fa346076470000280cc4848060202060600a000121200c602020003180c188e1bc581e0a1c331fac470c1c2c750e00ce02c33800604060c08000000cc0100040cc000000000000000003fffc000001f8000e006207fff83f07fffff001ffc7fff83f07fffff001ffc7bf0001803fff00000fc001f8000c01fff800007e00040fdfffe00fffc0fffff00f7effff007ffe07ffff807bdd03f80001f8000fffc000081fc0000fc000fffe00022040fe00007e0003fff000100103f80001f8001fffc0004212024063bdddbb7bbbeebbafbb5ddf7de0000000000000000000000000000000f76daf6bdef7bb7af6f5ed7bd7ffe00000000000000000000000000000000000000000000003f7ddfbddfbf6efdefdfbeefddfbf7f77efdefdfc00000000000000000000000000000000000000000000001fbddfb7efdbfdfbf7fbf7eefdfbf7eefdfbbfff7efffc00000000000000000000000000003086c6267a7e880e
-def bigNat_9 : Nat := 0x1fffffffffffffffffffc03fffffffffffffffffffbfffffffffffffffffffbdfffffffffffffffffffdefffffffffffffffffffef7b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000118ccd9bddde4599719aeef3ef089adc62ce3bef3d128dc759c7179ef000004010c630000404080b18af000000021000843162f000002108578021085e00c5e00bc018308f18ce1e3670f78f18460ce1e3c33878f78fec02306f070f0c78387878fe8c1821c3c3df803878787e000000803060180c103c183004000030060801f00307c0000081800103000c1f00200081f0000000000000000003fffffffffe00000fff8007ffffc007fffffffe0007ffffc007fffffffe0007bffffe003ffffffff0003dfffff001ffffffff8001ef6fe000000fffff000000007f0000007ffff80000002001fc000001fffff00000008fe000000fffff00000004007f0000007ffffc0000002109fc000001ffffe00000008420000183bdddbb7bbbeebbafbb5ddf7deddb5bef5df77df7bb5dbeebbefafbde0000000000000000000000000000000000000000000000000000000000000000000000000003f7ddfbddfbf6efdefdfbeefddfbf7f77efdefdfdfb77edfefdfdeff7efefdfddfbf7bf7f7bfff7efefefffc0000000000000000000000000000000000000000000000000000000000000000000000000f498ffd8ed4e30a1
-def bigNat_10 : Nat := 0x1fffffffffffffffffffdf8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000801011100411401288820800829002882208201289045104141080000000000020000004000810b0000000001000040143000000200858000108600086000c000000000000000000000000000000020000008008000000000008000000400080000020020210000040404000000000000000000000000000000000000001000004000000000000000000100000000100000000000000000003fffffffffffffff00003f7fffffff8000000000007fffffff80000000000043fffffffc0000000000021fffffffe000000000001080ffffffff00000000000087fffffff8000000000004211fffffffe0000000000010ffffffff0000000000008427fffffff8000000000004211fffffffe0000000000010844247e03bdddbb7bbbeebbafbb5ddf7deddb5bef5df77df7bb5dbeebbefafbdef76daf6bdef7bb7af6f5ed7bd7ffef6def7bdbdef7af7ffedef7bdebfff7bdefffdefffdfff80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c4d18fe0e464bfc7
-def bigNat_11 : Nat := 0x3fffffffffffffffffffbf7fffffffffffffffffff7fffffffffffffffffff7bfffffffffffffffffffbdfffffffffffffffffffdef6fffffffffffffffffffef7fffffffffffffffffff7bddfffffffffffffffffffdefffffffffffffffffffef7b7fffffffffffffffffff7bddfffffffffffffffffffdef77b77ffbbdddbb7bbbeebbafbb5ddf7deddb5bef5df77df7bb5dbeebbefafbdef76daf6bdef7bb7af6f5ed7bd7ffef6def7bdbdef7af7ffedef7bdebfff7bdefffdefffdfffbf7ddfbddfbf6efdefdfbeefddfbf7f77efdefdfdfb77edfefdfdeff7efefdfddfbf7bf7f7bfff7efefefffdfbddfb7efdbfdfbf7fbf7eefdfbf7eefdfbbfff7efffdefdfbfdfbf7efdfbfff7efdfbfffffffffffffffffff
-def NN0 : Nat := 2235
+def bigNat_0 : Nat := 0x7fffefdffff7fffdeffffbdffff7bdbfffef7fffdef77fffdeffffbdedffff7bddffff7bddeddffead6ab6aabfff555fffaafffd57ffebfff7ffed6db56d5b6daad7ffedb7ffedab6db55afffdbfff6db6dbfff6dbfff0000000000000000
+def bigNat_1 : Nat := 0x1529549554000aaa000550002a8001400080012924a92a4925528001248001254924aa5000240009249240009240000000000000000000
+def bigNat_2 : Nat := 0x800010200008000210000420000842400010800021088000210000421200008422000084221220000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+def bigNat_3 : Nat := 0xffff81ffff03c00000000000000000000ffff81e000000001ffff03c1e1c00001008200030a044189000c49106288314062c0040024430c0210c24c30c280080400421850861604161862424862600000000000000000208a04044501114283e28107a503c0082a101054211010542432e81e004130844255b03c1e1c08a0100860000000440000000011000080007ffe00c006c430c0210000c300000280c05420001bfff0c36180006dbfff05095e78da63bb83
+def bigNat_4 : Nat := 0x7fffc0000001ffff7800000007fffc0f000000000000001ffff03c1ffff7801ec00002000900885460002a322152940a98854e0a9802184600004a2c1494d814980802184582a318a8c208248a8e618a9400000000000000000410408088242f0800421050ba2780010442429c80f0020284040304244a4e03c0294e7801ec01042000b008800000000022000140000bfff00000618460000da2c0000d80000180618458000180006186dbfff6180008333acbef42c83ce
+def bigNat_5 : Nat := 0x7fffc0ffffbc01ffff7801ffff7bdc00000000000000001e45001b2800e95007c003c007800000010120280007449007c40900904a00f8003c6c06c006c6c0074000000000000000008230101118042604084c081038084821904042a042224bb0049763c0052ea780031ea7bdc00023000020000000045000028000157ffe00000000100050103602800000db7ffec0b01b05afffc00006c06c00006c00002bbde9588e747baf
+def bigNat_6 : Nat := 0x3fffe07fffde007fffde00000001ffff7bdc000000000000000000008a00d45000722a03b0001d000e801d04009001080028401d80001d0da001b50006a001a869a0001c84901d800000000000000001044220222108484810909020c1109246e2048dc5e0028d35e10848040634b7bdc420300402044420008008a00005000002afffc0000000000000c01b00158002ad7ffe000000da001b500000000006db0000006dbfffc2fe323dd067eef3
+def bigNat_7 : Nat := 0x1ffff000000ffffbc00000003fffef000000007fffdeffffbdec0000000000000000000000812000a00a9855455c002ac0015600ab01560d4c00015b690002960002960d2b4c000054c015304d34915700015600000000000000000208044143c2108080a1e13c4102200284e4f1010804030939e61273dec800c0080800c0800440804816000a00000555fff8000000000000000000d6c00015b6d8000000000000dab6c0000000000006db6dbfff000000731fc533d12e69c4
+def bigNat_8 : Nat := 0x1ffff7fffde00000000000003fffef7fffdef7000000000000000000000000000000000000a40000aa8ce0000660003300019800cc01980d69b548000000031800031809a2692510670119c00000019800019800000000000000000410188183cc60f31e410600820c010304f8f609f1ef7401c00803808810070100100701084809018ac0000aabfff0000000000000000000000000d6db56c00000000000000000dab6db55afffdbfff00000000000000003dff840d09b9e83
+def bigNat_9 : Nat := 0x7fffe01ffff7fffdeffffbdffff7bd80000000000000000000000000000000000000000000000000ad6ab6002f0000178000bc0005e002f005e0096d256c524d8297e00927e00000000000f8003e00000003e00003e0000000000000000007e0600103f040fc1e81f83d03f07bd80700000e0080000e00801c010000380210803802108000060ad6ab60000000000000000000000000000000d6db56d5b6daad7ffedb7ffe0000000000000000000000000000000083e001c11f614e20
+def bigNat_10 : Nat := 0x7fffefc0000000000000000000000000000000000000000000000000000000000000000000000000084a2400300000180000c00006000300060000000000000000040000040000000000008000200000000200000200000000000000000007ff80fdfc007f0010fe0021fc004203f80087f0010847f0010fe002109fc004211fc004211091f80ad6ab6aabfff555fffaafffd57ffebfff7ffe00000000000000000000000000000000000000000000000000000000fc000185278004b9
+def bigNat_11 : Nat := 0x7fffefdffff7fffdeffffbdffff7bdbfffef7fffdef77fffdeffffbdedffff7bddffff7bddeddffead6ab6aabfff555fffaafffd57ffebfff7ffed6db56d5b6daad7ffedb7ffedab6db55afffdbfff6db6dbfff6dbfffffffffffffffffff
+def NN0 : Nat := 756
 def AA0 : Nat := bigNat_0
 def HX0 : Nat := bigNat_1
 def HY0 : Nat := bigNat_2
-def segsX0 : List (ℕ × ℕ) := [(63, 78), (78, 85), (85, 92), (92, 99), (99, 114), (114, 121), (121, 128), (128, 135), (135, 142), (142, 149), (149, 158), (158, 165), (165, 172), (172, 177), (177, 192), (192, 199), (199, 214), (214, 218), (218, 225), (225, 232), (232, 236), (236, 243), (243, 250), (250, 257), (257, 264), (264, 268), (268, 275), (275, 282), (282, 291), (291, 298), (298, 305), (305, 314), (314, 317), (317, 324), (324, 331), (331, 334), (334, 341), (341, 345), (345, 350), (350, 357), (357, 372), (372, 380), (380, 388), (388, 395), (395, 410), (410, 415), (415, 423), (423, 430), (430, 435), (435, 442), (442, 449), (449, 453), (453, 461), (461, 468), (468, 476), (476, 483), (483, 492), (492, 497), (497, 505), (505, 512), (512, 521), (521, 524), (524, 531), (531, 535), (535, 538), (538, 545), (545, 553), (553, 560), (560, 565), (565, 572), (572, 579), (579, 583), (583, 591), (591, 598), (598, 605), (605, 609), (609, 616), (616, 620), (620, 626), (626, 633), (633, 640), (640, 645), (645, 652), (652, 656), (656, 659), (659, 666), (666, 673), (673, 677), (677, 682), (682, 689), (689, 693), (693, 699), (699, 706), (706, 721), (721, 736), (736, 741), (741, 756), (756, 761), (761, 766), (766, 771), (771, 786), (786, 788), (788, 793), (793, 798), (798, 803), (803, 808), (808, 813), (813, 816), (816, 831), (831, 836), (836, 838), (838, 843), (843, 848), (848, 853), (853, 858), (858, 861), (861, 866), (866, 871), (871, 876), (876, 881), (881, 884), (884, 887), (887, 892), (892, 907), (907, 909), (909, 914), (914, 919), (919, 921), (921, 924), (924, 929), (929, 931), (931, 936), (936, 939), (939, 944), (944, 946), (946, 951), (951, 954), (954, 958), (958, 963), (963, 968), (968, 973), (973, 978), (978, 980), (980, 983), (983, 988), (988, 990), (990, 993), (993, 996), (996, 999), (999, 1003), (1003, 1008), (1008, 1013), (1013, 1018), (1018, 1024), (1024, 1026), (1026, 1032), (1032, 1038), (1038, 1042), (1042, 1044), (1044, 1048), (1048, 1054), (1054, 1057), (1057, 1061), (1061, 1063), (1063, 1066), (1066, 1070), (1070, 1075), (1075, 1081), (1081, 1087), (1087, 1091), (1091, 1097), (1097, 1101), (1101, 1103), (1103, 1108), (1108, 1114), (1114, 1117), (1117, 1119), (1119, 1122), (1122, 1125), (1125, 1129), (1129, 1132), (1132, 1137), (1137, 1143), (1143, 1149), (1149, 1153), (1153, 1157), (1157, 1159), (1159, 1162), (1162, 1166), (1166, 1172), (1172, 1174), (1174, 1178), (1178, 1182), (1182, 1184), (1184, 1188), (1188, 1194), (1194, 1198), (1198, 1202), (1202, 1207), (1207, 1210), (1210, 1214), (1214, 1217), (1217, 1221), (1221, 1225), (1225, 1230), (1230, 1234)]
-def segsY0 : List (ℕ × ℕ) := [(1234, 1247), (1247, 1251), (1251, 1254), (1254, 1259), (1259, 1263), (1263, 1268), (1268, 1273), (1273, 1353), (1353, 1357), (1357, 1362), (1362, 1367), (1367, 1447), (1447, 1450), (1450, 1455), (1455, 1460), (1460, 1540), (1540, 1545), (1545, 1625), (1625, 1629), (1629, 1634), (1634, 1639), (1639, 1719), (1719, 1724), (1724, 1804), (1804, 1807), (1807, 1812), (1812, 1817), (1817, 1897), (1897, 1902), (1902, 1982), (1982, 1987), (1987, 2067), (2067, 2147), (2147, 2154), (2154, 2234)]
+def segsX0 : List (ℕ × ℕ) := [(63, 78), (78, 81), (81, 84), (84, 87), (87, 102), (102, 105), (105, 108), (108, 111), (111, 114), (114, 117), (117, 120), (120, 123), (123, 138), (138, 141), (141, 156), (156, 158), (158, 161), (161, 163), (163, 165), (165, 167), (167, 170), (170, 173), (173, 176), (176, 179), (179, 182), (182, 184), (184, 186), (186, 189), (189, 192), (192, 207), (207, 210), (210, 213), (213, 216), (216, 231), (231, 233), (233, 236), (236, 238), (238, 240), (240, 242), (242, 245), (245, 248), (248, 251), (251, 254), (254, 257), (257, 259), (259, 261), (261, 264), (264, 267), (267, 269), (269, 271), (271, 274), (274, 277), (277, 280), (280, 283), (283, 285), (285, 288), (288, 303), (303, 318), (318, 320), (320, 335), (335, 337), (337, 339), (339, 341), (341, 356), (356, 358), (358, 360), (360, 362), (362, 377), (377, 379), (379, 381), (381, 383), (383, 385), (385, 387), (387, 402), (402, 404), (404, 406), (406, 408), (408, 410), (410, 412), (412, 415), (415, 418), (418, 420), (420, 422), (422, 424), (424, 427), (427, 429), (429, 432), (432, 434), (434, 436)]
+def segsY0 : List (ℕ × ℕ) := [(436, 449), (449, 453), (453, 456), (456, 461), (461, 465), (465, 470), (470, 475), (475, 493), (493, 497), (497, 502), (502, 507), (507, 525), (525, 528), (528, 533), (533, 538), (538, 556), (556, 561), (561, 579), (579, 583), (583, 588), (588, 593), (593, 611), (611, 616), (616, 634), (634, 637), (637, 642), (642, 647), (647, 665), (665, 670), (670, 688), (688, 693), (693, 711), (711, 729), (729, 736), (736, 755)]
 def rawP0 : List ℕ := [bigNat_3, bigNat_4, bigNat_5, bigNat_6, bigNat_7, bigNat_8, bigNat_9, bigNat_10]
 def TG0 : ℕ := bigNat_11
 def I : Inst := ⟨NN0, AA0, HX0, HY0, segsX0, segsY0, rawP0, TG0⟩
@@ -1234,27 +1223,6 @@ lemma cov_bit (d : Bool) (l i : ℕ) (v : List W) : (cov d l v).testBit i = true
   | cons w v ih =>
     change (Nat.lor (sp d l w.s) (cov d l v)).testBit i = true ↔ _
     simp [no, ih]
-lemma forceNat_eq (value : ℕ) (next : ℕ → ℕ) : forceNat value next = next value := by
-  cases value <;> rfl
-
-lemma coverageTwice_spec (nn : ℕ) (d : Bool) (l : ℕ) (words : List W) (seen both : ℕ) :
-    coverageTwice nn d l words seen both =
-      (both ||| (seen &&& covC nn d l words) ||| twiceC nn d l words) := by
-  induction words generalizing seen both with
-  | nil => simp [coverageTwice,covC,twiceC]
-  | cons w tail ih =>
-    let bits := spC nn d l w.s
-    change forceNat bits (fun b => forceNat (Nat.lor seen b) fun more =>
-      forceNat (Nat.lor both (Nat.land seen b)) fun overlap => coverageTwice nn d l tail more overlap) =
-      (both ||| (seen &&& (bits ||| covC nn d l tail)) ||| ((bits &&& covC nn d l tail) ||| twiceC nn d l tail))
-    simp only [forceNat_eq,ih,no,nl,Nat.and_or_distrib_left,Nat.and_or_distrib_right]
-    ac_rfl
-
-lemma coverageTwice_eq (nn : ℕ) (d : Bool) (l : ℕ) (words : List W) :
-    coverageTwice nn d l words 0 0 = twiceC nn d l words := by
-  simp [coverageTwice_spec]
-
-
 lemma twice_bit (d : Bool) (l i : ℕ) (v : List W) (h : (twice d l v).testBit i = false) :
     v.Pairwise (fun w w' => ¬ ((sp d l w.s).testBit i = true ∧ (sp d l w'.s).testBit i = true)) := by
   induction v with
@@ -1274,7 +1242,7 @@ lemma Rep.card {v : List W} {S : Finset ℕ} (h : Rep v S) : S.card = v.length :
   rw [← h.2, List.toFinset_card_of_nodup h.1, List.length_map]
 lemma uq_of {d : Bool} {l i : ℕ} {v : List W} {S : Finset ℕ} (h : Rep v S) {w : W} (hw : w ∈ v)
     (hu : (Nat.land (sp d l w.s) (wst d l v)).testBit i = true) : l.testBit i = true ∧ Uq I.NN d S w.s i := by
-  simp only [nl, wst, wstC, coverageTwice_eq, nx, Nat.testBit_and, Nat.testBit_xor, Bool.and_eq_true, sp_bit] at hu
+  simp only [nl, wst, wstC, nx, Nat.testBit_and, Nat.testBit_xor, Bool.and_eq_true, sp_bit] at hu
   obtain ⟨⟨hl, hs⟩, ht⟩ := hu
   have ht : (twice d l v).testBit i = false := by simpa [hl] using ht
   refine ⟨hl, hs, fun c hc hne => ?_⟩
@@ -3458,6 +3426,184 @@ noncomputable def chk (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) : Bool :=
       st I.NN fun nn => st I.AA fun aa => st I.HX fun hx => st I.HY fun hy =>
       anySubC nn (pos t) l v 0 (fun r => startvC nn aa hx hy l m g B K t p H ph r)))
     (pwr E Z)) (pL (Q.map fun e => 16 + (K - e.2)))) (pL (Q.map fun _ => 16))) (PZ Q)) (mz Z)) (lz Z)
+
+lemma scan_eq_any (p : XW → Bool) (xs : List XW) : scan p xs = xs.any p := by
+  induction xs with
+  | nil => rfl
+  | cons w ws ih =>
+    change Bool.rec (motive := fun _ => Bool) (scan p ws) true (p w) = _
+    rw [ih, bR]
+    cases h : p w <;> simp [List.any_cons, h]
+
+lemma pairsC_eq (H : ℕ) (f : XW → XW → Bool) (a : XW) (xs : List XW) :
+    pairsC H f (a :: xs) =
+      (xs.any (fun x => hb H (a.s + x.s) && f a x) || pairsC H f xs) := by
+  have he : (fun x : XW => bif hb H (a.s + x.s) then f a x else false) =
+      (fun x : XW => hb H (a.s + x.s) && f a x) := by
+    funext x
+    cases hb H (a.s + x.s) <;> rfl
+  change Bool.rec (motive := fun _ => Bool) (pairsC H f xs) true
+    (scan (fun x => Bool.rec (motive := fun _ => Bool) false (f a x) (hb H (a.s + x.s))) xs) = _
+  rw [bR, scan_eq_any]
+  simp only [bR, he]
+  cases xs.any (fun x => hb H (a.s + x.s) && f a x) <;> rfl
+
+def possibleInputPair (H : ℕ) (v : List W) : Bool :=
+  List.rec (motive := fun _ => Bool) false
+    (fun a rest later =>
+      Bool.rec (motive := fun _ => Bool) later true (rest.any fun b => hb H (a.s + b.s))) v
+
+lemma possibleInputPair_cons (H : ℕ) (a : W) (v : List W) :
+    possibleInputPair H (a :: v) = ((v.any fun b => hb H (a.s + b.s)) || possibleInputPair H v) := by
+  change Bool.rec (motive := fun _ => Bool) (possibleInputPair H v) true
+    (v.any fun b => hb H (a.s + b.s)) = _
+  cases v.any (fun b => hb H (a.s + b.s)) <;> rfl
+
+lemma mkXC_map (nn : ℕ) (d : Bool) (l o : ℕ) (v : List W) :
+    mkXC nn d l o v = v.map (fun w => ⟨w, w.s, Nat.shiftRight w.s nn, Nat.land (spC nn d l w.s) o⟩) := by
+  induction v with
+  | nil => rfl
+  | cons w v ih =>
+    change _ :: mkXC nn d l o v = _ :: _
+    rw [ih]
+
+lemma fs_eq_filter (xs : List XW) : fs xs = xs.filter (fun x => !Nat.beq x.w.r 0) := by
+  induction xs with
+  | nil => rfl
+  | cons x xs ih =>
+    change Bool.rec (motive := fun _ => List XW) (x :: fs xs) (fs xs) (Nat.beq x.w.r 0) = _
+    rw [ih]
+    cases h : Nat.beq x.w.r 0 <;> simp [h]
+
+lemma fr_eq_filter (xs : List XW) : fr xs = xs.filter (fun x => Nat.beq x.w.r 0) := by
+  induction xs with
+  | nil => rfl
+  | cons x xs ih =>
+    change Bool.rec (motive := fun _ => List XW) (fr xs) (x :: fr xs) (Nat.beq x.w.r 0) = _
+    rw [ih]
+    cases h : Nat.beq x.w.r 0 <;> simp [h]
+
+lemma pairImpossible {H nn l o : ℕ} {d : Bool} {v : List W} (f : XW → XW → Bool)
+    (h : possibleInputPair H v = false) :
+    pairsC H f (fs (mkXC nn d l o v)) = false := by
+  induction v with
+  | nil => rfl
+  | cons a v ih =>
+    rw [possibleInputPair_cons, Bool.or_eq_false_iff] at h
+    let a' : XW := ⟨a, a.s, Nat.shiftRight a.s nn, Nat.land (spC nn d l a.s) o⟩
+    change pairsC H f (Bool.rec (motive := fun _ => List XW)
+      (a' :: fs (mkXC nn d l o v)) (fs (mkXC nn d l o v)) (Nat.beq a.r 0)) = _
+    cases ha : Nat.beq a.r 0
+    · change pairsC H f (a' :: fs (mkXC nn d l o v)) = false
+      rw [pairsC_eq, ih h.2, Bool.or_false]
+      apply List.any_eq_false.mpr
+      intro x hx
+      rw [fs_eq_filter, List.mem_filter, mkXC_map, List.mem_map] at hx
+      obtain ⟨⟨w, hw, rfl⟩, _⟩ := hx
+      intro hit
+      simp only [Bool.and_eq_true] at hit
+      exact List.any_eq_false.mp h.1 w hw hit.1
+    · exact ih h.2
+
+lemma noGenerated {nn l o : ℕ} {d : Bool} {v : List W}
+    (h : v.any (fun w => Nat.beq w.r 0) = false) : fr (mkXC nn d l o v) = [] := by
+  rw [fr_eq_filter]
+  apply List.filter_eq_nil_iff.mpr
+  intro x hx
+  rw [mkXC_map, List.mem_map] at hx
+  obtain ⟨w, hw, rfl⟩ := hx
+  exact List.any_eq_false.mp h w hw
+
+lemma noMoves {v : List W} (h : v.any (fun w => Nat.beq w.r 0) = false)
+    (nn aa hx hy l m g k z y : ℕ) (F : ℕ → ℕ → ℕ → List W → Bool) :
+    mvC nn aa hx hy F l m g k 0 z v y = false := by
+  have hp (f : XW → XW → Bool) : pairsN f (mkXC nn false l (wstC nn false l v) v) = false := by
+    rw [pairsN, noGenerated h]; rfl
+  have hnode : nodeC nn (F (Nat.sub k 1) 0) false l m g
+      (Nat.sub (Nat.sub k 0) y) v.length z v pairsN = false := by
+    simp only [nodeC, hp, bR, Bool.cond_self]
+  simp only [mvC, show pos 0 = false from rfl, hnode, show ∀ f, prd 0 f = false by intro; rfl, bR]
+
+lemma noNode {v : List W} {H : ℕ} (h : possibleInputPair H v = false)
+    (nn : ℕ) (d : Bool) (l m g e n z : ℕ) (f : ℕ → List W → Bool) :
+    nodeC nn f d l m g e n z v (fun h xs => pairsC H h (fs xs)) = false := by
+  simp only [nodeC, pairImpossible _ h, bR, Bool.cond_self]
+
+lemma tst_const_false (nn aa hx hy : ℕ) (d : Bool) (l e : ℕ) (v : List W) :
+    tstC nn aa hx hy d l e v (fun _ => false) = false := by
+  simp only [tstC, bR, Bool.cond_self]
+
+def relevantStart (t H ph : ℕ) (v : List W) : Bool :=
+  (Nat.ble v.length 1 || (Nat.beq ph 1 && (pos t || v.any fun w => Nat.beq w.r 0))) ||
+    possibleInputPair H v
+
+lemma relevantStart_facts {t H ph : ℕ} {v : List W} (h : relevantStart t H ph v = false) :
+    Nat.ble v.length 1 = false ∧
+      (Nat.beq ph 1 = false ∨ (t = 0 ∧ v.any (fun w => Nat.beq w.r 0) = false)) ∧
+      possibleInputPair H v = false := by
+  simp only [relevantStart, Bool.or_eq_false_iff, Bool.and_eq_false_iff] at h
+  refine ⟨h.1.1, h.1.2.imp_right ?_, h.2⟩
+  rintro ⟨ht, hv⟩
+  exact ⟨by cases t <;> simp [pos] at ht ⊢, hv⟩
+
+lemma inactiveTop {t H ph : ℕ} {v : List W} (h : relevantStart t H ph v = false)
+    (nn aa hx hy l m g K k z : ℕ) :
+    topCC nn aa hx hy l m g K H ph k t z v = false := by
+  obtain ⟨hl, hm, hp⟩ := relevantStart_facts h
+  simp only [topCC, hl, noNode hp, bR]
+  rcases hm with hm | ⟨rfl, hv⟩
+  · simp only [hm, Bool.cond_false, tst_const_false]
+  · simp only [noMoves hv, Bool.cond_self, tst_const_false]
+
+def guardStart (t H ph : ℕ) (test : List W → Bool) (v : List W) : Bool :=
+  Bool.rec (motive := fun _ => Bool) false (test v) (relevantStart t H ph v)
+
+lemma guardStart_eq {t H ph : ℕ} {test : List W → Bool}
+    (h : ∀ v, relevantStart t H ph v = false → test v = false) :
+    guardStart t H ph test = test := by
+  funext v
+  unfold guardStart
+  cases hv : relevantStart t H ph v
+  · exact (h v hv).symm
+  · rfl
+
+lemma inactiveStart {t H ph : ℕ} {v : List W} (h : relevantStart t H ph v = false)
+    (nn aa hx hy l m g B K p : ℕ) :
+    startvC nn aa hx hy l m g B K t p H ph v = false := by
+  simp only [startvC, child, st_eq, inactiveTop h, bR, Bool.cond_self]
+
+noncomputable def searchInputs (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ)
+    (test : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → List W → Bool) : Bool :=
+  (fun l => (fun m => (fun P => (fun g => (fun B => (fun p =>
+    frc (avl P m (rawL E)) (fun v => st l fun l => st m fun m => st g fun g => st B fun B => st p fun p =>
+      st I.NN fun nn => st I.AA fun aa => st I.HX fun hx => st I.HY fun hy =>
+      anySubC nn (pos t) l v 0 (guardStart t H ph (test nn aa hx hy l m g B p))))
+    (pwr E Z)) (pL (Q.map fun e => 16 + (K - e.2)))) (pL (Q.map fun _ => 16))) (PZ Q)) (mz Z)) (lz Z)
+
+lemma searchInputs_eq {E Q : List (ℕ × ℕ)} {Z K t H ph : ℕ}
+    {test : ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → ℕ → List W → Bool}
+    (h : ∀ nn aa hx hy l m g B p v, relevantStart t H ph v = false →
+      test nn aa hx hy l m g B p v = false) :
+    searchInputs E Q Z K t H ph test =
+      (fun l => (fun m => (fun P => (fun g => (fun B => (fun p =>
+        frc (avl P m (rawL E)) (fun v => st l fun l => st m fun m => st g fun g => st B fun B => st p fun p =>
+          st I.NN fun nn => st I.AA fun aa => st I.HX fun hx => st I.HY fun hy =>
+          anySubC nn (pos t) l v 0 (test nn aa hx hy l m g B p)))
+        (pwr E Z)) (pL (Q.map fun e => 16 + (K - e.2)))) (pL (Q.map fun _ => 16))) (PZ Q)) (mz Z)) (lz Z) := by
+  simp only [searchInputs, guardStart_eq (h _ _ _ _ _ _ _ _ _)]
+
+noncomputable def chkFast (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) : Bool :=
+  searchInputs E Q Z K t H ph (fun nn aa hx hy l m g B p =>
+    startvC nn aa hx hy l m g B K t p H ph)
+
+lemma chkFast_eq (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) :
+    chkFast E Q Z K t H ph = chk E Q Z K t H ph := by
+  unfold chkFast
+  rw [searchInputs_eq (fun nn aa hx hy l m g B p _ h =>
+    inactiveStart h nn aa hx hy l m g B K p)]
+  rfl
+
+
 lemma tz_sub {Z Z' : ℕ} (h : mz Z' &&& mz Z = mz Z') : tz Z &&& mz Z' = tz Z' := by
   simp only [tz, nl, Nat.and_assoc]; rw [Nat.and_comm (mz Z), h]
 lemma Im_WZ {E : List (ℕ × ℕ)} {Z Z' : ℕ} (h : mz Z' &&& mz Z = mz Z') {S : Finset ℕ} (hS : (S : Set ℕ) ⊆ WZ E Z) : Im (mz Z') S ⊆ WZ E Z' := by
@@ -4358,6 +4504,38 @@ noncomputable def chkPairPicked (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (ki
       anySubC nn (pos t) l v 0 (fun r => startPairPicked nn aa hx hy l m g B K t p H ph r kind)))
     (pwr E Z)) (pL (Q.map fun e => 16 + (K - e.2)))) (pL (Q.map fun _ => 16))) (PZ Q)) (mz Z)) (lz Z)
 
+
+lemma noNodePicked {v : List W} {H : ℕ} (h : possibleInputPair H v = false)
+    (nn : ℕ) (d kind : Bool) (l m g e n z : ℕ) (f : ℕ → List W → Bool) :
+    nodePicked nn f d l m g e n z v H kind = false := by
+  simp only [nodePicked, pairImpossible _ h, bR, Bool.cond_self]
+
+lemma inactiveTopPicked {t H ph : ℕ} {v : List W} (h : relevantStart t H ph v = false)
+    (nn aa hx hy l m g K k z : ℕ) (kind : Bool) :
+    topPairPicked nn aa hx hy l m g K H ph k t z v kind = false := by
+  obtain ⟨hl, hm, hp⟩ := relevantStart_facts h
+  simp only [topPairPicked, hl, noNodePicked hp, bR]
+  rcases hm with hm | ⟨rfl, hv⟩
+  · simp only [hm, Bool.cond_false, tst_const_false]
+  · simp only [noMoves hv, Bool.cond_self, tst_const_false]
+
+lemma inactiveStartPicked {t H ph : ℕ} {v : List W} (h : relevantStart t H ph v = false)
+    (nn aa hx hy l m g B K p : ℕ) (kind : Bool) :
+    startPairPicked nn aa hx hy l m g B K t p H ph v kind = false := by
+  simp only [startPairPicked, child, st_eq, inactiveTopPicked h, bR, Bool.cond_self]
+
+noncomputable def chkPairFast (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (kind : Bool) : Bool :=
+  searchInputs E Q Z K t H ph (fun nn aa hx hy l m g B p v =>
+    startPairPicked nn aa hx hy l m g B K t p H ph v kind)
+
+lemma chkPairFast_eq (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (kind : Bool) :
+    chkPairFast E Q Z K t H ph kind = chkPairPicked E Q Z K t H ph kind := by
+  unfold chkPairFast
+  rw [searchInputs_eq (fun nn aa hx hy l m g B p _ h =>
+    inactiveStartPicked h nn aa hx hy l m g B K p kind)]
+  rfl
+
+
 lemma chkPair_picked (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ)
     (h : ∀ b : Bool, chkPairPicked E Q Z K t H ph b = false) : chk E Q Z K t H ph = false := by
   suffices chk E Q Z K t H ph = true → False by
@@ -5138,7 +5316,9 @@ lemma co1_id : ∀ a ∈ q1, Imp [] a.1 a.2 := by
   exact ir a (List.mem_of_mem_filter ha)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co1t0_res : chk [] q1 1 10 0 FF 1 = false := by decide +kernel
+theorem co1t0_res : chk [] q1 1 10 0 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co1t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q1 1 10 0 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5146,7 +5326,9 @@ lemma co1t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co1t0_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co1t1_res : chk [] q1 1 10 1 FF 1 = false := by decide +kernel
+theorem co1t1_res : chk [] q1 1 10 1 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co1t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q1 1 10 1 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5154,7 +5336,9 @@ lemma co1t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co1t1_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co1t2_res : chk [] q1 1 10 2 FF 1 = false := by decide +kernel
+theorem co1t2_res : chk [] q1 1 10 2 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co1t2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q1 1 10 2 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5162,7 +5346,9 @@ lemma co1t2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co1t2_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co1t3_res : chk [] q1 1 10 3 FF 1 = false := by decide +kernel
+theorem co1t3_res : chk [] q1 1 10 3 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co1t3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q1 1 10 3 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5170,7 +5356,9 @@ lemma co1t3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co1t3_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co1t4_res : chk [] q1 1 10 4 FF 1 = false := by decide +kernel
+theorem co1t4_res : chk [] q1 1 10 4 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co1t4 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q1 1 10 4 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5178,7 +5366,9 @@ lemma co1t4 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co1t4_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co1t5_res : chk [] q1 1 10 5 FF 1 = false := by decide +kernel
+theorem co1t5_res : chk [] q1 1 10 5 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co1t5 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q1 1 10 5 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5186,7 +5376,9 @@ lemma co1t5 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co1t5_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co1t6_res : chk [] q1 1 10 6 FF 1 = false := by decide +kernel
+theorem co1t6_res : chk [] q1 1 10 6 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co1t6 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q1 1 10 6 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5194,7 +5386,9 @@ lemma co1t6 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co1t6_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co1t7_res : chk [] q1 1 10 7 FF 1 = false := by decide +kernel
+theorem co1t7_res : chk [] q1 1 10 7 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co1t7 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q1 1 10 7 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5202,7 +5396,9 @@ lemma co1t7 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co1t7_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co1t8_res : chk [] q1 1 10 8 FF 1 = false := by decide +kernel
+theorem co1t8_res : chk [] q1 1 10 8 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co1t8 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q1 1 10 8 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5210,7 +5406,9 @@ lemma co1t8 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co1t8_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co1t9_res : chk [] q1 1 10 9 FF 1 = false := by decide +kernel
+theorem co1t9_res : chk [] q1 1 10 9 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co1t9 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q1 1 10 9 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5218,7 +5416,9 @@ lemma co1t9 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co1t9_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co1t10_res : chk [] q1 1 10 10 FF 1 = false := by decide +kernel
+theorem co1t10_res : chk [] q1 1 10 10 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co1t10 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q1 1 10 10 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5247,74 +5447,120 @@ lemma co2_id : ∀ a ∈ q2, Imp [] a.1 a.2 := by
   exact ir a (List.mem_of_mem_filter ha)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_0 : chk [] q2 2 11 0 0x0 1 = false := by decide +kernel
+theorem co2t0_0 : chk [] q2 2 11 0 0x0 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_1 : chk [] q2 2 11 0 0x1 0 = false := by decide +kernel
+theorem co2t0_1 : chk [] q2 2 11 0 0x20 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_2 : chk [] q2 2 11 0 0x4 0 = false := by decide +kernel
+theorem co2t0_2 : chk [] q2 2 11 0 0x2000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_3 : chk [] q2 2 11 0 0x100 0 = false := by decide +kernel
+theorem co2t0_3 : chk [] q2 2 11 0 0x400000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_4 : chk [] q2 2 11 0 0x200 0 = false := by decide +kernel
+theorem co2t0_4 : chk [] q2 2 11 0 0x40000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_5 : chk [] q2 2 11 0 0x100000 0 = false := by decide +kernel
+theorem co2t0_5 : chk [] q2 2 11 0 0x400000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_6 : chk [] q2 2 11 0 0x4000000 0 = false := by decide +kernel
+theorem co2t0_6 : chk [] q2 2 11 0 0x800000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_7 : chk [] q2 2 11 0 0x10000000000 0 = false := by decide +kernel
+theorem co2t0_7 : chk [] q2 2 11 0 0x8000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_8 : chk [] q2 2 11 0 0x400000000000000 0 = false := by decide +kernel
+theorem co2t0_8 : chk [] q2 2 11 0 0x40000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_9 : chk [] q2 2 11 0 0x40000000000000000 0 = false := by decide +kernel
+theorem co2t0_9 : chk [] q2 2 11 0 0x100000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_10 : chk [] q2 2 11 0 0x4000000000000000000 0 = false := by decide +kernel
+theorem co2t0_10 : chk [] q2 2 11 0 0x800000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_11 : chk [] q2 2 11 0 0x100000000000000000000 0 = false := by decide +kernel
+theorem co2t0_11 : chk [] q2 2 11 0 0x10000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_12 : chk [] q2 2 11 0 0x200000000000000000000000000 0 = false := by decide +kernel
+theorem co2t0_12 : chk [] q2 2 11 0 0x800000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_13 : chk [] q2 2 11 0 0x8000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t0_13 : chk [] q2 2 11 0 0x10000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_14 : chk [] q2 2 11 0 0x10000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t0_14 : chk [] q2 2 11 0 0x200000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_15 : chk [] q2 2 11 0 0x1000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t0_15 : chk [] q2 2 11 0 0x10000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_16 : chk [] q2 2 11 0 0x40000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t0_16 : chk [] q2 2 11 0 0x200000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_17 : chk [] q2 2 11 0 0x800000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t0_17 : chk [] q2 2 11 0 0x4000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_18 : chk [] q2 2 11 0 0x80000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t0_18 : chk [] q2 2 11 0 0x200000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_19 : chk [] q2 2 11 0 0x2000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t0_19 : chk [] q2 2 11 0 0x4000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_20 : chk [] q2 2 11 0 0x100000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t0_20 : chk [] q2 2 11 0 0x80000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_21 : chk [] q2 2 11 0 0x10000000000000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t0_21 : chk [] q2 2 11 0 0x400000000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t0_22 : chk [] q2 2 11 0 0x3efffffffefdffff7f7bfffefe7dfffffefbfbfbfffefffbeffcfa 0 = false := by decide +kernel
-def co2t0_cov : List (ℕ × ℕ) := [(0x0, 1), (0x1, 0), (0x4, 0), (0x100, 0), (0x200, 0), (0x100000, 0), (0x4000000, 0), (0x10000000000, 0), (0x400000000000000, 0), (0x40000000000000000, 0), (0x4000000000000000000, 0), (0x100000000000000000000, 0), (0x200000000000000000000000000, 0), (0x8000000000000000000000000000, 0), (0x10000000000000000000000000000, 0), (0x1000000000000000000000000000000, 0), (0x40000000000000000000000000000000000, 0), (0x800000000000000000000000000000000000, 0), (0x80000000000000000000000000000000000000, 0), (0x2000000000000000000000000000000000000000000, 0), (0x100000000000000000000000000000000000000000000, 0), (0x10000000000000000000000000000000000000000000000000000, 0), (0x3efffffffefdffff7f7bfffefe7dfffffefbfbfbfffefffbeffcfa, 0)]
+theorem co2t0_22 : chk [] q2 2 11 0 0x3ffbffffffffffff7bdffffbdeffffdef7ef6b73fffbfbffffdfdf 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
+def co2t0_cov : List (ℕ × ℕ) := [(0x0, 1), (0x20, 0), (0x2000, 0), (0x400000000, 0), (0x40000000000, 0), (0x400000000000000, 0), (0x800000000000000, 0), (0x8000000000000000, 0), (0x40000000000000000, 0), (0x100000000000000000, 0), (0x800000000000000000, 0), (0x10000000000000000000, 0), (0x800000000000000000000, 0), (0x10000000000000000000000, 0), (0x200000000000000000000000, 0), (0x10000000000000000000000000000, 0), (0x200000000000000000000000000000, 0), (0x4000000000000000000000000000000, 0), (0x200000000000000000000000000000000000, 0), (0x4000000000000000000000000000000000000, 0), (0x80000000000000000000000000000000000000, 0), (0x400000000000000000000000000000000000000000000000000, 0), (0x3ffbffffffffffff7bdffffbdeffffdef7ef6b73fffbfbffffdfdf, 0)]
 lemma co2t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 0 a.1 a.2 = false := by
   refine ⟨co2t0_cov, by decide +kernel, ?_⟩
   intro a ha
@@ -5345,74 +5591,120 @@ lemma co2t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
   · exact co2t0_22
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_0 : chk [] q2 2 11 1 0x0 1 = false := by decide +kernel
+theorem co2t1_0 : chk [] q2 2 11 1 0x0 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_1 : chk [] q2 2 11 1 0x1 0 = false := by decide +kernel
+theorem co2t1_1 : chk [] q2 2 11 1 0x20 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_2 : chk [] q2 2 11 1 0x4 0 = false := by decide +kernel
+theorem co2t1_2 : chk [] q2 2 11 1 0x2000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_3 : chk [] q2 2 11 1 0x100 0 = false := by decide +kernel
+theorem co2t1_3 : chk [] q2 2 11 1 0x400000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_4 : chk [] q2 2 11 1 0x200 0 = false := by decide +kernel
+theorem co2t1_4 : chk [] q2 2 11 1 0x40000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_5 : chk [] q2 2 11 1 0x100000 0 = false := by decide +kernel
+theorem co2t1_5 : chk [] q2 2 11 1 0x400000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_6 : chk [] q2 2 11 1 0x4000000 0 = false := by decide +kernel
+theorem co2t1_6 : chk [] q2 2 11 1 0x800000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_7 : chk [] q2 2 11 1 0x10000000000 0 = false := by decide +kernel
+theorem co2t1_7 : chk [] q2 2 11 1 0x8000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_8 : chk [] q2 2 11 1 0x400000000000000 0 = false := by decide +kernel
+theorem co2t1_8 : chk [] q2 2 11 1 0x40000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_9 : chk [] q2 2 11 1 0x40000000000000000 0 = false := by decide +kernel
+theorem co2t1_9 : chk [] q2 2 11 1 0x100000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_10 : chk [] q2 2 11 1 0x4000000000000000000 0 = false := by decide +kernel
+theorem co2t1_10 : chk [] q2 2 11 1 0x800000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_11 : chk [] q2 2 11 1 0x100000000000000000000 0 = false := by decide +kernel
+theorem co2t1_11 : chk [] q2 2 11 1 0x10000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_12 : chk [] q2 2 11 1 0x200000000000000000000000000 0 = false := by decide +kernel
+theorem co2t1_12 : chk [] q2 2 11 1 0x800000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_13 : chk [] q2 2 11 1 0x8000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t1_13 : chk [] q2 2 11 1 0x10000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_14 : chk [] q2 2 11 1 0x10000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t1_14 : chk [] q2 2 11 1 0x200000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_15 : chk [] q2 2 11 1 0x1000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t1_15 : chk [] q2 2 11 1 0x10000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_16 : chk [] q2 2 11 1 0x40000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t1_16 : chk [] q2 2 11 1 0x200000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_17 : chk [] q2 2 11 1 0x800000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t1_17 : chk [] q2 2 11 1 0x4000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_18 : chk [] q2 2 11 1 0x80000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t1_18 : chk [] q2 2 11 1 0x200000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_19 : chk [] q2 2 11 1 0x2000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t1_19 : chk [] q2 2 11 1 0x4000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_20 : chk [] q2 2 11 1 0x100000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t1_20 : chk [] q2 2 11 1 0x80000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_21 : chk [] q2 2 11 1 0x10000000000000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co2t1_21 : chk [] q2 2 11 1 0x400000000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t1_22 : chk [] q2 2 11 1 0x3efffffffefdffff7f7bfffefe7dfffffefbfbfbfffefffbeffcfa 0 = false := by decide +kernel
-def co2t1_cov : List (ℕ × ℕ) := [(0x0, 1), (0x1, 0), (0x4, 0), (0x100, 0), (0x200, 0), (0x100000, 0), (0x4000000, 0), (0x10000000000, 0), (0x400000000000000, 0), (0x40000000000000000, 0), (0x4000000000000000000, 0), (0x100000000000000000000, 0), (0x200000000000000000000000000, 0), (0x8000000000000000000000000000, 0), (0x10000000000000000000000000000, 0), (0x1000000000000000000000000000000, 0), (0x40000000000000000000000000000000000, 0), (0x800000000000000000000000000000000000, 0), (0x80000000000000000000000000000000000000, 0), (0x2000000000000000000000000000000000000000000, 0), (0x100000000000000000000000000000000000000000000, 0), (0x10000000000000000000000000000000000000000000000000000, 0), (0x3efffffffefdffff7f7bfffefe7dfffffefbfbfbfffefffbeffcfa, 0)]
+theorem co2t1_22 : chk [] q2 2 11 1 0x3ffbffffffffffff7bdffffbdeffffdef7ef6b73fffbfbffffdfdf 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
+def co2t1_cov : List (ℕ × ℕ) := [(0x0, 1), (0x20, 0), (0x2000, 0), (0x400000000, 0), (0x40000000000, 0), (0x400000000000000, 0), (0x800000000000000, 0), (0x8000000000000000, 0), (0x40000000000000000, 0), (0x100000000000000000, 0), (0x800000000000000000, 0), (0x10000000000000000000, 0), (0x800000000000000000000, 0), (0x10000000000000000000000, 0), (0x200000000000000000000000, 0), (0x10000000000000000000000000000, 0), (0x200000000000000000000000000000, 0), (0x4000000000000000000000000000000, 0), (0x200000000000000000000000000000000000, 0), (0x4000000000000000000000000000000000000, 0), (0x80000000000000000000000000000000000000, 0), (0x400000000000000000000000000000000000000000000000000, 0), (0x3ffbffffffffffff7bdffffbdeffffdef7ef6b73fffbfbffffdfdf, 0)]
 lemma co2t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 1 a.1 a.2 = false := by
   refine ⟨co2t1_cov, by decide +kernel, ?_⟩
   intro a ha
@@ -5443,7 +5735,9 @@ lemma co2t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
   · exact co2t1_22
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t2_res : chk [] q2 2 11 2 FF 1 = false := by decide +kernel
+theorem co2t2_res : chk [] q2 2 11 2 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co2t2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 2 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5451,7 +5745,9 @@ lemma co2t2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co2t2_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t3_res : chk [] q2 2 11 3 FF 1 = false := by decide +kernel
+theorem co2t3_res : chk [] q2 2 11 3 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co2t3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 3 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5459,7 +5755,9 @@ lemma co2t3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co2t3_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t4_res : chk [] q2 2 11 4 FF 1 = false := by decide +kernel
+theorem co2t4_res : chk [] q2 2 11 4 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co2t4 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 4 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5467,7 +5765,9 @@ lemma co2t4 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co2t4_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t5_res : chk [] q2 2 11 5 FF 1 = false := by decide +kernel
+theorem co2t5_res : chk [] q2 2 11 5 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co2t5 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 5 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5475,7 +5775,9 @@ lemma co2t5 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co2t5_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t6_res : chk [] q2 2 11 6 FF 1 = false := by decide +kernel
+theorem co2t6_res : chk [] q2 2 11 6 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co2t6 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 6 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5483,7 +5785,9 @@ lemma co2t6 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co2t6_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t7_res : chk [] q2 2 11 7 FF 1 = false := by decide +kernel
+theorem co2t7_res : chk [] q2 2 11 7 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co2t7 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 7 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5491,7 +5795,9 @@ lemma co2t7 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co2t7_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t8_res : chk [] q2 2 11 8 FF 1 = false := by decide +kernel
+theorem co2t8_res : chk [] q2 2 11 8 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co2t8 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 8 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5499,7 +5805,9 @@ lemma co2t8 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co2t8_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t9_res : chk [] q2 2 11 9 FF 1 = false := by decide +kernel
+theorem co2t9_res : chk [] q2 2 11 9 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co2t9 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 9 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5507,7 +5815,9 @@ lemma co2t9 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co2t9_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t10_res : chk [] q2 2 11 10 FF 1 = false := by decide +kernel
+theorem co2t10_res : chk [] q2 2 11 10 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co2t10 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 10 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5515,7 +5825,9 @@ lemma co2t10 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
     simpa [he] using co2t10_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co2t11_res : chk [] q2 2 11 11 FF 1 = false := by decide +kernel
+theorem co2t11_res : chk [] q2 2 11 11 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co2t11 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q2 2 11 11 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5545,7 +5857,9 @@ lemma co4_id : ∀ a ∈ q4, Imp [] a.1 a.2 := by
   exact ir a (List.mem_of_mem_filter ha)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co4t0_res : chk [] q4 4 10 0 FF 1 = false := by decide +kernel
+theorem co4t0_res : chk [] q4 4 10 0 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co4t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q4 4 10 0 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5553,7 +5867,9 @@ lemma co4t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co4t0_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co4t1_res : chk [] q4 4 10 1 FF 1 = false := by decide +kernel
+theorem co4t1_res : chk [] q4 4 10 1 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co4t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q4 4 10 1 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5561,7 +5877,9 @@ lemma co4t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co4t1_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co4t2_res : chk [] q4 4 10 2 FF 1 = false := by decide +kernel
+theorem co4t2_res : chk [] q4 4 10 2 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co4t2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q4 4 10 2 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5569,7 +5887,9 @@ lemma co4t2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co4t2_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co4t3_res : chk [] q4 4 10 3 FF 1 = false := by decide +kernel
+theorem co4t3_res : chk [] q4 4 10 3 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co4t3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q4 4 10 3 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5577,7 +5897,9 @@ lemma co4t3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co4t3_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co4t4_res : chk [] q4 4 10 4 FF 1 = false := by decide +kernel
+theorem co4t4_res : chk [] q4 4 10 4 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co4t4 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q4 4 10 4 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5585,7 +5907,9 @@ lemma co4t4 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co4t4_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co4t5_res : chk [] q4 4 10 5 FF 1 = false := by decide +kernel
+theorem co4t5_res : chk [] q4 4 10 5 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co4t5 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q4 4 10 5 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5593,7 +5917,9 @@ lemma co4t5 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co4t5_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co4t6_res : chk [] q4 4 10 6 FF 1 = false := by decide +kernel
+theorem co4t6_res : chk [] q4 4 10 6 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co4t6 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q4 4 10 6 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5601,7 +5927,9 @@ lemma co4t6 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co4t6_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co4t7_res : chk [] q4 4 10 7 FF 1 = false := by decide +kernel
+theorem co4t7_res : chk [] q4 4 10 7 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co4t7 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q4 4 10 7 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5609,7 +5937,9 @@ lemma co4t7 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co4t7_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co4t8_res : chk [] q4 4 10 8 FF 1 = false := by decide +kernel
+theorem co4t8_res : chk [] q4 4 10 8 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co4t8 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q4 4 10 8 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5617,7 +5947,9 @@ lemma co4t8 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co4t8_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co4t9_res : chk [] q4 4 10 9 FF 1 = false := by decide +kernel
+theorem co4t9_res : chk [] q4 4 10 9 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co4t9 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q4 4 10 9 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5625,7 +5957,9 @@ lemma co4t9 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using co4t9_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co4t10_res : chk [] q4 4 10 10 FF 1 = false := by decide +kernel
+theorem co4t10_res : chk [] q4 4 10 10 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co4t10 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q4 4 10 10 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5648,21 +5982,21 @@ lemma co4 : Imp [] 4 11 := imp_of (Or.inl rfl) co4_p (by norm_num) co4_id
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-lemma co8_alignment : cofactorAlignment 4 8 0x749764b825992bc05e4a600000000000000000000000000245922090c02a23f11e48e402900000000000000000000000000003913889403f01300300740270000000000000000000000000020780ac0504011fd80f87e292c000000000000000000000000001ea80000043ce0000f2c7883bf000000000000000000000000000058e747343981c98e38718025000000000000000000000000001ad8d586a234c1a38d146803310000000000000000000000000017f80205ea2e600480c0586b8a0000000000000000000000000014a0a4451a28614089f04e692b0000000000000000000000000001e08f407a23111524a8444ae0000000000000000000000000000f687900661d50e70719252a83000000000000000000000000000c285f405816649428ed466a290000000000000000000000000009d84c825612408d808421a9ca00000000000000000000000000071036c028022060a5f816497300000000000000000000000000008001124893803980d526092300000000000000000000000000490a4d532498449724812dc91f 1 = true := by decide +kernel
+lemma co8_alignment : cofactorAlignment 4 8 0x1b300000000000000000000000000000000000000000006c40001ae00000000000000000000000000000000000002800000003580180000000000000000000000000000000680321a50d1809c33a3590000000000000000000000000000000000000000000000000199000000000000000000000000000000000000000000064c0000170000000000000000000000000000000002fc03d00000002f403c000000000000000000000000000aa000c2a003b09f80740744210000000000000000000000000001c000000011c000046422c35800000000000000000000000000000043804c10c0848d5c20c3fb0000000000000000000000000000000001f80f907b03cc6ac3e80000000000000000000000000006b034c0360c11aa8f2078a3bd0000000000000000000000000001800bc05c0b4000004c15c3a300000000000000000000000000015827c0180140458e000f83760000000000000000000000000000400086a235f01500846b8350000000000000000000000000001a70d787223831ad8d346e234c 1 = true := by decide +kernel
 
 lemma co8 : Imp [] 8 11 :=
   imp_by_cofactor_symmetry (by decide +kernel) co8_alignment (by decide +kernel) (by decide +kernel) co4
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-lemma co16_alignment : cofactorAlignment 2 16 0x128400049f00f00dc02c012245922090c02a23f11e08e4029000000000000000000000000000000000000000000000000000021590a084c00d00d106482a01f20780ac0504011fd80f87e290800000000000000000000000000000000000000000000000000001dd8ee00023b31d88eb07523a40058e747343981c98e3871802500000000000000000000000000000000000000000000000000001970ca400c31f18d00d862600a17f80205ea2e600480c0586b8a000000000000000000000000000000000000000000000000000000889a400026212f095c03624801e08f407a2311152418444ae000000000000000000000000000000000000000000000000000000e106ec0481af016801433618c0c285f405816648228ed466a29000000000000000000000000000000000000000000000000000000184081f60f400ca4081d29a4071036c028022060a5f8164973000000000000000000000000000000000000000000000000000001c23fc0ac913027a4300808fe47ea6592229844852e391f88fb 2 = true := by decide +kernel
+lemma co16_alignment : cofactorAlignment 2 16 0xa000000000000000006c40001ae0000000000000000000000000000000000000000000000000000000000000000500000fc0001a700000680321a50d1809c33a34100000000000000000000000000000000000000000000000000000000000000000000065c0001950000000000000000064c000017000000000000000000000000000000000000000000000000000000005a400016700000880000040aa000c2a003b09f807407442100000000000000000000000000000000000000000000000000000048000000037000044c020036000043804c10c0848cfc20c3fb000000000000000000000000000000000000000000000000000000000d402c0ef07683a81d00d906b034c0360c119e8f2078a3bd000000000000000000000000000000000000000000000000000000080b40000a80078cec058398015827c0180140458e000f837600000000000000000000000000000000000000000000000000000118ce00a43470278d1005233719b0e4c68c3831a1909466a334 2 = true := by decide +kernel
 
 lemma co16 : Imp [] 16 12 :=
   imp_by_cofactor_symmetry (by decide +kernel) co16_alignment (by decide +kernel) (by decide +kernel) co2
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-lemma co32_alignment : cofactorAlignment 1 32 0x11a800046323011788b6034003913889403f013003007402721590a084c00d00d106482a01f20780ac0504011fd80f87e2908000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001bc0dd46e436d0000da06c635e1ad8d586a234c1a38d146803311970ca400c31f18d00d862600a17f80205ea2e600480c0586b8a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011886042801810508043f41f20f687900661d50e7071920aa830e106ec0481af016801433618c0c285f405816648228ed466a290000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001c808002e90101d8038110945008001120093803980d526092301c23fc0ac913027a4300808fe47ea4d5222a2248524811f88fb 1 = true := by decide +kernel
+lemma co32_alignment : cofactorAlignment 1 32 0x2000000000000280000000358018000000000000500000fc0001a700000680321a50d1809c33a341000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000182000000000003e00000002fc03d00000002f403c00005a400016700000880000040aa000c2a003b09f80740744210000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a800000000e00000002040ff00000001f80f907b03cc67c3e800000d402c0ef07683a81d00d906b034c0360c119e8f2078a3bd00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000012004801a33a01280180e0365004000867235f01500846b83500118ce00a43470278d1005233719b0d7868c3b61a18d3466a334 1 = true := by decide +kernel
 
 lemma co32 : Imp [] 32 11 :=
   imp_by_cofactor_symmetry (by decide +kernel) co32_alignment (by decide +kernel) (by decide +kernel) co1
@@ -5675,79 +6009,120 @@ lemma co64_id : ∀ a ∈ q64, Imp [] a.1 a.2 := by
   exact ir a (List.mem_of_mem_filter ha)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_0 : chk [] q64 64 11 0 0x0 1 = false := by decide +kernel
+theorem co64t0_0 : chk [] q64 64 11 0 0x0 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_1 : chk [] q64 64 11 0 0x400 0 = false := by decide +kernel
+theorem co64t0_1 : chk [] q64 64 11 0 0x1 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_2 : chk [] q64 64 11 0 0x1000000000 0 = false := by decide +kernel
+theorem co64t0_2 : chk [] q64 64 11 0 0x2 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_3 : chk [] q64 64 11 0 0x4000000000000 0 = false := by decide +kernel
+theorem co64t0_3 : chk [] q64 64 11 0 0x40 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_4 : chk [] q64 64 11 0 0x400000000000000 0 = false := by decide +kernel
+theorem co64t0_4 : chk [] q64 64 11 0 0x80 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_5 : chk [] q64 64 11 0 0x1000000000000000000 0 = false := by decide +kernel
+theorem co64t0_5 : chk [] q64 64 11 0 0x400 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_6 : chk [] q64 64 11 0 0x10000000000000000000 0 = false := by decide +kernel
+theorem co64t0_6 : chk [] q64 64 11 0 0x1000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_7 : chk [] q64 64 11 0 0x40000000000000000000 0 = false := by decide +kernel
+theorem co64t0_7 : chk [] q64 64 11 0 0x2000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_8 : chk [] q64 64 11 0 0x10000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_8 : chk [] q64 64 11 0 0x10000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_9 : chk [] q64 64 11 0 0x40000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_9 : chk [] q64 64 11 0 0x20000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_10 : chk [] q64 64 11 0 0x10000000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_10 : chk [] q64 64 11 0 0x40000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_11 : chk [] q64 64 11 0 0x40000000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_11 : chk [] q64 64 11 0 0x200000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_12 : chk [] q64 64 11 0 0x400000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_12 : chk [] q64 64 11 0 0x800000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_13 : chk [] q64 64 11 0 0x400000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_13 : chk [] q64 64 11 0 0x4000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_14 : chk [] q64 64 11 0 0x400000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_14 : chk [] q64 64 11 0 0x8000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_15 : chk [] q64 64 11 0 0x1000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_15 : chk [] q64 64 11 0 0x4000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_16 : chk [] q64 64 11 0 0x10000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_16 : chk [] q64 64 11 0 0x100000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_17 : chk [] q64 64 11 0 0x10000000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_17 : chk [] q64 64 11 0 0x40000000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_18 : chk [] q64 64 11 0 0x4000000000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_18 : chk [] q64 64 11 0 0x2000000000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_19 : chk [] q64 64 11 0 0x10000000000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_19 : chk [] q64 64 11 0 0x40000000000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_20 : chk [] q64 64 11 0 0x4000000000000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t0_20 : chk [] q64 64 11 0 0x80000000000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t0_21 : chk [] q64 64 11 0 0x40000000000000000000000000000000000000000000000000000 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t0_22 : chk [] q64 64 11 0 0x3bbfebfeffeefffbfffffbffbfffaffaffaefffbfbffeffffffbff 0 = false := by decide +kernel
-def co64t0_cov : List (ℕ × ℕ) := [(0x0, 1), (0x400, 0), (0x1000000000, 0), (0x4000000000000, 0), (0x400000000000000, 0), (0x1000000000000000000, 0), (0x10000000000000000000, 0), (0x40000000000000000000, 0), (0x10000000000000000000000, 0), (0x40000000000000000000000, 0), (0x10000000000000000000000000, 0), (0x40000000000000000000000000, 0), (0x400000000000000000000000000000, 0), (0x400000000000000000000000000000000, 0), (0x400000000000000000000000000000000000000, 0), (0x1000000000000000000000000000000000000000000, 0), (0x10000000000000000000000000000000000000000000, 0), (0x10000000000000000000000000000000000000000000000, 0), (0x4000000000000000000000000000000000000000000000000, 0), (0x10000000000000000000000000000000000000000000000000, 0), (0x4000000000000000000000000000000000000000000000000000, 0), (0x40000000000000000000000000000000000000000000000000000, 0), (0x3bbfebfeffeefffbfffffbffbfffaffaffaefffbfbffeffffffbff, 0)]
+theorem co64t0_21 : chk [] q64 64 11 0 0x33dfbfefbfffffffffffffffffffffffffffffffffff359ffecb3c 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
+def co64t0_cov : List (ℕ × ℕ) := [(0x0, 1), (0x1, 0), (0x2, 0), (0x40, 0), (0x80, 0), (0x400, 0), (0x1000, 0), (0x2000, 0), (0x10000, 0), (0x20000000, 0), (0x40000000, 0), (0x200000000, 0), (0x800000000, 0), (0x4000000000, 0), (0x8000000000, 0), (0x4000000000000000000000000000000000000000000000, 0), (0x100000000000000000000000000000000000000000000000, 0), (0x40000000000000000000000000000000000000000000000000, 0), (0x2000000000000000000000000000000000000000000000000000, 0), (0x40000000000000000000000000000000000000000000000000000, 0), (0x80000000000000000000000000000000000000000000000000000, 0), (0x33dfbfefbfffffffffffffffffffffffffffffffffff359ffecb3c, 0)]
 lemma co64t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 0 a.1 a.2 = false := by
   refine ⟨co64t0_cov, by decide +kernel, ?_⟩
   intro a ha
   simp only [co64t0_cov, List.mem_cons, List.not_mem_nil, or_false] at ha
-  rcases ha with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  rcases ha with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
   · exact co64t0_0
   · exact co64t0_1
   · exact co64t0_2
@@ -5770,82 +6145,122 @@ lemma co64t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
   · exact co64t0_19
   · exact co64t0_20
   · exact co64t0_21
-  · exact co64t0_22
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_0 : chk [] q64 64 11 1 0x0 1 = false := by decide +kernel
+theorem co64t1_0 : chk [] q64 64 11 1 0x0 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_1 : chk [] q64 64 11 1 0x400 0 = false := by decide +kernel
+theorem co64t1_1 : chk [] q64 64 11 1 0x1 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_2 : chk [] q64 64 11 1 0x1000000000 0 = false := by decide +kernel
+theorem co64t1_2 : chk [] q64 64 11 1 0x2 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_3 : chk [] q64 64 11 1 0x4000000000000 0 = false := by decide +kernel
+theorem co64t1_3 : chk [] q64 64 11 1 0x40 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_4 : chk [] q64 64 11 1 0x400000000000000 0 = false := by decide +kernel
+theorem co64t1_4 : chk [] q64 64 11 1 0x80 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_5 : chk [] q64 64 11 1 0x1000000000000000000 0 = false := by decide +kernel
+theorem co64t1_5 : chk [] q64 64 11 1 0x400 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_6 : chk [] q64 64 11 1 0x10000000000000000000 0 = false := by decide +kernel
+theorem co64t1_6 : chk [] q64 64 11 1 0x1000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_7 : chk [] q64 64 11 1 0x40000000000000000000 0 = false := by decide +kernel
+theorem co64t1_7 : chk [] q64 64 11 1 0x2000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_8 : chk [] q64 64 11 1 0x10000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_8 : chk [] q64 64 11 1 0x10000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_9 : chk [] q64 64 11 1 0x40000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_9 : chk [] q64 64 11 1 0x20000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_10 : chk [] q64 64 11 1 0x10000000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_10 : chk [] q64 64 11 1 0x40000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_11 : chk [] q64 64 11 1 0x40000000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_11 : chk [] q64 64 11 1 0x200000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_12 : chk [] q64 64 11 1 0x400000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_12 : chk [] q64 64 11 1 0x800000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_13 : chk [] q64 64 11 1 0x400000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_13 : chk [] q64 64 11 1 0x4000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_14 : chk [] q64 64 11 1 0x400000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_14 : chk [] q64 64 11 1 0x8000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_15 : chk [] q64 64 11 1 0x1000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_15 : chk [] q64 64 11 1 0x4000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_16 : chk [] q64 64 11 1 0x10000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_16 : chk [] q64 64 11 1 0x100000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_17 : chk [] q64 64 11 1 0x10000000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_17 : chk [] q64 64 11 1 0x40000000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_18 : chk [] q64 64 11 1 0x4000000000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_18 : chk [] q64 64 11 1 0x2000000000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_19 : chk [] q64 64 11 1 0x10000000000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_19 : chk [] q64 64 11 1 0x40000000000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_20 : chk [] q64 64 11 1 0x4000000000000000000000000000000000000000000000000000 0 = false := by decide +kernel
+theorem co64t1_20 : chk [] q64 64 11 1 0x80000000000000000000000000000000000000000000000000000 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t1_21 : chk [] q64 64 11 1 0x40000000000000000000000000000000000000000000000000000 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem co64t1_22 : chk [] q64 64 11 1 0x3bbfebfeffeefffbfffffbffbfffaffaffaefffbfbffeffffffbff 0 = false := by decide +kernel
-def co64t1_cov : List (ℕ × ℕ) := [(0x0, 1), (0x400, 0), (0x1000000000, 0), (0x4000000000000, 0), (0x400000000000000, 0), (0x1000000000000000000, 0), (0x10000000000000000000, 0), (0x40000000000000000000, 0), (0x10000000000000000000000, 0), (0x40000000000000000000000, 0), (0x10000000000000000000000000, 0), (0x40000000000000000000000000, 0), (0x400000000000000000000000000000, 0), (0x400000000000000000000000000000000, 0), (0x400000000000000000000000000000000000000, 0), (0x1000000000000000000000000000000000000000000, 0), (0x10000000000000000000000000000000000000000000, 0), (0x10000000000000000000000000000000000000000000000, 0), (0x4000000000000000000000000000000000000000000000000, 0), (0x10000000000000000000000000000000000000000000000000, 0), (0x4000000000000000000000000000000000000000000000000000, 0), (0x40000000000000000000000000000000000000000000000000000, 0), (0x3bbfebfeffeefffbfffffbffbfffaffaffaefffbfbffeffffffbff, 0)]
+theorem co64t1_21 : chk [] q64 64 11 1 0x33dfbfefbfffffffffffffffffffffffffffffffffff359ffecb3c 0 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
+def co64t1_cov : List (ℕ × ℕ) := [(0x0, 1), (0x1, 0), (0x2, 0), (0x40, 0), (0x80, 0), (0x400, 0), (0x1000, 0), (0x2000, 0), (0x10000, 0), (0x20000000, 0), (0x40000000, 0), (0x200000000, 0), (0x800000000, 0), (0x4000000000, 0), (0x8000000000, 0), (0x4000000000000000000000000000000000000000000000, 0), (0x100000000000000000000000000000000000000000000000, 0), (0x40000000000000000000000000000000000000000000000000, 0), (0x2000000000000000000000000000000000000000000000000000, 0), (0x40000000000000000000000000000000000000000000000000000, 0), (0x80000000000000000000000000000000000000000000000000000, 0), (0x33dfbfefbfffffffffffffffffffffffffffffffffff359ffecb3c, 0)]
 lemma co64t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 1 a.1 a.2 = false := by
   refine ⟨co64t1_cov, by decide +kernel, ?_⟩
   intro a ha
   simp only [co64t1_cov, List.mem_cons, List.not_mem_nil, or_false] at ha
-  rcases ha with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  rcases ha with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
   · exact co64t1_0
   · exact co64t1_1
   · exact co64t1_2
@@ -5868,10 +6283,11 @@ lemma co64t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
   · exact co64t1_19
   · exact co64t1_20
   · exact co64t1_21
-  · exact co64t1_22
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t2_res : chk [] q64 64 11 2 FF 1 = false := by decide +kernel
+theorem co64t2_res : chk [] q64 64 11 2 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co64t2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 2 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5879,7 +6295,9 @@ lemma co64t2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
     simpa [he] using co64t2_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t3_res : chk [] q64 64 11 3 FF 1 = false := by decide +kernel
+theorem co64t3_res : chk [] q64 64 11 3 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co64t3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 3 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5887,7 +6305,9 @@ lemma co64t3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
     simpa [he] using co64t3_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t4_res : chk [] q64 64 11 4 FF 1 = false := by decide +kernel
+theorem co64t4_res : chk [] q64 64 11 4 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co64t4 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 4 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5895,7 +6315,9 @@ lemma co64t4 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
     simpa [he] using co64t4_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t5_res : chk [] q64 64 11 5 FF 1 = false := by decide +kernel
+theorem co64t5_res : chk [] q64 64 11 5 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co64t5 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 5 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5903,7 +6325,9 @@ lemma co64t5 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
     simpa [he] using co64t5_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t6_res : chk [] q64 64 11 6 FF 1 = false := by decide +kernel
+theorem co64t6_res : chk [] q64 64 11 6 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co64t6 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 6 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5911,7 +6335,9 @@ lemma co64t6 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
     simpa [he] using co64t6_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t7_res : chk [] q64 64 11 7 FF 1 = false := by decide +kernel
+theorem co64t7_res : chk [] q64 64 11 7 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co64t7 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 7 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5919,7 +6345,9 @@ lemma co64t7 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
     simpa [he] using co64t7_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t8_res : chk [] q64 64 11 8 FF 1 = false := by decide +kernel
+theorem co64t8_res : chk [] q64 64 11 8 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co64t8 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 8 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5927,7 +6355,9 @@ lemma co64t8 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
     simpa [he] using co64t8_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t9_res : chk [] q64 64 11 9 FF 1 = false := by decide +kernel
+theorem co64t9_res : chk [] q64 64 11 9 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co64t9 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 9 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5935,7 +6365,9 @@ lemma co64t9 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
     simpa [he] using co64t9_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t10_res : chk [] q64 64 11 10 FF 1 = false := by decide +kernel
+theorem co64t10_res : chk [] q64 64 11 10 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co64t10 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 10 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5943,7 +6375,9 @@ lemma co64t10 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [
     simpa [he] using co64t10_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co64t11_res : chk [] q64 64 11 11 FF 1 = false := by decide +kernel
+theorem co64t11_res : chk [] q64 64 11 11 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co64t11 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q64 64 11 11 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5973,7 +6407,9 @@ lemma co128_id : ∀ a ∈ q128, Imp [] a.1 a.2 := by
   exact ir a (List.mem_of_mem_filter ha)
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co128t0_res : chk [] q128 128 8 0 FF 1 = false := by decide +kernel
+theorem co128t0_res : chk [] q128 128 8 0 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co128t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q128 128 8 0 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5981,7 +6417,9 @@ lemma co128t0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [
     simpa [he] using co128t0_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co128t1_res : chk [] q128 128 8 1 FF 1 = false := by decide +kernel
+theorem co128t1_res : chk [] q128 128 8 1 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co128t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q128 128 8 1 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5989,7 +6427,9 @@ lemma co128t1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [
     simpa [he] using co128t1_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co128t2_res : chk [] q128 128 8 2 FF 1 = false := by decide +kernel
+theorem co128t2_res : chk [] q128 128 8 2 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co128t2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q128 128 8 2 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -5997,7 +6437,9 @@ lemma co128t2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [
     simpa [he] using co128t2_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co128t3_res : chk [] q128 128 8 3 FF 1 = false := by decide +kernel
+theorem co128t3_res : chk [] q128 128 8 3 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co128t3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q128 128 8 3 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6005,7 +6447,9 @@ lemma co128t3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [
     simpa [he] using co128t3_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co128t4_res : chk [] q128 128 8 4 FF 1 = false := by decide +kernel
+theorem co128t4_res : chk [] q128 128 8 4 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co128t4 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q128 128 8 4 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6013,7 +6457,9 @@ lemma co128t4 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [
     simpa [he] using co128t4_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co128t5_res : chk [] q128 128 8 5 FF 1 = false := by decide +kernel
+theorem co128t5_res : chk [] q128 128 8 5 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co128t5 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q128 128 8 5 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6021,7 +6467,9 @@ lemma co128t5 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [
     simpa [he] using co128t5_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co128t6_res : chk [] q128 128 8 6 FF 1 = false := by decide +kernel
+theorem co128t6_res : chk [] q128 128 8 6 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co128t6 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q128 128 8 6 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6029,7 +6477,9 @@ lemma co128t6 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [
     simpa [he] using co128t6_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co128t7_res : chk [] q128 128 8 7 FF 1 = false := by decide +kernel
+theorem co128t7_res : chk [] q128 128 8 7 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co128t7 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q128 128 8 7 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6037,7 +6487,9 @@ lemma co128t7 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [
     simpa [he] using co128t7_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem co128t8_res : chk [] q128 128 8 8 FF 1 = false := by decide +kernel
+theorem co128t8_res : chk [] q128 128 8 8 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma co128t8 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] q128 128 8 8 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6110,7 +6562,9 @@ lemma rootBounds_p : pOk 0 rootBounds = true := by decide +kernel
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root0_res : chk [] rootBounds 0 13 0 FF 1 = false := by decide +kernel
+theorem root0_res : chk [] rootBounds 0 13 0 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 0 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6118,7 +6572,9 @@ lemma root0 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using root0_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root1_res : chk [] rootBounds 0 13 1 FF 1 = false := by decide +kernel
+theorem root1_res : chk [] rootBounds 0 13 1 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 1 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6126,7 +6582,9 @@ lemma root1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using root1_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root2_res : chk [] rootBounds 0 13 2 FF 1 = false := by decide +kernel
+theorem root2_res : chk [] rootBounds 0 13 2 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 2 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6134,7 +6592,9 @@ lemma root2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using root2_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root3_res : chk [] rootBounds 0 13 3 FF 1 = false := by decide +kernel
+theorem root3_res : chk [] rootBounds 0 13 3 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 3 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6142,7 +6602,9 @@ lemma root3 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using root3_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root4_res : chk [] rootBounds 0 13 4 FF 1 = false := by decide +kernel
+theorem root4_res : chk [] rootBounds 0 13 4 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root4 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 4 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6150,7 +6612,9 @@ lemma root4 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using root4_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root5_res : chk [] rootBounds 0 13 5 FF 1 = false := by decide +kernel
+theorem root5_res : chk [] rootBounds 0 13 5 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root5 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 5 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6158,7 +6622,9 @@ lemma root5 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using root5_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root6_res : chk [] rootBounds 0 13 6 FF 1 = false := by decide +kernel
+theorem root6_res : chk [] rootBounds 0 13 6 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root6 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 6 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6166,7 +6632,9 @@ lemma root6 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using root6_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root7_res : chk [] rootBounds 0 13 7 FF 1 = false := by decide +kernel
+theorem root7_res : chk [] rootBounds 0 13 7 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root7 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 7 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6174,7 +6642,9 @@ lemma root7 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using root7_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root8_res : chk [] rootBounds 0 13 8 FF 1 = false := by decide +kernel
+theorem root8_res : chk [] rootBounds 0 13 8 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root8 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 8 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6182,7 +6652,9 @@ lemma root8 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using root8_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root9_res : chk [] rootBounds 0 13 9 FF 1 = false := by decide +kernel
+theorem root9_res : chk [] rootBounds 0 13 9 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root9 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 9 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6190,7 +6662,9 @@ lemma root9 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] 
     simpa [he] using root9_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root10_res : chk [] rootBounds 0 13 10 FF 1 = false := by decide +kernel
+theorem root10_res : chk [] rootBounds 0 13 10 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root10 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 10 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6198,7 +6672,9 @@ lemma root10 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
     simpa [he] using root10_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root11_res : chk [] rootBounds 0 13 11 FF 1 = false := by decide +kernel
+theorem root11_res : chk [] rootBounds 0 13 11 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root11 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 11 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6206,7 +6682,9 @@ lemma root11 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
     simpa [he] using root11_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root12_res : chk [] rootBounds 0 13 12 FF 1 = false := by decide +kernel
+theorem root12_res : chk [] rootBounds 0 13 12 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root12 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 12 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6214,7 +6692,9 @@ lemma root12 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk []
     simpa [he] using root12_res⟩
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem root13_res : chk [] rootBounds 0 13 13 FF 1 = false := by decide +kernel
+theorem root13_res : chk [] rootBounds 0 13 13 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 lemma root13 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ a ∈ M, chk [] rootBounds 0 13 13 a.1 a.2 = false :=
   ⟨[(FF,1)], ffull, by
     intro a ha
@@ -6633,7 +7113,6 @@ lemma pairs_distribute (f : XW → XW → Bool) (g : Fin 8 → XW → XW → Boo
       exact ⟨b,by rw [hb]; rfl⟩
 
 
-
 lemma mode_distribute {f : ℕ → List W → Bool} {g : Fin 8 → ℕ → List W → Bool}
     (m free e n z : ℕ) (v : List W) (a c : W) (da dc s x y : ℕ)
     (h : ∀ j, picked (f j) (fun b => g b j)) :
@@ -6653,25 +7132,6 @@ lemma mode_distribute {f : ℕ → List W → Bool} {g : Fin 8 → ℕ → List 
       · simp [ha]
       · simpa only [ha,Bool.cond_true] using mid'
     · simpa only [hs,Bool.cond_true,f2] using mid'
-
-lemma pair_distribute {f : W → W → ℕ → ℕ → ℕ → ℕ → ℕ → Bool}
-    {g : Fin 8 → W → W → ℕ → ℕ → ℕ → ℕ → ℕ → Bool}
-    (h : ∀ a c da dc s x y, f a c da dc s x y = true → ∃ b, g b a c da dc s x y = true)
-    (a c : XW) : pair f a c = true → ∃ b, pair (g b) a c = true := by
-  obtain ⟨w,s,q,u⟩ := a
-  obtain ⟨w',s',q',u'⟩ := c
-  simp only [pair,bR]
-  cases hb : f w w' (Nat.xor (Nat.land u s') u) (Nat.xor (Nat.land u' s) u')
-      (Nat.land s s') (Nat.lor w.a w'.a) (Nat.land w.b w'.b)
-  · simp only [hb,Bool.cond_false]
-    intro hor
-    obtain ⟨b,hb⟩ := h _ _ _ _ _ _ _ hor
-    refine ⟨b, ?_⟩
-    rw [hb]
-    simp
-  · intro _
-    obtain ⟨b,hb⟩ := h _ _ _ _ _ _ _ hb
-    exact ⟨b,by rw [hb]; rfl⟩
 
 lemma pairOne_distribute (d : Bool) {f : W → W → ℕ → ℕ → ℕ → ℕ → ℕ → Bool}
     {g : Fin 8 → W → W → ℕ → ℕ → ℕ → ℕ → ℕ → Bool}
@@ -6694,14 +7154,6 @@ lemma pickedNode_as_mode (NN : ℕ) (f : ℕ → List W → Bool) (d : Bool) (l 
   unfold nodePicked modeF
   cases Nat.ble n e <;> cases Nat.ble (Nat.succ n) e <;> rfl
 
-lemma nodeS_distribute {f : ℕ → List W → Bool} {branches : Fin 8 → ℕ → List W → Bool}
-    (NN : ℕ) (d : Bool) (l m g e n z : ℕ) (v : List W)
-    (h : ∀ j, picked (f j) (fun b => branches b j)) :
-    nodeC NN f d l m g e n z v pairsS = true →
-      ∃ b, nodeC NN (branches b) d l m g e n z v pairsS = true := by
-  simp only [nodeC_as_mode,pairsS]
-  exact pairs_distribute _ _ (fun x y => pair_distribute (fun _ _ _ _ _ _ _ => mode_distribute m g e n z v _ _ _ _ _ _ _ h) x y) _
-
 lemma nodePicked_distribute {f : ℕ → List W → Bool} {branches : Fin 8 → ℕ → List W → Bool}
     (NN : ℕ) (d : Bool) (l m g e n z : ℕ) (v : List W) (H : ℕ) (kind : Bool)
     (h : ∀ j, picked (f j) (fun b => branches b j)) :
@@ -6710,24 +7162,6 @@ lemma nodePicked_distribute {f : ℕ → List W → Bool} {branches : Fin 8 → 
   simp only [pickedNode_as_mode]
   exact pairsC_picked H _ _ (fun x y => pairOne_distribute kind
     (fun _ _ _ _ _ _ _ => mode_distribute m g e n z v _ _ _ _ _ _ _ h) x y) _
-
-def forkHere (cut : ℕ) (late : Bool) (k : ℕ) : Bool := Nat.ble k cut == late
-
-noncomputable def look1Fork (NN AA HX HY l m g K cut : ℕ) (late : Bool) (fuel : Nat) : ℕ → ℕ → ℕ → List W → Bool :=
-  Nat.rec (motive := fun _ => ℕ → ℕ → ℕ → List W → Bool) (fun k _ _ _ => forkHere cut late k)
-    (fun _ ih k t z v =>
-      Bool.rec (motive := fun _ => Bool)
-        (tstC NN AA HX HY (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
-          Bool.rec (motive := fun _ => Bool)
-            (Bool.rec (motive := fun _ => Bool) false
-              (mvC NN AA HX HY (lookC NN AA HX HY l m g K) l m g k t z v y) (forkHere cut late k)) true
-            (nodeC NN (ih (Nat.sub k 1) t) (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v pairsS)))
-        (forkHere cut late k) (Nat.ble v.length 1)) fuel
-
-lemma forkHere_pick (cut k : ℕ) : ∃ b : Fin 8, forkHere cut (cvOp b) k = true := by
-  cases h : Nat.ble k cut
-  · exact ⟨0, by simp [forkHere,cvOp,h]⟩
-  · exact ⟨1, by simp [forkHere,cvOp,h]⟩
 
 lemma look1C_step (nn aa hx hy l m g K fuel k t z : ℕ) (v : List W) :
     look1C nn aa hx hy l m g K fuel.succ k t z v =
@@ -6743,171 +7177,165 @@ lemma look1C_step (nn aa hx hy l m g K fuel k t z : ℕ) (v : List W) :
             l m g (Nat.sub (Nat.sub k t) y) v.length z v pairsS))) true (Nat.ble v.length 1) = _
   simp only [bR]
 
-lemma look1Fork_step (nn aa hx hy l m g K cut fuel k t z : ℕ) (late : Bool) (v : List W) :
-    look1Fork nn aa hx hy l m g K cut late fuel.succ k t z v =
-      (bif Nat.ble v.length 1 then forkHere cut late k else
-        tstC nn aa hx hy (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
-          bif nodeC nn (look1Fork nn aa hx hy l m g K cut late fuel (Nat.sub k 1) t) (pos t)
-            l m g (Nat.sub (Nat.sub k t) y) v.length z v pairsS then true
-          else bif forkHere cut late k then mvC nn aa hx hy (lookC nn aa hx hy l m g K) l m g k t z v y else false)) := by
-  change Bool.rec (motive := fun _ => Bool)
-      (tstC nn aa hx hy (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
-        Bool.rec (motive := fun _ => Bool) (Bool.rec (motive := fun _ => Bool) false
-          (mvC nn aa hx hy (lookC nn aa hx hy l m g K) l m g k t z v y) (forkHere cut late k)) true
-          (nodeC nn (look1Fork nn aa hx hy l m g K cut late fuel (Nat.sub k 1) t) (pos t)
-            l m g (Nat.sub (Nat.sub k t) y) v.length z v pairsS)))
-      (forkHere cut late k) (Nat.ble v.length 1) = _
+noncomputable def notCandidate (f : Nat → Nat → List W → Bool) (m g e n z q : Nat)
+    (v : List W) (a : W) : Bool :=
+  nots f m g e n z q v [a]
+
+lemma nots_cons (f : Nat → Nat → List W → Bool) (m g e n z q : Nat)
+    (v : List W) (a : W) (r : List W) :
+    nots f m g e n z q v (a :: r) =
+      (notCandidate f m g e n z q v a || nots f m g e n z q v r) := by
+  unfold notCandidate
+  unfold nots
+  dsimp only
   simp only [bR]
+  have fact (d x : Bool) : (bif d then true else x) = ((bif d then true else false) || x) := by
+    cases d <;> rfl
+  exact fact _ _
 
-set_option maxHeartbeats 0 in
-lemma look1Fork_distribute (nn aa hx hy l m g K cut fuel k t : ℕ) :
-    ∀ z, picked (look1C nn aa hx hy l m g K fuel k t z)
-      (fun b => look1Fork nn aa hx hy l m g K cut (cvOp b) fuel k t z) := by
-  induction fuel generalizing k t with
-  | zero => intro z v _; exact forkHere_pick cut k
-  | succ fuel ih =>
-    intro z v
-    simp only [look1C_step,look1Fork_step]
-    cases hv : Nat.ble v.length 1
-    · simp only [hv,Bool.cond_false]
-      apply tst_picked
-      intro y
-      dsimp only
-      let pass := fun f => nodeC nn f (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v pairsS
-      change (bif pass (look1C nn aa hx hy l m g K fuel (Nat.sub k 1) t) then true
-        else mvC nn aa hx hy (lookC nn aa hx hy l m g K) l m g k t z v y) = true →
-        ∃ b, (bif pass (look1Fork nn aa hx hy l m g K cut (cvOp b) fuel (Nat.sub k 1) t) then true
-          else bif forkHere cut (cvOp b) k then mvC nn aa hx hy (lookC nn aa hx hy l m g K) l m g k t z v y else false) = true
-      cases hb : pass (look1C nn aa hx hy l m g K fuel (Nat.sub k 1) t)
-      · simp only [hb,Bool.cond_false]
-        intro hm
-        obtain ⟨b,hb⟩ := forkHere_pick cut k
-        refine ⟨b,?_⟩
-        rw [hb,hm]
-        cases pass (look1Fork nn aa hx hy l m g K cut (cvOp b) fuel (Nat.sub k 1) t) <;> rfl
-      · intro _
-        obtain ⟨b,hb⟩ := nodeS_distribute nn (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v (ih _ t) hb
-        refine ⟨b,?_⟩
-        change pass (look1Fork nn aa hx hy l m g K cut (cvOp b) fuel (Nat.sub k 1) t) = true at hb
-        rw [hb]; rfl
-    · simp only [hv,Bool.cond_true]
-      exact fun _ => forkHere_pick cut k
-
-
-
-
-lemma ins_zero (o : W) (v : List W) : ins o v (fun _ => false) = false := by
-  induction v with
-  | nil => rfl
+lemma nots_true_iff (f : Nat → Nat → List W → Bool) (m g e n z q : Nat) (v r : List W) :
+    nots f m g e n z q v r = true ↔
+      ∃ a ∈ r, notCandidate f m g e n z q v a = true := by
+  induction r with
+  | nil => simp [nots]
   | cons a r ih =>
-    change Bool.rec (motive := fun _ => Bool) (ins o r (fun _ => false))
-      (Bool.rec (motive := fun _ => Bool) false false (Nat.beq o.s a.s)) (Nat.ble a.s o.s) = false
-    rw [ih,bR,bR]
-    cases Nat.ble a.s o.s <;> cases Nat.beq o.s a.s <;> rfl
+    rw [nots_cons, Bool.or_eq_true, ih]
+    constructor
+    · rintro (h | ⟨b,hb,ht⟩)
+      · exact ⟨a, by simp, h⟩
+      · exact ⟨b, by simp [hb], ht⟩
+    · rintro ⟨b,hb,ht⟩
+      rcases List.mem_cons.mp hb with rfl | hb
+      · exact Or.inl ht
+      · exact Or.inr ⟨b,hb,ht⟩
 
-lemma put_zero (m s x y : ℕ) (v : List W) : put m s x y v (fun _ => false) = false := by
-  simp only [put,st_eq,bR,ins_zero]
-  cases Nat.beq s m <;> cases Nat.beq s 0 <;> rfl
+lemma nots_some_bin (f : Nat → Nat → List W → Bool) (m g e n z q : Nat) (v r : List W)
+    (h : nots f m g e n z q v r = true) :
+    ∃ b : Fin 8, nots f m g e n z q v (r.filter fun a => a.s % 8 == b.val) = true := by
+  obtain ⟨a,ha,hit⟩ := (nots_true_iff _ _ _ _ _ _ _ _ _).mp h
+  refine ⟨⟨a.s % 8, Nat.mod_lt _ (by decide)⟩,
+    (nots_true_iff _ _ _ _ _ _ _ _ _).mpr ⟨a, ?_, hit⟩⟩
+  simp [ha]
 
-lemma mid_zero (m g e n z : ℕ) (v : List W) (a c : W) (da dc s x y : ℕ) :
-    mid (fun _ _ => false) m g e n z v a c da dc s x y = false := by
-  simp only [mid,st_eq,kids_unfold,child,rm_eq,put_zero,bR,Bool.cond_self,Bool.and_false,Bool.or_self]
 
-lemma scan_zero (p : XW → Bool) (xs : List XW) (h : ∀ w, p w = false) : scan p xs = false := by
-  induction xs with
-  | nil => rfl
-  | cons w ws ih =>
-    change Bool.rec (motive := fun _ => Bool) (scan p ws) true (p w) = false
-    simp only [h,bR,Bool.cond_false,ih]
+def nextPairPred (b : ℕ) (p : XW → XW → Bool) (a c : XW) : Bool :=
+  Bool.rec (motive := fun _ => Bool) false (p a c) (Nat.beq (((a.s + c.s) % MM) % 8) b)
 
-lemma pairs_zero (p : XW → XW → Bool) (xs : List XW) (h : ∀ a b, p a b = false) : pairs p xs = false := by
-  induction xs with
-  | nil => rfl
-  | cons w ws ih =>
-    change Bool.rec (motive := fun _ => Bool) (pairs p ws) true (scan (p w) ws) = false
-    simp only [scan_zero (p w) ws (h w),bR,Bool.cond_false,ih]
+lemma nextPairPred_picked (p : XW → XW → Bool) (a : XW) :
+    picked (p a) (fun b => nextPairPred b p a) := by
+  intro c h
+  refine ⟨⟨((a.s + c.s) % MM) % 8, Nat.mod_lt _ (by decide)⟩, ?_⟩
+  simpa only [nextPairPred, bR, Nat.beq_refl, Bool.cond_true] using h
 
-lemma mode_zero (m g e n z : ℕ) (v : List W) (a c : W) (da dc s x y : ℕ) :
-    modeF n e (mid (fun _ _ => false) m g e n.pred z v) a c da dc s x y = false := by
-  unfold modeF
-  cases Nat.ble n e <;> cases Nat.ble n.succ e <;>
-    simp only [Bool.cond_false,Bool.cond_true,f0,f1,f2,bR,mid_zero,Bool.cond_self]
+def nextPairS (b : ℕ) (p : XW → XW → Bool) (xs : List XW) : Bool :=
+  pairsS (nextPairPred b p) xs
 
-lemma nodeS_zero (nn : ℕ) (d : Bool) (l m g e n z : ℕ) (v : List W) :
-    nodeC nn (fun _ _ => false) d l m g e n z v pairsS = false := by
-  simp only [nodeC_as_mode,pairsS]
-  apply pairs_zero
-  rintro ⟨a,s,q,u⟩ ⟨c,s',q',u'⟩
-  simp only [pair,bR,mode_zero,Bool.cond_false]
+def nextPairN (b : ℕ) (p : XW → XW → Bool) (xs : List XW) : Bool :=
+  pairsN (nextPairPred b p) xs
 
-lemma tst_zero (nn aa hx hy : ℕ) (d : Bool) (l e : ℕ) (v : List W) :
-    tstC nn aa hx hy d l e v (fun _ => false) = false := by
-  simp only [tstC,bR,Bool.cond_self]
+lemma nextPairS_picked (p : XW → XW → Bool) (xs : List XW) :
+    pairsS p xs = true → ∃ b : Fin 8, nextPairS b p xs = true :=
+  pairs_distribute _ _ (nextPairPred_picked p) _
 
-lemma fork_beyond_cut (nn aa hx hy l m g K cut fuel k t z : ℕ) (v : List W)
-    (hk : k ≤ cut) : look1Fork nn aa hx hy l m g K cut false fuel k t z v = false := by
-  have hstop : forkHere cut false k = false := by simp [forkHere,Nat.ble_eq_true_of_le hk]
-  induction fuel generalizing k t z v with
-  | zero => exact hstop
-  | succ fuel ih =>
-    have hr : look1Fork nn aa hx hy l m g K cut false fuel (Nat.sub k 1) t = fun _ _ => false := by
-      funext q w
-      have hchild : Nat.sub k 1 ≤ cut := (Nat.sub_le k 1).trans hk
-      exact ih _ _ _ w hchild (by rw [forkHere,Nat.ble_eq_true_of_le hchild]; rfl)
-    simp only [look1Fork_step,hstop,hr,nodeS_zero,Bool.cond_false,tst_zero,Bool.cond_self]
+lemma nextPairN_picked (p : XW → XW → Bool) (xs : List XW) :
+    pairsN p xs = true → ∃ b : Fin 8, nextPairN b p xs = true := by
+  simp only [nextPairN, pairsN, bR]
+  cases hs : pairs p (fr xs)
+  · simp only [Bool.cond_false]
+    intro h
+    obtain ⟨b, hb⟩ := scan_picked _ _ _
+      (fun a => scan_picked _ _ _ (nextPairPred_picked p a)) h
+    refine ⟨b, ?_⟩
+    simp only [hb, Bool.cond_self]
+  · intro _
+    obtain ⟨b, hb⟩ := pairs_distribute _ _ (nextPairPred_picked p) _ hs
+    exact ⟨b, by simp only [hb, Bool.cond_true]⟩
 
-noncomputable def look1Pruned (NN AA HX HY l m g K cut : ℕ) (late : Bool) (fuel : Nat) : ℕ → ℕ → ℕ → List W → Bool :=
-  Nat.rec (motive := fun _ => ℕ → ℕ → ℕ → List W → Bool) (fun k _ _ _ => forkHere cut late k)
-    (fun _ ih k t z v =>
+noncomputable def mvNext (NN AA HX HY bin : Nat) (F : Nat → Nat → Nat → List W → Bool) (l m g k t z : Nat) (v : List W) (y : Nat) : Bool :=
+  (fun n => Bool.rec (motive := fun _ => Bool) (prd t (fun s => nots (fun q z v => cvC NN (pos s) l v (tstC NN AA HX HY (pos s) l (Nat.sub k s) v (fun y =>
+      Bool.rec (motive := fun _ => Bool) (prd s (fun s => nots (fun q' z v => cvC NN (pos s) l v (tstC NN AA HX HY (pos s) l (Nat.sub (Nat.sub k 1) s) v (fun y =>
+          nodeC NN (F (Nat.sub k 3) s) (pos s) l m g (Nat.sub (Nat.sub (Nat.sub k 2) s) y) v.length z v (pairsQ q q'))))
+          m g (Nat.sub (Nat.sub (Nat.sub k 1) s) y) v.length z (Nat.succ q) v v)) true
+        (nodeC NN (F (Nat.sub k 2) s) (pos s) l m g (Nat.sub (Nat.sub (Nat.sub k 1) s) y) v.length z v (pairsP q)))))
+      m g (Nat.sub (Nat.sub k s) y) n z 0 v (v.filter fun a => a.s % 8 == bin))) true
+    (nodeC NN (F (Nat.sub k 1) t) (pos t) l m g (Nat.sub (Nat.sub k t) y) n z v (nextPairN bin))) v.length
+lemma prdNots_picked (t : ℕ) (f : ℕ → ℕ → ℕ → List W → Bool)
+    (m g n z q : ℕ) (e : ℕ → ℕ) (v : List W) :
+    prd t (fun s => nots (f s) m g (e s) n z q v v) = true →
+    ∃ b : Fin 8, prd t (fun s => nots (f s) m g (e s) n z q v
+      (v.filter fun a => a.s % 8 == (b : ℕ))) = true := by
+  cases t with
+  | zero => simp [prd]
+  | succ t => exact nots_some_bin (f t) m g (e t) n z q v v
+
+lemma mvNext_picked (nn aa hx hy l m g k t z : ℕ)
+    (F : ℕ → ℕ → ℕ → List W → Bool) (v : List W) (y : ℕ) :
+    mvC nn aa hx hy F l m g k t z v y = true →
+    ∃ b : Fin 8, mvNext nn aa hx hy b F l m g k t z v y = true := by
+  simp only [mvC, mvNext, bR]
+  cases hd : nodeC nn (F (Nat.sub k 1) t) (pos t) l m g
+      (Nat.sub (Nat.sub k t) y) v.length z v pairsN
+  · simp only [Bool.cond_false]
+    intro h
+    obtain ⟨b, hb⟩ := prdNots_picked t _ m g v.length z 0 _ v h
+    exact ⟨b, by simp only [hb, Bool.cond_self]⟩
+  · intro _
+    rw [nodeC_as_mode] at hd
+    obtain ⟨b, hb⟩ := nextPairN_picked _ _ hd
+    exact ⟨b, by simp only [nodeC_as_mode, hb, Bool.cond_true]⟩
+
+noncomputable def look1Next (nn aa hx hy l m g K : ℕ) (bin : ℕ) :
+    ℕ → ℕ → ℕ → ℕ → List W → Bool
+  | 0, _, _, _, _ => Nat.beq bin 0
+  | fuel + 1, k, t, z, v =>
+    Bool.rec (motive := fun _ => Bool) (tstC nn aa hx hy (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
       Bool.rec (motive := fun _ => Bool)
-        (Bool.rec (motive := fun _ => Bool)
-          (tstC NN AA HX HY (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
-            Bool.rec (motive := fun _ => Bool)
-              (Bool.rec (motive := fun _ => Bool) false
-                (mvC NN AA HX HY (lookC NN AA HX HY l m g K) l m g k t z v y) (forkHere cut late k)) true
-              (nodeC NN (ih (Nat.sub k 1) t) (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v pairsS)))
-          (forkHere cut late k) (Nat.ble v.length 1)) false (!late && Nat.ble k cut)) fuel
+        (mvNext nn aa hx hy bin (lookC nn aa hx hy l m g K) l m g k t z v y) true
+        (nodeC nn (look1C nn aa hx hy l m g K fuel (Nat.sub k 1) t)
+          (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v (nextPairS bin))))
+        (Nat.beq bin 0) (Nat.ble v.length 1)
 
-lemma look1Pruned_eq (nn aa hx hy l m g K cut : ℕ) (late : Bool) (fuel : ℕ) :
-    look1Pruned nn aa hx hy l m g K cut late fuel = look1Fork nn aa hx hy l m g K cut late fuel := by
-  induction fuel with
-  | zero => rfl
-  | succ fuel ih =>
-    funext k t z v
-    change Bool.rec (motive := fun _ => Bool)
-      (Bool.rec (motive := fun _ => Bool)
-        (tstC nn aa hx hy (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
-          Bool.rec (motive := fun _ => Bool)
-            (Bool.rec (motive := fun _ => Bool) false
-              (mvC nn aa hx hy (lookC nn aa hx hy l m g K) l m g k t z v y) (forkHere cut late k)) true
-            (nodeC nn (look1Pruned nn aa hx hy l m g K cut late fuel (Nat.sub k 1) t) (pos t) l m g
-              (Nat.sub (Nat.sub k t) y) v.length z v pairsS)))
-        (forkHere cut late k) (Nat.ble v.length 1)) false (!late && Nat.ble k cut) = _
-    rw [ih]
-    change Bool.rec (motive := fun _ => Bool) (look1Fork nn aa hx hy l m g K cut late fuel.succ k t z v)
-      false (!late && Nat.ble k cut) = _
-    rw [bR]
-    cases hh : (!late && Nat.ble k cut)
-    · rfl
-    · simp only [Bool.and_eq_true] at hh
-      have hl : late = false := by cases late <;> simpa using hh.1
-      rw [hl]
-      exact (fork_beyond_cut nn aa hx hy l m g K cut fuel.succ k t z v (Nat.le_of_ble_eq_true hh.2)).symm
+lemma look1Next_picked (nn aa hx hy l m g K fuel k t : ℕ) :
+    ∀ z, picked (look1C nn aa hx hy l m g K fuel k t z)
+      (fun b => look1Next nn aa hx hy l m g K b fuel k t z) := by
+  intro z v
+  cases fuel with
+  | zero =>
+    intro _
+    exact ⟨0, rfl⟩
+  | succ fuel =>
+    rw [look1C_step]
+    simp only [look1Next, bR]
+    cases hv : Nat.ble v.length 1
+    · simp only [Bool.cond_false]
+      apply tst_picked
+      intro y h
+      let f := look1C nn aa hx hy l m g K fuel (Nat.sub k 1) t
+      let e := Nat.sub (Nat.sub k t) y
+      cases hd : nodeC nn f (pos t) l m g e v.length z v pairsS
+      · have hm : mvC nn aa hx hy (lookC nn aa hx hy l m g K) l m g k t z v y = true := by
+          simpa only [f, e, hd, Bool.cond_false, Bool.or_false] using h
+        obtain ⟨b, hb⟩ := mvNext_picked nn aa hx hy l m g k t z _ v y hm
+        exact ⟨b, by simp only [hb, Bool.cond_self]⟩
+      · rw [nodeC_as_mode] at hd
+        obtain ⟨b, hb⟩ := nextPairS_picked _ _ hd
+        refine ⟨b, ?_⟩
+        simp only [nodeC_as_mode, hb, Bool.cond_true, f, e]
+    · exact fun _ => ⟨0, rfl⟩
 
-
-noncomputable def topPairFork (NN AA HX HY l m g K H ph k t z cut : ℕ)
-    (v : List W) (kind late : Bool) : Bool :=
+noncomputable def topPairNext (NN AA HX HY l m g K H ph k t z : ℕ)
+    (v : List W) (kind : Bool) (bin : ℕ) : Bool :=
   Bool.rec (motive := fun _ => Bool) (tstC NN AA HX HY (pos t) l (Nat.sub (Nat.succ k) t) v (fun y =>
     Bool.rec (motive := fun _ => Bool)
       (Bool.rec (motive := fun _ => Bool) false
         (mvC NN AA HX HY (lookC NN AA HX HY l m g K) l m g k t z v y) (Nat.beq ph 1)) true
-      (nodePicked NN (look1Pruned NN AA HX HY l m g K cut late K (Nat.sub k 1) t) (pos t) l m g (Nat.sub (Nat.sub k t) y)
+      (nodePicked NN (look1Next NN AA HX HY l m g K bin K (Nat.sub k 1) t) (pos t) l m g (Nat.sub (Nat.sub k t) y)
         v.length z v H kind))) true (Nat.ble v.length 1)
 
-lemma topPair_distribute (nn aa hx hy l m g K H ph k t z cut : ℕ) (v : List W) (kind : Bool) :
+lemma topPairNext_picked (nn aa hx hy l m g K H ph k t z : ℕ) (v : List W) (kind : Bool) :
     topPairPicked nn aa hx hy l m g K H ph k t z v kind = true →
-      ∃ b : Fin 8, topPairFork nn aa hx hy l m g K H ph k t z cut v kind (cvOp b) = true := by
-  simp only [topPairPicked, topPairFork, look1Pruned_eq, bR]
+      ∃ b : Fin 8, topPairNext nn aa hx hy l m g K H ph k t z v kind b = true := by
+  simp only [topPairPicked, topPairNext, bR]
   cases ht : Nat.ble v.length 1
   · simp only [ht, Bool.cond_false]
     apply tst_picked
@@ -6917,25 +7345,23 @@ lemma topPair_distribute (nn aa hx hy l m g K H ph k t z cut : ℕ) (v : List W)
         (Nat.sub (Nat.sub k t) y) v.length z v H kind
     · simp only [hx', Bool.cond_false] at h
       refine ⟨0, ?_⟩
-      rw [h]
-      cases nodePicked nn (look1Fork nn aa hx hy l m g K cut (cvOp 0) K (Nat.sub k 1) t) (pos t) l m g
-        (Nat.sub (Nat.sub k t) y) v.length z v H kind <;> rfl
+      simp only [h, Bool.cond_self]
     · obtain ⟨b,hb⟩ := nodePicked_distribute nn (pos t) l m g (Nat.sub (Nat.sub k t) y) v.length z v H kind
-        (look1Fork_distribute nn aa hx hy l m g K cut K (Nat.sub k 1) t) hx'
+        (look1Next_picked nn aa hx hy l m g K K (Nat.sub k 1) t) hx'
       exact ⟨b, by simp only [hb, Bool.cond_true]⟩
   · simp only [ht, Bool.cond_true]
     exact fun _ => ⟨0,by simp⟩
 
-noncomputable def startPairFork (NN AA HX HY l m g B K t p H ph cut : ℕ) (v : List W) (kind late : Bool) : Bool :=
+noncomputable def startPairNext (NN AA HX HY l m g B K t p H ph : ℕ) (v : List W) (kind : Bool) (bin : ℕ) : Bool :=
   Bool.rec (motive := fun _ => Bool) false (Bool.rec (motive := fun _ => Bool) false
-    (child (fun z r => topPairFork NN AA HX HY l m g K H ph K t z cut r kind late) g (fun h => h v) (Nat.sub B (sumc v)))
+    (child (fun z r => topPairNext NN AA HX HY l m g K H ph K t z r kind bin) g (fun h => h v) (Nat.sub B (sumc v)))
     (Nat.ble v.length (Nat.sub (Nat.succ K) t))) (hasP p v)
 
-lemma startPair_distribute (nn aa hx hy l m g B K t p H ph cut : ℕ) (kind : Bool) :
+lemma startPairNext_picked (nn aa hx hy l m g B K t p H ph : ℕ) (kind : Bool) :
     picked (fun v => startPairPicked nn aa hx hy l m g B K t p H ph v kind)
-      (fun b v => startPairFork nn aa hx hy l m g B K t p H ph cut v kind (cvOp b)) := by
+      (fun b v => startPairNext nn aa hx hy l m g B K t p H ph v kind b) := by
   intro v
-  simp only [startPairPicked, startPairFork, child, st_eq, bR]
+  simp only [startPairPicked, startPairNext, child, st_eq, bR]
   cases h : hasP p v
   · simp [h]
   · simp only [h, Bool.cond_true]
@@ -6945,36 +7371,43 @@ lemma startPair_distribute (nn aa hx hy l m g B K t p H ph cut : ℕ) (kind : Bo
       cases hz : Nat.beq (Nat.land (Nat.sub B (sumc v)) g) g
       · simp [hz]
       · simp only [hz, Bool.cond_true]
-        exact topPair_distribute _ _ _ _ _ _ _ _ _ _ _ _ _ cut v kind
+        exact topPairNext_picked _ _ _ _ _ _ _ _ _ _ _ _ _ v kind
 
-noncomputable def chkPairFork (E Q : List (ℕ × ℕ)) (Z K t H ph cut : ℕ) (kind late : Bool) : Bool :=
-  (fun l => (fun m => (fun P => (fun g => (fun B => (fun p =>
-    frc (avl P m (rawL E)) (fun v => st l fun l => st m fun m => st g fun g => st B fun B => st p fun p =>
-      st I.NN fun nn => st I.AA fun aa => st I.HX fun hx => st I.HY fun hy =>
-      anySubC nn (pos t) l v 0 (fun r => startPairFork nn aa hx hy l m g B K t p H ph cut r kind late)))
-    (pwr E Z)) (pL (Q.map fun e => 16 + (K - e.2)))) (pL (Q.map fun _ => 16))) (PZ Q)) (mz Z)) (lz Z)
+noncomputable def chkPairNext (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (kind : Bool) (bin : ℕ) : Bool :=
+  searchInputs E Q Z K t H ph (fun nn aa hx hy l m g B p v =>
+    startPairNext nn aa hx hy l m g B K t p H ph v kind bin)
 
-lemma chkPair_fork (E Q : List (ℕ × ℕ)) (Z K t H ph cut : ℕ) (kind : Bool)
-    (h : ∀ late, chkPairFork E Q Z K t H ph cut kind late = false) :
+lemma guardStart_picked (t H ph : ℕ) {f : List W → Bool} {g : Fin 8 → List W → Bool}
+    (pickedTest : picked f g) :
+    picked (guardStart t H ph f) (fun b => guardStart t H ph (g b)) := by
+  intro v
+  unfold guardStart
+  cases h : relevantStart t H ph v
+  · simp
+  · simpa [h] using pickedTest v
+
+lemma chkPair_next (E Q : List (ℕ × ℕ)) (Z K t H ph : ℕ) (kind : Bool)
+    (checked : ∀ b : Fin 8, chkPairNext E Q Z K t H ph kind b = false) :
     chkPairPicked E Q Z K t H ph kind = false := by
-  suffices chkPairPicked E Q Z K t H ph kind = true → False by
-    cases he : chkPairPicked E Q Z K t H ph kind
-    · rfl
-    · exact (this he).elim
-  intro found
-  simp only [chkPairPicked,chkPairFork,frc_eq,st_eq] at found h
-  obtain ⟨b,hb⟩ := anySub_picked _ _ _ _ _ _ (startPair_distribute _ _ _ _ _ _ _ _ _ _ _ _ _ cut kind) _ found
-  exact Bool.noConfusion ((h (cvOp b)).symm.trans hb)
-
+  rw [← chkPairFast_eq]
+  refine Bool.eq_false_iff.mpr fun h => ?_
+  simp only [chkPairFast, chkPairNext, searchInputs, frc_eq, st_eq] at h checked
+  obtain ⟨b, hb⟩ := anySub_picked _ _ _ _ _ _
+    (guardStart_picked t H ph (startPairNext_picked _ _ _ _ _ _ _ _ _ _ _ _ _ kind)) _ h
+  exact Bool.noConfusion ((checked b).symm.trans hb)
 
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_0_and : chkPairPicked [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000000000 0 false = false := by decide +kernel
+theorem caseBinary_0_and : chkPairPicked [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_0_or : chkPairPicked [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000000000 0 true = false := by decide +kernel
-theorem caseBinary_0 : chk [] rootBounds 0 14 1 0x2000000000000000000000000000000000000000000000000 0 = false := by
+theorem caseBinary_0_or : chkPairPicked [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 true = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
+theorem caseBinary_0 : chk [] rootBounds 0 14 1 0x200000000000000000000000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -6983,29 +7416,15 @@ theorem caseBinary_0 : chk [] rootBounds 0 14 1 0x200000000000000000000000000000
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_1_and_early : chkPairFork [] rootBounds 0 14 1 0x10000000000000000 0 11 false false = false := by decide +kernel
+theorem caseBinary_1_and : chkPairPicked [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_1_and_late : chkPairFork [] rootBounds 0 14 1 0x10000000000000000 0 11 false true = false := by decide +kernel
-theorem caseBinary_1_and : chkPairPicked [] rootBounds 0 14 1 0x10000000000000000 0 false = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_1_and_early
-  · exact caseBinary_1_and_late
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseBinary_1_or_early : chkPairFork [] rootBounds 0 14 1 0x10000000000000000 0 11 true false = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseBinary_1_or_late : chkPairFork [] rootBounds 0 14 1 0x10000000000000000 0 11 true true = false := by decide +kernel
-theorem caseBinary_1_or : chkPairPicked [] rootBounds 0 14 1 0x10000000000000000 0 true = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_1_or_early
-  · exact caseBinary_1_or_late
-theorem caseBinary_1 : chk [] rootBounds 0 14 1 0x10000000000000000 0 = false := by
+theorem caseBinary_1_or : chkPairPicked [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 true = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
+theorem caseBinary_1 : chk [] rootBounds 0 14 1 0x10000000000000000000000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -7014,29 +7433,15 @@ theorem caseBinary_1 : chk [] rootBounds 0 14 1 0x10000000000000000 0 = false :=
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_2_and_early : chkPairFork [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 11 false false = false := by decide +kernel
+theorem caseBinary_2_and : chkPairPicked [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_2_and_late : chkPairFork [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 11 false true = false := by decide +kernel
-theorem caseBinary_2_and : chkPairPicked [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 false = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_2_and_early
-  · exact caseBinary_2_and_late
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseBinary_2_or_early : chkPairFork [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 11 true false = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseBinary_2_or_late : chkPairFork [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 11 true true = false := by decide +kernel
-theorem caseBinary_2_or : chkPairPicked [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 true = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_2_or_early
-  · exact caseBinary_2_or_late
-theorem caseBinary_2 : chk [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000000 0 = false := by
+theorem caseBinary_2_or : chkPairPicked [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 true = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
+theorem caseBinary_2 : chk [] rootBounds 0 14 1 0x400000000000000000000000000000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -7045,29 +7450,15 @@ theorem caseBinary_2 : chk [] rootBounds 0 14 1 0x400000000000000000000000000000
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_3_and_early : chkPairFork [] rootBounds 0 14 1 0x80000000 0 11 false false = false := by decide +kernel
+theorem caseBinary_3_and : chkPairPicked [] rootBounds 0 14 1 0x10000000000000000 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_3_and_late : chkPairFork [] rootBounds 0 14 1 0x80000000 0 11 false true = false := by decide +kernel
-theorem caseBinary_3_and : chkPairPicked [] rootBounds 0 14 1 0x80000000 0 false = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_3_and_early
-  · exact caseBinary_3_and_late
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseBinary_3_or_early : chkPairFork [] rootBounds 0 14 1 0x80000000 0 11 true false = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseBinary_3_or_late : chkPairFork [] rootBounds 0 14 1 0x80000000 0 11 true true = false := by decide +kernel
-theorem caseBinary_3_or : chkPairPicked [] rootBounds 0 14 1 0x80000000 0 true = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_3_or_early
-  · exact caseBinary_3_or_late
-theorem caseBinary_3 : chk [] rootBounds 0 14 1 0x80000000 0 = false := by
+theorem caseBinary_3_or : chkPairPicked [] rootBounds 0 14 1 0x10000000000000000 0 true = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
+theorem caseBinary_3 : chk [] rootBounds 0 14 1 0x10000000000000000 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -7076,11 +7467,15 @@ theorem caseBinary_3 : chk [] rootBounds 0 14 1 0x80000000 0 = false := by
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_4_and : chkPairPicked [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000 0 false = false := by decide +kernel
+theorem caseBinary_4_and : chkPairPicked [] rootBounds 0 14 1 0x20000000000000 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_4_or : chkPairPicked [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000 0 true = false := by decide +kernel
-theorem caseBinary_4 : chk [] rootBounds 0 14 1 0x4000000000000000000000000000000000000000000000000 0 = false := by
+theorem caseBinary_4_or : chkPairPicked [] rootBounds 0 14 1 0x20000000000000 0 true = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
+theorem caseBinary_4 : chk [] rootBounds 0 14 1 0x20000000000000 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -7089,29 +7484,48 @@ theorem caseBinary_4 : chk [] rootBounds 0 14 1 0x400000000000000000000000000000
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_5_and_early : chkPairFork [] rootBounds 0 14 1 0x1000000000000000000000000000000000000000000000000 0 11 false false = false := by decide +kernel
+theorem caseBinary_5_and : chkPairPicked [] rootBounds 0 14 1 0x100000000000000000000000 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_5_and_late : chkPairFork [] rootBounds 0 14 1 0x1000000000000000000000000000000000000000000000000 0 11 false true = false := by decide +kernel
-theorem caseBinary_5_and : chkPairPicked [] rootBounds 0 14 1 0x1000000000000000000000000000000000000000000000000 0 false = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_5_and_early
-  · exact caseBinary_5_and_late
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_5_or_early : chkPairFork [] rootBounds 0 14 1 0x1000000000000000000000000000000000000000000000000 0 11 true false = false := by decide +kernel
+theorem caseBinary_5_or_move0 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_5_or_late : chkPairFork [] rootBounds 0 14 1 0x1000000000000000000000000000000000000000000000000 0 11 true true = false := by decide +kernel
-theorem caseBinary_5_or : chkPairPicked [] rootBounds 0 14 1 0x1000000000000000000000000000000000000000000000000 0 true = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_5_or_early
-  · exact caseBinary_5_or_late
-theorem caseBinary_5 : chk [] rootBounds 0 14 1 0x1000000000000000000000000000000000000000000000000 0 = false := by
+theorem caseBinary_5_or_move1 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move2 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move3 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move4 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move5 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move6 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_5_or_move7 : chkPairNext [] rootBounds 0 14 1 0x100000000000000000000000 0 true 7 = false := by decide +kernel
+theorem caseBinary_5_or : chkPairPicked [] rootBounds 0 14 1 0x100000000000000000000000 0 true = false := by
+  apply chkPair_next
+  intro n
+  fin_cases n
+  · exact caseBinary_5_or_move0
+  · exact caseBinary_5_or_move1
+  · exact caseBinary_5_or_move2
+  · exact caseBinary_5_or_move3
+  · exact caseBinary_5_or_move4
+  · exact caseBinary_5_or_move5
+  · exact caseBinary_5_or_move6
+  · exact caseBinary_5_or_move7
+theorem caseBinary_5 : chk [] rootBounds 0 14 1 0x100000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -7120,11 +7534,15 @@ theorem caseBinary_5 : chk [] rootBounds 0 14 1 0x100000000000000000000000000000
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_6_and : chkPairPicked [] rootBounds 0 14 1 0x800000000000000000000000 0 false = false := by decide +kernel
+theorem caseBinary_6_and : chkPairPicked [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_6_or : chkPairPicked [] rootBounds 0 14 1 0x800000000000000000000000 0 true = false := by decide +kernel
-theorem caseBinary_6 : chk [] rootBounds 0 14 1 0x800000000000000000000000 0 = false := by
+theorem caseBinary_6_or : chkPairPicked [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 true = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
+theorem caseBinary_6 : chk [] rootBounds 0 14 1 0x80000000000000000000000000000000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -7133,11 +7551,15 @@ theorem caseBinary_6 : chk [] rootBounds 0 14 1 0x800000000000000000000000 0 = f
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_7_and : chkPairPicked [] rootBounds 0 14 1 0x8000000000000000000000000000000000000000000 0 false = false := by decide +kernel
+theorem caseBinary_7_and : chkPairPicked [] rootBounds 0 14 1 0x1000000000000000000000000 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_7_or : chkPairPicked [] rootBounds 0 14 1 0x8000000000000000000000000000000000000000000 0 true = false := by decide +kernel
-theorem caseBinary_7 : chk [] rootBounds 0 14 1 0x8000000000000000000000000000000000000000000 0 = false := by
+theorem caseBinary_7_or : chkPairPicked [] rootBounds 0 14 1 0x1000000000000000000000000 0 true = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
+theorem caseBinary_7 : chk [] rootBounds 0 14 1 0x1000000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -7146,42 +7568,48 @@ theorem caseBinary_7 : chk [] rootBounds 0 14 1 0x800000000000000000000000000000
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_8_and : chkPairPicked [] rootBounds 0 14 1 0x800 0 false = false := by decide +kernel
+theorem caseBinary_9_and : chkPairPicked [] rootBounds 0 14 1 0x800000000000000000000000000000000 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_8_or : chkPairPicked [] rootBounds 0 14 1 0x800 0 true = false := by decide +kernel
-theorem caseBinary_8 : chk [] rootBounds 0 14 1 0x800 0 = false := by
-  apply chkPair_picked
-  intro v
-  cases v
-  · exact caseBinary_8_and
-  · exact caseBinary_8_or
-
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_9_and_early : chkPairFork [] rootBounds 0 14 1 0x200 0 11 false false = false := by decide +kernel
+theorem caseBinary_9_or_move0 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000 0 true 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_9_and_late : chkPairFork [] rootBounds 0 14 1 0x200 0 11 false true = false := by decide +kernel
-theorem caseBinary_9_and : chkPairPicked [] rootBounds 0 14 1 0x200 0 false = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_9_and_early
-  · exact caseBinary_9_and_late
+theorem caseBinary_9_or_move1 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000 0 true 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_9_or_early : chkPairFork [] rootBounds 0 14 1 0x200 0 11 true false = false := by decide +kernel
+theorem caseBinary_9_or_move2 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000 0 true 2 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_9_or_late : chkPairFork [] rootBounds 0 14 1 0x200 0 11 true true = false := by decide +kernel
-theorem caseBinary_9_or : chkPairPicked [] rootBounds 0 14 1 0x200 0 true = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_9_or_early
-  · exact caseBinary_9_or_late
-theorem caseBinary_9 : chk [] rootBounds 0 14 1 0x200 0 = false := by
+theorem caseBinary_9_or_move3 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000 0 true 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_9_or_move4 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000 0 true 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_9_or_move5 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000 0 true 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_9_or_move6 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000 0 true 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_9_or_move7 : chkPairNext [] rootBounds 0 14 1 0x800000000000000000000000000000000 0 true 7 = false := by decide +kernel
+theorem caseBinary_9_or : chkPairPicked [] rootBounds 0 14 1 0x800000000000000000000000000000000 0 true = false := by
+  apply chkPair_next
+  intro n
+  fin_cases n
+  · exact caseBinary_9_or_move0
+  · exact caseBinary_9_or_move1
+  · exact caseBinary_9_or_move2
+  · exact caseBinary_9_or_move3
+  · exact caseBinary_9_or_move4
+  · exact caseBinary_9_or_move5
+  · exact caseBinary_9_or_move6
+  · exact caseBinary_9_or_move7
+theorem caseBinary_9 : chk [] rootBounds 0 14 1 0x800000000000000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -7190,29 +7618,48 @@ theorem caseBinary_9 : chk [] rootBounds 0 14 1 0x200 0 = false := by
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_10_and_early : chkPairFork [] rootBounds 0 14 1 0x1000000000000000000000000000 0 11 false false = false := by decide +kernel
+theorem caseBinary_10_and : chkPairPicked [] rootBounds 0 14 1 0x400 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_10_and_late : chkPairFork [] rootBounds 0 14 1 0x1000000000000000000000000000 0 11 false true = false := by decide +kernel
-theorem caseBinary_10_and : chkPairPicked [] rootBounds 0 14 1 0x1000000000000000000000000000 0 false = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_10_and_early
-  · exact caseBinary_10_and_late
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_10_or_early : chkPairFork [] rootBounds 0 14 1 0x1000000000000000000000000000 0 11 true false = false := by decide +kernel
+theorem caseBinary_10_or_move0 : chkPairNext [] rootBounds 0 14 1 0x400 0 true 0 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_10_or_late : chkPairFork [] rootBounds 0 14 1 0x1000000000000000000000000000 0 11 true true = false := by decide +kernel
-theorem caseBinary_10_or : chkPairPicked [] rootBounds 0 14 1 0x1000000000000000000000000000 0 true = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_10_or_early
-  · exact caseBinary_10_or_late
-theorem caseBinary_10 : chk [] rootBounds 0 14 1 0x1000000000000000000000000000 0 = false := by
+theorem caseBinary_10_or_move1 : chkPairNext [] rootBounds 0 14 1 0x400 0 true 1 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_10_or_move2 : chkPairNext [] rootBounds 0 14 1 0x400 0 true 2 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_10_or_move3 : chkPairNext [] rootBounds 0 14 1 0x400 0 true 3 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_10_or_move4 : chkPairNext [] rootBounds 0 14 1 0x400 0 true 4 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_10_or_move5 : chkPairNext [] rootBounds 0 14 1 0x400 0 true 5 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_10_or_move6 : chkPairNext [] rootBounds 0 14 1 0x400 0 true 6 = false := by decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+theorem caseBinary_10_or_move7 : chkPairNext [] rootBounds 0 14 1 0x400 0 true 7 = false := by decide +kernel
+theorem caseBinary_10_or : chkPairPicked [] rootBounds 0 14 1 0x400 0 true = false := by
+  apply chkPair_next
+  intro n
+  fin_cases n
+  · exact caseBinary_10_or_move0
+  · exact caseBinary_10_or_move1
+  · exact caseBinary_10_or_move2
+  · exact caseBinary_10_or_move3
+  · exact caseBinary_10_or_move4
+  · exact caseBinary_10_or_move5
+  · exact caseBinary_10_or_move6
+  · exact caseBinary_10_or_move7
+theorem caseBinary_10 : chk [] rootBounds 0 14 1 0x400 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -7221,11 +7668,15 @@ theorem caseBinary_10 : chk [] rootBounds 0 14 1 0x1000000000000000000000000000 
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_11_and : chkPairPicked [] rootBounds 0 14 1 0x1000000000000000000000000 0 false = false := by decide +kernel
+theorem caseBinary_11_and : chkPairPicked [] rootBounds 0 14 1 0x8000000000000000000000 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_11_or : chkPairPicked [] rootBounds 0 14 1 0x1000000000000000000000000 0 true = false := by decide +kernel
-theorem caseBinary_11 : chk [] rootBounds 0 14 1 0x1000000000000000000000000 0 = false := by
+theorem caseBinary_11_or : chkPairPicked [] rootBounds 0 14 1 0x8000000000000000000000 0 true = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
+theorem caseBinary_11 : chk [] rootBounds 0 14 1 0x8000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -7234,29 +7685,15 @@ theorem caseBinary_11 : chk [] rootBounds 0 14 1 0x1000000000000000000000000 0 =
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_12_and_early : chkPairFork [] rootBounds 0 14 1 0x400000000000000000000000 0 11 false false = false := by decide +kernel
+theorem caseBinary_12_and : chkPairPicked [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_12_and_late : chkPairFork [] rootBounds 0 14 1 0x400000000000000000000000 0 11 false true = false := by decide +kernel
-theorem caseBinary_12_and : chkPairPicked [] rootBounds 0 14 1 0x400000000000000000000000 0 false = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_12_and_early
-  · exact caseBinary_12_and_late
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseBinary_12_or_early : chkPairFork [] rootBounds 0 14 1 0x400000000000000000000000 0 11 true false = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseBinary_12_or_late : chkPairFork [] rootBounds 0 14 1 0x400000000000000000000000 0 11 true true = false := by decide +kernel
-theorem caseBinary_12_or : chkPairPicked [] rootBounds 0 14 1 0x400000000000000000000000 0 true = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_12_or_early
-  · exact caseBinary_12_or_late
-theorem caseBinary_12 : chk [] rootBounds 0 14 1 0x400000000000000000000000 0 = false := by
+theorem caseBinary_12_or : chkPairPicked [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 true = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
+theorem caseBinary_12 : chk [] rootBounds 0 14 1 0x40000000000000000000000000000000 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -7265,29 +7702,15 @@ theorem caseBinary_12 : chk [] rootBounds 0 14 1 0x400000000000000000000000 0 = 
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_13_and_early : chkPairFork [] rootBounds 0 14 1 0x400 0 11 false false = false := by decide +kernel
+theorem caseBinary_13_and : chkPairPicked [] rootBounds 0 14 1 0x80000 0 false = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseBinary_13_and_late : chkPairFork [] rootBounds 0 14 1 0x400 0 11 false true = false := by decide +kernel
-theorem caseBinary_13_and : chkPairPicked [] rootBounds 0 14 1 0x400 0 false = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_13_and_early
-  · exact caseBinary_13_and_late
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseBinary_13_or_early : chkPairFork [] rootBounds 0 14 1 0x400 0 11 true false = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem caseBinary_13_or_late : chkPairFork [] rootBounds 0 14 1 0x400 0 11 true true = false := by decide +kernel
-theorem caseBinary_13_or : chkPairPicked [] rootBounds 0 14 1 0x400 0 true = false := by
-  apply chkPair_fork (cut := 11)
-  intro late
-  cases late
-  · exact caseBinary_13_or_early
-  · exact caseBinary_13_or_late
-theorem caseBinary_13 : chk [] rootBounds 0 14 1 0x400 0 = false := by
+theorem caseBinary_13_or : chkPairPicked [] rootBounds 0 14 1 0x80000 0 true = false := by
+  rw [← chkPairFast_eq]
+  decide +kernel
+theorem caseBinary_13 : chk [] rootBounds 0 14 1 0x80000 0 = false := by
   apply chkPair_picked
   intro v
   cases v
@@ -7300,36 +7723,46 @@ theorem binaryCertificates : BinaryCertificates rootBounds := by
   intro p hp
   simp only [binaryRepresentatives,List.mem_cons,List.not_mem_nil,or_false] at hp
   rcases hp with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact ⟨0x2000000000000000000000000000000000000000000000000, by decide +kernel,caseBinary_0⟩
-  · exact ⟨0x10000000000000000, by decide +kernel,caseBinary_1⟩
-  · exact ⟨0x4000000000000000000000000000000000000000000000000000, by decide +kernel,caseBinary_2⟩
-  · exact ⟨0x80000000, by decide +kernel,caseBinary_3⟩
-  · exact ⟨0x4000000000000000000000000000000000000000000000000, by decide +kernel,caseBinary_4⟩
-  · exact ⟨0x1000000000000000000000000000000000000000000000000, by decide +kernel,caseBinary_5⟩
-  · exact ⟨0x800000000000000000000000, by decide +kernel,caseBinary_6⟩
-  · exact ⟨0x8000000000000000000000000000000000000000000, by decide +kernel,caseBinary_7⟩
-  · exact ⟨0x800, by decide +kernel,caseBinary_8⟩
-  · exact ⟨0x200, by decide +kernel,caseBinary_9⟩
-  · exact ⟨0x1000000000000000000000000000, by decide +kernel,caseBinary_10⟩
-  · exact ⟨0x1000000000000000000000000, by decide +kernel,caseBinary_11⟩
-  · exact ⟨0x400000000000000000000000, by decide +kernel,caseBinary_12⟩
-  · exact ⟨0x400, by decide +kernel,caseBinary_13⟩
+  · exact ⟨0x200000000000000000000000000000000000000000, by decide +kernel,caseBinary_0⟩
+  · exact ⟨0x10000000000000000000000000000000000000000, by decide +kernel,caseBinary_1⟩
+  · exact ⟨0x400000000000000000000000000000000000000000000000, by decide +kernel,caseBinary_2⟩
+  · exact ⟨0x10000000000000000, by decide +kernel,caseBinary_3⟩
+  · exact ⟨0x20000000000000, by decide +kernel,caseBinary_4⟩
+  · exact ⟨0x100000000000000000000000, by decide +kernel,caseBinary_5⟩
+  · exact ⟨0x80000000000000000000000000000000000000000000000000, by decide +kernel,caseBinary_6⟩
+  · exact ⟨0x1000000000000000000000000, by decide +kernel,caseBinary_7⟩
+  · exact ⟨0x100000000000000000000000, by decide +kernel,caseBinary_5⟩
+  · exact ⟨0x800000000000000000000000000000000, by decide +kernel,caseBinary_9⟩
+  · exact ⟨0x400, by decide +kernel,caseBinary_10⟩
+  · exact ⟨0x8000000000000000000000, by decide +kernel,caseBinary_11⟩
+  · exact ⟨0x40000000000000000000000000000000, by decide +kernel,caseBinary_12⟩
+  · exact ⟨0x80000, by decide +kernel,caseBinary_13⟩
 
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_0 : chk [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 = false := by decide +kernel
+theorem caseUnary_0 : chk [(0,0)] (unaryBoundsStrong rootBounds 0) 0 13 0 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_1 : chk [(1,0)] (unaryBoundsStrong rootBounds 1) 0 13 0 FF 1 = false := by decide +kernel
+theorem caseUnary_1 : chk [(1,0)] (unaryBoundsStrong rootBounds 1) 0 13 0 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_2 : chk [(2,0)] (unaryBoundsStrong rootBounds 2) 0 13 0 FF 1 = false := by decide +kernel
+theorem caseUnary_2 : chk [(2,0)] (unaryBoundsStrong rootBounds 2) 0 13 0 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_6 : chk [(6,0)] (unaryBoundsStrong rootBounds 6) 0 13 0 FF 1 = false := by decide +kernel
+theorem caseUnary_6 : chk [(6,0)] (unaryBoundsStrong rootBounds 6) 0 13 0 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem caseUnary_7 : chk [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 = false := by decide +kernel
+theorem caseUnary_7 : chk [(7,0)] (unaryBoundsStrong rootBounds 7) 0 13 0 FF 1 = false := by
+  rw [← chkFast_eq]
+  decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem unaryCertificates : UnaryCertificates :=
