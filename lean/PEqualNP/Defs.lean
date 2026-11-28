@@ -84,6 +84,9 @@ import PEqualNP.Defs.FactorSubst
 import PEqualNP.Defs.TwoColour
 import PEqualNP.Defs.Represents
 import PEqualNP.Defs.BranchingProgram
+import PEqualNP.Defs.SyntacticFold
+import PEqualNP.Defs.FoldExtra
+import PEqualNP.Defs.Silent
 
 /-!
 # The definitions root
