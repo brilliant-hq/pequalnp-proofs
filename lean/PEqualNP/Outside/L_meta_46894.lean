@@ -5,16 +5,16 @@ import PEqualNP.Defs
 -- Signed restrictions and the six-gate cutoff follow willakone’s L_meta_49521.
 -- The truth table, witness and restriction checks are for this desk assignment.
 namespace PEqualNP.Outside.L_meta_46894
-def bigNat_0 : Nat := 0x7fff7fff6fffedfffdbfffb6eefffbffdfff77ffbaebffdb56bffdffeafff6fff6dffefff7ff6fff7ff6ffefff6fff0000000000000000
-def bigNat_1 : Nat := 0x24a9400200150009000920010008009000800900100090000000000000000000
-def bigNat_2 : Nat := 0x80008000900012000240004911000400200088004514000000000000000000000000000000000000000000000000000000000000000000
-def bigNat_3 : Nat := 0x1fffc3fff86000003ffc00007ffb8e000000283281d420aa20ea603141920ca01960d601ac1a661a80000000000000000153e153e2267c56cf82b9f062252f14f8a76129f38e14f80468001ffe20006fff600000007ff0fff7ff0ffefff6000aaaaaaaaaaaaaaaa
-def bigNat_4 : Nat := 0xfffe000003fffb000fff8000000700000e800010085c02a082306250245202a415022a016222c02ca22c20000000000000000284b284b4d4960852cb2a5b044855a12d09b74258aea12c310bffc000800060006c000fff00060007ff6000fff6fffcccccccccccccccc
-def bigNat_5 : Nat := 0x7fff000001fffd8000000e0000001fff00003a00000816121090824c4048448a48508284454a288451451045140000000000000000429572950192a9365584ca908e29a8a5452d214aba28a558160000000afff00006dffe0000006fff0006ffe0006ffff0f0f0f0f0f0f0f0
-def bigNat_6 : Nat := 0x7fff00000fffec0000000000e00000001fff77ff8000001340241920c8b064b060148ca4e5260a0c50c6a18a1c0a18000000000000000073e643e609fccc3b99077302e83e30f987ce71f31040f99b400000000afff6fff01ffefff7ff00000006ffefff0000ff00ff00ff00ff00
-def bigNat_7 : Nat := 0x7fff7fff6000000000000000eefffbffc00000000000001a543861c300c180c18018f0c706386c706300c60c600c6000000000000000007cf87cf86e1f01c3e0387c24eecfc33e19f0467c20833e1b56bffdffe0000000001ffefff7ff6fff7ff00000000000ffff0000ffff0000
-def bigNat_8 : Nat := 0x7fff7fff6fffedfffdbfffb600000000000000000000001b56bf81fc0afe06fe06df00f807c00f807c00f80f800f8000000000000000007f007f006fe00dfc01bf803600f003c01e0007800003c01b56bffdffeafff6fff6c000000000000000000000000000ffffffff00000000
-def bigNat_9 : Nat := 0x7fff7fff6fffedfffdbfffb6eefffbffdfff77ffbaebffdb56bffdffeafff6fff6dffefff7ff6fff7ff6ffefff6ffffeeefac0fee8e8c0
+def bigNat_0 : Nat := 0xeeddbb76df7dfbfafdf7f5fbbf76ffffbf7eeefbbf7dddfbefbdf7bdedef6f7b70000000000000000
+def bigNat_1 : Nat := 0x4081110440822204104208421210908480000000000000000
+def bigNat_2 : Nat := 0x1112244892082040502080a04408900000000000000000000000000000000000000000000000000000
+def bigNat_3 : Nat := 0x70e1800007f0000fe3f07e0c00000000c0e7007038038e780001818c0c66000000000000000002244b870c1040bf80417f1f83f062b1f0000e0fb807c1c03efbc0001e1ef0f7b0aaaaaaaaaaaaaaaa
+def bigNat_4 : Nat := 0x3800ec0003f00003e000007ee00000005804053402800680294030081440a240000000000000000449c09760a29f88a49f11049bf7052a5807e0e03bf01c003e03df03c0c0f607b7cccccccccccccccc
+def bigNat_5 : Nat := 0x1c00760000f80001f80003f7000000002c0019a0000129a00052860012809404800000000000000008e093b12147c9110fca225fb8930a4cabf000ef80001ddf8003df7800de06f037f0f0f0f0f0f0f0f0
+def bigNat_6 : Nat := 0x1c03b00003e000001fbefe8000000000054e94000000392c514000a528000d8c000000000000000000e81d92205f512220fdf7f4921202c7733f7ee0000001ddfbef8007bde0006f780ff00ff00ff00ff00
+def bigNat_7 : Nat := 0x1dd8000003efbf7f4000000000000000078b19d4258a0000000000c631b18000000000000000000000eed020449f7dfbfa914441202444f87c3f7eeefbbf7c0000000007bdedef00000ffff0000ffff0000
+def bigNat_8 : Nat := 0x1ddbb76ed80000000000000000000000060c1118460c22306186300000000000000000000000000000eeddbb76d861c3c2e18785c33866ff803f7eeefbbf7dddfbefbdf000000000000ffffffff00000000
+def bigNat_9 : Nat := 0xeeddbb76df7dfbfafdf7f5fbbf76ffffbf7eeefbbf7dddfbefbdf7bdedef6f7b7feeefac0fee8e8c0
 variable {R : ℕ → ℕ}
 def op (d : Bool) (a b : ℕ) : ℕ := bif d then a ||| b else a &&& b
 lemma op_comm (d : Bool) (a b : ℕ) : op d a b = op d b a := by
@@ -1018,7 +1018,7 @@ structure X where
 structure Cm where
   a : List Nat
   b : List Nat
-def NN : Nat := 440
+def NN : Nat := 325
 def AA : Nat := bigNat_0
 def HX : Nat := bigNat_1
 def HY : Nat := bigNat_2
@@ -1164,8 +1164,8 @@ lemma uq_of {d : Bool} {l i : ℕ} {v : List W} {S : Finset ℕ} (h : Rep v S) {
   have := hp.forall hw hw' (fun e => hne (by rw [e]))
   simp only [sp_bit, hl, hs, Bool.true_and, true_and] at this
   simpa using this
-def segsX : List (ℕ × ℕ) := [(63, 76), (76, 79), (79, 92), (92, 104), (104, 107), (107, 119), (119, 132), (132, 135), (135, 147), (147, 160), (160, 173), (173, 176), (176, 179), (179, 192), (192, 195), (195, 208), (208, 210), (210, 212), (212, 225), (225, 238), (238, 240), (240, 243), (243, 245), (245, 247), (247, 250), (250, 253)]
-def segsY : List (ℕ × ℕ) := [(253, 266), (266, 268), (268, 272), (272, 274), (274, 278), (278, 291), (291, 295), (295, 309), (309, 322), (322, 336), (336, 340), (340, 344), (344, 347), (347, 350), (350, 366), (366, 369), (369, 385), (385, 388), (388, 404), (404, 407), (407, 423), (423, 439)]
+def segsX : List (ℕ × ℕ) := [(63, 67), (67, 70), (70, 75), (75, 80), (80, 83), (83, 88), (88, 93), (93, 96), (96, 101), (101, 106), (106, 111), (111, 117), (117, 122), (122, 128), (128, 134), (134, 141), (141, 145), (145, 149), (149, 155), (155, 162), (162, 166), (166, 172), (172, 176), (176, 180), (180, 187), (187, 194)]
+def segsY : List (ℕ × ℕ) := [(194, 212), (212, 215), (215, 219), (219, 226), (226, 230), (230, 237), (237, 239), (239, 247), (247, 253), (253, 260), (260, 262), (262, 270), (270, 277), (277, 283), (283, 289), (289, 292), (292, 295), (295, 299), (299, 302), (302, 306), (306, 309), (309, 313), (313, 316), (316, 320), (320, 324)]
 def segOk (s : ℕ × ℕ) : Bool := decide (s.1 < s.2) && decide (AA % 2 ^ s.2 + 2 ^ (s.1 + 1) = 2 ^ s.2 + AA % 2 ^ s.1) &&
   !AA.testBit s.1 && !AA.testBit s.2
 set_option maxRecDepth 100000 in
@@ -2995,7 +2995,7 @@ def rawG : List ℕ := rawL six
 def FPM : ℕ := 2 ^ 64 - 1
 def FULL : ℕ := 2 ^ NN - 1
 def TG : ℕ := bigNat_9
-def cutMasks : List ℕ := [0x153e153e2267c5fffc3fff862252f3ffca7617ffb8e14f80468329ffe20aa6fff603141927ff0fff7ff0ffefff61a8aaaaaaaaaaaaaaaa, 0x284b284b4fffe0852cbfffb044fffa12d09b74258aea12c310bffc2a0823062506c520fff15062a07ff62c0fff6fffcccccccccccccccc, 0x42957fff0192a9fffd84ca908e29a8a55fff214aba28a558161210908afff04846dffe5082846fff2886ffe5106ffff0f0f0f0f0f0f0f0, 0x7fff43e60fffec3b99077302e83e30f99fff77ff9040f99b40241920cafff6fff01ffefff7ff0a0c50c6ffefff0a18ff00ff00ff00ff00, 0x7fff7fff6e1f01c3e0387c24eefffbffd9f0467c20833e1b56bffdffe0c180c1801ffefff7ff6fff7ff0c60c600c60ffff0000ffff0000, 0x7fff7fff6fffedfffdbfffb600f003c01e0007800003c01b56bffdffeafff6fff6df00f807c00f807c00f80f800f80ffffffff00000000, 0xfffffffffffffe9307d460f9fffffeb07ffffd60c71ffffffd7fffe2bdfffdf159ffffffff35fe69f29fe53e599fff5555555555555555, 0xfffffffff2b69fffffcd5a4fff7aa7ffffff8fffff17fffeff7a3ffff7fff9fffdbfffd5bfffdfffe9ddfffd35dd3d3333333333333333, 0xffff8d6afffffec9aa7ffffff1fffffffad2ffffc5fffff7e9fffffffdb3bffffb75b7ffffffbab5fffbaebfffbaeb0f0f0f0f0f0f0f0f, 0x8c19fffff60333ffffffffff1ffffffff8318e0cffffffecbffffffff74f9b4f9feb735b1ad9fffffff95e75e3ffff00ff00ff00ff00ff, 0x830783079fffffffffffffff11303cc1ffffffffffffffe5abc79e3cffffffffffe70f38f9c7938f9cffffffffffff0000ffff0000ffff, 0x80ff80ff901ff203fe407fc9ffffffffffffffffffffffe4a9407e03f501f901f93fffffffffffffffffffffffffff00000000ffffffff, 0x7fff0d956fffecca543fffb68ed9ab655fff26caba2b655340bffdffe8b246fff25ffea885446fff5486ffea906fff0f0f0f0ff0f0f0f0, 0x7fff7fff62a96dfffd8d258644fff9d2ce9b73a58ae9d2da563a41ffe2fff0fff49a20fff6906d207ff6d40fff6fff33333333cccccccc, 0x3f803f80fffedfffdbfffb6eefffbffc7f041fc2080fe010287e03f0afff6fff6dffefff7ff6fff7ff03e03e003e00000ffffffff0000, 0xce67fff661cc1fffdbfffb6e8ce33399fff77ff9043398816bffdffe24e624e66dffefff7ff058c2cc6ffefff059800ff00ffff00ff00]
+def cutMasks : List ℕ := [0x2244b870c1040bf80417f1f83f062b1f0000e0fb807c1c03efbc0001e1ef0f7b0aaaaaaaaaaaaaaaa, 0x449c09760a29f88a49f11049bf7052a5807e0e03bf01c003e03df03c0c0f607b7cccccccccccccccc, 0x8e093b12147c9110fca225fb8930a4cabf000ef80001ddf8003df7800de06f037f0f0f0f0f0f0f0f0, 0xe81d92205f512220fdf7f4921202c7733f7ee0000001ddfbef8007bde0006f780ff00ff00ff00ff00, 0xeed020449f7dfbfa914441202444f87c3f7eeefbbf7c0000000007bdedef00000ffff0000ffff0000, 0xeeddbb76d861c3c2e18785c33866ff803f7eeefbbf7dddfbefbdf000000000000ffffffff00000000, 0x1ffffc78f3ffffc07fff80e07c0f9ffffffff9f8c7fc7e3fe38c3ffff3f39f9ccf5555555555555555, 0x1ffe3ff89fffe07fffe0fffffc08fffffffd3fdfd65febffcbfeb5fe7fbf5dfaed3333333333333333, 0x1f1ffc4ffff83ffff03fffe047fffffffe9fff32fffff6b2fffd6bcfff6bfb5fdb0f0f0f0f0f0f0f0f, 0x11fe27fffe0ffffff02080bffffffffffd58b5ffffffe369d75fffad6bfff939ff00ff00ff00ff00ff, 0x1113fffffe0820405ffffffffffffffffc3a7315ed3affffffffff9ce7273fffff0000ffff0000ffff, 0x1112244893fffffffffffffffffffffffcf9f773dcf9eee7cf3ce7ffffffffffff00000000ffffffff, 0xe0dd8076cc7d52d2fd25a1fbb1565b4aa67ee413bf7d8553ef98c7800de06f0370f0f0f0ff0f0f0f0, 0xeec1bb00d249fb48a9f6958abf76ad25bf4ceaf8aa7c5df84fa5203c0c0f607b733333333cccccccc, 0x1dbb76df7dfbfa70c3c4e31c2207fc0c3846631c31ddfbefbdf7bdedef000000000ffffffff0000, 0xec03b76df30e1e2fdf7f5512a6438f31a142efbbf7cd8e1863df7bde0006f78000ff00ffff00ff00]
 def kz (Z : ℕ) : ℕ := (List.range 16).foldr (fun i x => bif Nat.testBit Z i then Nat.lor x (cutMasks.getD i 0) else x) 0
 def lz (Z : ℕ) : ℕ := Nat.land AA (Nat.xor (kz Z) FULL)
 def fz (Z : ℕ) : ℕ := Nat.land FPM (Nat.xor (kz Z) FULL)
