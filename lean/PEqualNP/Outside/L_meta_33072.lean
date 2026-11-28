@@ -1,18 +1,18 @@
 import PEqualNP.Defs
 
 namespace PEqualNP.Outside.L_meta_33072
-def bigNat_0 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xfffff7ffffbe) 64) 0xfffff7ffffbdffff) 64) 0xdf7dffffeeffffef) 64) 0x7ddffffdefbbffff) 64) 0xbdf77ddefffdb56a) 64) 0xd5ffeb6aabffd57f) 64) 0xfafff7ffadadaabf) 64) 0xfd5bffd6bffdbffd) 64) 0xab5adb56fff6fff6) 64) 0xb56d7ffbffdb6fff) 64) 0x0
-def bigNat_1 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x24a95) 64) 0x2a00149554002a80) 64) 0x500080052525540) 64) 0x2a4002940024002) 64) 0x54a524a900090009) 64) 0x4a92800400249000) 64) 0x0
-def bigNat_2 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x1000008000041) 64) 0x80000420000) 64) 0x2082000011000010) 64) 0x8220000210440000) 64) 0x4208822100000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0
-def bigNat_3 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3ffffc000) 64) 0x7) 64) 0xffff03e0f83c0000) 64) 0x80880000011) 64) 0x2202440480260001) 64) 0x1100011210121) 64) 0x1300010028c088c) 64) 0x880020a04402312) 64) 0x408c000000000000) 64) 0x42230111182) 64) 0x422302031840848) 64) 0xc1050c7a60042161) 64) 0x440841c208892cb) 64) 0x81f07c1e088c0008) 64) 0x400000200001100) 64) 0x20007ff80018000) 64) 0x108001bffc) 64) 0x818034600060000) 64) 0x850d0003ffdb6fff) 64) 0x17b2fbf5e4e68fe5
-def bigNat_4 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xfffff00) 64) 0x0) 64) 0x3ffff81f07) 64) 0xffff7800fb800000) 64) 0x40002180011045) 64) 0x2808c411c08c0008) 64) 0x1083230852c0863) 64) 0x860000410a02184) 64) 0x21c4224210e08630) 64) 0xc228000000000000) 64) 0x840c0220604) 64) 0x840c45aa6001013) 64) 0x208100382080682) 64) 0x88922e80f80a25d) 64) 0x3c007dc010300060) 64) 0x888001400) 64) 0x2fff000000c0080) 64) 0x118001600018000) 64) 0x204218500006fff6) 64) 0x31617ff800186000) 64) 0xa07f34fba47bf57f
-def bigNat_5 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x1ff) 64) 0xffc0f83ffffbc007) 64) 0xffff7bee00000000) 64) 0x39041400d) 64) 0x2a01e003801c0000) 64) 0x4400b2800d2500f0) 64) 0xe1020480a403c0) 64) 0x38d02d802c01636) 64) 0x68000000000000) 64) 0x108500442808) 64) 0x10850080c80820a4) 64) 0x410208c04525b00) 64) 0x7c0a2b49e000c369) 64) 0x3df7000021400100) 64) 0x860a000157f) 64) 0xf800000000202200) 64) 0x1400016bffc0001) 64) 0x8302c056fff00006) 64) 0x816c0000001b0000) 64) 0xff2dbf66878c593c
-def bigNat_6 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x3) 64) 0xffff80f8000001ff) 64) 0xffde003ffffbdf70) 64) 0x0) 64) 0x420131201502e) 64) 0x5800b00584100) 64) 0x5002a2902e0002c0) 64) 0x2c35005b4001300) 64) 0x130d68000a805424) 64) 0x8170000000000000) 64) 0x210810884090) 64) 0x2108110300914538) 64) 0x407c41102062932f) 64) 0xc324defb90401) 64) 0x8010040242040402) 64) 0x10000b00abffc000) 64) 0x21802800) 64) 0x15bffc000000001) 64) 0xa802db0000000006) 64) 0xb4000000001b6fff) 64) 0x7763e0c7fc09a64f
-def bigNat_7 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xfff) 64) 0xff00000000000003) 64) 0xffffbe00000001ff) 64) 0xffdefb8000000000) 64) 0x0) 64) 0x2005811216d40228) 64) 0x45008a04504800) 64) 0x5422c00228002280) 64) 0x228356a000009200) 64) 0x920948904b025800) 64) 0x940000000000000) 64) 0x401066f08300) 64) 0x210600c03210639) 64) 0x9f000220c04313cf) 64) 0x7dc040700100080e) 64) 0x420084404183002) 64) 0xc0000b6a00000000) 64) 0x2c002abf) 64) 0xfc00000000000001) 64) 0xab58000000000006) 64) 0xb56d7ffbffc00000) 64) 0xf9f45ca2fdfdd44a
-def bigNat_8 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x1ffffe0000003) 64) 0xffffbefbffffdc00) 64) 0x0) 64) 0x1) 64) 0x4a85c000000b0) 64) 0x16002c01605b53) 64) 0x13000130001300) 64) 0x130254b126085c08) 64) 0x5c0000002c016000) 64) 0x580000000000000) 64) 0x820183000c20) 64) 0xc3e182100c01843e) 64) 0x1f7d843f0e801c00) 64) 0x1010038042020070) 64) 0x841108080618002) 64) 0xd5ffe00000000000) 64) 0x2dad8000) 64) 0x1) 64) 0xab5adb56fff6fff0) 64) 0x0) 64) 0xc8bfb73e6bf218b3
-def bigNat_9 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x1ffffe000) 64) 0x1ffffefffff78) 64) 0x0) 64) 0x0) 64) 0x3) 64) 0x4ad00260000004c0) 64) 0x9801300980125a) 64) 0x15c0025c0085c02) 64) 0x5c00000000016001) 64) 0x60000000b0058000) 64) 0x1600000000000000) 64) 0xfc1e0400f000) 64) 0x83fe041ff03c07c0) 64) 0x82007c00003e004) 64) 0x21007c0084100f80) 64) 0x108220080781b568) 64) 0x0) 64) 0x2dadaabf) 64) 0xfd5bffd6bffdbffc) 64) 0x0) 64) 0x0) 64) 0x2f45ee30b8296df7
-def bigNat_10 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x1ffffefff) 64) 0xff7c000000000000) 64) 0x0) 64) 0x0) 64) 0x2) 64) 0x6a91038004940700) 64) 0xe001c00e000000) 64) 0x60000600006000) 64) 0x6000000000018001) 64) 0x80000000c0060000) 64) 0x1800000000000000) 64) 0xffe007ff003e) 64) 0xfc0007e00001f800) 64) 0x1041f80008fc0008) 64) 0x401f80010823f000) 64) 0x21044110f801b56a) 64) 0xd5ffeb6aabffd57f) 64) 0xfafff7ff80000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0xf39cf9eb5b376bea
-def bigNat_11 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xfffff7ffffbe) 64) 0xfffff7ffffbdffff) 64) 0xdf7dffffeeffffef) 64) 0x7ddffffdefbbffff) 64) 0xbdf77ddefffdb56a) 64) 0xd5ffeb6aabffd57f) 64) 0xfafff7ffadadaabf) 64) 0xfd5bffd6bffdbffd) 64) 0xab5adb56fff6fff6) 64) 0xb56d7ffbffdb6fff) 64) 0xffffffffffffffff
+def bigNat_0 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xfffff) 64) 0x7ffffbfff7ffffbf) 64) 0xfffdfffbffffbfff) 64) 0xfbffffbffffdfffb) 64) 0xffffbffff7ffff7f) 64) 0xfeffffeffffdffff) 64) 0xdfffbffffbffff7f) 64) 0xfff7ffeffffefffd) 64) 0xfffbfff6d5ab57ff) 64) 0xffff5b555ffffffd) 64) 0x57ffffff5ffffffd) 64) 0xffffffd6d6d55fff) 64) 0xfffd5bffffffad7f) 64) 0xfffff6ffffffed5a) 64) 0xd6dab7ffffff6fff) 64) 0xfffed6adaffffffe) 64) 0xffffffedb7ffffff) 64) 0x0
+def bigNat_1 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x92a54a800) 64) 0xa4aaa0000002) 64) 0xa8000000a0000002) 64) 0x29292aa000) 64) 0x2a40000005280) 64) 0x900000012a5) 64) 0x2925480000009000) 64) 0x1295250000001) 64) 0x1248000000) 64) 0x0
+def bigNat_2 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x100000) 64) 0x8000040008000040) 64) 0x2000400004000) 64) 0x400004000020004) 64) 0x400008000080) 64) 0x100001000020000) 64) 0x2000400004000080) 64) 0x8001000010002) 64) 0x4000000000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0
+def bigNat_3 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7ffff8000000000) 64) 0x0) 64) 0x7) 64) 0xffff00000ffffe00) 64) 0x1ffffc0003fff00) 64) 0x200401540) 64) 0x10055220040) 64) 0x1548010055001005) 64) 0x5000080001005500) 64) 0x200aa420040154) 64) 0x400802a800080146) 64) 0x40154c00802a80) 64) 0x41400802a800802) 64) 0xa892004015400000) 64) 0x4223) 64) 0x111182230211181) 64) 0x18c111810918109) 64) 0x181091a18f4c1118) 64) 0x10858108b0210b04) 64) 0x460420e0421c0841) 64) 0xc111892cb8108312) 64) 0x5970446146ae088c) 64) 0x1118223000201000) 64) 0x1000000001) 64) 0x1000000040000001) 64) 0xffffffc000c00000) 64) 0x2100) 64) 0x6ffffffe040) 64) 0xc01a300000006000) 64) 0x10a1a0000000) 64) 0xffffffedb7ffffff) 64) 0x17b2fbf5e4e68fe5
+def bigNat_4 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7ffff80) 64) 0x0) 64) 0x0) 64) 0x1fff) 64) 0xfc00003ffff80007) 64) 0xffff7fffe0000000) 64) 0x1ffffdfff800000) 64) 0x100008015980) 64) 0x88200566280801) 64) 0x5988200566020056) 64) 0x6000400820056623) 64) 0x400acc580801598) 64) 0xc1002b3000020850) 64) 0x80159841002b308) 64) 0x44841002b301002b) 64) 0x3186080159800000) 64) 0x840c) 64) 0x2206040c0420622) 64) 0xd530206020260202) 64) 0x6020260200702060) 64) 0x201a020340403408) 64) 0x184917408060922e) 64) 0x82060a25d0a25c04) 64) 0x280818184f41030) 64) 0x206040c001800000) 64) 0x4440000001) 64) 0x400000005ffffffc) 64) 0x6004000) 64) 0x1180000002c00) 64) 0x60000000102) 64) 0x10c2800000006fff) 64) 0xfffec62c2ffffffe) 64) 0xc30000000) 64) 0xa07f34fba47bf57f
+def bigNat_5 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7ffff0) 64) 0xffffe0001fff) 64) 0xfdffff8000000007) 64) 0xffff7fffeffffeff) 64) 0xfc00000000000000) 64) 0x159e08) 64) 0x20a00056782a0015) 64) 0x9e00005678000567) 64) 0x8000022000567828) 64) 0xacf04a00159e0) 64) 0x2b3c081024052) 64) 0x159e00002b3c1a) 64) 0x5b0002b3c0002b3) 64) 0xc1b000159e000000) 64) 0x10850) 64) 0x442808500842804) 64) 0x640428041480414) 64) 0x8041480411804281) 64) 0x496c04140292d810) 64) 0xa0515a4515882090) 64) 0x4280c3690c36818) 64) 0x6d210a0209002140) 64) 0x4280850004000000) 64) 0x430500000001) 64) 0x57ffffff00000000) 64) 0x10110000) 64) 0x1400000002d7f) 64) 0xfffff00000000c18) 64) 0x1602b7ffffff0000) 64) 0xd02d80000000) 64) 0xd80000000) 64) 0xff2dbf66878c593c
+def bigNat_6 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x7ffff000007fff) 64) 0xf0000000007ffff7) 64) 0xfffe000000001fff) 64) 0xfdffffbffffbfff0) 64) 0x0) 64) 0x0) 64) 0x1080299e009) 64) 0xa80a6780000299) 64) 0xe0000a678000a678) 64) 0x20802800a678029) 64) 0x14cf00000299e00) 64) 0x533c01a802da00) 64) 0x299e0000533c01a) 64) 0xd0000533c000533c) 64) 0x1240299e0000000) 64) 0x21081) 64) 0x884090811084088) 64) 0x1804840a8a708820) 64) 0xa8a708822048409) 64) 0x8a4c98a191040121) 64) 0x2619266190cc324) 64) 0xc840904019040120) 64) 0x8032102410064204) 64) 0x8409081010084000) 64) 0x58055ffffffc) 64) 0x0) 64) 0x10c0140000) 64) 0x15bffffff8000) 64) 0xd40) 64) 0x16d8000000000000) 64) 0xd68000000000) 64) 0xdb7ffffff) 64) 0x7763e0c7fc09a64f
+def bigNat_7 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xfffff) 64) 0x0) 64) 0x7ffff7ffff0000) 64) 0x7ffff7) 64) 0xfffeffffefffc000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x80160431e000b) 64) 0x6a010c780000431e) 64) 0x10c780010c780) 64) 0x24002a10c780000) 64) 0x218f00000431e000) 64) 0x863c001ab500000) 64) 0x431e0000863c0012) 64) 0x9120863c000863c0) 64) 0x431e00000000) 64) 0x40106) 64) 0x6f08301060108300) 64) 0x601808320c7320c7) 64) 0x3004030044180831) 64) 0xc4f10c1e2189e02) 64) 0xc02038020300407) 64) 0x830080e0080e01) 64) 0x1c020c020380418) 64) 0x8301060c00b0000) 64) 0x5b5000000000) 64) 0x0) 64) 0x1600155fff) 64) 0xfffc000000000000) 64) 0xd5a) 64) 0xc000000000000000) 64) 0xd6adaffffffe) 64) 0xffffffe000000000) 64) 0xf9f45ca2fdfdd44a
+def bigNat_8 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xfffff0000000) 64) 0x7ffff7ffff7fff) 64) 0xf7ffffbfff000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x40012a13e00000) 64) 0x4f80000013e0) 64) 0x4f800004f800) 64) 0x2da98004f800000) 64) 0x9f00000013e0000) 64) 0x27c00012a589304) 64) 0x13e0000827c00000) 64) 0x27c000027c00) 64) 0x13e000000000) 64) 0x82018) 64) 0x3000c201861f0c10) 64) 0x806100c3087c3087) 64) 0xc3087c3087e100c2) 64) 0x7020060400e040) 64) 0x30801c0801c10038) 64) 0x100c200702007040) 64) 0xe04030801c08061) 64) 0xc20186000b57ff) 64) 0xffff000000000000) 64) 0x0) 64) 0x16d6c00000) 64) 0x0) 64) 0xd5a) 64) 0xd6dab7ffffff6fff) 64) 0xfffe000000000000) 64) 0x0) 64) 0xc8bfb73e6bf218b3
+def bigNat_9 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x1ffffe00000) 64) 0xfffff7ffffbf) 64) 0xff00000000000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0xd2b4009c000000) 64) 0x2700000009c00) 64) 0x2700000270000) 64) 0x92d00a70000002) 64) 0x4e00000109c00000) 64) 0x9380000000000000) 64) 0x9c00000138000000) 64) 0x1380000138000) 64) 0x9c0000000000) 64) 0xfc1e0) 64) 0x400f001e041ff020) 64) 0xff800f000f8000f8) 64) 0xf8000f8000f00) 64) 0xf8000f8001f0003) 64) 0xc003e0003e0007c0) 64) 0xf000f8000f8001) 64) 0xf0003c003e000780) 64) 0xf001e06d5a00000) 64) 0x0) 64) 0x0) 64) 0x16d6d55fff) 64) 0xfffd5bffffffad7f) 64) 0xfffff6ffffffe000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x2f45ee30b8296df7
+def bigNat_10 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0x1ffffefffff) 64) 0x7ffe000000000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x9aa440e0000002) 64) 0x4a0380000000e000) 64) 0x3800000380000) 64) 0x380000000) 64) 0x700000000e000000) 64) 0x1c00000000000000) 64) 0xe0000001c0000000) 64) 0x1c000001c0000) 64) 0xe00000000000) 64) 0xffe00) 64) 0x7ff003e007e0003f) 64) 0x1f003f0003f00) 64) 0x3f0003f0001f003) 64) 0xf0003f0007e0007c) 64) 0xfc000fc001f800) 64) 0x1f003f0003f0007e) 64) 0x7c00fc000f801) 64) 0xf003e006d5ab57ff) 64) 0xffff5b555ffffffd) 64) 0x57ffffff5ffffffd) 64) 0xffffffc000000000) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0x0) 64) 0xf39cf9eb5b376bea
+def bigNat_11 : Nat := Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (Nat.lor (Nat.shiftLeft (0xfffff) 64) 0x7ffffbfff7ffffbf) 64) 0xfffdfffbffffbfff) 64) 0xfbffffbffffdfffb) 64) 0xffffbffff7ffff7f) 64) 0xfeffffeffffdffff) 64) 0xdfffbffffbffff7f) 64) 0xfff7ffeffffefffd) 64) 0xfffbfff6d5ab57ff) 64) 0xffff5b555ffffffd) 64) 0x57ffffff5ffffffd) 64) 0xffffffd6d6d55fff) 64) 0xfffd5bffffffad7f) 64) 0xfffff6ffffffed5a) 64) 0xd6dab7ffffff6fff) 64) 0xfffed6adaffffffe) 64) 0xffffffedb7ffffff) 64) 0xffffffffffffffff
 variable {R : ℕ → ℕ}
 def op (d : Bool) (a b : ℕ) : ℕ := bif d then a ||| b else a &&& b
 lemma op_comm (d : Bool) (a b : ℕ) : op d a b = op d b a := by
@@ -1016,7 +1016,7 @@ structure X where
 structure Cm where
   a : List Nat
   b : List Nat
-def NN : Nat := 689
+def NN : Nat := 1109
 def AA : Nat := bigNat_0
 def HX : Nat := bigNat_1
 def HY : Nat := bigNat_2
@@ -1162,8 +1162,8 @@ lemma uq_of {d : Bool} {l i : ℕ} {v : List W} {S : Finset ℕ} (h : Rep v S) {
   have := hp.forall hw hw' (fun e => hne (by rw [e]))
   simp only [sp_bit, hl, hs, Bool.true_and, true_and] at this
   simpa using this
-def segsX : List (ℕ × ℕ) := [(63, 76), (76, 79), (79, 82), (82, 85), (85, 98), (98, 111), (111, 113), (113, 116), (116, 119), (119, 121), (121, 123), (123, 126), (126, 128), (128, 131), (131, 144), (144, 147), (147, 160), (160, 163), (163, 165), (165, 167), (167, 170), (170, 173), (173, 176), (176, 178), (178, 181), (181, 183), (183, 186), (186, 188), (188, 190), (190, 193), (193, 206), (206, 209), (209, 222), (222, 224), (224, 227), (227, 229), (229, 242), (242, 245), (245, 247), (247, 249), (249, 262), (262, 264), (264, 266), (266, 268), (268, 270), (270, 273), (273, 276), (276, 278), (278, 281), (281, 284), (284, 286), (286, 299), (299, 312), (312, 314), (314, 327), (327, 329), (329, 331), (331, 333), (333, 346), (346, 348), (348, 350), (350, 352), (352, 354), (354, 356), (356, 359), (359, 362), (362, 364), (364, 377), (377, 379), (379, 381), (381, 384), (384, 386), (386, 388), (388, 391), (391, 393), (393, 395), (395, 398), (398, 401)]
-def segsY : List (ℕ × ℕ) := [(401, 416), (416, 421), (421, 425), (425, 431), (431, 435), (435, 441), (441, 446), (446, 466), (466, 470), (470, 476), (476, 481), (481, 501), (501, 505), (505, 511), (511, 516), (516, 536), (536, 540), (540, 561), (561, 567), (567, 573), (573, 593), (593, 598), (598, 619), (619, 640), (640, 646), (646, 667), (667, 688)]
+def segsX : List (ℕ × ℕ) := [(63, 91), (91, 94), (94, 97), (97, 100), (100, 128), (128, 156), (156, 158), (158, 161), (161, 164), (164, 166), (166, 168), (168, 171), (171, 173), (173, 176), (176, 204), (204, 207), (207, 235), (235, 238), (238, 240), (240, 242), (242, 245), (245, 248), (248, 251), (251, 253), (253, 256), (256, 258), (258, 261), (261, 263), (263, 265), (265, 268), (268, 296), (296, 299), (299, 327), (327, 329), (329, 332), (332, 334), (334, 362), (362, 365), (365, 367), (367, 369), (369, 397), (397, 399), (399, 401), (401, 403), (403, 405), (405, 408), (408, 411), (411, 413), (413, 416), (416, 419), (419, 421), (421, 449), (449, 477), (477, 479), (479, 507), (507, 509), (509, 511), (511, 513), (513, 541), (541, 543), (543, 545), (545, 547), (547, 549), (549, 551), (551, 554), (554, 557), (557, 559), (559, 587), (587, 589), (589, 591), (591, 594), (594, 596), (596, 598), (598, 601), (601, 603), (603, 605), (605, 608), (608, 611)]
+def segsY : List (ℕ × ℕ) := [(611, 626), (626, 641), (641, 656), (656, 676), (676, 691), (691, 711), (711, 730), (730, 750), (750, 765), (765, 785), (785, 804), (804, 824), (824, 839), (839, 859), (859, 878), (878, 898), (898, 913), (913, 934), (934, 954), (954, 974), (974, 994), (994, 1009), (1009, 1030), (1030, 1051), (1051, 1066), (1066, 1087), (1087, 1108)]
 def segOk (s : ℕ × ℕ) : Bool := decide (s.1 < s.2) && decide (AA % 2 ^ s.2 + 2 ^ (s.1 + 1) = 2 ^ s.2 + AA % 2 ^ s.1) &&
   !AA.testBit s.1 && !AA.testBit s.2
 set_option maxRecDepth 100000 in
@@ -3758,92 +3758,11 @@ lemma iroot : Imp [] 0 14 := imp_ts (Or.inl rfl) root_p (by norm_num) ir (fun t 
   · exact one h11
   · exact one h12
   · exact one h13)
-def rng (a b : ℕ) : ℕ := 2 ^ b - 2 ^ a
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem proot_1_0 : chk [] rt 0 14 1 (rng 0 36) 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_1 : chk [] rt 0 14 1 (rng 36 49) 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_2 : chk [] rt 0 14 1 (rng 49 60) 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_3 : chk [] rt 0 14 1 (rng 60 92) 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_4 : chk [] rt 0 14 1 (rng 92 141) 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_5 : chk [] rt 0 14 1 (rng 141 176) 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_6 : chk [] rt 0 14 1 (rng 176 198) 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_1_7 : chk [] rt 0 14 1 (rng 198 214) 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pfull_1 : mFull [(rng 0 36, 1), (rng 36 49, 0), (rng 49 60, 0), (rng 60 92, 0), (rng 92 141, 0), (rng 141 176, 0), (rng 176 198, 0), (rng 198 214, 0)] = true := by decide +kernel
-lemma pex_1 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 14 1 p.1 p.2 = false := by
-  refine ⟨[(rng 0 36, 1), (rng 36 49, 0), (rng 49 60, 0), (rng 60 92, 0), (rng 92 141, 0), (rng 141 176, 0), (rng 176 198, 0), (rng 198 214, 0)], pfull_1, fun p hp => ?_⟩
-  simp only [List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at hp
-  rcases hp with h | h | h | h | h | h | h | h
-  · subst h; exact proot_1_0
-  · subst h; exact proot_1_1
-  · subst h; exact proot_1_2
-  · subst h; exact proot_1_3
-  · subst h; exact proot_1_4
-  · subst h; exact proot_1_5
-  · subst h; exact proot_1_6
-  · subst h; exact proot_1_7
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_2_0 : chk [] rt 0 14 2 (rng 0 81) 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_2_1 : chk [] rt 0 14 2 (rng 81 214) 0 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem pfull_2 : mFull [(rng 0 81, 1), (rng 81 214, 0)] = true := by decide +kernel
-lemma pex_2 : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 14 2 p.1 p.2 = false := by
-  refine ⟨[(rng 0 81, 1), (rng 81 214, 0)], pfull_2, fun p hp => ?_⟩
-  simp only [List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at hp
-  rcases hp with h | h
-  · subst h; exact proot_2_0
-  · subst h; exact proot_2_1
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_3 : chk [] rt 0 14 3 FF 1 = false := by decide +kernel
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem proot_hi : okT [] rt 0 15 [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] = true := by decide +kernel
-lemma iroot_pos {t : ℕ} {S : Finset ℕ} (ht1 : 1 ≤ t) (hS : (S : Set ℕ) ⊆ C (mz 0) (WZ [] 0))
-    (hl : Live Z0 (mz 0) (tz 0) 14 t S) : False := by
-  have hmin : ∀ q < 14, ¬ Sol Z0 (mz 0) (tz 0) q (C (mz 0) (WZ [] 0)) := fun q hq => iroot q hq
-  have hm0 : Min Z0 (mz 0) (tz 0) 14 t S := ⟨hl, fun q hq hs => hmin q hq (hs.mono le_rfl (by rintro x (hx | hx); exact hS hx; exact Or.inr hx))⟩
-  have htk : t < 15 := by have := hm0.size.2; omega
-  have hM : ∃ M : List (ℕ × ℕ), mFull M = true ∧ ∀ p ∈ M, chk [] rt 0 14 t p.1 p.2 = false := by
-    have h := proot_hi
-    simp only [okT, List.all_cons, List.all_nil, Bool.and_true, Bool.and_eq_true, Bool.not_eq_true'] at h
-    obtain ⟨h4, h5, h6, h7, h8, h9, h10, h11, h12, h13, h14⟩ := h
-    interval_cases t
-    · exact pex_1
-    · exact pex_2
-    · exact one proot_3
-    · exact one h4
-    · exact one h5
-    · exact one h6
-    · exact one h7
-    · exact one h8
-    · exact one h9
-    · exact one h10
-    · exact one h11
-    · exact one h12
-    · exact one h13
-    · exact one h14
-  exact imp_of_live (L := 15) (Or.inl rfl) root_p (by norm_num) ir (by omega) hS hl hmin (Or.inr hM)
+theorem proot_1 : chk [] rt 0 14 1 FF 1 = false := by decide +kernel
+lemma iroot_one {S : Finset ℕ} (hS : (S : Set ℕ) ⊆ C (mz 0) (WZ [] 0)) (hl : Live Z0 (mz 0) (tz 0) 14 1 S) : False :=
+  imp_of_live (L := 15) (Or.inl rfl) root_p (by norm_num) ir (by omega) hS hl (fun q hq => iroot q hq) (Or.inr (one proot_1))
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
 section circuit
 variable (m : ℕ)
@@ -4026,74 +3945,121 @@ theorem fanInTwo_of {gates : List Gate} {o : ℕ}
   intro g hg; obtain ⟨ho, hl⟩ := h g hg
   exact ⟨by simpa only [Set.mem_insert_iff, Set.mem_singleton_iff] using ho, hl⟩
 
-lemma ex_sol_not {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (S : Set ℕ),
+lemma ex_live0 {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (S : Set ℕ),
+    (∀ x ∈ w, x ∈ S) → 0 ∈ S → m ∈ S →
+    (∀ g ∈ gs, (g.op = GateOp.and ∨ g.op = GateOp.or) ∧ g.inputs.length ≤ 2) →
+    (∃ i, (ex m gs w).getD i 0 = T) →
+    ∃ k ≤ gs.length, ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T k 0 S0 := by
+  induction gs with
+  | nil =>
+    rintro w S hw h0 _ _ ⟨i, rfl⟩
+    exact ⟨0, le_rfl, {w.getD i 0}, by simpa using getD_mem hw h0 i, .stop⟩
+  | cons g gs ih =>
+    intro w S hw h0 hm hg hT
+    have rd := fun i => getD_mem hw h0 i
+    obtain ⟨k, hk, S1, hS1, hl⟩ := ih (w ++ [gv m w g]) (insert (gv m w g) S) (fun x hx => by
+      simp only [List.mem_append, List.mem_singleton] at hx; rcases hx with hx | rfl; exact Or.inr (hw x hx); exact Or.inl rfl)
+      (Or.inr h0) (Or.inr hm) (fun x hx => hg x (List.mem_cons_of_mem _ hx)) hT
+    have hlen : k ≤ (g :: gs).length := by simp; omega
+    have stay : gv m w g ∈ S → ∃ k ≤ (g :: gs).length, ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T k 0 S0 :=
+      fun h => ⟨k, hlen, S1, fun x hx => (hS1 hx).elim (fun e => e ▸ h) id, hl⟩
+    by_cases hz : gv m w g ∈ S1
+    swap
+    · exact ⟨k, hlen, S1, fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx)), hl⟩
+    have hbi : ∀ (d : Bool) (i j : ℕ), gv m w g = op d (w.getD i 0) (w.getD j 0) →
+        ∃ k ≤ (g :: gs).length, ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T k 0 S0 := by
+      intro d i j he
+      by_cases hab : w.getD i 0 = w.getD j 0
+      · exact stay (by rw [he, hab, op_self]; exact rd j)
+      rw [he] at hz hS1
+      refine ⟨k + 1, by simp; omega, insert (w.getD i 0) (insert (w.getD j 0) (S1.erase (op d (w.getD i 0) (w.getD j 0)))), ?_,
+        Live.bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hz])⟩
+      intro x hx; simp at hx; rcases hx with rfl | rfl | ⟨h1, h2⟩; exact rd i; exact rd j; exact (hS1 h1).resolve_left h2
+    obtain ⟨hop, -⟩ := hg g List.mem_cons_self
+    obtain ⟨o, l⟩ := g
+    simp only at hop
+    rcases hop with rfl | rfl
+    · match l with
+      | [] => exact stay hm
+      | [i] => exact stay (rd i)
+      | i :: j :: _ => exact hbi false i j rfl
+    · match l with
+      | [] => exact stay h0
+      | [i] => exact stay (rd i)
+      | i :: j :: _ => exact hbi true i j rfl
+
+lemma ex_sol_one {T : ℕ} (m : ℕ) (gs : List Gate) : ∀ (w : List ℕ) (S : Set ℕ),
     (∀ x ∈ w, x ∈ S) → 0 ∈ S → m ∈ S →
     (∀ g ∈ gs, g.op ∈ ({GateOp.and, GateOp.or, GateOp.not} : Set GateOp) ∧ g.inputs.length ≤ 2) →
+    gs.Pairwise (fun a b => a.op = GateOp.not → b.op ≠ GateOp.not) →
     (∃ g ∈ gs, g.op = GateOp.not) →
     (∃ i, (ex m gs w).getD i 0 = T) →
-    Sol Z0 m T (gs.length - 1) S ∨ ∃ t, 1 ≤ t ∧ ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T gs.length t S0 := by
+    Sol Z0 m T (gs.length - 1) S ∨ ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T gs.length 1 S0 := by
   induction gs with
-  | nil => intro _ _ _ _ _ _ hnot; simp at hnot
+  | nil => intro _ _ _ _ _ _ _ hnot; simp at hnot
   | cons g gs ih =>
-    intro w S hw h0 hm hg hnot hT
+    intro w S hw h0 hm hg hP hnot hT
     have hgs := fun x hx => hg x (List.mem_cons_of_mem _ hx)
     have rd := fun i => getD_mem hw h0 i
     have hwm_stay : gv m w g ∈ S → ∀ x ∈ w ++ [gv m w g], x ∈ S := fun h x hx => by
       simp only [List.mem_append, List.mem_singleton] at hx; rcases hx with hx | rfl; exact hw x hx; exact h
     have hwm_ins : ∀ x ∈ w ++ [gv m w g], x ∈ insert (gv m w g) S := fun x hx => by
       simp only [List.mem_append, List.mem_singleton] at hx; rcases hx with hx | rfl; exact Or.inr (hw x hx); exact Or.inl rfl
-    obtain ⟨hop, hlen⟩ := hg g List.mem_cons_self
+    have hnot' : g.op ≠ GateOp.not → ∃ g' ∈ gs, g'.op = GateOp.not := fun hg' => by
+      obtain ⟨g', hm', ho⟩ := hnot
+      rcases List.mem_cons.1 hm' with rfl | hm'
+      · exact absurd ho hg'
+      · exact ⟨g', hm', ho⟩
+    have hbi : ∀ (d : Bool) (i j : ℕ), g.op ≠ GateOp.not → gv m w g = op d (w.getD i 0) (w.getD j 0) →
+        Sol Z0 m T ((g :: gs).length - 1) S ∨ ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ S ∧ Live Z0 m T (g :: gs).length 1 S0 := by
+      intro d i j hgn he
+      have hn := hnot' hgn
+      rcases ih (w ++ [gv m w g]) (insert (gv m w g) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs hP.of_cons hn hT with hs | ⟨S1, hS1, hl1⟩
+      · rw [he] at hs
+        exact Or.inl ((Sol.bi (d := d) (rd i) (rd j) (al0 _ _ _) hs).mono (by cases gs <;> simp at hn ⊢) subset_rfl)
+      rw [he] at hS1
+      by_cases hz : op d (w.getD i 0) (w.getD j 0) ∈ S1
+      · by_cases hab : w.getD i 0 = w.getD j 0
+        · have hsub : (S1 : Set ℕ) ⊆ S := fun x hx => (hS1 hx).elim (fun e => by subst e; rw [hab, op_self]; exact rd j) id
+          exact Or.inl (hl1.sol.mono (by cases gs <;> simp at hn ⊢) hsub)
+        · refine Or.inr ⟨insert (w.getD i 0) (insert (w.getD j 0) (S1.erase (op d (w.getD i 0) (w.getD j 0)))), ?_, Live.bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hz])⟩
+          intro x hx; simp at hx; rcases hx with rfl | rfl | ⟨h1, h2⟩; exact rd i; exact rd j; exact (hS1 h1).resolve_left h2
+      · exact Or.inl (hl1.sol.mono (by cases gs <;> simp at hn ⊢) (fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx))))
+    obtain ⟨hop, -⟩ := hg g List.mem_cons_self
     obtain ⟨o, l⟩ := g
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hop
     rcases hop with rfl | rfl | rfl
-    · have hnot' : ∃ g' ∈ gs, g'.op = GateOp.not := by
-        rcases hnot with ⟨g', hg', ho⟩; simp only [List.mem_cons] at hg'; rcases hg' with rfl | hg'; simp at ho; exact ⟨g', hg', ho⟩
-      match l with
+    · match l with
       | [] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.and, []⟩]) S (hwm_stay hm) h0 hm hgs hT)
       | [i] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.and, [i]⟩]) S (hwm_stay (rd i)) h0 hm hgs hT)
-      | i :: j :: _ =>
-        rcases ih (w ++ [gv m w ⟨.and, i :: j :: _⟩]) (insert (op false (w.getD i 0) (w.getD j 0)) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs hnot' hT with hs | ⟨t, ht, S1, hS1, hl1⟩
-        · exact Or.inl ((Sol.bi (d := false) (rd i) (rd j) (al0 _ _ _) hs).mono (by cases gs <;> simp at hnot' ⊢) subset_rfl)
-        · by_cases hz : op false (w.getD i 0) (w.getD j 0) ∈ S1
-          · by_cases hab : w.getD i 0 = w.getD j 0
-            · have hsub : (S1 : Set ℕ) ⊆ S := fun x hx => (hS1 hx).elim (fun e => by subst e; rw [hab, op_self]; exact rd j) id
-              exact Or.inl (hl1.sol.mono le_rfl hsub)
-            · refine Or.inr ⟨t, ht, insert (w.getD i 0) (insert (w.getD j 0) (S1.erase (op false (w.getD i 0) (w.getD j 0)))), ?_, Live.bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hz])⟩
-              intro x hx; simp at hx; rcases hx with rfl | rfl | ⟨h1, h2⟩; exact rd i; exact rd j; exact (hS1 h1).resolve_left h2
-          · exact Or.inl (hl1.sol.mono le_rfl (fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx))))
-    · have hnot' : ∃ g' ∈ gs, g'.op = GateOp.not := by
-        rcases hnot with ⟨g', hg', ho⟩; simp only [List.mem_cons] at hg'; rcases hg' with rfl | hg'; simp at ho; exact ⟨g', hg', ho⟩
-      match l with
+      | i :: j :: _ => exact hbi false i j (by simp) rfl
+    · match l with
       | [] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.or, []⟩]) S (hwm_stay h0) h0 hm hgs hT)
       | [i] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.or, [i]⟩]) S (hwm_stay (rd i)) h0 hm hgs hT)
-      | i :: j :: _ =>
-        rcases ih (w ++ [gv m w ⟨.or, i :: j :: _⟩]) (insert (op true (w.getD i 0) (w.getD j 0)) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs hnot' hT with hs | ⟨t, ht, S1, hS1, hl1⟩
-        · exact Or.inl ((Sol.bi (d := true) (rd i) (rd j) (al0 _ _ _) hs).mono (by cases gs <;> simp at hnot' ⊢) subset_rfl)
-        · by_cases hz : op true (w.getD i 0) (w.getD j 0) ∈ S1
-          · by_cases hab : w.getD i 0 = w.getD j 0
-            · have hsub : (S1 : Set ℕ) ⊆ S := fun x hx => (hS1 hx).elim (fun e => by subst e; rw [hab, op_self]; exact rd j) id
-              exact Or.inl (hl1.sol.mono le_rfl hsub)
-            · refine Or.inr ⟨t, ht, insert (w.getD i 0) (insert (w.getD j 0) (S1.erase (op true (w.getD i 0) (w.getD j 0)))), ?_, Live.bi hab (al0 _ _ _) (by rwa [Finset.insert_erase hz])⟩
-              intro x hx; simp at hx; rcases hx with rfl | rfl | ⟨h1, h2⟩; exact rd i; exact rd j; exact (hS1 h1).resolve_left h2
-          · exact Or.inl (hl1.sol.mono le_rfl (fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx))))
-    · match l with
+      | i :: j :: _ => exact hbi true i j (by simp) rfl
+    · have hfree : ∀ b ∈ gs, (b.op = GateOp.and ∨ b.op = GateOp.or) ∧ b.inputs.length ≤ 2 := fun b hb => by
+        obtain ⟨ho, hl⟩ := hgs b hb
+        have hn : b.op ≠ GateOp.not := List.rel_of_pairwise_cons hP hb rfl
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at ho
+        exact ⟨ho.elim Or.inl fun h => h.elim Or.inr fun h => absurd h hn, hl⟩
+      match l with
       | [] => exact Or.inl (ex_sol m gs (w ++ [gv m w ⟨.not, []⟩]) S (hwm_stay hm) h0 hm hgs hT)
       | i :: _ =>
-        have go := ex_sol m gs (w ++ [gv m w ⟨.not, i :: _⟩]) (insert (w.getD i 0 ^^^ m) S) hwm_ins (Or.inr h0) (Or.inr hm) hgs hT
-        obtain ⟨k, hk, t, S1, hS1, hl1⟩ := go.live
+        obtain ⟨k, hk, S1, hS1, hl1⟩ := ex_live0 m gs (w ++ [gv m w ⟨.not, i :: _⟩]) (insert (w.getD i 0 ^^^ m) S) hwm_ins (Or.inr h0) (Or.inr hm) hfree hT
         by_cases hz : w.getD i 0 ^^^ m ∈ S1
         · have hsub : ((insert (w.getD i 0) (S1.erase (w.getD i 0 ^^^ m)) : Finset ℕ) : Set ℕ) ⊆ S := by
             intro x hx; simp at hx; rcases hx with rfl | ⟨h1, h2⟩; exact rd i; exact (hS1 h1).resolve_left h2
-          have hlu : Live Z0 m T (k + 1) (t + 1) (insert (w.getD i 0) (S1.erase (w.getD i 0 ^^^ m))) := Live.un (by rwa [Finset.insert_erase hz])
+          have hlu : Live Z0 m T (k + 1) 1 (insert (w.getD i 0) (S1.erase (w.getD i 0 ^^^ m))) := Live.un (by rwa [Finset.insert_erase hz])
           by_cases hkeq : k = gs.length
-          · subst hkeq; exact Or.inr ⟨t + 1, by omega, _, hsub, hlu⟩
+          · subst hkeq; exact Or.inr ⟨_, hsub, hlu⟩
           · exact Or.inl (hlu.sol.mono (by simp; omega) hsub)
         · exact Or.inl (hl1.sol.mono (by simp; omega) (fun x hx => (hS1 hx).resolve_left (fun e => hz (e ▸ hx))))
 
-theorem bridge_not (gates : List Gate) (o : ℕ) (hD : FanInTwo ⟨gates, o⟩) (hnot : ∃ g ∈ gates, g.op = GateOp.not)
+theorem bridge_one (gates : List Gate) (o : ℕ) (hD : FanInTwo ⟨gates, o⟩)
+    (hP : gates.Pairwise (fun a b => a.op = GateOp.not → b.op ≠ GateOp.not)) (hnot : ∃ g ∈ gates, g.op = GateOp.not)
     (hf : ∀ y : Fin 8 → Bool, Circuit.eval ⟨gates, o⟩ (List.ofFn y) = f y) :
     Sol Z0 (mz 0) (tz 0) (gates.length - 1) (C (mz 0) (WZ [] 0)) ∨
-    ∃ t, 1 ≤ t ∧ ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ C (mz 0) (WZ [] 0) ∧ Live Z0 (mz 0) (tz 0) gates.length t S0 := by
+    ∃ S0 : Finset ℕ, (S0 : Set ℕ) ⊆ C (mz 0) (WZ [] 0) ∧ Live Z0 (mz 0) (tz 0) gates.length 1 S0 := by
   let row : ℕ → Fin 8 → Bool := fun k v => (rawP.getD v.val 0).testBit k
   let init : List ℕ := rawP.map (· &&& mz 0)
   have hinit_sub : ∀ x ∈ init, x &&& mz 0 = x := by intro x hx; simp only [init, List.mem_map] at hx; obtain ⟨w, _, rfl⟩ := hx; rw [Nat.and_assoc, Nat.and_self]
@@ -4113,7 +4079,7 @@ theorem bridge_not (gates : List Gate) (o : ℕ) (hD : FanInTwo ⟨gates, o⟩) 
       have h := hf (row k)
       change (gates.foldl (fun w g => w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]) (List.ofFn (row k))).getD o false = f (row k) at h
       rw [h]; exact (f_bit k).symm
-  exact ex_sol_not (mz 0) gates init (C (mz 0) (WZ [] 0)) hinit_mem (Or.inr (Set.mem_insert _ _)) (Or.inr (Set.mem_insert_of_mem _ rfl)) hD hnot ⟨o, hout⟩
+  exact ex_sol_one (mz 0) gates init (C (mz 0) (WZ [] 0)) hinit_mem (Or.inr (Set.mem_insert _ _)) (Or.inr (Set.mem_insert_of_mem _ rfl)) hD hP hnot ⟨o, hout⟩
 
 section onenot
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
@@ -4139,7 +4105,9 @@ theorem onGraphCorrect : ∀ x : Fin 8 → Bool, f x = decide (∃ i < ([0, 3, 0
 
 theorem onFinal :
 ∀ (gates : List PEqualNP.CircuitLowerBounds.Gate) (o : ℕ), (∀ g ∈ gates, (g.op = PEqualNP.CircuitLowerBounds.GateOp.and ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.or ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.not) ∧ g.inputs.length ≤ 2) → (∀ i j : Fin gates.length, (gates.get i).op = PEqualNP.CircuitLowerBounds.GateOp.not → (gates.get j).op = PEqualNP.CircuitLowerBounds.GateOp.not → i = j) → (∀ x : Fin 8 → Bool, PEqualNP.CircuitLowerBounds.Circuit.eval ⟨gates, o⟩ (List.ofFn x) = decide (∃ i < ([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 3, 6, 4, 6, 0, 7, 1, 7, 2, 7, 3, 7, 5, 7] : List ℕ).length / 2, (List.ofFn x).getD (([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 3, 6, 4, 6, 0, 7, 1, 7, 2, 7, 3, 7, 5, 7] : List ℕ).getD (2 * i) 0) false = true ∧ (List.ofFn x).getD (([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 3, 6, 4, 6, 0, 7, 1, 7, 2, 7, 3, 7, 5, 7] : List ℕ).getD (2 * i + 1) 0) false = true)) → ∃ (gates' : List PEqualNP.CircuitLowerBounds.Gate) (o' : ℕ), (∀ g ∈ gates', (g.op = PEqualNP.CircuitLowerBounds.GateOp.and ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.or) ∧ g.inputs.length ≤ 2) ∧ gates'.length ≤ gates.length ∧ ∀ x : Fin 8 → Bool, PEqualNP.CircuitLowerBounds.Circuit.eval ⟨gates', o'⟩ (List.ofFn x) = decide (∃ i < ([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 3, 6, 4, 6, 0, 7, 1, 7, 2, 7, 3, 7, 5, 7] : List ℕ).length / 2, (List.ofFn x).getD (([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 3, 6, 4, 6, 0, 7, 1, 7, 2, 7, 3, 7, 5, 7] : List ℕ).getD (2 * i) 0) false = true ∧ (List.ofFn x).getD (([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 3, 6, 4, 6, 0, 7, 1, 7, 2, 7, 3, 7, 5, 7] : List ℕ).getD (2 * i + 1) 0) false = true) := by
-  intro gates o hfit _hone hev
+  intro gates o hfit hone hev
+  have hP : gates.Pairwise (fun a b => a.op = GateOp.not → b.op ≠ GateOp.not) :=
+    List.pairwise_iff_get.2 fun i j hij ha hb => (Fin.ne_of_lt hij) (hone i j ha hb)
   have hf : ∀ y : Fin 8 → Bool, Circuit.eval ⟨gates, o⟩ (List.ofFn y) = f y := fun y => (hev y).trans (onGraphCorrect y).symm
   by_cases hnot : ∃ g ∈ gates, g.op = GateOp.not
   · have hge : 15 ≤ gates.length := by
@@ -4147,9 +4115,9 @@ theorem onFinal :
       by_cases hlt2 : gates.length < 14
       · exact iroot gates.length hlt2 (bridge ⟨gates, o⟩ (fanInTwo_of hfit) hf)
       · have heq : gates.length = 14 := by omega
-        rcases bridge_not gates o (fanInTwo_of hfit) hnot hf with hsol | ⟨t, ht1, S0, hS0, hl0⟩
+        rcases bridge_one gates o (fanInTwo_of hfit) hP hnot hf with hsol | ⟨S0, hS0, hl0⟩
         · exact iroot (gates.length - 1) (by omega) hsol
-        · rw [heq] at hl0; exact iroot_pos ht1 hS0 hl0
+        · rw [heq] at hl0; exact iroot_one hS0 hl0
     have hw : onWit.length = 15 := rfl
     exact ⟨onWit, 22, onWitBasis, by omega, fun x => (onWitCorrect x).trans (onGraphCorrect x)⟩
   · refine ⟨gates, o, ?_, le_rfl, hev⟩
