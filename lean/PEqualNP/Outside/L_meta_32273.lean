@@ -1,4 +1,3 @@
-import Mathlib
 import PEqualNP.Defs
 
 namespace PEqualNP.Outside.L_meta_32273_aux.Source7
@@ -7463,79 +7462,6 @@ theorem noLive_symGate {e e' : Gt}
 end PEqualNP.Outside.L_meta_32273_aux.Source7
 namespace PEqualNP.Outside.L_meta_32273_aux.Source7
 
-theorem allGatesBySym
-    (h0 : noLiveGate (false,0,1))
-    (h2 : noLiveGate (false,0,2))
-    (h3 : noLiveGate (false,0,3))
-    (h5 : noLiveGate (false,0,4))
-    (h7 : noLiveGate (false,0,5))
-    (h9 : noLiveGate (false,0,6))
-    (h11 : noLiveGate (false,1,3))
-    (h13 : noLiveGate (false,1,4))
-    (h14 : noLiveGate (false,1,6))
-    (h15 : noLiveGate (true,0,1))
-    (h17 : noLiveGate (true,1,3))
-    (h19 : noLiveGate (true,1,4))
-    (h20 : noLiveGate (false,3,4))
-    (h22 : noLiveGate (false,3,6))
-    (h24 : noLiveGate (false,4,6))
-    (h25 : noLiveGate (true,0,4))
-    (h27 : noLiveGate (false,3,5))
-    (h28 : noLiveGate (true,0,3))
-    (h30 : noLiveGate (true,3,4))
-    (h32 : noLiveGate (true,4,6))
-    (h33 : noLiveGate (true,0,6))
-    (h35 : noLiveGate (true,0,5))
-    (h37 : noLiveGate (true,0,2))
-    (h38 : noLiveGate (true,1,6))
-    (h39 : noLiveGate (true,3,5))
-    (h40 : noLiveGate (true,3,6))
-    : ∀ e ∈ gtypes, noLiveGate e := by
-  intro e he
-  simp only [gtypes,List.mem_cons,List.not_mem_nil,or_false] at he
-  rcases he with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact h0
-  · exact noLive_symGate (by decide) tw1 h0
-  · exact h2
-  · exact h3
-  · exact noLive_symGate (by decide) tw4 h3
-  · exact h5
-  · exact noLive_symGate (by decide) tw6 h5
-  · exact h7
-  · exact noLive_symGate (by decide) tw8 h7
-  · exact h9
-  · exact noLive_symGate (by decide) tw10 h9
-  · exact h11
-  · exact noLive_symGate (by decide) tw12 h11
-  · exact h13
-  · exact h14
-  · exact h15
-  · exact noLive_symGate (by decide) tw16 h15
-  · exact h17
-  · exact noLive_symGate (by decide) tw18 h17
-  · exact h19
-  · exact h20
-  · exact noLive_symGate (by decide) tw21 h20
-  · exact h22
-  · exact noLive_symGate (by decide) tw23 h22
-  · exact h24
-  · exact h25
-  · exact noLive_symGate (by decide) tw26 h25
-  · exact h27
-  · exact h28
-  · exact noLive_symGate (by decide) tw29 h28
-  · exact h30
-  · exact noLive_symGate (by decide) tw31 h30
-  · exact h32
-  · exact h33
-  · exact noLive_symGate (by decide) tw34 h33
-  · exact h35
-  · exact noLive_symGate (by decide) tw36 h35
-  · exact h37
-  · exact h38
-  · exact h39
-  · exact h40
-  · exact noLive_symGate (by decide) tw41 h40
 end PEqualNP.Outside.L_meta_32273_aux.Source7
 namespace PEqualNP.Outside.L_meta_32273_aux.Source7
 
@@ -8113,88 +8039,6 @@ theorem afterFiltered (n : ℕ) (e : Gt) (cs : List ℕ) (H fm fh : ℕ) (done :
 
 end PEqualNP.Outside.L_meta_32273_aux.Source7
 namespace PEqualNP.Outside.L_meta_32273_aux.Source7
-set_option maxRecDepth 100000 in
-set_option maxHeartbeats 0 in
-theorem filteredNum38 : chkG topFirstFilter [(true,1,6)] (tabE (true,1,6) (qualOwn 38) (pick rawT [1,2,4,8,16,32,64,9,12,33,66,1032,1056,8256])) (0xe,0x106d) 0 12 1 0x4000000002a00000000000000000000000000000004000 1 = false := by decide +kernel
-end PEqualNP.Outside.L_meta_32273_aux.Source7
-namespace PEqualNP.Outside.L_meta_32273_aux.Source7
-theorem filteredProof38 (num : chkG topFirstFilter [(true,1,6)] (tabE (true,1,6) (qualOwn 38) (pick rawT [1,2,4,8,16,32,64,9,12,33,66,1032,1056,8256])) (0xe,0x106d) 0 12 1 0x4000000002a00000000000000000000000000000004000 1 = false)
-    (h0 : noLiveGate (false,0,1))
-    (h2 : noLiveGate (false,0,2))
-    (h3 : noLiveGate (false,0,3))
-    (h5 : noLiveGate (false,0,4))
-    (h7 : noLiveGate (false,0,5))
-    (h9 : noLiveGate (false,0,6))
-    (h11 : noLiveGate (false,1,3))
-    (h13 : noLiveGate (false,1,4))
-    (h14 : noLiveGate (false,1,6))
-    (h15 : noLiveGate (true,0,1))
-    (h17 : noLiveGate (true,1,3))
-    (h19 : noLiveGate (true,1,4))
-    (h20 : noLiveGate (false,3,4))
-    (h22 : noLiveGate (false,3,6))
-    (h24 : noLiveGate (false,4,6))
-    (h25 : noLiveGate (true,0,4))
-    (h27 : noLiveGate (false,3,5))
-    (h28 : noLiveGate (true,0,3))
-    (h30 : noLiveGate (true,3,4))
-    (h32 : noLiveGate (true,4,6))
-    (h33 : noLiveGate (true,0,6))
-    (h35 : noLiveGate (true,0,5))
-    (h37 : noLiveGate (true,0,2))
-    (h39 : noLiveGate (true,3,5))
-    (h40 : noLiveGate (true,3,6))
-    : noLiveGate (true,1,6) := by
-  intro V hS hl
-  let ds : List Gt := [(false,0,1),(false,1,2),(false,0,2),(false,0,3),(false,2,5),(false,0,4),(false,2,4),(false,0,5),(false,2,3),(false,0,6),(false,2,6),(false,1,3),(false,1,5),(false,1,4),(false,1,6),(true,0,1),(true,1,2),(true,1,3),(true,1,5),(true,1,4),(false,3,4),(false,4,5),(false,3,6),(false,5,6),(false,4,6),(true,0,4),(true,2,4),(false,3,5),(true,0,3),(true,2,5),(true,3,4),(true,4,5),(true,4,6),(true,0,6),(true,2,6),(true,0,5),(true,2,3),(true,0,2),(true,3,5),(true,3,6),(true,5,6)]
-  refine afterFiltered 38 (true,1,6) [1,2,4,8,16,32,64,9,12,33,66,1032,1056,8256] 0x4000000002a00000000000000000000000000000004000 0xe 0x106d ds own0 ?_ (by decide +kernel) num hS hl
-  intro f hf
-  simp only [ds,List.mem_cons,List.not_mem_nil,or_false] at hf
-  rcases hf with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
-  · exact h0
-  · exact noLive_symGate (by decide) tw1 h0
-  · exact h2
-  · exact h3
-  · exact noLive_symGate (by decide) tw4 h3
-  · exact h5
-  · exact noLive_symGate (by decide) tw6 h5
-  · exact h7
-  · exact noLive_symGate (by decide) tw8 h7
-  · exact h9
-  · exact noLive_symGate (by decide) tw10 h9
-  · exact h11
-  · exact noLive_symGate (by decide) tw12 h11
-  · exact h13
-  · exact h14
-  · exact h15
-  · exact noLive_symGate (by decide) tw16 h15
-  · exact h17
-  · exact noLive_symGate (by decide) tw18 h17
-  · exact h19
-  · exact h20
-  · exact noLive_symGate (by decide) tw21 h20
-  · exact h22
-  · exact noLive_symGate (by decide) tw23 h22
-  · exact h24
-  · exact h25
-  · exact noLive_symGate (by decide) tw26 h25
-  · exact h27
-  · exact h28
-  · exact noLive_symGate (by decide) tw29 h28
-  · exact h30
-  · exact noLive_symGate (by decide) tw31 h30
-  · exact h32
-  · exact h33
-  · exact noLive_symGate (by decide) tw34 h33
-  · exact h35
-  · exact noLive_symGate (by decide) tw36 h35
-  · exact h37
-  · exact h39
-  · exact h40
-  · exact noLive_symGate (by decide) tw41 h40
-end PEqualNP.Outside.L_meta_32273_aux.Source7
-
-namespace PEqualNP.Outside.L_meta_32273_aux.Source7
 def finalCuts : ℕ → List ℕ
   | 0 => [1,2,4,8,16,32,64]
   | 2 => [2,1,4,8,16,32,64,5,3,6,9,12,17,20,33,36]
@@ -8223,111 +8067,238 @@ def finalCuts : ℕ → List ℕ
   | 39 => [2,1,4,8,16,32,64,42,10,34,9,12,33,36,3,6]
   | 40 => [2,1,4,8,16,32,64,10,66,9,12,65,68,3,6,34]
   | _ => []
+private structure GatePhase where
+  e : Gt
+  H : ℕ
+  fm : ℕ
+  fh : ℕ
+
+private def gatePhase : ℕ → GatePhase
+  | 33 => ⟨(true,0,6),0xa8200000000280020004054000002a004000000002a000000,0x69,0x32200002071d1100cb0069⟩
+  | 24 => ⟨(false,4,6),0xa802a00000028002000005400000000840004000028000000,0x41,0x7510442110684e04⟩
+  | 32 => ⟨(true,4,6),0xa800a800000000028002000005420000100000000000028000000,0x5a,0x105c00924c41a500054⟩
+  | 28 => ⟨(true,0,3),0x280001000002800280000540000000000001000002a000000,0x4c,0xb270100108d11300511⟩
+  | 30 => ⟨(true,3,4),0xa0002800000000008002400005080000400000000000028000000,0x2d,0xc41e6b414c⟩
+  | 35 => ⟨(true,0,5),0x10800000008800002000005000000010000002000028000000,0x1e,0x30401946⟩
+  | 37 => ⟨(true,0,2),0x400020080040000000000001000000280a0000,0x1a,0x3822175⟩
+  | 27 => ⟨(false,3,5),0x10000080000000002200004000010000000000000028000200,0x13,0x59332⟩
+  | 40 => ⟨(true,3,6),0x280000400000000001000000000a800000,0x25,0x132587fa1f⟩
+  | 39 => ⟨(true,3,5),0x200000000000800000002040000000000000000000800000100000,0xd,0xc1a⟩
+  | 38 => ⟨(true,1,6),0x4000000002a00000000000000000000000000000004000,0xe,0x106d⟩
+  | _ => ⟨(false,0,1),0,0,0⟩
+private def phaseNum (n : ℕ) : Prop :=
+  let r := gatePhase n
+  chkG topFirstFilter [r.e] (tabE r.e (qualOwn n) (pick rawT (finalCuts n))) (r.fm,r.fh) 0 12 1 r.H 1 = false
+
+private def knownGates (done : List Gt) : Prop := ∀ e ∈ done, noLiveGate e
+
+private theorem knownCons {e : Gt} {done : List Gt} (he : noLiveGate e)
+    (hd : knownGates done) : knownGates (e :: done) := by
+  intro x hx
+  rcases List.mem_cons.mp hx with rfl | hx
+  · exact he
+  · exact hd x hx
+
+private theorem applyPhase (n : ℕ) (done : List Gt)
+    (own : ∀ x ∈ rawT, x.1 ∈ qualOwn n → Imp [(gatePhase n).e] x.1 x.2)
+    (previous : knownGates done)
+    (cover : coveredFiltered (gatePhase n).e done (gatePhase n).H (gatePhase n).fm (gatePhase n).fh = true)
+    (num : phaseNum n) : noLiveGate (gatePhase n).e :=
+  afterFiltered n _ _ _ _ _ done own previous cover num
+
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+private theorem orderedGates
+    (num0 : qualFact 0 (false,0,1) (finalCuts 0))
+    (num2 : qualFact 2 (false,0,2) (finalCuts 2))
+    (num3 : qualFact 3 (false,0,3) (finalCuts 3))
+    (num5 : qualFact 5 (false,0,4) (finalCuts 5))
+    (num7 : qualFact 7 (false,0,5) (finalCuts 7))
+    (num9 : qualFact 9 (false,0,6) (finalCuts 9))
+    (num11 : qualFact 11 (false,1,3) (finalCuts 11))
+    (num13 : qualFact 13 (false,1,4) (finalCuts 13))
+    (num14 : qualFact 14 (false,1,6) (finalCuts 14))
+    (num15 : qualFact 15 (true,0,1) (finalCuts 15))
+    (num17 : qualFact 17 (true,1,3) (finalCuts 17))
+    (num19 : qualFact 19 (true,1,4) (finalCuts 19))
+    (num20 : qualFact 20 (false,3,4) (finalCuts 20))
+    (num22 : qualFact 22 (false,3,6) (finalCuts 22))
+    (num25 : qualFact 25 (true,0,4) (finalCuts 25))
+    (num33 : phaseNum 33)
+    (num24 : phaseNum 24)
+    (num32 : phaseNum 32)
+    (num28 : phaseNum 28)
+    (num30 : phaseNum 30)
+    (num35 : phaseNum 35)
+    (num37 : phaseNum 37)
+    (num27 : phaseNum 27)
+    (num40 : phaseNum 40)
+    (num39 : phaseNum 39)
+    (num38 : phaseNum 38)
+    : ∀ e ∈ gtypes, noLiveGate e := by
+  have h0 : noLiveGate (false,0,1) := fun hS hl => excludeAfter _ (qualOwn 0) (finalCuts 0) (by decide) own0 (qGateOk _ _ _) num0 hS hl
+  have h2 : noLiveGate (false,0,2) := fun hS hl => excludeAfter _ (qualOwn 2) (finalCuts 2) (by decide) own0 (qGateOk _ _ _) num2 hS hl
+  have h3 : noLiveGate (false,0,3) := fun hS hl => excludeAfter _ (qualOwn 3) (finalCuts 3) (by decide) own0 (qGateOk _ _ _) num3 hS hl
+  have h5 : noLiveGate (false,0,4) := fun hS hl => excludeAfter _ (qualOwn 5) (finalCuts 5) (by decide) own0 (qGateOk _ _ _) num5 hS hl
+  have h7 : noLiveGate (false,0,5) := fun hS hl => excludeAfter _ (qualOwn 7) (finalCuts 7) (by decide) own0 (qGateOk _ _ _) num7 hS hl
+  have h9 : noLiveGate (false,0,6) := fun hS hl => excludeAfter _ (qualOwn 9) (finalCuts 9) (by decide) own0 (qGateOk _ _ _) num9 hS hl
+  have h11 : noLiveGate (false,1,3) := fun hS hl => excludeAfter _ (qualOwn 11) (finalCuts 11) (by decide) own0 (qGateOk _ _ _) num11 hS hl
+  have h13 : noLiveGate (false,1,4) := fun hS hl => excludeAfter _ (qualOwn 13) (finalCuts 13) (by decide) own0 (qGateOk _ _ _) num13 hS hl
+  have h14 : noLiveGate (false,1,6) := fun hS hl => excludeAfter _ (qualOwn 14) (finalCuts 14) (by decide) own0 (qGateOk _ _ _) num14 hS hl
+  have h15 : noLiveGate (true,0,1) := fun hS hl => excludeAfter _ (qualOwn 15) (finalCuts 15) (by decide) own0 (qGateOk _ _ _) num15 hS hl
+  have h17 : noLiveGate (true,1,3) := fun hS hl => excludeAfter _ (qualOwn 17) (finalCuts 17) (by decide) own0 (qGateOk _ _ _) num17 hS hl
+  have h19 : noLiveGate (true,1,4) := fun hS hl => excludeAfter _ (qualOwn 19) (finalCuts 19) (by decide) own0 (qGateOk _ _ _) num19 hS hl
+  have h20 : noLiveGate (false,3,4) := fun hS hl => excludeAfter _ (qualOwn 20) (finalCuts 20) (by decide) w20_1_h (qGateOk _ _ _) num20 hS hl
+  have h22 : noLiveGate (false,3,6) := fun hS hl => excludeAfter _ (qualOwn 22) (finalCuts 22) (by decide) w22_1_h (qGateOk _ _ _) num22 hS hl
+  have h25 : noLiveGate (true,0,4) := fun hS hl => excludeAfter _ (qualOwn 25) (finalCuts 25) (by decide) w25_1_h (qGateOk _ _ _) num25 hS hl
+  let initial : List Gt := [(false,0,1),(false,1,2),(false,0,2),(false,0,3),(false,2,5),(false,0,4),(false,2,4),(false,0,5),(false,2,3),(false,0,6),(false,2,6),(false,1,3),(false,1,5),(false,1,4),(false,1,6),(true,0,1),(true,1,2),(true,1,3),(true,1,5),(true,1,4),(false,3,4),(false,4,5),(false,3,6),(false,5,6),(true,0,4),(true,2,4)]
+  have last0 : knownGates initial := by
+    intro f hf
+    simp only [initial,List.mem_cons,List.not_mem_nil,or_false] at hf
+    rcases hf with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+    · exact h0
+    · exact noLive_symGate (by decide) tw1 h0
+    · exact h2
+    · exact h3
+    · exact noLive_symGate (by decide) tw4 h3
+    · exact h5
+    · exact noLive_symGate (by decide) tw6 h5
+    · exact h7
+    · exact noLive_symGate (by decide) tw8 h7
+    · exact h9
+    · exact noLive_symGate (by decide) tw10 h9
+    · exact h11
+    · exact noLive_symGate (by decide) tw12 h11
+    · exact h13
+    · exact h14
+    · exact h15
+    · exact noLive_symGate (by decide) tw16 h15
+    · exact h17
+    · exact noLive_symGate (by decide) tw18 h17
+    · exact h19
+    · exact h20
+    · exact noLive_symGate (by decide) tw21 h20
+    · exact h22
+    · exact noLive_symGate (by decide) tw23 h22
+    · exact h25
+    · exact noLive_symGate (by decide) tw26 h25
+  have h33 : noLiveGate (true,0,6) := applyPhase 33 initial w33_1_h last0 (by decide +kernel) num33
+  let after33 : List Gt := (true,0,6) :: (true,2,6) :: initial
+  have last1 : knownGates after33 := (knownCons (h33) (knownCons (noLive_symGate (by decide) tw34 h33) last0))
+  have h24 : noLiveGate (false,4,6) := applyPhase 24 after33 w24_1_h last1 (by decide +kernel) num24
+  let after24 : List Gt := (false,4,6) :: after33
+  have last2 : knownGates after24 := (knownCons (h24) last1)
+  have h32 : noLiveGate (true,4,6) := applyPhase 32 after24 w32_1_h last2 (by decide +kernel) num32
+  let after32 : List Gt := (true,4,6) :: after24
+  have last3 : knownGates after32 := (knownCons (h32) last2)
+  have h28 : noLiveGate (true,0,3) := applyPhase 28 after32 w28_1_h last3 (by decide +kernel) num28
+  let after28 : List Gt := (true,0,3) :: (true,2,5) :: after32
+  have last4 : knownGates after28 := (knownCons (h28) (knownCons (noLive_symGate (by decide) tw29 h28) last3))
+  have h30 : noLiveGate (true,3,4) := applyPhase 30 after28 w30_1_h last4 (by decide +kernel) num30
+  let after30 : List Gt := (true,3,4) :: (true,4,5) :: after28
+  have last5 : knownGates after30 := (knownCons (h30) (knownCons (noLive_symGate (by decide) tw31 h30) last4))
+  have h35 : noLiveGate (true,0,5) := applyPhase 35 after30 w35_1_h last5 (by decide +kernel) num35
+  let after35 : List Gt := (true,0,5) :: (true,2,3) :: after30
+  have last6 : knownGates after35 := (knownCons (h35) (knownCons (noLive_symGate (by decide) tw36 h35) last5))
+  have h37 : noLiveGate (true,0,2) := applyPhase 37 after35 w37_1_h last6 (by decide +kernel) num37
+  let after37 : List Gt := (true,0,2) :: after35
+  have last7 : knownGates after37 := (knownCons (h37) last6)
+  have h27 : noLiveGate (false,3,5) := applyPhase 27 after37 w27_1_h last7 (by decide +kernel) num27
+  let after27 : List Gt := (false,3,5) :: after37
+  have last8 : knownGates after27 := (knownCons (h27) last7)
+  have h40 : noLiveGate (true,3,6) := applyPhase 40 after27 w40_1_h last8 (by decide +kernel) num40
+  let after40 : List Gt := (true,3,6) :: (true,5,6) :: after27
+  have last9 : knownGates after40 := (knownCons (h40) (knownCons (noLive_symGate (by decide) tw41 h40) last8))
+  have h39 : noLiveGate (true,3,5) := applyPhase 39 after40 own0 last9 (by decide +kernel) num39
+  let after39 : List Gt := (true,3,5) :: after40
+  have last10 : knownGates after39 := (knownCons (h39) last9)
+  have h38 : noLiveGate (true,1,6) := applyPhase 38 after39 own0 last10 (by decide +kernel) num38
+  let after38 : List Gt := (true,1,6) :: after39
+  have last11 : knownGates after38 := (knownCons (h38) last10)
+  have included : gtypes.all (fun f => decide (f ∈ after38)) = true := by decide +kernel
+  intro e he
+  exact last11 e (of_decide_eq_true (List.all_eq_true.mp included e he))
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
 theorem unaryNumeric : chkG topC [] qT13 (1,0) 0 13 1 0 1 = false := by decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric0 : qualFact 0 (false,0,1) (finalCuts 0) := by unfold qualFact; decide +kernel
+private theorem checkedPhase0 : qualFact 0 (false,0,1) (finalCuts 0) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric2 : qualFact 2 (false,0,2) (finalCuts 2) := by unfold qualFact; decide +kernel
+private theorem checkedPhase2 : qualFact 2 (false,0,2) (finalCuts 2) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric3 : qualFact 3 (false,0,3) (finalCuts 3) := by unfold qualFact; decide +kernel
+private theorem checkedPhase3 : qualFact 3 (false,0,3) (finalCuts 3) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric5 : qualFact 5 (false,0,4) (finalCuts 5) := by unfold qualFact; decide +kernel
+private theorem checkedPhase5 : qualFact 5 (false,0,4) (finalCuts 5) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric7 : qualFact 7 (false,0,5) (finalCuts 7) := by unfold qualFact; decide +kernel
+private theorem checkedPhase7 : qualFact 7 (false,0,5) (finalCuts 7) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric9 : qualFact 9 (false,0,6) (finalCuts 9) := by unfold qualFact; decide +kernel
+private theorem checkedPhase9 : qualFact 9 (false,0,6) (finalCuts 9) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric11 : qualFact 11 (false,1,3) (finalCuts 11) := by unfold qualFact; decide +kernel
+private theorem checkedPhase11 : qualFact 11 (false,1,3) (finalCuts 11) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric13 : qualFact 13 (false,1,4) (finalCuts 13) := by unfold qualFact; decide +kernel
+private theorem checkedPhase13 : qualFact 13 (false,1,4) (finalCuts 13) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric14 : qualFact 14 (false,1,6) (finalCuts 14) := by unfold qualFact; decide +kernel
+private theorem checkedPhase14 : qualFact 14 (false,1,6) (finalCuts 14) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric15 : qualFact 15 (true,0,1) (finalCuts 15) := by unfold qualFact; decide +kernel
+private theorem checkedPhase15 : qualFact 15 (true,0,1) (finalCuts 15) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric17 : qualFact 17 (true,1,3) (finalCuts 17) := by unfold qualFact; decide +kernel
+private theorem checkedPhase17 : qualFact 17 (true,1,3) (finalCuts 17) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric19 : qualFact 19 (true,1,4) (finalCuts 19) := by unfold qualFact; decide +kernel
+private theorem checkedPhase19 : qualFact 19 (true,1,4) (finalCuts 19) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric20 : qualFact 20 (false,3,4) (finalCuts 20) := by unfold qualFact; decide +kernel
+private theorem checkedPhase20 : qualFact 20 (false,3,4) (finalCuts 20) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric22 : qualFact 22 (false,3,6) (finalCuts 22) := by unfold qualFact; decide +kernel
+private theorem checkedPhase22 : qualFact 22 (false,3,6) (finalCuts 22) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric24 : qualFact 24 (false,4,6) (finalCuts 24) := by unfold qualFact; decide +kernel
+private theorem checkedPhase25 : qualFact 25 (true,0,4) (finalCuts 25) := by unfold qualFact; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric25 : qualFact 25 (true,0,4) (finalCuts 25) := by unfold qualFact; decide +kernel
+private theorem checkedPhase33 : phaseNum 33 := by unfold phaseNum; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric27 : qualFact 27 (false,3,5) (finalCuts 27) := by unfold qualFact; decide +kernel
+private theorem checkedPhase24 : phaseNum 24 := by unfold phaseNum; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric28 : qualFact 28 (true,0,3) (finalCuts 28) := by unfold qualFact; decide +kernel
+private theorem checkedPhase32 : phaseNum 32 := by unfold phaseNum; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric30 : qualFact 30 (true,3,4) (finalCuts 30) := by unfold qualFact; decide +kernel
+private theorem checkedPhase28 : phaseNum 28 := by unfold phaseNum; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric32 : qualFact 32 (true,4,6) (finalCuts 32) := by unfold qualFact; decide +kernel
+private theorem checkedPhase30 : phaseNum 30 := by unfold phaseNum; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric33 : qualFact 33 (true,0,6) (finalCuts 33) := by unfold qualFact; decide +kernel
+private theorem checkedPhase35 : phaseNum 35 := by unfold phaseNum; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric35 : qualFact 35 (true,0,5) (finalCuts 35) := by unfold qualFact; decide +kernel
+private theorem checkedPhase37 : phaseNum 37 := by unfold phaseNum; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric37 : qualFact 37 (true,0,2) (finalCuts 37) := by unfold qualFact; decide +kernel
+private theorem checkedPhase27 : phaseNum 27 := by unfold phaseNum; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric39 : qualFact 39 (true,3,5) (finalCuts 39) := by unfold qualFact; decide +kernel
+private theorem checkedPhase40 : phaseNum 40 := by unfold phaseNum; decide +kernel
 set_option maxRecDepth 100000 in
 set_option maxHeartbeats 0 in
-theorem numeric40 : qualFact 40 (true,3,6) (finalCuts 40) := by unfold qualFact; decide +kernel
-theorem excludeAllGates : ∀ e ∈ gtypes, noLiveGate e := by
-  apply allGatesBySym
-  · exact fun hs hl => excludeAfter (false,0,1) (qualOwn 0) (finalCuts 0) (by decide) own0 (qGateOk _ _ _) numeric0 hs hl
-  · exact fun hs hl => excludeAfter (false,0,2) (qualOwn 2) (finalCuts 2) (by decide) own0 (qGateOk _ _ _) numeric2 hs hl
-  · exact fun hs hl => excludeAfter (false,0,3) (qualOwn 3) (finalCuts 3) (by decide) own0 (qGateOk _ _ _) numeric3 hs hl
-  · exact fun hs hl => excludeAfter (false,0,4) (qualOwn 5) (finalCuts 5) (by decide) own0 (qGateOk _ _ _) numeric5 hs hl
-  · exact fun hs hl => excludeAfter (false,0,5) (qualOwn 7) (finalCuts 7) (by decide) own0 (qGateOk _ _ _) numeric7 hs hl
-  · exact fun hs hl => excludeAfter (false,0,6) (qualOwn 9) (finalCuts 9) (by decide) own0 (qGateOk _ _ _) numeric9 hs hl
-  · exact fun hs hl => excludeAfter (false,1,3) (qualOwn 11) (finalCuts 11) (by decide) own0 (qGateOk _ _ _) numeric11 hs hl
-  · exact fun hs hl => excludeAfter (false,1,4) (qualOwn 13) (finalCuts 13) (by decide) own0 (qGateOk _ _ _) numeric13 hs hl
-  · exact fun hs hl => excludeAfter (false,1,6) (qualOwn 14) (finalCuts 14) (by decide) own0 (qGateOk _ _ _) numeric14 hs hl
-  · exact fun hs hl => excludeAfter (true,0,1) (qualOwn 15) (finalCuts 15) (by decide) own0 (qGateOk _ _ _) numeric15 hs hl
-  · exact fun hs hl => excludeAfter (true,1,3) (qualOwn 17) (finalCuts 17) (by decide) own0 (qGateOk _ _ _) numeric17 hs hl
-  · exact fun hs hl => excludeAfter (true,1,4) (qualOwn 19) (finalCuts 19) (by decide) own0 (qGateOk _ _ _) numeric19 hs hl
-  · exact fun hs hl => excludeAfter (false,3,4) (qualOwn 20) (finalCuts 20) (by decide) w20_1_h (qGateOk _ _ _) numeric20 hs hl
-  · exact fun hs hl => excludeAfter (false,3,6) (qualOwn 22) (finalCuts 22) (by decide) w22_1_h (qGateOk _ _ _) numeric22 hs hl
-  · exact fun hs hl => excludeAfter (false,4,6) (qualOwn 24) (finalCuts 24) (by decide) w24_1_h (qGateOk _ _ _) numeric24 hs hl
-  · exact fun hs hl => excludeAfter (true,0,4) (qualOwn 25) (finalCuts 25) (by decide) w25_1_h (qGateOk _ _ _) numeric25 hs hl
-  · exact fun hs hl => excludeAfter (false,3,5) (qualOwn 27) (finalCuts 27) (by decide) w27_1_h (qGateOk _ _ _) numeric27 hs hl
-  · exact fun hs hl => excludeAfter (true,0,3) (qualOwn 28) (finalCuts 28) (by decide) w28_1_h (qGateOk _ _ _) numeric28 hs hl
-  · exact fun hs hl => excludeAfter (true,3,4) (qualOwn 30) (finalCuts 30) (by decide) w30_1_h (qGateOk _ _ _) numeric30 hs hl
-  · exact fun hs hl => excludeAfter (true,4,6) (qualOwn 32) (finalCuts 32) (by decide) w32_1_h (qGateOk _ _ _) numeric32 hs hl
-  · exact fun hs hl => excludeAfter (true,0,6) (qualOwn 33) (finalCuts 33) (by decide) w33_1_h (qGateOk _ _ _) numeric33 hs hl
-  · exact fun hs hl => excludeAfter (true,0,5) (qualOwn 35) (finalCuts 35) (by decide) w35_1_h (qGateOk _ _ _) numeric35 hs hl
-  · exact fun hs hl => excludeAfter (true,0,2) (qualOwn 37) (finalCuts 37) (by decide) w37_1_h (qGateOk _ _ _) numeric37 hs hl
-  · exact filteredProof38 filteredNum38 (fun hs hl => excludeAfter (false,0,1) (qualOwn 0) (finalCuts 0) (by decide) own0 (qGateOk _ _ _) numeric0 hs hl) (fun hs hl => excludeAfter (false,0,2) (qualOwn 2) (finalCuts 2) (by decide) own0 (qGateOk _ _ _) numeric2 hs hl) (fun hs hl => excludeAfter (false,0,3) (qualOwn 3) (finalCuts 3) (by decide) own0 (qGateOk _ _ _) numeric3 hs hl) (fun hs hl => excludeAfter (false,0,4) (qualOwn 5) (finalCuts 5) (by decide) own0 (qGateOk _ _ _) numeric5 hs hl) (fun hs hl => excludeAfter (false,0,5) (qualOwn 7) (finalCuts 7) (by decide) own0 (qGateOk _ _ _) numeric7 hs hl) (fun hs hl => excludeAfter (false,0,6) (qualOwn 9) (finalCuts 9) (by decide) own0 (qGateOk _ _ _) numeric9 hs hl) (fun hs hl => excludeAfter (false,1,3) (qualOwn 11) (finalCuts 11) (by decide) own0 (qGateOk _ _ _) numeric11 hs hl) (fun hs hl => excludeAfter (false,1,4) (qualOwn 13) (finalCuts 13) (by decide) own0 (qGateOk _ _ _) numeric13 hs hl) (fun hs hl => excludeAfter (false,1,6) (qualOwn 14) (finalCuts 14) (by decide) own0 (qGateOk _ _ _) numeric14 hs hl) (fun hs hl => excludeAfter (true,0,1) (qualOwn 15) (finalCuts 15) (by decide) own0 (qGateOk _ _ _) numeric15 hs hl) (fun hs hl => excludeAfter (true,1,3) (qualOwn 17) (finalCuts 17) (by decide) own0 (qGateOk _ _ _) numeric17 hs hl) (fun hs hl => excludeAfter (true,1,4) (qualOwn 19) (finalCuts 19) (by decide) own0 (qGateOk _ _ _) numeric19 hs hl) (fun hs hl => excludeAfter (false,3,4) (qualOwn 20) (finalCuts 20) (by decide) w20_1_h (qGateOk _ _ _) numeric20 hs hl) (fun hs hl => excludeAfter (false,3,6) (qualOwn 22) (finalCuts 22) (by decide) w22_1_h (qGateOk _ _ _) numeric22 hs hl) (fun hs hl => excludeAfter (false,4,6) (qualOwn 24) (finalCuts 24) (by decide) w24_1_h (qGateOk _ _ _) numeric24 hs hl) (fun hs hl => excludeAfter (true,0,4) (qualOwn 25) (finalCuts 25) (by decide) w25_1_h (qGateOk _ _ _) numeric25 hs hl) (fun hs hl => excludeAfter (false,3,5) (qualOwn 27) (finalCuts 27) (by decide) w27_1_h (qGateOk _ _ _) numeric27 hs hl) (fun hs hl => excludeAfter (true,0,3) (qualOwn 28) (finalCuts 28) (by decide) w28_1_h (qGateOk _ _ _) numeric28 hs hl) (fun hs hl => excludeAfter (true,3,4) (qualOwn 30) (finalCuts 30) (by decide) w30_1_h (qGateOk _ _ _) numeric30 hs hl) (fun hs hl => excludeAfter (true,4,6) (qualOwn 32) (finalCuts 32) (by decide) w32_1_h (qGateOk _ _ _) numeric32 hs hl) (fun hs hl => excludeAfter (true,0,6) (qualOwn 33) (finalCuts 33) (by decide) w33_1_h (qGateOk _ _ _) numeric33 hs hl) (fun hs hl => excludeAfter (true,0,5) (qualOwn 35) (finalCuts 35) (by decide) w35_1_h (qGateOk _ _ _) numeric35 hs hl) (fun hs hl => excludeAfter (true,0,2) (qualOwn 37) (finalCuts 37) (by decide) w37_1_h (qGateOk _ _ _) numeric37 hs hl) (fun hs hl => excludeAfter (true,3,5) (qualOwn 39) (finalCuts 39) (by decide) own0 (qGateOk _ _ _) numeric39 hs hl) (fun hs hl => excludeAfter (true,3,6) (qualOwn 40) (finalCuts 40) (by decide) w40_1_h (qGateOk _ _ _) numeric40 hs hl)
-  · exact fun hs hl => excludeAfter (true,3,5) (qualOwn 39) (finalCuts 39) (by decide) own0 (qGateOk _ _ _) numeric39 hs hl
-  · exact fun hs hl => excludeAfter (true,3,6) (qualOwn 40) (finalCuts 40) (by decide) w40_1_h (qGateOk _ _ _) numeric40 hs hl
+private theorem checkedPhase39 : phaseNum 39 := by unfold phaseNum; decide +kernel
+set_option maxRecDepth 100000 in
+set_option maxHeartbeats 0 in
+private theorem checkedPhase38 : phaseNum 38 := by unfold phaseNum; decide +kernel
+theorem excludeAllGates : ∀ e ∈ gtypes, noLiveGate e := orderedGates checkedPhase0 checkedPhase2 checkedPhase3 checkedPhase5 checkedPhase7 checkedPhase9 checkedPhase11 checkedPhase13 checkedPhase14 checkedPhase15 checkedPhase17 checkedPhase19 checkedPhase20 checkedPhase22 checkedPhase25 checkedPhase33 checkedPhase24 checkedPhase32 checkedPhase28 checkedPhase30 checkedPhase35 checkedPhase37 checkedPhase27 checkedPhase40 checkedPhase39 checkedPhase38
 end PEqualNP.Outside.L_meta_32273_aux.Source7
 theorem PEqualNP.Outside.L_meta_32273 : (∀ (gates : List PEqualNP.CircuitLowerBounds.Gate) (o : ℕ), (∀ g ∈ gates, (g.op = PEqualNP.CircuitLowerBounds.GateOp.and ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.or ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.not) ∧ g.inputs.length ≤ 2) → (∀ i j : Fin gates.length, (gates.get i).op = PEqualNP.CircuitLowerBounds.GateOp.not → (gates.get j).op = PEqualNP.CircuitLowerBounds.GateOp.not → i = j) → (∀ x : Fin 8 → Bool, PEqualNP.CircuitLowerBounds.Circuit.eval ⟨gates, o⟩ (List.ofFn x) = decide (∃ i < ([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 4, 6, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7] : List ℕ).length / 2, (List.ofFn x).getD (([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 4, 6, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7] : List ℕ).getD (2 * i) 0) false = true ∧ (List.ofFn x).getD (([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 4, 6, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7] : List ℕ).getD (2 * i + 1) 0) false = true)) → ∃ (gates' : List PEqualNP.CircuitLowerBounds.Gate) (o' : ℕ), (∀ g ∈ gates', (g.op = PEqualNP.CircuitLowerBounds.GateOp.and ∨ g.op = PEqualNP.CircuitLowerBounds.GateOp.or) ∧ g.inputs.length ≤ 2) ∧ gates'.length ≤ gates.length ∧ ∀ x : Fin 8 → Bool, PEqualNP.CircuitLowerBounds.Circuit.eval ⟨gates', o'⟩ (List.ofFn x) = decide (∃ i < ([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 4, 6, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7] : List ℕ).length / 2, (List.ofFn x).getD (([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 4, 6, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7] : List ℕ).getD (2 * i) 0) false = true ∧ (List.ofFn x).getD (([0, 3, 0, 4, 1, 4, 1, 5, 2, 5, 0, 6, 2, 6, 4, 6, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7] : List ℕ).getD (2 * i + 1) 0) false = true)) := PEqualNP.Outside.L_meta_32273_aux.finishFront PEqualNP.Outside.L_meta_32273_aux.Source7.unaryNumeric PEqualNP.Outside.L_meta_32273_aux.Source7.excludeAllGates
